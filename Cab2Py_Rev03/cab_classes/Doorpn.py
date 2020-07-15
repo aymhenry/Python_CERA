@@ -425,8 +425,8 @@ class Doorpn(CabUtils):
 			res3_QDFZCS =  0.45 * loc_QNDFZC
 			res4_QDFZFS =  0.45 * loc_QNDFZF
 
-			res7_QDFZCL =  0.25 * loc_QLFZC + 0.45 * loc_QNVFZC + com_WATERZ*( 1061.0 + 0.444 * loc_TFZCAB)
-			res8_QDFZFL =  0.25 * loc_QLFZF + 0.45 * loc_QNVFZF + com_WATERZ*(( 1061.0 + 0.444 * loc_TFZCAB) + (158.9 - 0.488*loc_TFRZE))
+			res7_QDFZCL =  0.25 * loc_QLFZC + 0.45 * loc_QNVFZC + self.com_WATERZ*( 1061.0 + 0.444 * loc_TFZCAB)
+			res8_QDFZFL =  0.25 * loc_QLFZF + 0.45 * loc_QNVFZF + self.com_WATERZ*(( 1061.0 + 0.444 * loc_TFZCAB) + (158.9 - 0.488*loc_TFRZE))
 		
 		return [res1_QDFFCS, res2_QDFFFS, res3_QDFZCS, res4_QDFZFS, res5_QDFFCL, res6_QDFFFL, res7_QDFZCL, res8_QDFZFL]
 		

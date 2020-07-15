@@ -155,7 +155,7 @@ class View (ABC):
 	def sec03_Mode2(self):
 		self.objCabout.write_or_terminate (" ")
 		self.objCabout.write_or_terminate ("Mullion")
-		self.objCabout.write_or_terminate (" ,Side of mullion from the outside wall, % 7.3f, of the fresh food compartmen" % ( Unit.feet_cm(self.obj_data.WALL) ) )
+		self.objCabout.write_or_terminate (" ,Side of mullion from the outside wall, % 7.3f, CM,from the outside wall of the fresh food compartment" % ( Unit.feet_cm(self.obj_data.WALL) ) )
 		self.objCabout.write_or_terminate (" ,Mullion thickness,% 7.3f, CM" % ( Unit.feet_cm(self.obj_data.THMUL) ) )
 
 		self.objCabout.write_or_terminate (" ")
@@ -681,7 +681,6 @@ class View (ABC):
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 class View_Ql2(View):
 	def show_final_results (self):
-		# Format 900
 		self.objCabout.write_or_terminate (' ')
 		self.objCabout.write_or_terminate ('HEAT LEAK BREAKDOWN')
 		self.objCabout.write_or_terminate (' , ,FRESH FOOD,FREEZER')
@@ -697,10 +696,10 @@ class View_Ql2(View):
 		self.objCabout.write_or_terminate (' ,Mullion'  + ',%10.2f,%10.2f'  % ( Unit.BtuH_Watt(self.obj_data.QMULN),  Unit.BtuH_Watt(self.obj_data.QMUL)   ))
 		self.objCabout.write_or_terminate (' ,Wedge'    + ',%10.2f,%10.2f'  % ( Unit.BtuH_Watt(self.obj_data.QWFF),   Unit.BtuH_Watt(self.obj_data.QWFZ)   ))
 		self.objCabout.write_or_terminate (' ,Gasket'   + ',%10.2f,%10.2f'  % ( Unit.BtuH_Watt(self.obj_data.QGR),    Unit.BtuH_Watt(self.obj_data.QGZF)   ))
-
-		self.objCabout.write_or_terminate (' ,Open door sensible load' + ',%10.2f,%10.2f'  % ( Unit.BtuH_Watt(QSDRFF),     Unit.BtuH_Watt(QSDRFZ)     ))
-		self.objCabout.write_or_terminate (' ,Moisture load - condense'+ ',%10.2f,%10.2f'  % ( Unit.BtuH_Watt(QLDRFF),     Unit.BtuH_Watt(QLDRFZ)     ))
-		self.objCabout.write_or_terminate (' ,Moisture load - frost'   + ',%10.2f,%10.2f'  % ( Unit.BtuH_Watt(QFDRFF),     Unit.BtuH_Watt(QFDRFZ)     ))
+		
+		self.objCabout.write_or_terminate (' ,Open door sensible load' + ',%10.2f,%10.2f'  % ( Unit.BtuH_Watt(self.obj_data.QSDRFF), Unit.BtuH_Watt(self.obj_data.QSDRFZ) ))
+		self.objCabout.write_or_terminate (' ,Moisture load - condense'+ ',%10.2f,%10.2f'  % ( Unit.BtuH_Watt(self.obj_data.QLDRFF), Unit.BtuH_Watt(self.obj_data.QLDRFZ) ))
+		self.objCabout.write_or_terminate (' ,Moisture load - frost'   + ',%10.2f,%10.2f'  % ( Unit.BtuH_Watt(self.obj_data.QFDRFF), Unit.BtuH_Watt(self.obj_data.QFDRFZ) ))
 
 		self.objCabout.write_or_terminate (' ,Anti-sweat heater'     + ',%10.2f,%10.2f'  % ( Unit.BtuH_Watt(self.obj_data.FFASHQ), Unit.BtuH_Watt(self.obj_data.FZASHQ) ))
 		self.objCabout.write_or_terminate (' ,Refrigerant line heat' + ',%10.2f,%10.2f'  % ( Unit.BtuH_Watt(self.obj_data.FFREFQ), Unit.BtuH_Watt(self.obj_data.FZREFQ) ))
@@ -713,7 +712,7 @@ class View_Ql2(View):
 	def show_rep (self):
 		self.rep_title ()
 		self.sec01_Mode238()
-		self.sec03_Mode2
+		self.sec03_Mode2 ()
 		self.sec08_Mode_all()
 		self.sec10_Mode23578()
 		self.sec11_Mode238()

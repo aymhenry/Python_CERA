@@ -244,14 +244,14 @@ class Ql5 (CabUtils):
 
 		lstRes = obj_doorpn.main()
 
-		cmo_QGZF   = lstRes [0]
-		cmo_QDFFFS = lstRes [1]
-		cmo_QDFZCS = lstRes [2]
-		cmo_QDFZFS = lstRes [3]
+		Cab.QDFFCS = lstRes [0]
+		Cab.QDFFFS = lstRes [1]
+		Cab.QDFZCS = lstRes [2]
+		Cab.QDFZFS = lstRes [3]
 
-		cmo_QDFFCL = lstRes [4]
-		cmo_QDFFFL = lstRes [5]
-		cmo_QDFZCL = lstRes [6]
-		cmo_QDFZFL = lstRes [7]
+		Cab.QDFFCL = lstRes [4]
+		Cab.QDFFFL = lstRes [5]
+		Cab.QDFZCL = lstRes [6]
+		Cab.QDFZFL = lstRes [7]
 		return 
 

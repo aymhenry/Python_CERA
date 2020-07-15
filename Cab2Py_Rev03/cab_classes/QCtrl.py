@@ -99,6 +99,9 @@ class QCtrl_Abstract (ABC):
 	# Output		:
 	#-----------------------------------------------------------
 	def set_ncctype (self):
+		# thi svalue is NA in mode 5
+		if self.obj_data.NMOD == 5: return
+		
 		ncc_type = None
 		if self.obj_data.CCHGT != 0.0:
 			if self.obj_data.CDUP != 0.0:
@@ -174,28 +177,21 @@ class QCtrl_Abstract (ABC):
 		self.obj_data.DOL = Unit.mm_inch (self.obj_data.DOL )
 		self.obj_data.DOL = Unit.cm_feet (self.obj_data.DOL )
 		
-		self.obj_data.TIRLS = Unit.cm_feet (self.obj_data.TIRLS )	
 		self.obj_data.TIFRS = Unit.cm_feet (self.obj_data.TIFRS )
 		
 		self.obj_data.DGSKT = Unit.cm_feet (self.obj_data.DGSKT )
 		#---------------------
+		self.obj_data.BINSUL = Unit.cm_feet (self.obj_data.BINSUL )
+		#---------------------
 		self.obj_data.TIFB = Unit.cm_feet (self.obj_data.TIFB )
 		self.obj_data.TIFF = Unit.cm_feet (self.obj_data.TIFF )
-		
-		self.obj_data.CDUP = Unit.cm_inch (self.obj_data.CDUP )
-		self.obj_data.CDDN = Unit.cm_inch (self.obj_data.CDDN )
-		self.obj_data.CCHGT = Unit.cm_inch (self.obj_data.CCHGT )
-			
 			
 		self.obj_data.COL = Unit.WattMK_BtuHrFtF (self.obj_data.COL )
 		self.obj_data.CIL = Unit.WattMK_BtuHrFtF (self.obj_data.CIL )
 		
 		self.obj_data.HXVUZ = Unit.liter_ft3 (self.obj_data.HXVUZ )
 		self.obj_data.VOLAZ = Unit.liter_ft3 (self.obj_data.VOLAZ )
-		self.obj_data.HXVUR = Unit.liter_ft3 (self.obj_data.HXVUR )
-		self.obj_data.VOLAR = Unit.liter_ft3 (self.obj_data.VOLAR )
 		
-		self.obj_data.HRFFC = ( self.obj_data.SECFFC / 3600.0 ) * self.obj_data.FFCOPN
 		self.obj_data.HRFRZ = ( self.obj_data.SECFRZ / 3600.0 ) * self.obj_data.FRZOPN
 		
 		self.obj_data.TDRAIR = Unit.c_f (self.obj_data.TDRAIR )
@@ -203,7 +199,7 @@ class QCtrl_Abstract (ABC):
 		
 		self.obj_data.TROOM = Unit.c_f (self.obj_data.TROOM )
 		self.obj_data.TFRZ = Unit.c_f (self.obj_data.TFRZ )
-		self.obj_data.TFF = Unit.c_f (self.obj_data.TFF )
+		
 		self.obj_data.TBTM = Unit.c_f (self.obj_data.TBTM )
 		
 		self.qrdset ( )
@@ -320,15 +316,16 @@ class QCtrl_Ql2 (QCtrl_Abstract):
 		obj_volume.calc_volume()
 
 	def calculte_cycle (self):
-		self.obj_data.QMULN = -self.obj_data.QMUL
+		self.calc_cycle_start()
 		
-		self.obj_data.QFFTOT = self.obj_data.QLSIDE + self.obj_data.QBACKL + self.obj_data.QFRNTL + self.obj_data.QLTOP  + self.obj_data.QLBTTM 	\
-			+ self.obj_data.QMULN  + self.obj_data.QWFF   + self.obj_data.QGR    + QSDRFF + QLDRFF 		\
-			+ QFDRFF + self.obj_data.FFASHQ + self.obj_data.FFHEAT + self.obj_data.FFREFQ + self.obj_data.FFPENA
+		self.obj_data.QMULN = -self.obj_data.QMUL
+		self.obj_data.QFFTOT = self.obj_data.QLSIDE       + self.obj_data.QBACKL + self.obj_data.QFRNTL + self.obj_data.QLTOP  + self.obj_data.QLBTTM 	\
+			+ self.obj_data.QMULN  + self.obj_data.QWFF   + self.obj_data.QGR    + self.obj_data.QSDRFF + self.obj_data.QLDRFF 		\
+			+ self.obj_data.QFDRFF + self.obj_data.FFASHQ + self.obj_data.FFHEAT + self.obj_data.FFREFQ + self.obj_data.FFPENA
 			
-		self.obj_data.QFZTOT = self.obj_data.QRSIDE + self.obj_data.QBACKR + self.obj_data.QFRNTR + self.obj_data.QRTOP  + self.obj_data.QRBTTM +		\
-			self.obj_data.QMUL + self.obj_data.QWFZ   + self.obj_data.QGZF   + QSDRFZ + QLDRFZ +		\
-			QFDRFZ + self.obj_data.FZASHQ + self.obj_data.FZHEAT + self.obj_data.FZREFQ + self.obj_data.FZPENA
+		self.obj_data.QFZTOT = self.obj_data.QRSIDE     + self.obj_data.QBACKR + self.obj_data.QFRNTR + self.obj_data.QRTOP  + self.obj_data.QRBTTM +		\
+			self.obj_data.QMUL   + self.obj_data.QWFZ   + self.obj_data.QGZF   + self.obj_data.QSDRFZ + self.obj_data.QLDRFZ +		\
+			self.obj_data.QFDRFZ + self.obj_data.FZASHQ + self.obj_data.FZHEAT + self.obj_data.FZREFQ + self.obj_data.FZPENA
 			
 		self.obj_data.QHTFF = self.obj_data.FFASHQ + self.obj_data.FFHEAT
 		self.obj_data.QHTFZ = self.obj_data.FZASHQ + self.obj_data.FZHEAT
@@ -338,7 +335,11 @@ class QCtrl_Ql2 (QCtrl_Abstract):
 		
 	def setup_vars_extra (self):
 		self.obj_data.setup_vars ( 0.0,	\
-			['BOTTOM','FLGB','NCCTYPE','RKIN', 'RKINFF','RKINFZ','WKINR','WKIN', 'DKINFF','DKINFZ','CKMUL', 'HLGZF','HLRG']\
+			['QRTOP','QFRNTR','QDFFCS','QLTOP','QMUL']\
+			)
+		
+		self.obj_data.setup_vars ( 0.0,	\
+			['BOTTOM','FLGB','NCCTYPE','RKIN', 'RKINFF','RKINFZ','WKINR','WKIN', 'DKINFF','DKINFZ','CKMUL']\
 			)
 		
 	def adjust_units (self):
@@ -347,10 +348,9 @@ class QCtrl_Ql2 (QCtrl_Abstract):
 		
 		self.obj_data.CINSUL = Unit.cm_feet (self.obj_data.CINSUL )
 		self.obj_data.TIFT = Unit.cm_feet (self.obj_data.TIFT )
-		
+		self.obj_data.TIRLS = Unit.cm_feet (self.obj_data.TIRLS )
 		self.obj_data.BINFRZ = Unit.cm_feet (self.obj_data.BINFRZ )
-		self.obj_data.TIRT = Unit.cm_inch (self.obj_data.TIRT )
-	
+		self.obj_data.TFF = Unit.c_f (self.obj_data.TFF )
 		#self.obj_data.RKIN = 0.0
 		
 		self.obj_data.RKINFF = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RFF )
@@ -367,8 +367,8 @@ class QCtrl_Ql2 (QCtrl_Abstract):
 		self.obj_data.TIRF = Unit.cm_feet(self.obj_data.TIRF )
 		self.obj_data.TIRB = Unit.cm_feet(self.obj_data.TIRB )		
 		#---
-		self.obj_data.CDUP = Unit.cm_feet(self.obj_data.CDUP )		
-		self.obj_data.CDDN = Unit.cm_feet(self.obj_data.CDDN )		
+		self.obj_data.CDUP = Unit.cm_feet(self.obj_data.CDUP )
+		self.obj_data.CDDN = Unit.cm_feet(self.obj_data.CDDN )
 		self.obj_data.CCHGT = Unit.cm_feet(self.obj_data.CCHGT )		
 		#-----
 		self.obj_data.WALL = Unit.cm_feet (self.obj_data.WALL )
@@ -383,14 +383,17 @@ class QCtrl_Ql2 (QCtrl_Abstract):
 		self.obj_data.FZHEAT = Unit.Watt_BtuH (self.obj_data.FZHEAT )
 		
 		self.obj_data.FZPENA = Unit.Watt_BtuH (self.obj_data.FZPENA )
-		self.obj_data.FFPENA = Unit.Watt_BtuH (self.obj_data.FFPENA )		
+		self.obj_data.FFPENA = Unit.Watt_BtuH (self.obj_data.FFPENA )
 		
-		#----
+		self.obj_data.HXVUR = Unit.liter_ft3 (self.obj_data.HXVUR )
+		self.obj_data.HRFFC = ( self.obj_data.SECFFC / 3600.0 ) * self.obj_data.FFCOPN
 		self.obj_data.WEDGE = Unit.cm_feet (self.obj_data.WEDGE )
 		self.obj_data.WEDGER = Unit.cm_feet (self.obj_data.WEDGER )
-				
+		self.obj_data.VOLAR = Unit.liter_ft3 (self.obj_data.VOLAR )
+		
 		self.obj_data.FLANGE = Unit.cm_feet (self.obj_data.FLANGE )
 		self.obj_data.FLANGER = Unit.cm_feet (self.obj_data.FLANGER )
+		self.obj_data.FLGB = self.obj_data.FLANGER
 
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # Job 			: Control class for Q113 (mode 1,3) 
@@ -426,16 +429,17 @@ class QCtrl_Ql13 (QCtrl_Abstract):
 		
 	def setup_vars_extra (self):
 		self.obj_data.setup_vars ( 0.0,	\
-			['QMUL','FLGB','NCCTYPE', 'RKIN', 'RKINFF','RKINFZ','WKINR','WKIN', 'DKINFF','DKINFZ','CKMUL', 'HLGZF']\
+			['QMUL','FLGB','NCCTYPE', 'RKIN', 'RKINFF','RKINFZ','WKINR','WKIN', 'DKINFF','DKINFZ','CKMUL']\
 			 )
 		
 	def adjust_units (self):
 		self.obj_data.HLFZG = Unit.WattM_BtuThHInchF ( self.obj_data.HLFZG )
-		self.obj_data.HLGZF = Unit.WattM_BtuThHInchF ( self.obj_data.HLGZF )
+		#self.obj_data.HLGZF = Unit.WattM_BtuThHInchF ( self.obj_data.HLGZF )
 		self.obj_data.HLRG  = Unit.WattM_BtuThHInchF ( self.obj_data.HLRG  )
 		
-		self.obj_data.BINSUL = Unit.cm_feet (self.obj_data.BINSUL )
+		self.obj_data.TFF = Unit.c_f (self.obj_data.TFF )
 		self.obj_data.TIRRS = Unit.cm_feet (self.obj_data.TIRRS )
+		self.obj_data.TIRLS = Unit.cm_feet (self.obj_data.TIRLS )
 		self.obj_data.TIFLS = Unit.cm_feet (self.obj_data.TIFLS )
 		self.obj_data.TIFT = Unit.cm_feet (self.obj_data.TIFT )
 		
@@ -462,31 +466,28 @@ class QCtrl_Ql13 (QCtrl_Abstract):
 		self.obj_data.FFPENA = Unit.Watt_BtuH (self.obj_data.FFPENA )
 		self.obj_data.FZPENA = Unit.Watt_BtuH (self.obj_data.FZPENA )
 		
-		#----------
+		self.obj_data.HRFFC = ( self.obj_data.SECFFC / 3600.0 ) * self.obj_data.FFCOPN
+		
 		self.obj_data.WEDGE = Unit.cm_feet (self.obj_data.WEDGE )
 		self.obj_data.WEDGER = Unit.cm_feet (self.obj_data.WEDGER )
 		
 		self.obj_data.FLANGE = Unit.cm_feet (self.obj_data.FLANGE )
 		self.obj_data.FLANGER = Unit.cm_feet (self.obj_data.FLANGER )
 		
-		#not found self.obj_data.FLGB = Unit.cm_feet (self.obj_data.FLGB )
-		#not found self.obj_data.FZEVAP = Unit.cm_feet (self.obj_data.FZEVAP )
-		
 		self.obj_data.TOPMUL = Unit.cm_feet (self.obj_data.TOPMUL )
 		self.obj_data.THMUL = Unit.cm_feet (self.obj_data.THMUL )
-		
-		#no mode 1 self.obj_data.TMS = Unit.cm_feet(self.obj_data.TMS )
-		#self.obj_data.TMB = Unit.cm_feet(self.obj_data.TMB )
-		#self.obj_data.TMF = Unit.cm_feet(self.obj_data.TMF )
-		#---
+
+		self.obj_data.HXVUR = Unit.liter_ft3 (self.obj_data.HXVUR )
+
 		self.obj_data.TIRF = Unit.cm_feet(self.obj_data.TIRF )
 		self.obj_data.TIRB = Unit.cm_feet(self.obj_data.TIRB )
+		self.obj_data.VOLAR = Unit.liter_ft3 (self.obj_data.VOLAR )
 		
 		self.obj_data.CDUP = Unit.cm_feet (self.obj_data.CDUP )
 		self.obj_data.CDDN = Unit.cm_feet (self.obj_data.CDDN )
 		self.obj_data.CCHGT = Unit.cm_feet (self.obj_data.CCHGT )
 		
-		self.obj_data.FLGB = self.obj_data.FLANGER		
+		self.obj_data.FLGB = self.obj_data.FLANGER
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # Job 			: Control class for Q1467 (mode 4,7) 
 #
@@ -521,7 +522,10 @@ class QCtrl_Ql467 (QCtrl_Abstract):
 		self.obj_data.FH = Unit.cm_inch (self.obj_data.FH )
 		self.obj_data.FW = Unit.cm_inch (self.obj_data.FW )
 		self.obj_data.FD = Unit.cm_inch (self.obj_data.FD )
-					
+		
+		self.obj_data.CDUP = Unit.cm_feet(self.obj_data.CDUP )
+		self.obj_data.CDDN = Unit.cm_feet(self.obj_data.CDDN )
+		
 		self.obj_data.RKIN = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RCAB )
 		self.obj_data.TKIN = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RTOP )
 
@@ -533,18 +537,9 @@ class QCtrl_Ql467 (QCtrl_Abstract):
 		self.obj_data.FZREFQ = Unit.Watt_BtuH (self.obj_data.FZREFQ )
 		self.obj_data.FZPENA = Unit.Watt_BtuH (self.obj_data.FZPENA )
 
-		#---
-		self.obj_data.TIRT = Unit.cm_feet(self.obj_data.TIRT )
-		#---
 		self.obj_data.FW = Unit.cm_feet(self.obj_data.FW )
 		self.obj_data.FD = Unit.cm_feet(self.obj_data.FD )
 		self.obj_data.FH = Unit.cm_feet(self.obj_data.FH )
-		#---
-		#self.obj_data.WEDGE = Unit.cm_feet (self.obj_data.WEDGE )
-		#self.obj_data.WEDGER = Unit.cm_feet (self.obj_data.WEDGER )
-		
-		#self.obj_data.FLANGE = Unit.cm_feet (self.obj_data.FLANGE )
-		#self.obj_data.FLANGER = Unit.cm_feet (self.obj_data.FLANGER )
 		
 		self.obj_data.FLGB = self.obj_data.FLANGER 
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -569,7 +564,7 @@ class QCtrl_Ql5 (QCtrl_Abstract):
 		
 		self.obj_data.QBTTM  = self.obj_data.QBOTTM       + self.obj_data.QSH    + self.obj_data.QSV
 		self.obj_data.QFZTOT = self.obj_data.QRSIDE       + self.obj_data.QLSIDE + self.obj_data.QBACK  + self.obj_data.QFRONT + self.obj_data.QTOP 	\
-			+ self.obj_data.QBTTM  + self.obj_data.QGZF   + self.obj_data.QSDRFZ + self.obj_data.QLDRFZ + self.obj_dataQFDRFZ 			\
+			+ self.obj_data.QBTTM  + self.obj_data.QGZF   + self.obj_data.QSDRFZ + self.obj_data.QLDRFZ + self.obj_data.QFDRFZ 			\
 			+ self.obj_data.FZASHQ + self.obj_data.FZHEAT + self.obj_data.FZREFQ + self.obj_data.FZPENA
 			
 		self.obj_data.QHTFZ  = self.obj_data.FZASHQ + self.obj_data.FZHEAT
@@ -580,11 +575,14 @@ class QCtrl_Ql5 (QCtrl_Abstract):
 		self.obj_data.setup_vars ( 0.0,	\
 			['RKIN', 'TKIN', 'HIWP', 'HLFZG']\
 			 )
+		
+		self.obj_data.setup_vars ( 0.0,	\
+			['QW','VOLAR','FFCOPN','HRFFC'] )
 	
 	def adjust_units (self):
 		
-		obj_data.TIFT = Unit.cm_feet (obj_data.TIFT )
-		obj_data.CINSUL = Unit.cm_feet (obj_data.CINSUL )
+		self.obj_data.TIFT = Unit.cm_feet (self.obj_data.TIFT )
+		self.obj_data.CINSUL = Unit.cm_feet (self.obj_data.CINSUL )
 		self.obj_data.CWIDE = Unit.cm_feet (self.obj_data.CWIDE )
 		self.obj_data.CHGT = Unit.cm_feet (self.obj_data.CHGT )
 		self.obj_data.SCIN = Unit.cm_feet (self.obj_data.SCIN )
@@ -592,11 +590,10 @@ class QCtrl_Ql5 (QCtrl_Abstract):
 		
 		self.obj_data.TFF = self.obj_data.TFRZ
 		self.obj_data.TIFLS = self.obj_data.TIFRS
-
+		
 		self.obj_data.RKIN = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RCAB )
 		self.obj_data.TKIN = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RTOP )
 		#---
-		
 		self.obj_data.FZASHQ = Unit.Watt_BtuH (self.obj_data.FZASHQ )
 		self.obj_data.FZREFQ = Unit.Watt_BtuH (self.obj_data.FZREFQ )
 		self.obj_data.FZHEAT = Unit.Watt_BtuH (self.obj_data.FZHEAT )
@@ -641,7 +638,7 @@ class QCtrl_Ql8 (QCtrl_Abstract):
 		
 	def setup_vars_extra (self):
 		self.obj_data.setup_vars ( 0.0,	\
-			['QBCOMP','FLGB','NCCTYPE', 'RKIN', 'RKINFF','RKINFZ','WKINR','WKIN', 'DKINFF','DKINFZ','CKMUL', 'HLGZF','HLRG']\
+			['QBCOMP','FLGB','NCCTYPE', 'RKIN', 'RKINFF','RKINFZ','WKINR','WKIN', 'DKINFF','DKINFZ','CKMUL']\
 			 )
 	
 	def adjust_units (self):
@@ -655,10 +652,13 @@ class QCtrl_Ql8 (QCtrl_Abstract):
 		self.obj_data.DKINFF = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RDRFF )
 		self.obj_data.DKINFZ = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RDRFZ )
 		self.obj_data.CKMUL = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RMUL )
-		self.obj_data.TIRT = Unit.cm_inch (self.obj_data.TIRT )
+		
+		self.obj_data.CDUP = Unit.cm_feet(self.obj_data.CDUP )
+		self.obj_data.CDDN = Unit.cm_feet(self.obj_data.CDDN )
 		
 		self.obj_data.HLGZF = Unit.WattM_BtuThHInchF ( self.obj_data.HLGZF )
 		self.obj_data.HLRG  = Unit.WattM_BtuThHInchF ( self.obj_data.HLRG  )
+		self.obj_data.HXVUR = Unit.liter_ft3 (self.obj_data.HXVUR )
 		#-----
 		self.obj_data.FFPENA = Unit.Watt_BtuH (self.obj_data.FFPENA )
 		self.obj_data.FZPENA = Unit.Watt_BtuH (self.obj_data.FZPENA )
@@ -675,6 +675,7 @@ class QCtrl_Ql8 (QCtrl_Abstract):
 		self.obj_data.WEDGE = Unit.cm_feet (self.obj_data.WEDGE )
 		self.obj_data.WEDGER = Unit.cm_feet (self.obj_data.WEDGER )
 		
+		self.obj_data.TIRLS = Unit.cm_feet (self.obj_data.TIRLS )
 		self.obj_data.TIRF = Unit.cm_feet(self.obj_data.TIRF )
 		self.obj_data.TIRB = Unit.cm_feet(self.obj_data.TIRB )	
 		
@@ -685,7 +686,10 @@ class QCtrl_Ql8 (QCtrl_Abstract):
 		self.obj_data.THMUL = Unit.cm_feet (self.obj_data.THMUL )
 		
 		self.obj_data.TIRT = Unit.cm_feet(self.obj_data.TIRT )
-				
+		self.obj_data.VOLAR = Unit.liter_ft3 (self.obj_data.VOLAR )
+		self.obj_data.HRFFC = ( self.obj_data.SECFFC / 3600.0 ) * self.obj_data.FFCOPN
+		self.obj_data.TFF = Unit.c_f (self.obj_data.TFF )
+
 		self.obj_data.FLGB = self.obj_data.FLANGER 
 		self.obj_data.TIFLS = self.obj_data.TIFRS
 		self.obj_data.TIRRS = self.obj_data.TIRLS

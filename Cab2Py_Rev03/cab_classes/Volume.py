@@ -25,7 +25,6 @@ class Volume (ABC):
 		self.BINSUL = obj_data.BINSUL + self.DINS
 
 		self.HXVUZ = self.obj_data.HXVUZ *1000 # change from liter to cm3
-		self.HXVUR = self.obj_data.HXVUR *1000 # change from liter to cm3
 	# --------------------
 	@abstractmethod
 	def calc_volume (self):
@@ -39,6 +38,7 @@ class Volume (ABC):
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 class Volume_Ql2(Volume):
 	def calc_volume (self): 
+		self.HXVUR = self.obj_data.HXVUR *1000 # change from liter to cm3
 		self.TIRT = self.obj_data.TIRT + self.DINS
 		self.TIRLS = self.obj_data.TIRLS + self.DINS
 		self.TIFT = self.obj_data.TIFT + self.DINS
@@ -89,6 +89,7 @@ class Volume_Ql2(Volume):
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 class Volume_Ql13 (Volume):
 	def calc_volume (self): 
+		self.HXVUR = self.obj_data.HXVUR *1000 # change from liter to cm3
 		self.TIFLS = self.obj_data.TIFLS + self.DINS
 		self.TIRRS = self.obj_data.TIRRS + self.DINS
 		self.TIRLS = self.obj_data.TIRLS + self.DINS
@@ -170,6 +171,10 @@ class Volume_Ql5(Volume):
 		
 		self.SCIN = self.obj_data.SCIN + self.DINS
 		self.STIN = self.obj_data.STIN + self.DINS
+		
+		self.obj_data.TIFLS = self.obj_data.TIFRS # create a new var in data
+		self.TIFLS = self.obj_data.TIFLS + self.DINS
+		#-----
 		
 		self.obj_data.VFZ = ( ( ( self.obj_data.WIDTH - self.TIFLS - self.TIFRS ) * ( self.obj_data.DEPTH - self.TIFF - self.TIFB ) * \
 			( self.obj_data.HEIGHT - self.BINSUL - self.TIFT ) ) - ( ( self.obj_data.DEPTH - self.TIFF - self.TIFB ) * ( self.obj_data.CWIDE - \

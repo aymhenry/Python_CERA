@@ -51,7 +51,7 @@ class Start:
 			print ("Expected resone, none propoer input data")
 			print ("=======================================\n\n")
 			sys.exit('3100')	# terminat application
-			
+		
 		self.view ()			# output results
 	#-----------------------------------------------------------
 	# Job 			: output results a reported form
@@ -100,7 +100,7 @@ class Start:
 		
 		# read data list from file, and put values in variables
 		obj_datamodel.build_var_list()
-		
+
 		# Is data is good, or exit application
 		if obj_datamodel.isError():
 			print (obj_datamodel.err_description() )	# print error description
@@ -108,7 +108,7 @@ class Start:
 
 		# Create related data object as the given configration
 		self.obj_data = obj_datamodel.get_data_object()
-				
+
 		# Create related object as the given configration
 		self.obj_control = ""
 		
@@ -143,10 +143,10 @@ class Start:
 		# Creates Vars & convert units
 		self.obj_control.set_vars_common()		# Create commom in abstract class
 		self.obj_control.setup_vars_extra()		# Create extra vars, indvidual for every class
-				
+		
 		self.obj_control.setMode()				# set mode in commom in abstract class
 		self.obj_control.set_ncctype()			# set ncctype in commom in abstract class
-		
+
 		# Calculate Volume
 		self.obj_control.volume()
 		
