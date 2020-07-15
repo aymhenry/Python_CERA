@@ -135,9 +135,6 @@ class Volume_Ql4(Volume):
 	def calc_volume (self): 
 		self.TIFLS = self.obj_data.TIFLS + self.DINS
 		self.TIFT = self.obj_data.TIFT + self.DINS
-		self.TIRF = self.obj_data.TIRF + self.DINS
-		self.TIRB = self.obj_data.TIRB + self.DINS
-		self.CINSUL = self.obj_data.CINSUL + self.DINS
 		
 		self.obj_data.VFZ = self.obj_data.VOLAZ
 		self.obj_data.VFF = ( self.obj_data.WIDTH - self.TIFLS - self.TIFRS ) * ( self.obj_data.HEIGHT - self.BINSUL - self.TIFT ) * 	\

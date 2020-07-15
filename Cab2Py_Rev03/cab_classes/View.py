@@ -109,7 +109,7 @@ class View (ABC):
 	#-----------------------------------------------------------
 	def sec01_Mode238 (self): # configration 3 (1 or 7) 2
 		self.objCabout.write_or_terminate ("Freezer:") # Fortran 890
-		self.objCabout.write_or_terminate (" ,Wedge deep,% 7.3f ,CM" % ( Unit.feet_cm(self.obj_data.WEDGE  ) ) )
+		self.objCabout.write_or_terminate (" ,Wedge deep,   % 7.3f ,CM" % ( Unit.feet_cm(self.obj_data.WEDGE  ) ) )
 		self.objCabout.write_or_terminate (" ,Flanges wide, % 7.3f ,CM" % ( Unit.feet_cm(self.obj_data.FLANGE ) ) )
 
 		self.objCabout.write_or_terminate ("Fresh food compartment:") # Fortran 891
@@ -129,7 +129,7 @@ class View (ABC):
 	# Output		:
 	#-----------------------------------------------------------
 	def sec02_Mode47(self):
-		self.objCabout.write_or_terminate ("  ,Wedge deep, ,% 7.3f,CM" % ( Unit.feet_cm(self.obj_data.WEDGE ) ) )
+		self.objCabout.write_or_terminate ("  ,Wedge deep,  % 7.3f,CM" % ( Unit.feet_cm(self.obj_data.WEDGE ) ) )
 		self.objCabout.write_or_terminate ("  ,Flanges wide,% 7.3f,CM" % ( Unit.feet_cm(self.obj_data.FLANGE) ) )
 
 	#-----------------------------------------------------------
@@ -233,8 +233,8 @@ class View (ABC):
 	def sec05_Mode5(self):
 		self.objCabout.write_or_terminate (" ")
 		self.objCabout.write_or_terminate ("COMPRESSOR COMPARTMENT")
-		self.objCabout.write_or_terminate (" ,Height, % 7.3f, CM" %( Unit.inch_cm(self.obj_data.CWIDE)) )
-		self.objCabout.write_or_terminate (" ,Width,  % 7.3f, CM" %( Unit.inch_cm(self.obj_data.CHGT) ) )
+		self.objCabout.write_or_terminate (" ,Height, % 7.3f, CM" %( Unit.feet_cm(self.obj_data.CWIDE)) )
+		self.objCabout.write_or_terminate (" ,Width,  % 7.3f, CM" %( Unit.feet_cm(self.obj_data.CHGT) ) )
 
 		self.objCabout.write_or_terminate (" ")
 		self.objCabout.write_or_terminate ("INSULATION THICKNESS (CM) ")
@@ -245,10 +245,10 @@ class View (ABC):
 		self.objCabout.write_or_terminate (" ,Back, % 7.3f, CM" %( Unit.feet_cm(self.obj_data.TIFB) ) )
 
 		self.obj_data.TIFLS = self.obj_data.TIFRS
-		self.objCabout.write_or_terminate ("Bottom, % 7.3f, CM" %( Unit.feet_cm(self.obj_data.BINSUL) ) )
+		self.objCabout.write_or_terminate (" ,Bottom, % 7.3f, CM" %( Unit.feet_cm(self.obj_data.BINSUL) ) )
 
-		self.objCabout.write_or_terminate (" ,Compartment side, % 7.3f,CM" %( Unit.inch_cm(self.obj_data.SCIN) ) )
-		self.objCabout.write_or_terminate (" ,Compartment top,  % 7.3f,CM" %( Unit.inch_cm(self.obj_data.STIN) ) )
+		self.objCabout.write_or_terminate (" ,Compartment side, % 7.3f,CM" %( Unit.feet_cm(self.obj_data.SCIN) ) )
+		self.objCabout.write_or_terminate (" ,Compartment top,  % 7.3f,CM" %( Unit.feet_cm(self.obj_data.STIN) ) )
 	
 	#-----------------------------------------------------------
 	# Job 			: show input data, this section is displayed for modes 4,7
@@ -425,10 +425,6 @@ class View (ABC):
 		self.objCabout.write_or_terminate ("  ,Freezer cabinet,        % 7.3f, DEG C " % ( Unit.f_c(self.obj_data.TFRZ) ) )
 		self.objCabout.write_or_terminate ("  ,Fresh food cabinet,     % 7.3f, DEG C " % ( Unit.f_c(self.obj_data.TFF)  ) )
 		self.objCabout.write_or_terminate ("  ,Air under refrigerator, % 7.3f, DEG C " % ( Unit.f_c(self.obj_data.TBTM) ) )
-
-		#	RCAB = 1.0/(self.obj_data.RKIN * 12.0)
-		#	RWEDGE = 1.0/(self.obj_data.WKIN * 12.0)
-		#	RDOOR = 1.0/(self.obj_data.DKIN * 12.0)
 			
 		self.objCabout.write_or_terminate (" ")
 		self.objCabout.write_or_terminate ("THERMAL CHARACTERISTICS")
@@ -437,7 +433,8 @@ class View (ABC):
 		self.objCabout.write_or_terminate ("  ,Cabinet,% 10.4f,m2-C/W-cm " % ( 1.0/Unit.BtuHrFtF_CmWattF2K(self.obj_data.RKIN) )  )
 		self.objCabout.write_or_terminate ("  ,Wedge,  % 10.4f,m2-C/W-cm " % ( 1.0/Unit.BtuHrFtF_CmWattF2K(self.obj_data.WKIN)) )
 		self.objCabout.write_or_terminate ("  ,Door,   % 10.4f,m2-C/W-cm " % ( 1.0/Unit.BtuHrFtF_CmWattF2K(self.obj_data.DKIN) ) )
-		self.objCabout.write_or_terminate ("  ,Gasket heat leak,   % 10.4f, W/m-C" % ( Unit.CmWattF2K_BtuInchHrF2F(  Unit.BtuThHInchF_WattM (self.obj_data.HLFZG)   )) )
+		self.objCabout.write_or_terminate ("  ,Door,   % 10.4f,m2-C/W-cm " % ( 1.0/Unit.BtuHrFtF_CmWattF2K(self.obj_data.DKIN) ) )
+		self.objCabout.write_or_terminate ("  ,Gasket heat leak,   % 10.4f, W/m-C" % ( Unit.BtuThHInchF_WattM(self.obj_data.HLFZG ) ) ) 
 	
 	#-----------------------------------------------------------
 	# Job 			: show input data, this section is displayed for mode 5
@@ -459,7 +456,7 @@ class View (ABC):
 		self.objCabout.write_or_terminate ("Thermal resistivity")
 		self.objCabout.write_or_terminate ("  ,Freezer cabinet,    % 10.4f, m2-C/W-cm" % ( 1.0/Unit.BtuHrFtF_CmWattF2K(self.obj_data.RKIN)) )
 		self.objCabout.write_or_terminate ("  ,Freezer top (door), % 10.4f, m2-C/W-cm" % ( 1.0/Unit.BtuHrFtF_CmWattF2K(self.obj_data.TKIN)  ) )
-
+		
 		self.objCabout.write_or_terminate ("  ,Gasket heat leak,% 10.4f, W/m-C" % ( Unit.BtuThHInchF_WattM (self.obj_data.HLFZG) ) )
 	
 	#-----------------------------------------------------------
@@ -475,19 +472,15 @@ class View (ABC):
 		self.objCabout.write_or_terminate ("  ,Freezer cabinet,        % 7.3f, DEG C " % ( Unit.f_c(self.obj_data.TFRZ) ) )
 		self.objCabout.write_or_terminate ("  ,Air under refrigerator, % 7.3f, DEG C " % ( Unit.f_c(self.obj_data.TBTM) ) )
 
-		#RCAB = 1.0/(self.obj_data.RKIN * 12.0)
-		#RWEDGE = 1.0/(self.obj_data.WKIN * 12.0)
-		#RDOOR = 1.0/(self.obj_data.DKIN * 12.0)
-
 		self.objCabout.write_or_terminate (" ")
 		self.objCabout.write_or_terminate ("THERMAL CHARACTERISTICS")
 		self.objCabout.write_or_terminate ("Thermal resistivity")
 
-		self.objCabout.write_or_terminate ("  ,Cabinet,% 10.4f,m2-C/W-cm " % ( Unit.CmWattF2K_BtuInchHrF2F(RCAB) )  )
-		self.objCabout.write_or_terminate ("  ,Wedge,  % 10.4f,m2-C/W-cm " % ( Unit.CmWattF2K_BtuInchHrF2F(RWEDGE)) )
-		self.objCabout.write_or_terminate ("  ,Door,   % 10.4f,m2-C/W-cm " % ( Unit.CmWattF2K_BtuInchHrF2F(RDOOR) ) )
+		self.objCabout.write_or_terminate ("  ,Cabinet,% 10.4f,m2-C/W-cm " % ( Unit.CmWattF2K_BtuInchHrF2F(self.obj_data.RCAB) )  )
+		self.objCabout.write_or_terminate ("  ,Wedge,  % 10.4f,m2-C/W-cm " % ( Unit.CmWattF2K_BtuInchHrF2F(self.obj_data.RWEDGE)) )
+		self.objCabout.write_or_terminate ("  ,Door,   % 10.4f,m2-C/W-cm " % ( Unit.CmWattF2K_BtuInchHrF2F(self.obj_data.RDOOR) ) )
 
-		self.objCabout.write_or_terminate ("  ,Gasket heat leak   % 10.4f W/m-C " % ( Unit.BtuThHInchF_WattM (self.obj_data.HLFZG) ) )
+		self.objCabout.write_or_terminate ("  ,Gasket heat leak,   % 10.4f, W/m-C " % ( Unit.BtuThHInchF_WattM (self.obj_data.HLFZG) ) )
 	
 	#-----------------------------------------------------------
 	# Job 			: show input data, this section is displayed for modes 2,3,8
@@ -618,8 +611,8 @@ class View (ABC):
 		self.objCycout.write_or_terminate (" ,Outside cabinet power,%10.2f,W" % ( self.obj_data.OTHERW ) )
 
 		self.objCycout.write_or_terminate (" ,Room temperature ,%10.2f,DEG C " % ( Unit.f_c(self.obj_data.TROOM) ) )
-		self.objCycout.write_or_terminate (" ,Fresh food temperature ,%10.2f, DEG C " % ( Unit.f_c(self.obj_data.TFF)   ) )
-		self.objCycout.write_or_terminate (" ,Freezer temperature ,%10.2f, DEG C " % ( Unit.f_c(self.obj_data.TFRZ)  ) )
+		self.objCycout.write_or_terminate (" ,Fresh food temperature ,%7.3f, DEG C " % ( Unit.f_c(self.obj_data.TFF)   ) )
+		self.objCycout.write_or_terminate (" ,Freezer temperature ,%7.3f, DEG C " % ( Unit.f_c(self.obj_data.TFRZ)  ) )
 	
 	#-----------------------------------------------------------
 	# Job 			: show input data (cycle report), this section is displayed for mode 4
@@ -827,6 +820,7 @@ class View_Ql5(View):
 	# -----------------------------------
 	def show_rep (self):
 		self.rep_title ()
+		self.sec05_Mode5()
 		self.sec08_Mode_all()
 		self.sec10_Mode23578()
 		self.sec16_Mode5()

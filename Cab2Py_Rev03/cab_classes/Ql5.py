@@ -33,14 +33,14 @@ class Ql5 (CabUtils):
 		# Cab.CWIDE 	The width  of the compressor compartment
 		# Cab.CHGT 		The height of the compressor compartment
 		#
-		Cab.CWIDE = Cab.CWIDE +  Cab.SCIN
-		Cab.CHGT  = Cab.CHGT  +  Cab.STIN
+		CWIDE = Cab.CWIDE +  Cab.SCIN
+		CHGT  = Cab.CHGT  +  Cab.STIN
 		
 		TIFS = Cab.TIFRS
-		W1 = Cab.WIDTH  -  Cab.CWIDE  -  TIFS
-		W2 = Cab.CWIDE  -  TIFS
+		W1 = Cab.WIDTH  -  CWIDE  -  TIFS
+		W2 = CWIDE  -  TIFS
 		H1 = Cab.HEIGHT  -  Cab.BINSUL  -  Cab.TIFT  -  Cab.DGSKT 
-		H2 = Cab.HEIGHT  -  Cab.CHGT  -  Cab.TIFT  -  Cab.DGSKT   
+		H2 = Cab.HEIGHT  -  CHGT  -  Cab.TIFT  -  Cab.DGSKT   
 		DC = Cab.DEPTH  -  Cab.TIFF  -  Cab.TIFB
 		WC = Cab.WIDTH  -  TIFS  -  TIFS
 		HC = Cab.HEIGHT  -  Cab.TIFT  -  Cab.BINSUL  -  Cab.DGSKT 
@@ -67,7 +67,7 @@ class Ql5 (CabUtils):
 			 +  TAVGC * 0.15 * (2.0 * Cab.TIFF + 2.0 * TIFS + 2.0 * Cab.TIFT) / 9.0 
 
 		AIFRONT = (H1 * W1)  +  (H2 * W2)
-		AOFRONT = (Cab.HEIGHT - Cab.DGSKT) * Cab.WIDTH  -  (Cab.CHGT - Cab.STIN) * (Cab.CWIDE - Cab.SCIN)       
+		AOFRONT = (Cab.HEIGHT - Cab.DGSKT) * Cab.WIDTH  -  (CHGT - Cab.STIN) * (CWIDE - Cab.SCIN)       
 
 		if Cab.HIWP != 0:
 			RAWP = 1.0 / (Cab.HIWP * AIFRONT)
@@ -88,7 +88,7 @@ class Ql5 (CabUtils):
 			+  TAVGC * 0.15 * (2.0 * Cab.TIFB + 2.0 * TIFS + 2.0 * Cab.TIFT) / 9.0
 
 		AIBACK = (H1 * W1)  +  (H2 * W2)
-		AOBACK = (Cab.HEIGHT - Cab.DGSKT) * Cab.WIDTH  -  (Cab.CHGT - Cab.STIN) * (Cab.CWIDE - Cab.SCIN)        
+		AOBACK = (Cab.HEIGHT - Cab.DGSKT) * Cab.WIDTH  -  (CHGT - Cab.STIN) * (CWIDE - Cab.SCIN)        
 
 		if Cab.HIWP != 0:
 			RAWP = 1.0 / (Cab.HIWP * AIBACK)
@@ -126,7 +126,7 @@ class Ql5 (CabUtils):
 			+  Cab.TIFB) / 9.0
 
 		AIRSIDE = H2 * DC
-		AORSIDE = (Cab.HEIGHT - Cab.DGSKT - Cab.CHGT + Cab.STIN) * Cab.DEPTH
+		AORSIDE = (Cab.HEIGHT - Cab.DGSKT - CHGT + Cab.STIN) * Cab.DEPTH
 
 		if Cab.HIWP != 0:
 			RAWP = 1.0 / (Cab.HIWP * AIRSIDE)
@@ -161,7 +161,7 @@ class Ql5 (CabUtils):
 			(4.0 * Cab.STIN + 2.0 * TIFS + 2.0 * Cab.SCIN + 2.0 * Cab.TIFF + 2.0 * Cab.TIFB) / 9.0)      
 
 		AISH = W2 * DC
-		AOSH = Cab.DEPTH * (Cab.CWIDE - Cab.SCIN)
+		AOSH = Cab.DEPTH * (CWIDE - Cab.SCIN)
 
 		if Cab.HIWP != 0:
 			RAWP = 1.0 / (Cab.HIWP * AISH)
@@ -178,8 +178,8 @@ class Ql5 (CabUtils):
 			+  0.15 * (4.0 * Cab.SCIN + 2.0 * Cab.BINSUL + 2.0 * Cab.STIN + 2.0 * Cab.TIFF	\
 			+  2.0 * Cab.TIFB) / 9.0)              
 
-		AISV = (Cab.CHGT - Cab.BINSUL) * DC             
-		AOSV = Cab.DEPTH * (Cab.CHGT - Cab.STIN)
+		AISV = (CHGT - Cab.BINSUL) * DC             
+		AOSV = Cab.DEPTH * (CHGT - Cab.STIN)
 
 		if Cab.HIWP != 0:
 			 RAWP = 1.0 / (Cab.HIWP * AISV)
@@ -198,7 +198,7 @@ class Ql5 (CabUtils):
 		#     Heat leak through cab.bottom
 		#
 		AIB1 = W1 * DC
-		AOB1 = Cab.DEPTH * (Cab.WIDTH - Cab.CWIDE + Cab.SCIN)     
+		AOB1 = Cab.DEPTH * (Cab.WIDTH - CWIDE + Cab.SCIN)     
 		RBOT = Cab.RKIN * (AIB1 / Cab.BINSUL  +  1.08 * (W1 + DC) / 2.0  +  0.15 * (4.0 * Cab.BINSUL	\
 			+  2.0 * Cab.TIFF + 2.0 * Cab.TIFB + 2.0 * Cab.SCIN + 2.0 * TIFS) / 9.0)
 

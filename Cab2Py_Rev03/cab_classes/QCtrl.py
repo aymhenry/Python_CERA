@@ -171,11 +171,8 @@ class QCtrl_Abstract (ABC):
 		self.obj_data.WIDTH = Unit.cm_feet (self.obj_data.WIDTH )
 		self.obj_data.DEPTH = Unit.cm_feet (self.obj_data.DEPTH )
 		
-		self.obj_data.DIL = Unit.mm_inch (self.obj_data.DIL )
-		self.obj_data.DIL = Unit.cm_feet (self.obj_data.DIL )
-		
-		self.obj_data.DOL = Unit.mm_inch (self.obj_data.DOL )
-		self.obj_data.DOL = Unit.cm_feet (self.obj_data.DOL )
+		self.obj_data.DIL = Unit.mm_feet (self.obj_data.DIL )
+		self.obj_data.DOL = Unit.mm_feet (self.obj_data.DOL )
 		
 		self.obj_data.TIFRS = Unit.cm_feet (self.obj_data.TIFRS )
 		
@@ -434,7 +431,6 @@ class QCtrl_Ql13 (QCtrl_Abstract):
 		
 	def adjust_units (self):
 		self.obj_data.HLFZG = Unit.WattM_BtuThHInchF ( self.obj_data.HLFZG )
-		#self.obj_data.HLGZF = Unit.WattM_BtuThHInchF ( self.obj_data.HLGZF )
 		self.obj_data.HLRG  = Unit.WattM_BtuThHInchF ( self.obj_data.HLRG  )
 		
 		self.obj_data.TFF = Unit.c_f (self.obj_data.TFF )
@@ -495,11 +491,19 @@ class QCtrl_Ql13 (QCtrl_Abstract):
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 class QCtrl_Ql467 (QCtrl_Abstract):
 	def	view (self, str_cab_out, str_cycle):
-		obj_view = View_Ql467(self.obj_data, str_cab_out, str_cycle)
+		if self.obj_data.NMOD == 7:
+			obj_view = View_Ql7(self.obj_data, str_cab_out, str_cycle)
+		else:
+			obj_view = View_Ql4(self.obj_data, str_cab_out, str_cycle)
+			
 		obj_view.show_rep()
 
 	def volume (self):
-		obj_volume = Volume_Ql467(self.obj_data)
+		if self.obj_data.NMOD==4:
+			obj_volume = Volume_Ql4(self.obj_data)
+		else:
+			obj_volume = Volume_Ql7(self.obj_data)
+			
 		obj_volume.calc_volume()
 		
 	def calculte (self):
@@ -511,14 +515,15 @@ class QCtrl_Ql467 (QCtrl_Abstract):
 		
 	def setup_vars_extra (self):
 		self.obj_data.setup_vars ( 0.0,\
-		['BOTTOM','FLGB','NCCTYPE',  'RKIN', 'TKIN', 'HIWP', 'HLFZG']\
+		['BOTTOM','FLGB','NCCTYPE',  'RKIN', 'TKIN', 'HIWP']\
 			 )
-	
-	def adjust_units (self):
-		obj_data.TIFLS = Unit.cm_feet (obj_data.TIFLS )
-		obj_data.TIFT = Unit.cm_feet (obj_data.TIFT )
+		self.obj_data.setup_vars ( 0.0,['FH','FW','FD','RTOP','VOLAR','FFCOPN','HRFFC'])
 		
-		obj_data.CINSUL = Unit.cm_feet (obj_data.CINSUL )
+	def adjust_units (self):
+		self.obj_data.TIFLS = Unit.cm_feet (self.obj_data.TIFLS )
+		self.obj_data.TIFT = Unit.cm_feet (self.obj_data.TIFT )
+		
+		self.obj_data.CINSUL = Unit.cm_feet (self.obj_data.CINSUL )
 		self.obj_data.FH = Unit.cm_inch (self.obj_data.FH )
 		self.obj_data.FW = Unit.cm_inch (self.obj_data.FW )
 		self.obj_data.FD = Unit.cm_inch (self.obj_data.FD )
@@ -527,9 +532,13 @@ class QCtrl_Ql467 (QCtrl_Abstract):
 		self.obj_data.CDDN = Unit.cm_feet(self.obj_data.CDDN )
 		
 		self.obj_data.RKIN = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RCAB )
-		self.obj_data.TKIN = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RTOP )
-
-		#self.obj_data.HIWP = 0.0
+		self.obj_data.WKIN = 1.0/Unit.BtuHrFtF_CmWattF2K (self.obj_data.RWEDGE) 
+		self.obj_data.DKIN = 1.0/Unit.BtuHrFtF_CmWattF2K (self.obj_data.RDOOR) 
+		
+		self.obj_data.RCAB = 1.0 / ( self.obj_data.RKIN *12)
+		self.obj_data.RWEDGE = 1.0 / ( self.obj_data.WKIN *12)
+		self.obj_data.RDOOR = 1.0 / ( self.obj_data.RKIN *12)
+		
 		self.obj_data.HLFZG = Unit.WattM_BtuThHInchF (self.obj_data.HLFZG )
 		#---
 		self.obj_data.FZHEAT = Unit.Watt_BtuH (self.obj_data.FZHEAT )
@@ -540,8 +549,12 @@ class QCtrl_Ql467 (QCtrl_Abstract):
 		self.obj_data.FW = Unit.cm_feet(self.obj_data.FW )
 		self.obj_data.FD = Unit.cm_feet(self.obj_data.FD )
 		self.obj_data.FH = Unit.cm_feet(self.obj_data.FH )
+
+		self.obj_data.TFF = Unit.c_f (self.obj_data.TFF )
+		self.obj_data.WEDGE = Unit.cm_feet (self.obj_data.WEDGE )
+		self.obj_data.FLANGE = Unit.cm_feet (self.obj_data.FLANGE )
+		self.obj_data.FLGB = self.obj_data.FLANGE
 		
-		self.obj_data.FLGB = self.obj_data.FLANGER 
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # Job 			:  Control class for Q15 (mode 5) 
 #
@@ -573,18 +586,19 @@ class QCtrl_Ql5 (QCtrl_Abstract):
 
 	def setup_vars_extra (self):
 		self.obj_data.setup_vars ( 0.0,	\
-			['RKIN', 'TKIN', 'HIWP', 'HLFZG']\
+			['RKIN', 'TKIN', 'HIWP']\
 			 )
 		
 		self.obj_data.setup_vars ( 0.0,	\
 			['QW','VOLAR','FFCOPN','HRFFC'] )
 	
 	def adjust_units (self):
-		
 		self.obj_data.TIFT = Unit.cm_feet (self.obj_data.TIFT )
 		self.obj_data.CINSUL = Unit.cm_feet (self.obj_data.CINSUL )
+		
 		self.obj_data.CWIDE = Unit.cm_feet (self.obj_data.CWIDE )
 		self.obj_data.CHGT = Unit.cm_feet (self.obj_data.CHGT )
+		
 		self.obj_data.SCIN = Unit.cm_feet (self.obj_data.SCIN )
 		self.obj_data.STIN = Unit.cm_feet (self.obj_data.STIN )
 		
@@ -593,6 +607,7 @@ class QCtrl_Ql5 (QCtrl_Abstract):
 		
 		self.obj_data.RKIN = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RCAB )
 		self.obj_data.TKIN = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RTOP )
+		self.obj_data.RCAB = 1.0 / ( self.obj_data.RKIN *12)
 		#---
 		self.obj_data.FZASHQ = Unit.Watt_BtuH (self.obj_data.FZASHQ )
 		self.obj_data.FZREFQ = Unit.Watt_BtuH (self.obj_data.FZREFQ )
@@ -648,7 +663,7 @@ class QCtrl_Ql8 (QCtrl_Abstract):
 		self.obj_data.RKINFZ = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RFRZ )
 		self.obj_data.WKINR = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RWEDGER )
 		self.obj_data.WKIN = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RWEDGE )
-		
+				
 		self.obj_data.DKINFF = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RDRFF )
 		self.obj_data.DKINFZ = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RDRFZ )
 		self.obj_data.CKMUL = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RMUL )
@@ -689,7 +704,7 @@ class QCtrl_Ql8 (QCtrl_Abstract):
 		self.obj_data.VOLAR = Unit.liter_ft3 (self.obj_data.VOLAR )
 		self.obj_data.HRFFC = ( self.obj_data.SECFFC / 3600.0 ) * self.obj_data.FFCOPN
 		self.obj_data.TFF = Unit.c_f (self.obj_data.TFF )
-
+		
 		self.obj_data.FLGB = self.obj_data.FLANGER 
 		self.obj_data.TIFLS = self.obj_data.TIFRS
 		self.obj_data.TIRRS = self.obj_data.TIRLS

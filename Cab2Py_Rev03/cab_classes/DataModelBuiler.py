@@ -131,7 +131,7 @@ class DataModelBuiler (FileAccess):
 
 		elif self.int_configration == 7:
 			lst_var_names = lst_config1
-
+		
 		# send data list of variable, and relative list of values to data object.
 		# data object put values of data list on variable
 		self.obj_qdata.setup_vars ( self.lst_data, lst_var_names\
@@ -216,7 +216,7 @@ class DataModelBuiler (FileAccess):
 
 		# every configration has a set of data, configration no.1 requires 71, 2 requires 68, and so on
 		# no number in this list more than MAX_DATA_FILE_TO_READ, or this constant needs update
-		lst_required_data = [ 71,68,71, 44,0,47,71]
+		lst_required_data = [ 71,68,71, 44, 47,53,71]
 		
 		# read feed_back, related number of data to read
 		feed_back = self.getData_from_list (DataModelBuiler.CONFIGRATION_ROW,"int")
