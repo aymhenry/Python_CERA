@@ -216,6 +216,7 @@ class Volume_Ql7(Volume):
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 class Volume_Ql8(Volume):
 	def calc_volume (self): 
+		self.HXVUR = self.obj_data.HXVUR *1000 # change from liter to cm3	
 		self.TIRT = self.obj_data.TIRT + self.DINS
 		self.TIRF = self.obj_data.TIRF + self.DINS
 		self.TIRB = self.obj_data.TIRB + self.DINS

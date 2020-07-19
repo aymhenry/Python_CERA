@@ -50,29 +50,67 @@ class Ql2 (CabUtils):
 		# *** = Heat leak through edge is accounted for in the mullion heat leak calculation.
 		#
 		# Calculate the internal dimensions of the two compartments, freezer (FRZ), and fresh food compartment (FFC)
-
+		#
 		#	Internal dimensions
-		loc_TIFS = Cab.TIFRS
-		loc_TIRS = Cab.TIRLS
+		# -=-=-=-=-=-=-=-=-=-=-
+		loc_TIFS = Cab.TIFRS		# thickness of insulation on right side of freezer
+		loc_TIRS = Cab.TIRLS		# thickness of insulation on left side of refrigerator
 
+		# Effective height is height without
+		#	max. thickness of bottom insulation
+		#	thickness of top insulation
 		loc_HFRZ = Cab.HEIGHT - Cab.BINFRZ - Cab.TIFT
+
+		# Effective depth is depth without
+		#	thickness of insulation on front of freezer
+		#	thickness of back insulation
+		#	Freezer Freezer Wedge
+		#	Door Gasket Thickness
 		loc_DFRZ = Cab.DEPTH  - Cab.TIFF   - Cab.TIFB  - Cab.WEDGE - Cab.DGSKT
+
+		# Effective widith is width without
+		#	Distance From The Outside Wall Of The Fresh Food
+		#	thickness of the mullion
+		#	thickness of insulation on right side of freezer
 		loc_WFRZ = Cab.WIDTH  - Cab.WALL   - Cab.THMUL - loc_TIFS
 
+		# Effective Depth is the depth without
+		#	thickness of insulation on front of fresh food compartment
+		#	thickness of insulation on back of fresh food compartment
+		#	Fresh Food Compartment Wedge
+		#	Door Gasket Thickness
 		loc_DFFC = Cab.DEPTH  - Cab.TIRF   - Cab.TIRB  - Cab.WEDGER - Cab.DGSKT
+		
+		# Deferance between
+		#	Distance From The Outside Wall Of The Fresh Food
+		#	thickness of insulation on sides of fresh food compartment.
 		loc_WFFC = Cab.WALL   - loc_TIRS
+		
+		# Effective height is height without
+		#	maximum thickness of bottom insulation fresh food
+		#	thickness of insulation on top of fresh food compartment.
 		loc_HFFC = Cab.HEIGHT - Cab.BINSUL - Cab.TIRT
 
+		# inialize valuse
 		loc_ALPHA = 0.0
 		loc_BETA = 0.0
 
-		if Cab.NCCTYPE == 2:
-			loc_BETA = math.atan(Cab.CDDN/Cab.CCHGT)
+		if Cab.NCCTYPE == 2:	# NCC type depends on CCHGT: Compartment Height & CDUP: Top Depth dimensions of compressor
+			# Beta angle betwwen Compressor Compartment Bottom and Height
+			loc_BETA = math.atan(Cab.CDDN/Cab.CCHGT) #  Compressor Compartment Bottom Depth/ Height
 			loc_ALPHA = math.pi /4.0 - loc_BETA / 2.0
-
+			
+			# loc_H1F is height without
+			#	Fresh Food Compartment Wedge
+			#	Door Gasket Thickness
 			loc_H1F = Cab.HEIGHT - Cab.BINSUL - Cab.TIRT
+			
+			# Effective height is height without
+			#	max. thickness of bottom insulation
+			#	thickness of top insulation
 			loc_H1Z = Cab.HEIGHT - Cab.BINFRZ - Cab.TIFT
-
+			
+			# CCHGT :Compressor Compartment Height, BINSUL  Fresh Food Compartment Wedge 
 			loc_HTRIANF = Cab.CCHGT - Cab.BINSUL + Cab.BINSUL / math.sin(loc_BETA) - Cab.TIRB / math.tan(loc_BETA)
 			loc_HTRIANZ = Cab.CCHGT - Cab.BINFRZ + Cab.BINFRZ / math.sin(loc_BETA) - Cab.TIFB / math.tan(loc_BETA)
 
@@ -107,30 +145,32 @@ class Ql2 (CabUtils):
 			else:
 				loc_D2F = (Cab.CDDN - Cab.CDUP) /  math.sin(loc_BETA) - Cab.BINSUL * math.tan(loc_ALPHA)
 				loc_D2Z = (Cab.CDDN - Cab.CDUP) /  math.sin(loc_BETA) - Cab.BINFRZ * math.tan(loc_ALPHA)
-				
+
 			loc_D3F = Cab.DEPTH - Cab.CDDN - Cab.TIRF - Cab.WEDGER -Cab.BINSUL * math.tan(loc_ALPHA) - Cab.DGSKT
 			loc_D3Z = Cab.DEPTH - Cab.CDDN - Cab.TIFF - Cab.WEDGE - Cab.BINFRZ * math.tan(loc_ALPHA) - Cab.DGSKT
 
 			loc_DCF = Cab.DEPTH - Cab.WEDGER - Cab.TIRF - Cab.TIRB - Cab.DGSKT
 			loc_DCZ = Cab.DEPTH - Cab.WEDGE  - Cab.TIFF - Cab.TIFB - Cab.DGSKT
-			
+
 		loc_FALPHA = 4.0 * loc_ALPHA / math.pi
 		loc_FBETA  = 2.0 * loc_BETA  / math.pi
 
 		#
 		# CALCULATE INTERNAL SURFACE AREAS
-		#	Internal area of the left (fresh food) side   	     	loc_AILSDE
-		#	Internal area of the right (freezer) side   		loc_AIRSDE
-		#	Internal area of the front or back fresh food side 		loc_AILBCK
-		#	Internal area of the front or back freezer side    		loc_AIRBCK
-		#	Internal area of the top fresh food side    		loc_AILTOP
-		#	Internal area of the bottom fresh food side
-		#		not including the compressor area since the insulation
-		#		may (but does not have to be) thinner there			loc_AILBOT
-		#	Internal area of the top or bottom freezer side  		loc_AIRTOP
-		#	Area of the compressor									AOCOMP
+		# loc_AILSDE		Internal area of the left (fresh food) side
+		# loc_AIRSDE		Internal area of the right (freezer) side
+		# loc_AILBCK		Internal area of the front or back fresh food side
+		# loc_AIRBCK		Internal area of the front or back freezer side
+		# loc_AILTOP		Internal area of the top fresh food side
+		# loc_AILBOT		Internal area of the bottom fresh food side
+		#	Internal area of the bottom fresh food side not including the compressor area
+		#	since the insulation may (but does not have to be) thinner there
+		
+		# loc_AIRTOP		Internal area of the top or bottom freezer side
+		# AOCOMP			Area of the compressor
 
 		#	Internal Areas
+		# -=-=-=-=-=-=-=-=-=-=-
 		loc_AILTOP = loc_WFFC * loc_DFFC
 		loc_AIRTOP = loc_WFRZ * loc_DFRZ
 		loc_AILFNT = loc_WFFC * loc_HFFC
@@ -167,17 +207,19 @@ class Ql2 (CabUtils):
 			loc_AIRBTM3 = loc_WFRZ * loc_D3Z
 
 		# CALCULATE EXTERNAL SURFACE AREAS
-		# loc_AOLSDE  The external area of the left (fresh food) side  		
-		# loc_AORSDE  The external area of the right (freezer) side   		
-		# loc_AOLBCK  The external area of the front or back fresh food side 	
-		# loc_AORBCK  The external area of the front or back freezer side    	
-		# loc_AOLTOP  The external area of the top fresh food side    		
+		# loc_AOLSDE  The external area of the left (fresh food) side
+		# loc_AORSDE  The external area of the right (freezer) side
+		# loc_AOLBCK  The external area of the front or back fresh food side
+		# loc_AORBCK  The external area of the front or back freezer side
+		# loc_AOLTOP  The external area of the top fresh food side
 		#				The external area of the bottom fresh food side -
 		# 				not including the compressor area since the insulation
-		# loc_AOLBOT  may (but does not have to be) thinner there   		
-		# loc_AORTOP  The external area of the top or bottom freezer side    	
-		# AOCOMP	  Area of the compressor									
+		# loc_AOLBOT  may (but does not have to be) thinner there
+		# loc_AORTOP  The external area of the top or bottom freezer side
+		# AOCOMP	  Area of the compressor
 
+		# external surface areas
+		# -=-=-=-=-=-=-=-=-=-=-
 		loc_AOLSDE = (Cab.HEIGHT-Cab.BOTTOM) * (Cab.DEPTH - Cab.WEDGER - Cab.DGSKT)
 		loc_AORSDE = (Cab.HEIGHT-Cab.BOTTOM) * (Cab.DEPTH - Cab.WEDGE  - Cab.DGSKT)
 		loc_AOLBCK = (Cab.HEIGHT-Cab.BOTTOM) * (Cab.WALL  + Cab.THMUL / 2.0)
@@ -217,14 +259,14 @@ class Ql2 (CabUtils):
 		#Cab.RKINFF		Insulation conductivity for the sides, back, top and bottom of the fresh food compartment.
 		#Cab.RKINFZ		Insulation conductivity for the Freezer.
 		#
-
+		
 		loc_TAVGL = 0.25*(Cab.DKINFF + Cab.RKINFF + Cab.DKINFZ + Cab.RKINFZ)
 		#
 		#   "loc_TAVGL CALCULATION" ADDED BY A.ESPOSITO 7DEC89.
 		#
 		# Calculate the cabinet heat leak as the sum of the top, sides, bottom, front and back heat leaks.
 		#
-		# NOTE 
+		# NOTE
 		# The cabinet has six wall sections (top, bottom, left side, right side, bottom and back), 12 edges and 8
 		#    Corners. The door, which involves 4 edges and 4 corners, has in addition to the edge and corner effect,
 		#    a gasket and a wedge heat leak added in the shape factor for an edge is 0.54*Length of the edge.
@@ -252,8 +294,8 @@ class Ql2 (CabUtils):
 		# 	The Corner effects are divided by 3 because each corner shares 3 walls.
 		#	(They are actually divided by 9 to average the 3 insulation thicknesses).
 		
-		
-		#	The Left (Fresh Food) Side
+		# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		#   Calculate the heat leak out of the left (fresh food) side
 		#
 		if Cab.NCCTYPE == 1:
 			loc_RR = loc_AILSDE / loc_TIRS + 0.54 * (2.0 * loc_DFFC + 2.0 * loc_HFFC) / 2.0
@@ -281,6 +323,7 @@ class Ql2 (CabUtils):
 
 		# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		#   Calculate the heat leak out of the right (Freezer) side
+		#
 		if Cab.NCCTYPE == 1:
 			loc_RR = loc_AIRSDE / loc_TIFS + 0.54 * (2.0 * loc_DFRZ + 2.0* loc_HFRZ)/2.0 \
 					+ 0.15 * ((2.0 * loc_TIFS + Cab.TIFB + 2.0 * Cab.BINFRZ + Cab.TIFF) \
@@ -298,10 +341,9 @@ class Ql2 (CabUtils):
 			+ 0.15* (2.0*(2.0*Cab.BINFRZ+loc_TIFS)*loc_FALPHA	\
 			+ (2.0*(loc_TIFS+Cab.BINFRZ)+Cab.TIFF+Cab.TIFB)		\
 			+ (2.0*loc_TIFS+Cab.TIFB+2.0*Cab.TIFT+Cab.TIFF))/9.0
-
-
+		
 		loc_R1 = 1.0/(loc_RR*Cab.RKINFZ)+1.0/(Cab.HI*loc_AIRSDE)
-
+		
 		loc_list = self.radtrn (loc_R1, loc_R2, Cab.TFRZ, Cab.TRSIDE)
 		Cab.QRSIDE = loc_list[0]
 
@@ -315,11 +357,10 @@ class Ql2 (CabUtils):
 
 		loc_QLTOP = (1.0/(1.0/(Cab.HO * loc_AOLTOP) + 1.0/loc_R \
 				+ 1.0/(Cab.HI * loc_AILTOP))) * (Cab.TTOP - Cab.TFF)
-				
+
 		# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		#   Calculate the heat leak out of the right (freezer) top
 		#   The top has two Cab.DEPTH and one Width length edges
-
 		Loc_R = Cab.RKINFZ   * (loc_AIRTOP/Cab.TIFT + 0.54 * (loc_DFRZ + loc_WFRZ)/2.0	\
 			+ 0.15   * (loc_TIFS + Cab.TIFB + Cab.TIFT)/9.0)	\
 			+ loc_TAVGL * (0.54 * loc_WFRZ/2.0 + 0.15*(Cab.TIFF + Cab.TIFT + loc_TIFS)/9.0)
@@ -329,8 +370,6 @@ class Ql2 (CabUtils):
 		# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		#   Calculate the heat leak out of the left (fresh food) back
 		#   The back has two Height and two Width length edges
-
-
 		if Cab.NCCTYPE == 1:
 			loc_R  = loc_AILBCK/Cab.TIRB + 0.54*(loc_HFFC + 2.0 * loc_WFFC)/2.0 \
 				+ 0.15*(2.0*loc_TIRS+2.0 * Cab.TIRB+Cab.TIRT+Cab.BINSUL)/9.0
@@ -414,21 +453,10 @@ class Ql2 (CabUtils):
 				+ (2.0*Cab.BINSUL + loc_TIRS)*loc_FALPHA)/9.0
 			loc_R1 = 1.0/(loc_RB1 * Cab.RKINFF) + 1.0/(Cab.HI * loc_AILBTM1)
 			loc_R2 = 1.0/(Cab.HO  * loc_AOLBTM1)
-
-
-			#  CALL RADTRN(loc_R1,loc_R2,Cab.TFF,Cab.TBTM,
-			# .		TRADBT,ERMBOT,EFRBOT,loc_AORBTM1, <not used inside function>
-			# .     loc_QBOTTM1,Cab.TRSBOT,
-			#		Cab.QRDBOT,   				same as
-			#		Cab.QFCBOT 					always zero )
-
+			
 			loc_list = self.radtrn (loc_R1, loc_R2, Cab.TFF, Cab.TBTM)
 			loc_QBOTTM1 = loc_list[0]
-			Cab.TRSBOT  = loc_list[1]
-			Cab.QRDBOT = loc_list[0]
-			Cab.QFCBOT = 0.0
 			#-------------------------------------------------------------
-
 			loc_RB2 = loc_AILBTM2/Cab.BINSUL	\
 				+ 0.54*(loc_WFFC * (1.0 + loc_FALPHA) + loc_D2F)/2.0   \
 				+ 0.15*((2.0 * Cab.BINSUL + loc_TIRS) * loc_FALPHA      \
@@ -441,9 +469,7 @@ class Ql2 (CabUtils):
 			loc_list = self.radtrn (loc_R1, loc_R2, Cab.TFF, Cab.TBTM)
 			loc_QBOTTM2 = loc_list[0]
 			#-------------------------------------------------------------
-
 			Cab.QLBTTM = loc_QBOTTM1 + loc_QBOTTM2
-
 
 		if Cab.NCCTYPE == 3:
 			loc_RB1 = loc_AILBTM1/Cab.BINSUL + 0.54 * (loc_WFFC * (1+loc_FALPHA) + loc_D1F)/2.0   \
@@ -517,12 +543,12 @@ class Ql2 (CabUtils):
 
 			loc_R1 = 1.0/(loc_RB2*Cab.RKINFZ)+1.0/(Cab.HI*loc_AIRBTM2)
 			loc_R2 = 1.0/(Cab.HO*loc_AORBTM2)
-			
+
 			loc_list = self.radtrn (loc_R1, loc_R2, Cab.TFRZ, Cab.TBTM)
 			loc_QBOTTM2 = loc_list[0]
 			#-------------------------------------------------------------
 			Cab.QRBTTM = loc_QBOTTM1 + loc_QBOTTM2
-			
+
 		if Cab.NCCTYPE == 3:
 			loc_RB1 = loc_AIRBTM1/Cab.BINFRZ+0.54*(loc_WFRZ*(1+loc_FALPHA)+loc_D1Z)/2.0 \
 				+ 0.15 * ((2.0*Cab.BINFRZ+loc_TIFS)*loc_FALPHA   \
@@ -562,10 +588,10 @@ class Ql2 (CabUtils):
 		#
 		# Calculate the heat leak through the mullion
 		#
-		
+
 		#	loc_AMULL 	mullion surface area on the fresh food side.
 		#	loc_AMULR 	mullion surface area on the freezer side.
-		
+
 		loc_AMULL = loc_HFFC * loc_DFFC
 		loc_AMULR = loc_HFRZ * loc_DFRZ
 		Cab.QRBTTM = (1.0/(1.0/(Cab.HIRMUL*loc_AMULL) + 1.0/(Cab.HIFMUL*loc_AMULR) \
@@ -585,9 +611,9 @@ class Ql2 (CabUtils):
 		Cab.QGZN = 24.0* Cab.HLGZF *(loc_WFRZ + loc_HFRZ)*(Cab.TROOM - Cab.TFRZ)  # Change on 8/26/92
 		Cab.QGZF = Cab.QGZN
 		Cab.QGR  = 24.0* Cab.HLRG  *(loc_HFFC + loc_WFFC) * (Cab.TROOM - Cab.TFF)
-		
+
 		# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		#     CALCULATE HEAT LEAKS FOR THE Cab.WEDGE
+		#     CALCULATE HEAT LEAKS FOR THE WEDGE
 		#
 		loc_THETA = math.atan((loc_TIFS-Cab.FLANGE)/Cab.WEDGE)
 
@@ -596,7 +622,7 @@ class Ql2 (CabUtils):
 
 		loc_WL1 = (loc_HFRZ + Cab.TIFT+Cab.BINFRZ-Cab.FLGB+loc_WFRZ+loc_TIFS-2.0 * Cab.FLANGE)
 		loc_WL2 = loc_HFRZ + loc_WFRZ
-		
+
 		loc_QWFZC = (1.0/(1.0/(Cab.HO * Cab.WEDGE * (Cab.HEIGHT - Cab.BOTTOM + loc_WFRZ + loc_TIFS))	\
 				  + loc_THETA/(Cab.WKIN * math.log(loc_AWEDGE/loc_BWEDGE)	\
 				  * (loc_WL1+loc_WL2)/2.0))) * (Cab.TROOM-Cab.TFRZ)
@@ -605,11 +631,10 @@ class Ql2 (CabUtils):
 		loc_AWEDGE = Cab.WEDGE *(Cab.BINFRZ/(Cab.BINFRZ-Cab.FLGB))
 		loc_BWEDGE = loc_AWEDGE - Cab.WEDGE
 
-		loc_QWFZB = (1.0/(1.0/(Cab.HO*Cab.WEDGE*Cab.WIDTH) 	\
+		loc_QWFZB = (1.0/(1.0/(Cab.HO * Cab.WEDGE * Cab.WIDTH) 	\
 				  + loc_THETA/(Cab.WKIN* math.log(loc_AWEDGE/loc_BWEDGE) 	\
 				  * (loc_WFRZ+0.5*(loc_TIFS-Cab.FLANGE)))))*(Cab.TBTM-Cab.TFRZ)
-				
-				
+		
 		if Cab.WEDGER != 0:
 			loc_THETA = math.atan((loc_TIRS-Cab.FLANGER)/Cab.WEDGER)
 			loc_AWEDGE = Cab.WEDGER*(loc_TIRS/(loc_TIRS-Cab.FLANGER))
@@ -633,13 +658,13 @@ class Ql2 (CabUtils):
 		# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		#     SUM THE VARIOUS COMPONENTS OF THE HEAT LEAK
 		#
-		loc_QW   = loc_QWFZC + loc_QWFZB + loc_QWFFC + loc_QWFFB
+		Cab.QW   = loc_QWFZC + loc_QWFZB + loc_QWFFC + loc_QWFFB
 		Cab.QWFF = loc_QWFFC + loc_QWFFB
 		Cab.QWFZ = loc_QWFZC + loc_QWFZB
 		Cab.QGON = Cab.QGR   + Cab.QGZN
 		Cab.QGOF = Cab.QGR   + Cab.QGZF
-		Cab.QTON = loc_QW    + Cab.QGON + Cab.QFFT + Cab.QFRZ
-		Cab.QTOF = loc_QW    + Cab.QGOF + Cab.QFFT + Cab.QFRZ
+		Cab.QTON = Cab.QW    + Cab.QGON + Cab.QFFT + Cab.QFRZ
+		Cab.QTOF = Cab.QW    + Cab.QGOF + Cab.QFFT + Cab.QFRZ
 
 		# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		# The heat leak due to Door Openings

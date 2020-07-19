@@ -117,7 +117,7 @@ class QData:
 		# INSULATION AROUND SIDE OF THE COMPRESSOR COMPARTMENT (all will convert to INCHES )
 		# BINSUL - maximum thickness of cab.bottom insulation fresh food.
 		# CINSUL - thickness of insulation over compressor.
-		# BINFRZ - maximum thickness of cab.bottom insulation freezer.
+		# BINFRZ - maximum thickness of bottom insulation freezer.
 		# SCIN - thickness of insulation on side of compressor compartment.
 		# STIN - thickness of insulation on top of compressor compartment.
 		

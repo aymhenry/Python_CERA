@@ -11,9 +11,6 @@ from .QData import QData
 # Editor		: aymhenry@gmail.com
 #-----------------------------------------------------------
 class DataModelBuiler (FileAccess):
-	# Static variable for singleton pattron
-	__SINGLETON = None
-
 	MAX_DATA_FILE_TO_READ = 100		# maximum data file lines to read, this need to be updated if there is any data line more than this
 	CONFIGRATION_COUNT = 7 			# max. number of configrations
 	CONFIGRATION_ROW = 6 			# set row number that has the configration
@@ -26,18 +23,11 @@ class DataModelBuiler (FileAccess):
 	ERR_FOUND_MAXLIE = 105		   	# lines in file more than expected
 
 	def __init__(self):
-		# singleton class pattron
-		if DataModelBuiler.__SINGLETON == None:
-			DataModelBuiler.__SINGLETON = self
-
 			self.lst_data = []
 			self.obj_qdata = QData ()
 			self.int_parameter_count = None 	# number of parameter for the selected configration
 
 			self.int_configration = None 		# configration selected
-
-		else:
-			raise Exception (" DataModelBuiler Singleton,only ONE Instance")
 
 	#-----------------------------------------------------------
 	# Job 			: get created data class
@@ -53,21 +43,9 @@ class DataModelBuiler (FileAccess):
 	#
 	# Output		:
 	#-----------------------------------------------------------
-	def set_init_data (self,strFileName,strPath = ""):
-		super().__init__ (strFileName,strPath)
+	def set_init_data (self, strFileName, strPath = ""):
 
-	#-----------------------------------------------------------
-	# Job 			: Create an Instance,using singleton Pattron
-	# Input 		:
-	#
-	# Output		: object from this sigle tone class
-	#-----------------------------------------------------------
-	@staticmethod
-	def getInstance ():
-		if DataModelBuiler.__SINGLETON == None:
-			raise Exception ("No Instance")
-
-		return DataModelBuiler.__SINGLETON
+		super().__init__ (strFileName, "read" ,strPath) 
 
 	#-----------------------------------------------------------
 	# Job 			: Create vars in object

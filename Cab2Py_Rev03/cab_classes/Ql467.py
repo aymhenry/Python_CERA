@@ -38,9 +38,9 @@ class Ql467 (CabUtils):
 
 			HTRIAN = Cab.CCHGT - Cab.BINSUL + binsul / math.sin(beta) - TIFB / math.tan(beta)
 
-			h2 = h1 - htrian
-			d1 = htrian / cos(beta)
-			d2 = dc - htrian * math.tan(beta)
+			H2 = H1 - HTRIAN
+			d1 = HTRIAN / cos(beta)
+			d2 = dc - HTRIAN * math.tan(beta)
 
 		if Cab.NCCTYPE == 3:
 			BETA = math.atan((Cab.CDDN - Cab.CDUP) / Cab.CCHGT)
@@ -123,28 +123,27 @@ class Ql467 (CabUtils):
 			AOBTM3 = Cab.WIDTH * (Cab.DEPTH - Cab.CDDN - Cab.WEDGE - Cab.DGSKT)
 
 		# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		# Account for the presence of the freezer compartment in a
-		# math.single - door refrigerator.
+		# Account for the presence of the freezer compartment in a single - door refrigerator.
 		#
 		if (Cab.NMOD != 4) :
-			ftop = 0.0
-			fbak = 0.0
-			fsid = 0.0
+			FTOP = 0.0
+			FBAK = 0.0
+			FSID = 0.0
 			TCABT = Cab.TFRZ
 			TCABB = Cab.TFRZ
 			TCABS = Cab.TFRZ
 		else:
 			TBOX = Cab.TFF
-			ftop = Cab.FD * Cab.FW / AITOP
-			fbak = Cab.FH * Cab.FW / AIBACK
-			fsid = Cab.FH * Cab.FD / (2.0 * AISIDE)
+			FTOP = Cab.FD * Cab.FW / AITOP
+			FBAK = Cab.FH * Cab.FW / AIBACK
+			FSID = Cab.FH * Cab.FD / (2.0 * AISIDE)
 			
 			if (Cab.FW >= 0.9 * WC):
-				fsid = 2.0 * fsid
+				FSID = 2.0 * FSID
 				
-			TCABT = ftop * Cab.TFRZ + (1.0 - ftop) * Cab.TFF
-			TCABB = fbak * Cab.TFRZ + (1.0 - fbak) * Cab.TFF
-			TCABS = fsid * Cab.TFRZ + (1.0 - fsid) * Cab.TFF 
+			TCABT = FTOP * Cab.TFRZ + (1.0 - FTOP) * Cab.TFF
+			TCABB = FBAK * Cab.TFRZ + (1.0 - FBAK) * Cab.TFF
+			TCABS = FSID * Cab.TFRZ + (1.0 - FSID) * Cab.TFF 
 
 		# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		# The average insualtion conductivity.

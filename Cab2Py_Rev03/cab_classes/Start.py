@@ -28,6 +28,20 @@ class Start:
 	def __init__ (self):
 		self.obj_data = None	# object to save data
 		self.obj_control = None	# object to point to object control on data
+		
+		strPath = ""
+		self.str_file_cab_input = Start.FILE_CAB_INPUT
+		self.str_file_cab_output = Start.FILE_CAB_OUTPUT
+		
+	def set_filenames  (self, str_file_cab_in = "", str_file_cab_out="", strPath = ""):
+		self.strPath = strPath
+		
+		if str_file_cab_in != "":
+			self.str_file_cab_input = str_file_cab_in
+		
+		if str_file_cab_out != "":
+			self.str_file_cab_output = str_file_cab_out	
+	
 	#-----------------------------------------------------------
 	# Job 			: Main app start up, driver for all others
 	# Input 		:
@@ -60,7 +74,7 @@ class Start:
 	# Output		:
 	#-----------------------------------------------------------
 	def view (self):
-		self.obj_control.view( Start.FILE_CAB_OUTPUT, Start.FILE_CYC_OUTPUT)
+		self.obj_control.view( self.str_file_cab_output, Start.FILE_CYC_OUTPUT)
 		
 	#-----------------------------------------------------------
 	# Job 			: Calaculte heat balance, the main app target.
@@ -87,8 +101,8 @@ class Start:
 	#-----------------------------------------------------------
 	def data_prepare (self):
 		# Set main data file name
-		obj_datamodel = DataModelBuiler().getInstance()		# get object to create data inside obj_data
-		obj_datamodel.set_init_data (Start.FILE_CAB_INPUT) 	# Input data file name
+		obj_datamodel = DataModelBuiler()
+		obj_datamodel.set_init_data (self.str_file_cab_input, self.strPath ) 	# Input data file name
 		
 		# check if error, if so exit application
 		if obj_datamodel.isError():
@@ -105,10 +119,10 @@ class Start:
 		if obj_datamodel.isError():
 			print (obj_datamodel.err_description() )	# print error description
 			sys.exit('3001')							# terminate
-
+		
 		# Create related data object as the given configration
 		self.obj_data = obj_datamodel.get_data_object()
-
+		
 		# Create related object as the given configration
 		self.obj_control = ""
 		
@@ -139,7 +153,7 @@ class Start:
 		# 7: Two door refrigerator / freezer
 		elif self.obj_data.IRFTYP == 7: # Mode 3	Top - mount refrigerator / freezer	
 			self.obj_control = QCtrl_Ql13 (self.obj_data)
-		
+	
 		# Creates Vars & convert units
 		self.obj_control.set_vars_common()		# Create commom in abstract class
 		self.obj_control.setup_vars_extra()		# Create extra vars, indvidual for every class
@@ -153,5 +167,6 @@ class Start:
 		self.obj_control.adj_unit_common()		# unit adjust in commom in abstract class
 		
 		self.obj_control.adjust_units()
+	
 		
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=

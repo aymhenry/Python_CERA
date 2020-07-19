@@ -99,7 +99,7 @@ class QCtrl_Abstract (ABC):
 	# Output		:
 	#-----------------------------------------------------------
 	def set_ncctype (self):
-		# thi svalue is NA in mode 5
+		# this value is NA in mode 5
 		if self.obj_data.NMOD == 5: return
 		
 		ncc_type = None
@@ -514,8 +514,10 @@ class QCtrl_Ql467 (QCtrl_Abstract):
 		self.calc_cycle_Mode57()
 		
 	def setup_vars_extra (self):
+		# TFF was add, it is found in Config.6(mode 4), and not found in Config.5(mode7)
+		# To prevent var is not found error in Ql456 with deal with both mode.
 		self.obj_data.setup_vars ( 0.0,\
-		['BOTTOM','FLGB','NCCTYPE',  'RKIN', 'TKIN', 'HIWP']\
+		['BOTTOM','FLGB','NCCTYPE',  'RKIN', 'TKIN', 'HIWP','TFF']\
 			 )
 		self.obj_data.setup_vars ( 0.0,['FH','FW','FD','RTOP','VOLAR','FFCOPN','HRFFC'])
 		
@@ -588,7 +590,6 @@ class QCtrl_Ql5 (QCtrl_Abstract):
 		self.obj_data.setup_vars ( 0.0,	\
 			['RKIN', 'TKIN', 'HIWP']\
 			 )
-		
 		self.obj_data.setup_vars ( 0.0,	\
 			['QW','VOLAR','FFCOPN','HRFFC'] )
 	

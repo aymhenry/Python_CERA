@@ -62,28 +62,28 @@ class View (ABC):
 		# other user info, will be catched later
 
 		# output the type of refrigerator
-		if self.obj_data.IRFTYP == 1.0: # WRITE(IO,1002)
+		if self.obj_data.IRFTYP == 1.0: 
 			self.objCabout.write_or_terminate ('Thermal analysis of a two-door top-mount')
 			self.objCabout.write_or_terminate ('refrigerator/freezer')
 
-		elif self.obj_data.IRFTYP == 2.0: #	WRITE(IO,1005)
+		elif self.obj_data.IRFTYP == 2.0:
 			self.objCabout.write_or_terminate ('Thermal Analysis of a Two-Door')
 			self.objCabout.write_or_terminate ('Bottom-mount Refrigerator/Freezer')
 
-		elif self.obj_data.IRFTYP == 3.0: #	WRITE(IO,1001)
+		elif self.obj_data.IRFTYP == 3.0:
 			self.objCabout.write_or_terminate ('Thermal Analysis of a Side-By-Side')
 			self.objCabout.write_or_terminate ('Refrigerator/Freezer')
 
-		elif self.obj_data.IRFTYP == 4.0: #	WRITE(IO,1003)
+		elif self.obj_data.IRFTYP == 4.0:
 			self.objCabout.write_or_terminate ('Thermal Analysis of a Chest Freezer')
 
-		elif self.obj_data.IRFTYP == 5.0: #	 WRITE(IO,1004)
+		elif self.obj_data.IRFTYP == 5.0:
 			self.objCabout.write_or_terminate ('Thermal Analysis of an upright Freezer')
 
-		elif self.obj_data.IRFTYP == 6.0: #	WRITE(IO,1006)
+		elif self.obj_data.IRFTYP == 6.0:
 			self.objCabout.write_or_terminate ('Thermal Analysis of a one-door Refrigerator')
 
-		elif self.obj_data.IRFTYP == 7.0: #	WRITE(IO,1007)
+		elif self.obj_data.IRFTYP == 7.0:
 			self.objCabout.write_or_terminate ('Thermal Analysis of a one-door Refrigerator/Freezer')
 		
 		# dimensional specification
