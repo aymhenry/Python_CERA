@@ -13,9 +13,9 @@ from .Unit import Unit
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
 class View (ABC):
-	def __init__(self, obj_data, str_file_cab_out, str_file_cycle_out):
-		self.objCabout = FileAccess ( str_file_cab_out, "write" )
-		self.objCycout = FileAccess ( str_file_cycle_out, "append" )
+	def __init__(self, obj_data, str_file_cab_out, str_file_cycle_out, str_path_cab, str_path_cycle):
+		self.objCabout = FileAccess ( str_file_cab_out, "write", str_path_cab)
+		self.objCycout = FileAccess ( str_file_cycle_out, "append", str_path_cycle )
 		self.obj_data = obj_data
 
 	# Abstract methods
@@ -38,6 +38,7 @@ class View (ABC):
 	@abstractmethod
 	def show_rep (self):
 		pass
+
 	#-----------------------------------------------------------
 	# Job 			: show report title (common for all)
 	# Input 		:
@@ -540,7 +541,24 @@ class View (ABC):
 		self.objCabout.write_or_terminate ("  ,Fresh food cabine,  % 7.3f, W " % ( self.obj_data.FFAUXW ) )
 		self.objCabout.write_or_terminate ("  ,Freezer cabinet,    % 7.3f, W " % ( self.obj_data.FZAUXW ) )
 		self.objCabout.write_or_terminate ("  ,Outside cabinet,    % 7.3f, W " % ( self.obj_data.OTHERW ) )
-	
+
+	#-----------------------------------------------------------
+	# Job 			: show input data, this section is displayed for modes 4,5,7
+	#				this method is called from show_rep method ( from sub class methods)
+	# Input 		:
+	#
+	# Output		:
+	#-----------------------------------------------------------
+	def sec21_Mode457(self):
+		self.objCabout.write_or_terminate (" ")
+		self.objCabout.write_or_terminate ("ANTI-SWEAT Heaters")
+		self.objCabout.write_or_terminate (" ,Cabinet,%7.3f, W " % ( self.obj_data.FZASHW ) )
+
+		self.objCabout.write_or_terminate (" ")
+		self.objCabout.write_or_terminate ("Auxiliary Energy")
+		self.objCabout.write_or_terminate ("  ,Inside cabinet, % 7.3f, W " % ( self.obj_data.FZAUXW ) )
+		self.objCabout.write_or_terminate ("  ,Outside cabinet,% 7.3f, W " % ( self.obj_data.OTHERW ) )
+		
 	#-----------------------------------------------------------
 	# Job 			: show input data, this section is displayed for modes 5,7
 	#				this method is called from show_rep method ( from sub class methods)
@@ -573,23 +591,6 @@ class View (ABC):
 		self.objCabout.write_or_terminate (' ,Other thermal input'  + ',%10.2f'  % ( Unit.BtuH_Watt(self.obj_data.FZHEAT)  ))
 		self.objCabout.write_or_terminate ('Total ,'               + ',%10.2f'  % ( Unit.BtuH_Watt(self.obj_data.QFZTOT)  ))
 	
-	#-----------------------------------------------------------
-	# Job 			: show input data, this section is displayed for modes 4,5,7
-	#				this method is called from show_rep method ( from sub class methods)
-	# Input 		:
-	#
-	# Output		:
-	#-----------------------------------------------------------
-	def sec21_Mode457(self):
-		self.objCabout.write_or_terminate (" ")
-		self.objCabout.write_or_terminate ("ANTI-SWEAT Heaters")
-		self.objCabout.write_or_terminate (" ,Cabinet,%7.3f, W " % ( self.obj_data.FZASHW ) )
-
-		self.objCabout.write_or_terminate (" ")
-		self.objCabout.write_or_terminate ("Auxiliary Energy")
-		self.objCabout.write_or_terminate ("  ,Inside cabinet, % 7.3f, W " % ( self.obj_data.FZAUXW ) )
-		self.objCabout.write_or_terminate ("  ,Outside cabinet,% 7.3f, W " % ( self.obj_data.OTHERW ) )
-	
 	# ============ Output to Cycle file ==============
 	#	PASS DATA VALUES TO THE CYCLE MODEL
 	
@@ -601,18 +602,17 @@ class View (ABC):
 	# Output		:
 	#-----------------------------------------------------------
 	def sec1_cycle_Mode238 (self):
-		self.objCycout.write_or_terminate (" ")
 		self.objCycout.write_or_terminate ("Cabinet Loads Data")
-		self.objCycout.write_or_terminate (" ,Fresh food antisweat heater,%10.2f,W " % ( self.obj_data.FFASHW ) )
-		self.objCycout.write_or_terminate (" ,Fresh food auxiliary power,%10.2f,W" % ( self.obj_data.FFAUXW ) )
-		self.objCycout.write_or_terminate (" ,Freezer antisweat heater,%10.2f,W" % ( self.obj_data.FZASHW ) )
+		self.objCycout.write_or_terminate ("%10.2f,W ,Fresh food antisweat heater" % ( self.obj_data.FFASHW ) )
+		self.objCycout.write_or_terminate ("%10.2f,W ,Fresh food auxiliary power" % ( self.obj_data.FFAUXW ) )
+		self.objCycout.write_or_terminate ("%10.2f,W ,Freezer antisweat heater" % ( self.obj_data.FZASHW ) )
 
-		self.objCycout.write_or_terminate (" ,Freezer auxiliary power,%10.2f,W" % ( self.obj_data.FZAUXW ) )
-		self.objCycout.write_or_terminate (" ,Outside cabinet power,%10.2f,W" % ( self.obj_data.OTHERW ) )
+		self.objCycout.write_or_terminate ("%10.2f,W ,Freezer auxiliary power" % ( self.obj_data.FZAUXW ) )
+		self.objCycout.write_or_terminate ("%10.2f,W ,Outside cabinet power," % ( self.obj_data.OTHERW ) )
 
-		self.objCycout.write_or_terminate (" ,Room temperature ,%10.2f,DEG C " % ( Unit.f_c(self.obj_data.TROOM) ) )
-		self.objCycout.write_or_terminate (" ,Fresh food temperature ,%7.3f, DEG C " % ( Unit.f_c(self.obj_data.TFF)   ) )
-		self.objCycout.write_or_terminate (" ,Freezer temperature ,%7.3f, DEG C " % ( Unit.f_c(self.obj_data.TFRZ)  ) )
+		self.objCycout.write_or_terminate ("%10.2f,DEG C ,Room temperature " % ( Unit.f_c(self.obj_data.TROOM) ) )
+		self.objCycout.write_or_terminate ("%10.2f,DEG C ,Fresh food temperature " % ( Unit.f_c(self.obj_data.TFF)   ) )
+		self.objCycout.write_or_terminate ("%10.2f,DEG C ,Freezer temperature" % ( Unit.f_c(self.obj_data.TFRZ)  ) )
 	
 	#-----------------------------------------------------------
 	# Job 			: show input data (cycle report), this section is displayed for mode 4
@@ -622,19 +622,18 @@ class View (ABC):
 	# Output		:
 	#-----------------------------------------------------------
 	def sec2_cycle_Mode4 (self):
-		self.objCycout.write_or_terminate (" ")
 		self.objCycout.write_or_terminate ("Cabinet Loads Data")
-		self.objCycout.write_or_terminate (" ,Freezer antisweat heater,%10.2f,W" % ( self.obj_data.FZASHW ) )
+		self.objCycout.write_or_terminate ("%10.2f,W ,Freezer antisweat heater" % ( self.obj_data.FZASHW ) )
 
-		self.objCycout.write_or_terminate (" ,Fresh food auxiliary power,%10.2f,W" % ( self.obj_data.FZAUXW ) )
-		self.objCycout.write_or_terminate (" ,Freezer antisweat heater,%10.2f,W" % ( self.obj_data.FZASHW ) )
+		self.objCycout.write_or_terminate ("%10.2f,W ,Fresh food auxiliary power" % ( self.obj_data.FZAUXW ) )
+		self.objCycout.write_or_terminate ("%10.2f,W ,Freezer antisweat heater" % ( self.obj_data.FZASHW ) )
 
-		self.objCycout.write_or_terminate (" ,Freezer auxiliary power,%10.2f,W" % ( self.obj_data.FZAUXW ) )
-		self.objCycout.write_or_terminate (" ,Outside cabinet power,%10.2f,W" % ( self.obj_data.OTHERW ) )
+		self.objCycout.write_or_terminate ("%10.2f,W ,Freezer auxiliary power" % ( self.obj_data.FZAUXW ) )
+		self.objCycout.write_or_terminate ("%10.2f,W ,Outside cabinet power" % ( self.obj_data.OTHERW ) )
 
-		self.objCycout.write_or_terminate (" ,Room temperature ,%10.2f,DEG C " % ( Unit.f_c(self.obj_data.TROOM) ) )
-		self.objCycout.write_or_terminate (" ,Fresh food temperature ,%10.2f, DEG C " % ( Unit.f_c(self.obj_data.TFF)   ) )
-		self.objCycout.write_or_terminate (" ,Freezer temperature ,%10.2f, DEG C " % ( Unit.f_c(self.obj_data.TFRZ)  ) )
+		self.objCycout.write_or_terminate ("%10.2f,DEG C ,Room temperature " % ( Unit.f_c(self.obj_data.TROOM) ) )
+		self.objCycout.write_or_terminate ("%10.2f,DEG C ,Fresh food temperature" % ( Unit.f_c(self.obj_data.TFF)   ) )
+		self.objCycout.write_or_terminate ("%10.2f,DEG C ,Freezer temperature " % ( Unit.f_c(self.obj_data.TFRZ)  ) )
 		
 	#-----------------------------------------------------------
 	# Job 			: show input data (cycle report), this section is displayed for modes 5.7
@@ -644,19 +643,82 @@ class View (ABC):
 	# Output		:
 	#-----------------------------------------------------------
 	def sec3_cycle_Mode57 (self):
-		self.objCycout.write_or_terminate (" ")
 		self.objCycout.write_or_terminate ("Cabinet Loads Data")
-		self.objCycout.write_or_terminate (" ,Fresh food antisweat heater,%10.2f,W " % ( self.obj_data.FZASHW ) )
-		self.objCycout.write_or_terminate (" ,Fresh food auxiliary power ,%10.2f,W " % ( self.obj_data.FZAUXW ) )
-		self.objCycout.write_or_terminate (" ,Freezer antisweat heater ,%10.2f,W" % ( self.obj_data.FZASHW ) )
+		self.objCycout.write_or_terminate ("%10.2f,W ,Fresh food antisweat heater " % ( self.obj_data.FZASHW ) )
+		self.objCycout.write_or_terminate ("%10.2f,W ,Fresh food auxiliary power  " % ( self.obj_data.FZAUXW ) )
+		self.objCycout.write_or_terminate ("%10.2f,W ,Freezer antisweat heater" % ( self.obj_data.FZASHW ) )
 
-		self.objCycout.write_or_terminate (" ,Freezer auxiliary power ,%10.2f,W" % ( self.obj_data.FZAUXW ) )
-		self.objCycout.write_or_terminate (" ,Outside cabinet power ,%10.2f,W" % ( self.obj_data.OTHERW ) )
+		self.objCycout.write_or_terminate ("%10.2f,W ,Freezer auxiliary power" % ( self.obj_data.FZAUXW ) )
+		self.objCycout.write_or_terminate ("%10.2f,W ,Outside cabinet power" % ( self.obj_data.OTHERW ) )
 
-		self.objCycout.write_or_terminate (" ,Room temperature ,%10.2f,DEG C " % ( Unit.f_c(self.obj_data.TROOM) ) )
-		self.objCycout.write_or_terminate (" ,Fresh food temperature ,%10.2f, DEG C " % ( Unit.f_c(self.obj_data.TFF)   ) )
-		self.objCycout.write_or_terminate (" ,Freezer temperature ,%10.2f, DEG C " % ( Unit.f_c(self.obj_data.TFRZ)  ) )	
+		self.objCycout.write_or_terminate ("%10.2f,DEG C ,Room temperature " % ( Unit.f_c(self.obj_data.TROOM) ) )
+		self.objCycout.write_or_terminate ("%10.2f,DEG C ,Fresh food temperature " % ( Unit.f_c(self.obj_data.TFF)   ) )
+		self.objCycout.write_or_terminate ("%10.2f,DEG C ,Freezer temperature" % ( Unit.f_c(self.obj_data.TFRZ)  ) )	
 	
+	#-----------------------------------------------------------
+	# Job 			: show output data (cycle report), this section is displayed for modes 2,3,8
+	#				this method is called from show_rep method ( from sub class methods)
+	# Input 		:
+	#
+	# Output		:
+	#-----------------------------------------------------------
+	def sec4_cycle_Mode238(self):
+		self.objCycout.write_or_terminate ('HEAT LEAK BREAKDOWN')
+		self.objCycout.write_or_terminate ('(W) ,Description')
+		self.objCycout.write_or_terminate ('%10.2f ,Fresh food net load'    % ( Unit.BtuH_Watt(self.obj_data.QFFTOT) ))
+		self.objCycout.write_or_terminate ('%10.2f ,Freezer load'           % ( Unit.BtuH_Watt(self.obj_data.QFZTOT) ))
+
+		self.objCycout.write_or_terminate ('%10.2f ,Fresh food door sensible load'       % ( Unit.BtuH_Watt(self.obj_data.QSDRFF) ))
+		self.objCycout.write_or_terminate ('%10.2f ,Fresh food door condensation load'   % ( Unit.BtuH_Watt(self.obj_data.QLDRFF) ))
+		self.objCycout.write_or_terminate ('%10.2f ,Fresh food door frost load'          % ( Unit.BtuH_Watt(self.obj_data.QFDRFF) ))
+		self.objCycout.write_or_terminate ('%10.2f ,Freezer door sensible load'          % ( Unit.BtuH_Watt(self.obj_data.QSDRFZ) ))
+
+		self.objCycout.write_or_terminate ('%10.2f ,Freezer door condensation load'   % ( Unit.BtuH_Watt(self.obj_data.QLDRFZ) ))
+		self.objCycout.write_or_terminate ('%10.2f ,Freezer door frost load'          % ( Unit.BtuH_Watt(self.obj_data.QFDRFZ) ))
+
+		self.objCycout.write_or_terminate ('%10.2f ,Fresh food penetrations'          % ( Unit.BtuH_Watt(self.obj_data.FFPENA) ))
+		self.objCycout.write_or_terminate ('%10.2f ,Freezer penetrations'             % ( Unit.BtuH_Watt(self.obj_data.FZPENA) ))
+
+		self.objCycout.write_or_terminate ('%10.2f ,Fresh food heaters and controls'  % ( Unit.BtuH_Watt(self.obj_data.QHTFF) ))
+		self.objCycout.write_or_terminate ('%10.2f ,Freezer heaters and controls'     % ( Unit.BtuH_Watt(self.obj_data.QHTFZ) ))
+
+		self.objCycout.write_or_terminate ('%10.2f ,Fresh food refrigerant line'   % ( Unit.BtuH_Watt(self.obj_data.FFREFQ) ))
+		self.objCycout.write_or_terminate ('%10.2f ,Freezer refrigerant line'      % ( Unit.BtuH_Watt(self.obj_data.FZREFQ) ))
+
+		self.objCycout.write_or_terminate ('%10.2f ,Mullion heat load'             % (   Unit.BtuH_Watt(-1*self.obj_data.QMULN) ))
+	
+	#-----------------------------------------------------------
+	# Job 			: show output data (cycle report), this section is displayed for modes 4,5,7
+	#				this method is called from show_rep method ( from sub class methods)
+	# Input 		:
+	#
+	# Output		:
+	#-----------------------------------------------------------
+	def sec5_cycle_Mode457(self):
+		self.objCycout.write_or_terminate ('HEAT LEAK BREAKDOWN')
+		self.objCycout.write_or_terminate ('(W) ,Description')
+
+		self.objCycout.write_or_terminate ('%10.2f ,Fresh food net load'   % ( Unit.BtuH_Watt(self.obj_data.QFZTOT) ))
+		self.objCycout.write_or_terminate ('%10.2f ,Freezer load'          % ( Unit.BtuH_Watt(self.obj_data.QFZTOT) ))
+
+		self.objCycout.write_or_terminate ('%10.2f ,Fresh food door sensible load'       % ( Unit.BtuH_Watt(self.obj_data.QSDRFZ) ))
+		self.objCycout.write_or_terminate ('%10.2f ,Fresh food door condensation load'   % ( Unit.BtuH_Watt(self.obj_data.QLDRFZ) ))
+		self.objCycout.write_or_terminate ('%10.2f ,Fresh food door frost load'          % ( Unit.BtuH_Watt(self.obj_data.QFDRFZ) ))
+		self.objCycout.write_or_terminate ('%10.2f ,Freezer door sensible load'          % ( Unit.BtuH_Watt(self.obj_data.QSDRFZ) ))
+
+		self.objCycout.write_or_terminate ('%10.2f ,Freezer door condensation load'    % ( Unit.BtuH_Watt(self.obj_data.QLDRFZ) ))
+		self.objCycout.write_or_terminate ('%10.2f ,Freezer door frost load'           % ( Unit.BtuH_Watt(self.obj_data.QFDRFZ) ))
+
+		self.objCycout.write_or_terminate ('%10.2f ,Fresh food penetrations'           % ( Unit.BtuH_Watt(self.obj_data.FZPENA) ))
+		self.objCycout.write_or_terminate ('%10.2f ,Freezer penetrations'              % ( Unit.BtuH_Watt(self.obj_data.FZPENA) ))
+
+		self.objCycout.write_or_terminate ('%10.2f ,Fresh food heaters and controls'   % ( Unit.BtuH_Watt(self.obj_data.QHTFZ) ))
+		self.objCycout.write_or_terminate ('%10.2f ,Freezer heaters and controls'      % ( Unit.BtuH_Watt(self.obj_data.QHTFZ) ))
+
+		self.objCycout.write_or_terminate ('%10.2f ,Fresh food refrigerant line'  % ( Unit.BtuH_Watt(self.obj_data.FZREFQ) ))
+		self.objCycout.write_or_terminate ('%10.2f ,Freezer refrigerant line'     % ( Unit.BtuH_Watt(self.obj_data.FZREFQ) ))
+
+		self.objCycout.write_or_terminate ('%10.2f ,Mullion heat load'             % ( 0.0 ))	
 	#-----------------------------------------------------------
 	# Job 			: close data output files
 	# Input 		:
@@ -716,6 +778,7 @@ class View_Ql2(View):
 		self.show_final_results()
 		
 		self.sec1_cycle_Mode238()
+		self.sec4_cycle_Mode238()
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # Job 			: View for Configration3 (Mode 2)
 #
@@ -765,6 +828,7 @@ class View_Ql13 (View):
 		self.show_final_results()
 		
 		self.sec1_cycle_Mode238()
+		self.sec4_cycle_Mode238()
 		
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # Job 			: View for Configration3 (Mode 2)
@@ -787,6 +851,7 @@ class View_Ql4(View):
 		self.show_final_results()
 		
 		self.sec2_cycle_Mode4()
+		self.sec5_cycle_Mode457()
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # Job 			: View for Configration3 (Mode 2)
 #
@@ -830,6 +895,8 @@ class View_Ql5(View):
 		self.final_Mode57()
 		
 		self.sec3_cycle_Mode57()
+		self.sec5_cycle_Mode457()
+		
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # Job 			: View for Configration3 (Mode 2)
 #
@@ -853,6 +920,7 @@ class View_Ql7(View):
 		self.final_Mode57()
 		
 		self.sec3_cycle_Mode57()
+		self.sec5_cycle_Mode457()
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # Job 			: View for Configration1 (Mode 8)
 #
@@ -904,4 +972,5 @@ class View_Ql8(View):
 		self.show_final_results()
 		
 		self.sec1_cycle_Mode238()
+		self.sec4_cycle_Mode238()
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=

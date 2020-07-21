@@ -12,8 +12,11 @@ from cab_classes.Start import Start
 
 #------------------
 class CabApp( Frame ):
-	DATA_FOLDER = "data"
-
+	DATA_FOLDER  = "data"
+	FILE_INP_CAB = "Cabinet_dat.csv" 
+	FILE_OUT_CAB = "Cabinet_out.csv"
+	FILE_OUT_CYC = "Cycle_out.csv"
+	
 	#-----------------------------------------------------------
 	# Job 			: Runc Start class as selected configration, as button pressed
 	# Input 		:
@@ -48,7 +51,7 @@ class CabApp( Frame ):
 							
 		self.button7 = Button( self, text = "Config7", width = 25,
 							command=partial(self.set_config, 7) )
-														
+			
 		self.buttonNew = Button( self, text = "User Current", width = 25,
 							command=partial(self.set_config))
 		
@@ -75,11 +78,13 @@ class CabApp( Frame ):
 		strPath = sys.path[0] + "\\" + CabApp.DATA_FOLDER
 		
 		if int_config != 0:
-			self.str_file_cab_in  = str(int_config) + "-Cabinet_dat.csv"
-			self.str_file_cab_out = str(int_config) + "-Cabinet_out.csv"
+			self.str_file_cab_in    = str(int_config) + "-" + CabApp.FILE_INP_CAB
+			self.str_file_cab_out   = str(int_config) + "-" + CabApp.FILE_OUT_CAB
+			self.str_file_cycle_out = str(int_config) + "-" + CabApp.FILE_OUT_CYC
 		else:
-			self.str_file_cab_in  = "Cabinet_dat.csv"
-			self.str_file_cab_out = "Cabinet_out.csv"
+			self.str_file_cab_in    = CabApp.FILE_INP_CAB
+			self.str_file_cab_out   = CabApp.FILE_OUT_CAB
+			self.str_file_cycle_out = CabApp.FILE_OUT_CYC
 			
 		if not self.isFileExisits  ( self.str_file_cab_in, strPath):
 			mb.showerror("Error", "Cannot find file:" + self.str_file_cab_in)
@@ -89,7 +94,9 @@ class CabApp( Frame ):
 			mb.showerror("Error", "Cannot find file:" + self.str_file_cab_out)
 			return
 		
-		self.obj_start.set_filenames(self.str_file_cab_in, self.str_file_cab_out, strPath)
+		self.obj_start.set_filenames( self.str_file_cab_in, 	\
+			self.str_file_cab_out, self.str_file_cycle_out, 	\
+			strPath, strPath)
 		
 		self.obj_start.main()
 		

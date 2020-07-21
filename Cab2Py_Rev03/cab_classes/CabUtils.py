@@ -115,7 +115,7 @@ class CabUtils:
 	# (i.e. the radiative component is part of the convection coefficient
 	#
 	#----------------------------------------------------------- 
-	def radtrn (self, R1, R2, T1F, T2F):
+	def getRadHeatFlux (self, R1, R2, T1F, T2F):
 
 		TF = (R2 * T1F + R1 * T2F)/(R1 + R2)
 		Q  = (TF - T1F)/R1

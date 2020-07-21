@@ -40,7 +40,7 @@ class QCtrl_Abstract (ABC):
 	# Output		:
 	#-----------------------------------------------------------
 	@abstractmethod
-	def view (self, str_file_cab, str_file_cycle):
+	def view (self, str_file_cab, str_file_cycle, str_path_cab = "", str_path_cycle = ""):
 		pass
 
 	#-----------------------------------------------------------
@@ -304,8 +304,8 @@ class QCtrl_Abstract (ABC):
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 class QCtrl_Ql2 (QCtrl_Abstract):
-	def	view (self, str_cab_out, str_cycle):
-		obj_view = View_Ql2(self.obj_data, str_cab_out, str_cycle)
+	def	view (self, str_cab_out, str_cycle, str_path_cab = "", str_path_cycle = ""):
+		obj_view = View_Ql2(self.obj_data, str_cab_out, str_cycle, str_path_cab, str_path_cycle)
 		obj_view.show_rep()
 		
 	def volume (self):
@@ -398,8 +398,8 @@ class QCtrl_Ql2 (QCtrl_Abstract):
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 class QCtrl_Ql13 (QCtrl_Abstract):
-	def	view (self, str_cab_out, str_cycle):
-		obj_view = View_Ql13(self.obj_data, str_cab_out, str_cycle)
+	def	view (self, str_cab_out, str_cycle, str_path_cab = "", str_path_cycle = ""):
+		obj_view = View_Ql13(self.obj_data, str_cab_out, str_cycle, str_path_cab, str_path_cycle)
 		obj_view.show_rep()
 
 	def volume (self):
@@ -490,11 +490,11 @@ class QCtrl_Ql13 (QCtrl_Abstract):
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 class QCtrl_Ql467 (QCtrl_Abstract):
-	def	view (self, str_cab_out, str_cycle):
+	def	view (self, str_cab_out, str_cycle, str_path_cab = "", str_path_cycle = ""):
 		if self.obj_data.NMOD == 7:
-			obj_view = View_Ql7(self.obj_data, str_cab_out, str_cycle)
+			obj_view = View_Ql7(self.obj_data, str_cab_out, str_cycle, str_path_cab, str_path_cycle)
 		else:
-			obj_view = View_Ql4(self.obj_data, str_cab_out, str_cycle)
+			obj_view = View_Ql4(self.obj_data, str_cab_out, str_cycle, str_path_cab, str_path_cycle)
 			
 		obj_view.show_rep()
 
@@ -563,8 +563,8 @@ class QCtrl_Ql467 (QCtrl_Abstract):
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 class QCtrl_Ql5 (QCtrl_Abstract):
-	def	view (self, str_cab_out, str_cycle):
-		obj_view = View_Ql5(self.obj_data, str_cab_out, str_cycle)
+	def	view (self, str_cab_out, str_cycle, str_path_cab = "", str_path_cycle = ""):
+		obj_view = View_Ql5(self.obj_data, str_cab_out, str_cycle, str_path_cab, str_path_cycle)
 		obj_view.show_rep()
 
 	def volume (self):
@@ -624,8 +624,8 @@ class QCtrl_Ql5 (QCtrl_Abstract):
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 class QCtrl_Ql8 (QCtrl_Abstract):
-	def	view (self, str_cab_out, str_cycle):
-		obj_view = View_Ql8(self.obj_data, str_cab_out, str_cycle)
+	def	view (self, str_cab_out, str_cycle, str_path_cab = "", str_path_cycle = ""):
+		obj_view = View_Ql8(self.obj_data, str_cab_out, str_cycle, str_path_cab, str_path_cycle)
 		obj_view.show_rep()
 		
 	def volume (self):

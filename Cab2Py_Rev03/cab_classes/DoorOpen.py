@@ -10,7 +10,7 @@ from .CabUtils import CabUtils
 # Editor		: aymhenry@gmail.com
 #-----------------------------------------------------------
 
-class Doorpn(CabUtils):
+class DoorOpen(CabUtils):
 	#------- Internal Classs builder
 	class DoorpnBuilder:
 		# set copy of all vars as in basic class
@@ -40,7 +40,7 @@ class Doorpn(CabUtils):
 		
 		# builder method, transfer vars to main class and return the main object class
 		def build (self):
-			obj_doorpn = Doorpn ()
+			obj_doorpn = DoorOpen ()
 			
 			obj_doorpn.par_TSETFF = self.par_TSETFF
 			obj_doorpn.par_TSETFZ = self.par_TSETFZ
@@ -456,7 +456,7 @@ def main():
 	
 	#alternative to 
 	# call DOORPN(par_TSETFF, par_TSETFZ, par_HFFC, par_WFFC, par_DFFC, par_HFRZ, par_WFRZ, par_DFRZ)
-	obj_doorpn = Doorpn().DoorpnBuilder ()	\
+	obj_doorpn = DoorOpen().DoorpnBuilder ()	\
 		.withTempFFSetpoint (par_TSETFF)		\
 		.withTempFZSetpoint (par_TSETFZ)		\
 		.withHeighFF ( par_HFFC) 				\

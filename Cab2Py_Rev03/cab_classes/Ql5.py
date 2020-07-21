@@ -3,7 +3,7 @@ import math, sys, datetime
 
 # User Import
 from .CabUtils import CabUtils
-from .Doorpn import Doorpn
+from .DoorOpen import DoorOpen
 
 class Ql5 (CabUtils):
 	#=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
@@ -220,7 +220,7 @@ class Ql5 (CabUtils):
 
 		# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		# The heat leak due to Door Openings
-		obj_doorpn = Doorpn().DoorpnBuilder ()	\
+		obj_doorpn = DoorOpen().DoorpnBuilder ()	\
 			.withTempFFSetpoint (Cab.TFF)		\
 			.withTempFZSetpoint (Cab.TFRZ)		\
 			.withHeighFF (HC) 				\

@@ -3,7 +3,7 @@ import math, sys, datetime
 
 # User Import
 from .CabUtils import CabUtils
-from .Doorpn import Doorpn
+from .DoorOpen import DoorOpen
 
 class Ql8 (CabUtils):
 	#=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
@@ -186,7 +186,7 @@ class Ql8 (CabUtils):
 		R1 = 1.0 / (RR * Cab.RKINFF) + 1.0 / (Cab.HI * AIRSID)
 		R2 = 1.0 / (Cab.HO * AORSID)
 
-		loc_list = self.radtrn (R1, R2, Cab.TFF, Cab.TROOM)
+		loc_list = self.getRadHeatFlux (R1, R2, Cab.TFF, Cab.TROOM)
 		Cab.QRLSID = loc_list[0]
 		
 		# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -210,7 +210,7 @@ class Ql8 (CabUtils):
 		R1 = 1.0 / (RF * Cab.RKINFZ) + 1.0 / (Cab.HI * AIFSID)
 		R2 = 1.0 / (Cab.HO * AOFSID)
 
-		loc_list = self.radtrn (R1, R2, Cab.TFRZ, Cab.TROOM)
+		loc_list = self.getRadHeatFlux (R1, R2, Cab.TFRZ, Cab.TROOM)
 		Cab.QFLSID = loc_list[0]
 		
 		# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -221,7 +221,7 @@ class Ql8 (CabUtils):
 		R1 = 1.0 / (RR * Cab.RKINFF) + 1.0 / (Cab.HI * AIRSID)
 		R2 = 1.0 / (Cab.HO * AORSID)
 		
-		loc_list = self.radtrn (R1, R2, Cab.TFF, Cab.TROOM)
+		loc_list = self.getRadHeatFlux (R1, R2, Cab.TFF, Cab.TROOM)
 		Cab.QRRSID = loc_list[0]
 
 		# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -245,7 +245,7 @@ class Ql8 (CabUtils):
 		R1 = 1.0 / (RF * Cab.RKINFZ) + 1.0 / (Cab.HI * AIFSID)
 		R2 = 1.0 / (Cab.HO * AOFSID)
 		
-		loc_list = self.radtrn (R1, R2, Cab.TFRZ, Cab.TROOM)
+		loc_list = self.getRadHeatFlux (R1, R2, Cab.TFRZ, Cab.TROOM)
 		Cab.QFRSID = loc_list[0]
 		
 		# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -256,7 +256,7 @@ class Ql8 (CabUtils):
 		R1 = 1.0 / (Cab.R * Cab.RKINFF) + 1.0 / (Cab.HI * AIRTOP)
 		R2 = 1.0 / (Cab.HO * AORTOP)
 		
-		loc_list = self.radtrn (R1, R2, Cab.TFF, Cab.TROOM)
+		loc_list = self.getRadHeatFlux (R1, R2, Cab.TFF, Cab.TROOM)
 		Cab.QTOP = loc_list[0]
 		
 		# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -267,7 +267,7 @@ class Ql8 (CabUtils):
 		R1 = 1.0 / (Cab.R * Cab.RKINFF) + 1.0 / (Cab.HI * AIRBCK)
 		R2 = 1.0 / (Cab.HO * AORBCK)
 		
-		loc_list = self.radtrn (R1, R2, Cab.TFF, Cab.TROOM)
+		loc_list = self.getRadHeatFlux (R1, R2, Cab.TFF, Cab.TROOM)
 		Cab.QRBACK = loc_list[0]
 		
 		# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -288,7 +288,7 @@ class Ql8 (CabUtils):
 		R1 = 1.0 / (Cab.R * Cab.RKINFZ) + 1.0 / (Cab.HI * AIFBCK)
 		R2 = 1.0 / (Cab.HO * AOFBCK)
 		
-		loc_list = self.radtrn (R1, R2, Cab.TFRZ, Cab.TROOM)
+		loc_list = self.getRadHeatFlux (R1, R2, Cab.TFRZ, Cab.TROOM)
 		Cab.QFBACK = loc_list[0]
 
 		# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -300,7 +300,7 @@ class Ql8 (CabUtils):
 		R1 = 1.0 / (Cab.R * Cab.DKINFF) + 1.0 / (Cab.HI * AIRBCK)
 		R2 = 1.0 / (Cab.HO * AORBCK)
 		
-		loc_list = self.radtrn (R1, R2, Cab.TFF, Cab.TROOM)
+		loc_list = self.getRadHeatFlux (R1, R2, Cab.TFF, Cab.TROOM)
 		Cab.QRFRNT = loc_list[0]
 
 		# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -313,7 +313,7 @@ class Ql8 (CabUtils):
 		R1 = 1.0 / (Cab.R * Cab.DKINFZ) + 1.0 / (Cab.HI * AIFFNT)
 		R2 = 1.0 / (Cab.HO * AOFFNT)
 		
-		loc_list = self.radtrn (R1, R2, Cab.TFRZ, Cab.TROOM)
+		loc_list = self.getRadHeatFlux (R1, R2, Cab.TFRZ, Cab.TROOM)
 		Cab.QFFRNT = loc_list[0]
 		
 		# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -328,7 +328,7 @@ class Ql8 (CabUtils):
 			R1 = 1.0 / (Cab.R * Cab.RKINFZ) + 1.0 / (Cab.HI * AIB)
 			R2 = 1.0 / (Cab.HO * AOB)
 			
-			loc_list = self.radtrn (R1, R2, Cab.TFRZ, Cab.TBTM)
+			loc_list = self.getRadHeatFlux (R1, R2, Cab.TFRZ, Cab.TBTM)
 			Cab.QBOTTM = loc_list[0]
 			# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 	 
 
@@ -340,7 +340,7 @@ class Ql8 (CabUtils):
 			R1 = 1.0 / (RB1 * Cab.RKINFZ) + 1.0 / (Cab.HI * AIFBTM1)
 			R2 = 1.0 / (Cab.HO * AOFBTM1)
 
-			loc_list = self.radtrn (R1, R2, Cab.TFRZ, Cab.TBTM)
+			loc_list = self.getRadHeatFlux (R1, R2, Cab.TFRZ, Cab.TBTM)
 			Cab.QBOTTM1 = loc_list[0]
 			# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 	 
 
@@ -351,7 +351,7 @@ class Ql8 (CabUtils):
 			R1 = 1.0 / (RB2 * Cab.RKINFZ) + 1.0 / (Cab.HI * AIFBTM2)
 			R2 = 1.0 / (Cab.HO * AOFBTM2)
 			
-			loc_list = self.radtrn (R1, R2, Cab.TFRZ, Cab.TBTM)
+			loc_list = self.getRadHeatFlux (R1, R2, Cab.TFRZ, Cab.TBTM)
 			Cab.QBOTTM2 = loc_list[0]
 			# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 	 	 
 			Cab.QBOTTM = Cab.QBOTTM1 + Cab.QBOTTM2
@@ -364,7 +364,7 @@ class Ql8 (CabUtils):
 			R1 = 1.0 / (RB1 * Cab.RKINFZ) + 1.0 / (Cab.HI * AIFBTM1)
 			R2 = 1.0 / (Cab.HO * AOFBTM1)
 			
-			loc_list = self.radtrn (R1, R2, Cab.TFRZ, Cab.TBTM)
+			loc_list = self.getRadHeatFlux (R1, R2, Cab.TFRZ, Cab.TBTM)
 			Cab.QBOTTM1 = loc_list[0]
 			# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 	 
 
@@ -373,7 +373,7 @@ class Ql8 (CabUtils):
 			R1 = 1.0 / (RB2 * Cab.RKINFZ) + 1.0 / (Cab.HI * AIFBTM2)
 			R2 = 1.0 / (Cab.HO * AOFBTM2)
 			
-			loc_list = self.radtrn (R1, R2, Cab.TFRZ, Cab.TBTM)
+			loc_list = self.getRadHeatFlux (R1, R2, Cab.TFRZ, Cab.TBTM)
 			Cab.QBOTTM2 = loc_list[0]
 			# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 	 
 
@@ -383,7 +383,7 @@ class Ql8 (CabUtils):
 			R1 = 1.0 / (RB3 * Cab.RKINFZ) + 1.0 / (Cab.HI * AIFBTM3)
 			R2 = 1.0 / (Cab.HO * AOFBTM3)
 			
-			loc_list = self.radtrn (R1, R2, Cab.TFRZ, Cab.TBTM)
+			loc_list = self.getRadHeatFlux (R1, R2, Cab.TFRZ, Cab.TBTM)
 			Cab.QBOTTM3 = loc_list[0]
 			# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 	 	 
 			Cab.QBOTTM = Cab.QBOTTM1 + Cab.QBOTTM2 + Cab.QBOTTM3
@@ -450,7 +450,7 @@ class Ql8 (CabUtils):
 		
 		# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		# The heat leak due to Door Openings
-		obj_doorpn = Doorpn().DoorpnBuilder ()	\
+		obj_doorpn = DoorOpen().DoorpnBuilder ()	\
 			.withTempFFSetpoint (Cab.TFF)		\
 			.withTempFZSetpoint (Cab.TFRZ)		\
 			.withHeighFF ( HFFC) 				\
