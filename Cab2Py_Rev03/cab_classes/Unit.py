@@ -123,37 +123,40 @@ class Unit:
 	
 	#-----------------------------------------------
 	@staticmethod	
-	def CmWattF2K_BtuInchHrF2F (cond_watt):
+	def CmWattM2K_BtuInchHrF2F (cond_watt):
 		'''
-		input : cm watt/square meter/K 		Btu_inch_hr_f2_F__cm_watt_f2_K
+		input : cm watt/square meter/K or (CM.W/m2-DEG_C)
 		output: Btu (th) inch/hour/square foot/DEG_F or (BTU-INCH/HR-FT2-DEG F)
 		'''
 		return  cond_watt * Unit.COND_WATTCM_BTU_INCH
 		
 	@staticmethod
-	def BtuInchHrF2F_CmWattF2K (cond_btu):
+	def BtuInchHrF2F_CmWattM2K (cond_btu):
 		'''
 		input : Btu (th) inch/hour/square foot/DEG_F or (BTU-INCH/HR-FT2-DEG F)
-		output: cm watt/square meter/K
+		output: cm watt/square meter/K or or (CM.W/m2-DEG_C) or or (CM.W/m2-K)
 		'''	
 		return  cond_btu / Unit.COND_WATTCM_BTU_INCH
 	#-----------------------------------------------
 	@staticmethod
-	def CmWattF2K_BtuHrFtF (cond_watt):
+	def CmWattM2K_BtuHrFtF (cond_watt):
 		'''
 		input : cm watt/square meter/K or (CM.W/m2-DEG_C) CmWattF2K
-		output: (BTU/HR-FT-DEG F)/12   BtuHrFtF 
+		output: (BTU/HR-FT-DEG F)   BtuHrFtF 
+		
 		Btu (th) inch/hour/square foot/DEG_F /12 = Btu (th) /hour/ foot/DEG_F/12 or
 		conductivity to resistivity example:  resistivity = 1/ watt_btuInch(cond_watt)
 							resistivity unit = hr foot DEG_F/ Btu (th).
 		Unit.COND_WATTCM_BTU_INCH / Unit.DIST_FEET_INCH  =  0.069380 / 12
 		'''
 		return  cond_watt * Unit.COND_WATTCM_BTU_INCH / Unit.DIST_FEET_INCH 
+
 	@staticmethod
-	def BtuHrFtF_CmWattF2K (cond_btu):
+	def BtuHrFtF_CmWattM2K (cond_btu):
 		'''
 		input: Btu (th) inch/hour/square foot/DEG_F /12 = Btu (th) /hour/ foot/DEG_F/12 or (BTU/HR-FT-DEG F)/12		
 		output : cm watt/square meter/K or (CM.W/m2-DEG_C)
+		
 		Unit.DIST_FEET_INCH / Unit.COND_WATTCM_BTU_INCH  = 12/0.069380
 		'''
 		return  cond_btu * Unit.DIST_FEET_INCH / Unit.COND_WATTCM_BTU_INCH 

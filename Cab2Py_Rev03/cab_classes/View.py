@@ -376,15 +376,15 @@ class View (ABC):
 		self.objCabout.write_or_terminate (" ")
 		self.objCabout.write_or_terminate ("THERMAL CHARACTERISTICS")
 		self.objCabout.write_or_terminate ("Thermal Resistivity")
-		self.objCabout.write_or_terminate ("  ,Fresh food cabinet,  % 10.4f, m2-C/W-cm " %( 1.0/Unit.BtuHrFtF_CmWattF2K(self.obj_data.RKINFF) )   )
-		self.objCabout.write_or_terminate ("  ,Freezer cabinet,     % 10.4f, m2-C/W-cm " %( 1.0/Unit.BtuHrFtF_CmWattF2K(self.obj_data.RKINFZ) )  )
-		self.objCabout.write_or_terminate ("  ,Fresh food wedge,    % 10.4f, m2-C/W-cm " %( 1.0/Unit.BtuHrFtF_CmWattF2K(self.obj_data.WKINR) )  )
+		self.objCabout.write_or_terminate ("  ,Fresh food cabinet,  % 10.4f, m2-C/W-cm " %( 1.0/Unit.BtuHrFtF_CmWattM2K(self.obj_data.RKINFF) )   )
+		self.objCabout.write_or_terminate ("  ,Freezer cabinet,     % 10.4f, m2-C/W-cm " %( 1.0/Unit.BtuHrFtF_CmWattM2K(self.obj_data.RKINFZ) )  )
+		self.objCabout.write_or_terminate ("  ,Fresh food wedge,    % 10.4f, m2-C/W-cm " %( 1.0/Unit.BtuHrFtF_CmWattM2K(self.obj_data.WKINR) )  )
 
-		self.objCabout.write_or_terminate ("  ,Freezer wedge,       % 10.4f, m2-C/W-cm " %( 1.0/Unit.BtuHrFtF_CmWattF2K(self.obj_data.WKIN) )  )
-		self.objCabout.write_or_terminate ("  ,Fresh food door,     % 10.4f, m2-C/W-cm " %( 1.0/Unit.BtuHrFtF_CmWattF2K(self.obj_data.DKINFF) )  )
+		self.objCabout.write_or_terminate ("  ,Freezer wedge,       % 10.4f, m2-C/W-cm " %( 1.0/Unit.BtuHrFtF_CmWattM2K(self.obj_data.WKIN) )  )
+		self.objCabout.write_or_terminate ("  ,Fresh food door,     % 10.4f, m2-C/W-cm " %( 1.0/Unit.BtuHrFtF_CmWattM2K(self.obj_data.DKINFF) )  )
 
-		self.objCabout.write_or_terminate ("  ,Freezer door,% 10.4f, m2-C/W-cm " %( 1.0/Unit.BtuHrFtF_CmWattF2K(self.obj_data.DKINFZ) ))
-		self.objCabout.write_or_terminate ("  ,Mullion,     % 10.4f, m2-C/W-cm " %( 1.0/Unit.BtuHrFtF_CmWattF2K(self.obj_data.CKMUL) ) )
+		self.objCabout.write_or_terminate ("  ,Freezer door,% 10.4f, m2-C/W-cm " %( 1.0/Unit.BtuHrFtF_CmWattM2K(self.obj_data.DKINFZ) ))
+		self.objCabout.write_or_terminate ("  ,Mullion,     % 10.4f, m2-C/W-cm " %( 1.0/Unit.BtuHrFtF_CmWattM2K(self.obj_data.CKMUL) ) )
 	
 	#-----------------------------------------------------------
 	# Job 			: show input data, this section is displayed for mode 3
@@ -431,10 +431,10 @@ class View (ABC):
 		self.objCabout.write_or_terminate ("THERMAL CHARACTERISTICS")
 		self.objCabout.write_or_terminate ("Thermal Resistivity")
 		
-		self.objCabout.write_or_terminate ("  ,Cabinet,% 10.4f,m2-C/W-cm " % ( 1.0/Unit.BtuHrFtF_CmWattF2K(self.obj_data.RKIN) )  )
-		self.objCabout.write_or_terminate ("  ,Wedge,  % 10.4f,m2-C/W-cm " % ( 1.0/Unit.BtuHrFtF_CmWattF2K(self.obj_data.WKIN)) )
-		self.objCabout.write_or_terminate ("  ,Door,   % 10.4f,m2-C/W-cm " % ( 1.0/Unit.BtuHrFtF_CmWattF2K(self.obj_data.DKIN) ) )
-		self.objCabout.write_or_terminate ("  ,Door,   % 10.4f,m2-C/W-cm " % ( 1.0/Unit.BtuHrFtF_CmWattF2K(self.obj_data.DKIN) ) )
+		self.objCabout.write_or_terminate ("  ,Cabinet,% 10.4f,m2-C/W-cm " % ( 1.0/Unit.BtuHrFtF_CmWattM2K(self.obj_data.RKIN) )  )
+		self.objCabout.write_or_terminate ("  ,Wedge,  % 10.4f,m2-C/W-cm " % ( 1.0/Unit.BtuHrFtF_CmWattM2K(self.obj_data.WKIN)) )
+		self.objCabout.write_or_terminate ("  ,Door,   % 10.4f,m2-C/W-cm " % ( 1.0/Unit.BtuHrFtF_CmWattM2K(self.obj_data.DKIN) ) )
+		self.objCabout.write_or_terminate ("  ,Door,   % 10.4f,m2-C/W-cm " % ( 1.0/Unit.BtuHrFtF_CmWattM2K(self.obj_data.DKIN) ) )
 		self.objCabout.write_or_terminate ("  ,Gasket heat leak,   % 10.4f, W/m-C" % ( Unit.BtuThHInchF_WattM(self.obj_data.HLFZG ) ) ) 
 	
 	#-----------------------------------------------------------
@@ -455,8 +455,8 @@ class View (ABC):
 
 		self.objCabout.write_or_terminate ("THERMAL CHARACTERISTICS")
 		self.objCabout.write_or_terminate ("Thermal resistivity")
-		self.objCabout.write_or_terminate ("  ,Freezer cabinet,    % 10.4f, m2-C/W-cm" % ( 1.0/Unit.BtuHrFtF_CmWattF2K(self.obj_data.RKIN)) )
-		self.objCabout.write_or_terminate ("  ,Freezer top (door), % 10.4f, m2-C/W-cm" % ( 1.0/Unit.BtuHrFtF_CmWattF2K(self.obj_data.TKIN)  ) )
+		self.objCabout.write_or_terminate ("  ,Freezer cabinet,    % 10.4f, m2-C/W-cm" % ( 1.0/Unit.BtuHrFtF_CmWattM2K(self.obj_data.RKIN)) )
+		self.objCabout.write_or_terminate ("  ,Freezer top (door), % 10.4f, m2-C/W-cm" % ( 1.0/Unit.BtuHrFtF_CmWattM2K(self.obj_data.TKIN)  ) )
 		
 		self.objCabout.write_or_terminate ("  ,Gasket heat leak,% 10.4f, W/m-C" % ( Unit.BtuThHInchF_WattM (self.obj_data.HLFZG) ) )
 	
@@ -477,9 +477,9 @@ class View (ABC):
 		self.objCabout.write_or_terminate ("THERMAL CHARACTERISTICS")
 		self.objCabout.write_or_terminate ("Thermal resistivity")
 
-		self.objCabout.write_or_terminate ("  ,Cabinet,% 10.4f,m2-C/W-cm " % ( Unit.CmWattF2K_BtuInchHrF2F(self.obj_data.RCAB) )  )
-		self.objCabout.write_or_terminate ("  ,Wedge,  % 10.4f,m2-C/W-cm " % ( Unit.CmWattF2K_BtuInchHrF2F(self.obj_data.RWEDGE)) )
-		self.objCabout.write_or_terminate ("  ,Door,   % 10.4f,m2-C/W-cm " % ( Unit.CmWattF2K_BtuInchHrF2F(self.obj_data.RDOOR) ) )
+		self.objCabout.write_or_terminate ("  ,Cabinet,% 10.4f,m2-C/W-cm " % ( Unit.CmWattM2K_BtuInchHrF2F(self.obj_data.RCAB) )  )
+		self.objCabout.write_or_terminate ("  ,Wedge,  % 10.4f,m2-C/W-cm " % ( Unit.CmWattM2K_BtuInchHrF2F(self.obj_data.RWEDGE)) )
+		self.objCabout.write_or_terminate ("  ,Door,   % 10.4f,m2-C/W-cm " % ( Unit.CmWattM2K_BtuInchHrF2F(self.obj_data.RDOOR) ) )
 
 		self.objCabout.write_or_terminate ("  ,Gasket heat leak,   % 10.4f, W/m-C " % ( Unit.BtuThHInchF_WattM (self.obj_data.HLFZG) ) )
 	

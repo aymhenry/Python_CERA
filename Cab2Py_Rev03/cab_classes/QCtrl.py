@@ -350,14 +350,14 @@ class QCtrl_Ql2 (QCtrl_Abstract):
 		self.obj_data.TFF = Unit.c_f (self.obj_data.TFF )
 		#self.obj_data.RKIN = 0.0
 		
-		self.obj_data.RKINFF = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RFF )
-		self.obj_data.RKINFZ = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RFRZ )
-		self.obj_data.WKINR = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RWEDGER )
-		self.obj_data.WKIN = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RWEDGE )
+		self.obj_data.RKINFF = 1.0 / Unit.BtuHrFtF_CmWattM2K( self.obj_data.RFF )  # same as Unit.CmWattM2K_BtuHrFtF (1/input_value)
+		self.obj_data.RKINFZ = 1.0 / Unit.BtuHrFtF_CmWattM2K( self.obj_data.RFRZ )
+		self.obj_data.WKINR = 1.0 / Unit.BtuHrFtF_CmWattM2K( self.obj_data.RWEDGER )
+		self.obj_data.WKIN = 1.0 / Unit.BtuHrFtF_CmWattM2K( self.obj_data.RWEDGE )
 		
-		self.obj_data.DKINFF = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RDRFF )
-		self.obj_data.DKINFZ = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RDRFZ )
-		self.obj_data.CKMUL = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RMUL )
+		self.obj_data.DKINFF = 1.0 / Unit.BtuHrFtF_CmWattM2K( self.obj_data.RDRFF )
+		self.obj_data.DKINFZ = 1.0 / Unit.BtuHrFtF_CmWattM2K( self.obj_data.RDRFZ )
+		self.obj_data.CKMUL = 1.0 / Unit.BtuHrFtF_CmWattM2K( self.obj_data.RMUL )
 		#-----
 		self.obj_data.TIRT = Unit.cm_feet(self.obj_data.TIRT )
 		
@@ -442,14 +442,14 @@ class QCtrl_Ql13 (QCtrl_Abstract):
 		#self.obj_data.RKIN = 0.0
 		self.obj_data.CINSUL = Unit.cm_feet (self.obj_data.CINSUL )
 		
-		self.obj_data.RKINFF = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RFF )
-		self.obj_data.RKINFZ = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RFRZ )
-		self.obj_data.WKINR = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RWEDGER )
-		self.obj_data.WKIN = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RWEDGE )
+		self.obj_data.RKINFF = 1.0 / Unit.BtuHrFtF_CmWattM2K( self.obj_data.RFF ) # same as Unit.CmWattM2K_BtuHrFtF (1/input_value)
+		self.obj_data.RKINFZ = 1.0 / Unit.BtuHrFtF_CmWattM2K( self.obj_data.RFRZ )
+		self.obj_data.WKINR = 1.0 / Unit.BtuHrFtF_CmWattM2K( self.obj_data.RWEDGER )
+		self.obj_data.WKIN = 1.0 / Unit.BtuHrFtF_CmWattM2K( self.obj_data.RWEDGE )
 		
-		self.obj_data.DKINFF = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RDRFF )
-		self.obj_data.DKINFZ = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RDRFZ )
-		self.obj_data.CKMUL = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RMUL )
+		self.obj_data.DKINFF = 1.0 / Unit.BtuHrFtF_CmWattM2K( self.obj_data.RDRFF )
+		self.obj_data.DKINFZ = 1.0 / Unit.BtuHrFtF_CmWattM2K( self.obj_data.RDRFZ )
+		self.obj_data.CKMUL = 1.0 / Unit.BtuHrFtF_CmWattM2K( self.obj_data.RMUL )
 		#-----
 		self.obj_data.FFASHQ = Unit.Watt_BtuH (self.obj_data.FFASHQ )
 		self.obj_data.FZASHQ = Unit.Watt_BtuH (self.obj_data.FZASHQ )
@@ -533,9 +533,9 @@ class QCtrl_Ql467 (QCtrl_Abstract):
 		self.obj_data.CDUP = Unit.cm_feet(self.obj_data.CDUP )
 		self.obj_data.CDDN = Unit.cm_feet(self.obj_data.CDDN )
 		
-		self.obj_data.RKIN = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RCAB )
-		self.obj_data.WKIN = 1.0/Unit.BtuHrFtF_CmWattF2K (self.obj_data.RWEDGE) 
-		self.obj_data.DKIN = 1.0/Unit.BtuHrFtF_CmWattF2K (self.obj_data.RDOOR) 
+		self.obj_data.RKIN = 1.0 / Unit.BtuHrFtF_CmWattM2K( self.obj_data.RCAB ) # same as Unit.CmWattM2K_BtuHrFtF (1/input_value)
+		self.obj_data.WKIN = 1.0/Unit.BtuHrFtF_CmWattM2K (self.obj_data.RWEDGE) 
+		self.obj_data.DKIN = 1.0/Unit.BtuHrFtF_CmWattM2K (self.obj_data.RDOOR) 
 		
 		self.obj_data.RCAB = 1.0 / ( self.obj_data.RKIN *12)
 		self.obj_data.RWEDGE = 1.0 / ( self.obj_data.WKIN *12)
@@ -606,8 +606,8 @@ class QCtrl_Ql5 (QCtrl_Abstract):
 		self.obj_data.TFF = self.obj_data.TFRZ
 		self.obj_data.TIFLS = self.obj_data.TIFRS
 		
-		self.obj_data.RKIN = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RCAB )
-		self.obj_data.TKIN = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RTOP )
+		self.obj_data.RKIN = 1.0 / Unit.BtuHrFtF_CmWattM2K( self.obj_data.RCAB ) # same as Unit.CmWattM2K_BtuHrFtF (1/input_value)
+		self.obj_data.TKIN = 1.0 / Unit.BtuHrFtF_CmWattM2K( self.obj_data.RTOP )
 		self.obj_data.RCAB = 1.0 / ( self.obj_data.RKIN *12)
 		#---
 		self.obj_data.FZASHQ = Unit.Watt_BtuH (self.obj_data.FZASHQ )
@@ -660,14 +660,14 @@ class QCtrl_Ql8 (QCtrl_Abstract):
 	def adjust_units (self):
 		
 		#self.obj_data.RKIN = 0.0
-		self.obj_data.RKINFF = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RFF )
-		self.obj_data.RKINFZ = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RFRZ )
-		self.obj_data.WKINR = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RWEDGER )
-		self.obj_data.WKIN = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RWEDGE )
+		self.obj_data.RKINFF = 1.0 / Unit.BtuHrFtF_CmWattM2K( self.obj_data.RFF ) # same as Unit.CmWattM2K_BtuHrFtF (1/input_value)
+		self.obj_data.RKINFZ = 1.0 / Unit.BtuHrFtF_CmWattM2K( self.obj_data.RFRZ )
+		self.obj_data.WKINR = 1.0 / Unit.BtuHrFtF_CmWattM2K( self.obj_data.RWEDGER )
+		self.obj_data.WKIN = 1.0 / Unit.BtuHrFtF_CmWattM2K( self.obj_data.RWEDGE )
 				
-		self.obj_data.DKINFF = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RDRFF )
-		self.obj_data.DKINFZ = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RDRFZ )
-		self.obj_data.CKMUL = 1.0 / Unit.BtuHrFtF_CmWattF2K( self.obj_data.RMUL )
+		self.obj_data.DKINFF = 1.0 / Unit.BtuHrFtF_CmWattM2K( self.obj_data.RDRFF )
+		self.obj_data.DKINFZ = 1.0 / Unit.BtuHrFtF_CmWattM2K( self.obj_data.RDRFZ )
+		self.obj_data.CKMUL = 1.0 / Unit.BtuHrFtF_CmWattM2K( self.obj_data.RMUL )
 		
 		self.obj_data.CDUP = Unit.cm_feet(self.obj_data.CDUP )
 		self.obj_data.CDDN = Unit.cm_feet(self.obj_data.CDDN )
