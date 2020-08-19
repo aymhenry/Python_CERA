@@ -332,12 +332,7 @@ class QCtrl_Ql2 (QCtrl_Abstract):
 		
 	def setup_vars_extra (self):
 		self.obj_data.setup_vars ( 0.0,	\
-			['QRTOP','QFRNTR','QDFFCS','QLTOP','QMUL']\
-			)
-		
-		self.obj_data.setup_vars ( 0.0,	\
-			['BOTTOM','FLGB','NCCTYPE','RKIN', 'RKINFF','RKINFZ','WKINR','WKIN', 'DKINFF','DKINFZ','CKMUL']\
-			)
+			['BOTTOM'] )
 		
 	def adjust_units (self):
 		self.obj_data.HLGZF = Unit.WattM_BtuThHInchF (self.obj_data.HLGZF)
@@ -383,7 +378,7 @@ class QCtrl_Ql2 (QCtrl_Abstract):
 		self.obj_data.FFPENA = Unit.Watt_BtuH (self.obj_data.FFPENA )
 		
 		self.obj_data.HXVUR = Unit.liter_ft3 (self.obj_data.HXVUR )
-		self.obj_data.HRFFC = ( self.obj_data.SECFFC / 3600.0 ) * self.obj_data.FFCOPN
+		
 		self.obj_data.WEDGE = Unit.cm_feet (self.obj_data.WEDGE )
 		self.obj_data.WEDGER = Unit.cm_feet (self.obj_data.WEDGER )
 		self.obj_data.VOLAR = Unit.liter_ft3 (self.obj_data.VOLAR )
@@ -391,6 +386,7 @@ class QCtrl_Ql2 (QCtrl_Abstract):
 		self.obj_data.FLANGE = Unit.cm_feet (self.obj_data.FLANGE )
 		self.obj_data.FLANGER = Unit.cm_feet (self.obj_data.FLANGER )
 		self.obj_data.FLGB = self.obj_data.FLANGER
+		self.obj_data.HRFFC = ( self.obj_data.SECFFC / 3600.0 ) * self.obj_data.FFCOPN
 
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # Job 			: Control class for Q113 (mode 1,3) 
@@ -426,8 +422,7 @@ class QCtrl_Ql13 (QCtrl_Abstract):
 		
 	def setup_vars_extra (self):
 		self.obj_data.setup_vars ( 0.0,	\
-			['QMUL','FLGB','NCCTYPE', 'RKIN', 'RKINFF','RKINFZ','WKINR','WKIN', 'DKINFF','DKINFZ','CKMUL']\
-			 )
+			['QMUL'] )
 		
 	def adjust_units (self):
 		self.obj_data.HLFZG = Unit.WattM_BtuThHInchF ( self.obj_data.HLFZG )
@@ -517,9 +512,9 @@ class QCtrl_Ql467 (QCtrl_Abstract):
 		# TFF was add, it is found in Config.6(mode 4), and not found in Config.5(mode7)
 		# To prevent var is not found error in Ql456 with deal with both mode.
 		self.obj_data.setup_vars ( 0.0,\
-		['BOTTOM','FLGB','NCCTYPE',  'RKIN', 'TKIN', 'HIWP','TFF']\
+		['BOTTOM','TFF','FW','FH','FD','VOLAR','FFCOPN','HRFFC'] \
 			 )
-		self.obj_data.setup_vars ( 0.0,['FH','FW','FD','RTOP','VOLAR','FFCOPN','HRFFC'])
+
 		
 	def adjust_units (self):
 		self.obj_data.TIFLS = Unit.cm_feet (self.obj_data.TIFLS )
@@ -588,9 +583,6 @@ class QCtrl_Ql5 (QCtrl_Abstract):
 
 	def setup_vars_extra (self):
 		self.obj_data.setup_vars ( 0.0,	\
-			['RKIN', 'TKIN', 'HIWP']\
-			 )
-		self.obj_data.setup_vars ( 0.0,	\
 			['QW','VOLAR','FFCOPN','HRFFC'] )
 	
 	def adjust_units (self):
@@ -654,8 +646,7 @@ class QCtrl_Ql8 (QCtrl_Abstract):
 		
 	def setup_vars_extra (self):
 		self.obj_data.setup_vars ( 0.0,	\
-			['QBCOMP','FLGB','NCCTYPE', 'RKIN', 'RKINFF','RKINFZ','WKINR','WKIN', 'DKINFF','DKINFZ','CKMUL']\
-			 )
+			['QBCOMP'] )
 	
 	def adjust_units (self):
 		
@@ -704,6 +695,7 @@ class QCtrl_Ql8 (QCtrl_Abstract):
 		self.obj_data.TIRT = Unit.cm_feet(self.obj_data.TIRT )
 		self.obj_data.VOLAR = Unit.liter_ft3 (self.obj_data.VOLAR )
 		self.obj_data.HRFFC = ( self.obj_data.SECFFC / 3600.0 ) * self.obj_data.FFCOPN
+		
 		self.obj_data.TFF = Unit.c_f (self.obj_data.TFF )
 		
 		self.obj_data.FLGB = self.obj_data.FLANGER 
