@@ -1,0 +1,7 @@
+0.01,TOL_FRSH, ,   0.1
+0.01,TOL_FRZ  0.1
+0.01,TOL_COND 0.075
+0.01,TOL_MASS 
+0.01,TOL_HX 0.001
+1,N_EVAP, Evapourator count 
+1,N_COND, number of condenser 

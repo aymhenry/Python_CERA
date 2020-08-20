@@ -183,7 +183,7 @@ class Block2 (Data):
 		
 		for IT in range (1, Data.ITMAX +1):	# DO 100 IT=1,ITMAX
 			DPDV = DP(RT, V, A, B, B4, B42)
-			if (DPDV < 0.0):break	# GOTO 116
+			if (DPDV <= 0.0):break	# GOTO 116
 
 			VPOS = V
 			V = 0.5 * ( V + B4)
@@ -212,13 +212,13 @@ class Block2 (Data):
 
 		for IT in range (1, Data.ITMAX + 1):	#DO 160 IT=1,ITMAX
 			DPDV = DP(RT,V,A,B,B4,B42)
-			if (DPDV < 0.0): break	# GOTO 164
+			if (DPDV <= 0.0): break	# GOTO 164
 			VPOS = V
 			V = 2.0 * V
 
 		VNEG = V		# location 164
 
-		for IT in range (1,20): # DO 180 IT=1,20
+		for IT in range (1,20 +1): # DO 180 IT=1,20
 			VU = 0.5 * (VNEG+VPOS)
 			DPDV = DP(RT,VU,A,B,B4,B42)
 			if (DPDV  < 0.0) :
@@ -399,7 +399,7 @@ class Block2 (Data):
 			TCC = 0.2273291 * AC / (Data.R*BC)
 			FTC[J] = TCC - TC[J]
 	
-			if ( abs( FTC[J] ) <= 0.01):
+			if ( abs( FTC[J] ) < 0.01):
 				b_python_flag = False	# exit flag
 				break 					# GOTO 240
 			
@@ -571,7 +571,7 @@ class Block2 (Data):
 		#   LOWER BOUNDS.  if THE LOWER BOUND FOR PRESSURE IS NEGATIVE
 		#   RESET IT TO A SMALL POSITIVE VALUE.
 
-		if PLOW < 0.0:
+		if PLOW <= 0.0:
 			VLOW = 0.8 * B1
 			PC = 0.1049995 * Data.R * loc_TC / B1
 			PLOW = (1.0E-12) * PC
@@ -589,8 +589,8 @@ class Block2 (Data):
 
 		LPPOS   =  False
 		LPNEG   =  False
-		#LPPCON  =  False
-		LPPCON  =  True # A
+		#LPPCON  =  False  # modifed in Python, work arounf Fortran Goto
+		LPPCON  =  True 
 
 		#
 		#   STARTING WITH INITIAL VALUES OF PRESSURE CLOSE TO THE UPPER
@@ -616,7 +616,7 @@ class Block2 (Data):
 				LPNEG = True
 				FPNEG = FP[J]
 				PNEG  = PL[J]
-				PPOS = 0.0 # not set
+				PPOS = 0.0 # in python only
 			else:
 				LPPOS = True
 				FPPOS = FP[J]
@@ -735,7 +735,7 @@ class Block2 (Data):
 
 				#   COMPUTE EQUATION OF STATE COEFFICIENTS FOR PHASE 2
 				
-				[A2, B2] = self.espar (0,T,X1) 	#CALL espar (0,T,XX2, A2, B2)
+				[A2, B2] = self.espar (0,T,XX2) 	#CALL espar (0,T,XX2, A2, B2)
 				#[P5, P7] = self.vit (P1, P2, P3, P4, P5, P6)
 				[V2, LV2CON] = self.vit (T,PP[J], A2, B2,V2, not LBUB)	#CALL VIT (T,PP[J], A2, B2,V2,.NOT.LBUB,LV2CON)
 
@@ -813,7 +813,7 @@ class Block2 (Data):
 			#
 			#   COMPUTE NEW GUESS FOR SATURATION PRESSURE.
 			#
-			if (ITP < 2  or  J == 1  or  FP[1] == FP[2]) :
+			if (ITP <= 2  or  J == 1  or  FP[1] == FP[2]) :
 				PP[1] = PP[J]
 				FP[1] = FP[J]
 
@@ -846,13 +846,15 @@ class Block2 (Data):
 		#   DEPENDING ON WHETHER THE DEW OR BUBBLE POINT WAS CALCULATED.
 		#
 		if (LBUB)  :
-			for I in range (1, Data.NC + 1): # DO 860 I = 1,Data.NC
-				XV[I] = XX2[I]
+			#for I in range (1, Data.NC + 1): # DO 860 I = 1,Data.NC
+			#	XV[I] = XX2[I]
+			XV = XX2 [:]
 			VL = V1
 			VV = V2
 		else :
-			for I in range (1, Data.NC + 1): # DO 880 I = 1,Data.NC
-				XL[I] = XX2[I]
+			#for I in range (1, Data.NC + 1): # DO 880 I = 1,Data.NC
+			#	XL[I] = XX2[I]
+			XL = XX2 [:]
 			VL = V2
 			VV = V1
 
