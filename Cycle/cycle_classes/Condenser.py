@@ -781,6 +781,6 @@ class Condenser (Block2):
 		TC[JC] = TCNEW
 		MROLD = Data.MREF #useless
 
-		print ("aym ====.................. DELT=", DELT, " TC=", TC)
+		#print ("aym ====.................. DELT=", DELT, " TC=", TC)
 		return [ TS2, TC, JC, ICONC]
 

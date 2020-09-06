@@ -456,7 +456,7 @@ class Cycle (Adjlod, Condenser, FFEvap, Compressor, Evap2):
 			#  CALL BUBLT(T(15),XL(1,15),X,P(15),VL(15),V(15),.FALSE.,LCRIT)
 			self.setArr2dCol (XL, 15, XL_Temp)
 			
-			print ("aym 		before start iteratiojn  T[15],P[15]=",T[15], P[15])
+			
 			
 			TE[1] = T[15] + Data.DTSUPE
 			T[7] = TE[1]
@@ -614,7 +614,7 @@ class Cycle (Adjlod, Condenser, FFEvap, Compressor, Evap2):
 			#
 			Data.IE = 1
 			while ( (Data.IE  <=  ITMAXE)  and  LECON ): #DO WHILE (Data.IE  <=  ITMAXE  and  LECON)
-				print ("aym  inner loooop=============================================Data.IC, IE", Data.IC, Data.IE)
+				
 				#if (ICYCL  ==  2) :
 				#	CALL GOTOXY(45,17)
 				#else:
@@ -640,7 +640,7 @@ class Cycle (Adjlod, Condenser, FFEvap, Compressor, Evap2):
 					[ XL_Temp, X, P[15], VL[15], V[15], LCRIT] = self.bublt (T[15], XL_Temp, X, False )
 					self.setArr2dCol (XL, 1, XL_Temp)
 					
-					print ("aym start-=-=-=-==-=inner loop IE,T[15], P15 with be P7 =",Data.IE, T[15], P[15])
+					
 					
 					P[7] = P[15]
 					XQ[15] = 1.0
@@ -788,7 +788,7 @@ class Cycle (Adjlod, Condenser, FFEvap, Compressor, Evap2):
 				P[6]  = P[4]
 				P[13] = P[7]
 
-				print ("aym 		inside inner loop Data.IE,, T[15],P[7]=",Data.IE,T[15], P[7])
+				
 				
 				#[P4, P5, P6, P7, P8, P9, P10, P11] = self.hpin ( P1,P2,P3 )
 				[ T[6],XQ6, XL_Temp, XV_Temp, V[6],  VV6,HL,HV] = self.hpin ( H[6],P[6],X )
@@ -833,7 +833,7 @@ class Cycle (Adjlod, Condenser, FFEvap, Compressor, Evap2):
 				#
 				P[5] = P[13] + DPE
 				
-				print ("aym inner loop 							IE,P5 from p13+DPE =",Data.IE, P[5])
+				
 				
 				#TSHOW = T[6] - 273.11
 				#CALL GOTOXY(2,13)
@@ -857,7 +857,7 @@ class Cycle (Adjlod, Condenser, FFEvap, Compressor, Evap2):
 				PDEWE = P[5] - (1.0-FSUPE)*DPE
 				if (PDEWE >  P[5]): PDEWE = P[5]
 				
-				print ("aym 		inner loop IE,PDEWE final=",Data.IE, PDEWE)
+				
 				
 				# [P2, P3, P4, P5, P6, P8] = bublp ( P1, P2, P3,    P7)
 				[XREF,X,TDEW,VLDEW,VDEW, LCRIT] = self.bublp (PDEWE,XREF,X, False) # 	# CALL BUBLP(PDEWE,XREF,X,TDEW,VLDEW,VDEW,False,LCRIT)
@@ -878,7 +878,7 @@ class Cycle (Adjlod, Condenser, FFEvap, Compressor, Evap2):
 				H[12] = HDEW
 				XQ[12] = 1.0
 				
-				print ("aym inner loop IE,T[12]=",Data.IE, -273.11+T[12])
+				
 				#
 				#	FIND DUTY CYCLE, NET CAPACITY AND AVERAGE
 				#	FREEZER LOAD if ICYCL = 1
@@ -949,7 +949,7 @@ class Cycle (Adjlod, Condenser, FFEvap, Compressor, Evap2):
 				
 				#---------------------------ADDED NEW CODE (12/29/90)-------------------
 				T[15] = T[15] + TE[2] - T[7]
-				print ("aym ICONE=", ICONE)
+				
 				#-----------------------------END OF NEW CODE---------------------------
 				#
 				#
@@ -981,7 +981,7 @@ class Cycle (Adjlod, Condenser, FFEvap, Compressor, Evap2):
 				Data.ETAE = QFRSH/QMAXE
 				
 				if (ICONE  ==  1): LECON = False
-				print ("aym ........................................ TE[JE]",TE[JE])
+				
 				if (TE[JE]  <=  TEMIN):  LECON = False
 					
 				Data.IE = Data.IE + 1
@@ -2215,7 +2215,7 @@ class Cycle (Adjlod, Condenser, FFEvap, Compressor, Evap2):
 		print ("=====================================================================\n\n")
 	#=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
 	def showMsg (self, strMsg, fltValue=0.0, isOnlyTest = False):
-		return
+		
 		if isOnlyTest :
 			print ("\t ", strMsg)
 		else:
