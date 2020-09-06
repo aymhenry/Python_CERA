@@ -95,7 +95,7 @@ class Cycle (Adjlod, HeatExch):
 		if (Data.IMAP ==  0) : #Map
 			self.objCompType = Comp_Map(Cycle.obj_data)
 			
-		elif (Data.ICOND  ==  1) : # ERR
+		elif (Data.IMAP  ==  1) : # ERR
 			self.objCompType = Comp_ERR(Cycle.obj_data)
 			
 		else: # Efficiency Model

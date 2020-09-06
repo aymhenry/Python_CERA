@@ -14,7 +14,7 @@ from HeatExch import HeatExch
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 class EvapCool_Abstract (ABC, HeatExch):
 	def __init__ (self, objdata):
-		self.objEvapData = objdata
+		self.objData = objdata
 	# Abstract methods
 	#-----------------------------------------------------------
 	# Job 			: Evap. output pressure point (7)
@@ -95,9 +95,9 @@ class EvapCool_Abstract (ABC, HeatExch):
 class EvapCool_FFNat (EvapCool_Abstract): #Data.IFRSH== 0 
 	#=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
 	def calc_heat_temp (self):
-		return self.ffnat (self.objEvapData.T5,self.objEvapData.H5,self.objEvapData.T7,
-			self.objEvapData.TDEW,self.objEvapData.HDEW,self.objEvapData.TS3,	\
-			self.objEvapData.CPRVAP, self.objEvapData.IRFTYP)
+		return self.ffnat (self.objData.T5,self.objData.H5,self.objData.T7,
+			self.objData.TDEW,self.objData.HDEW,self.objData.TS3,	\
+			self.objData.CPRVAP, self.objData.IRFTYP)
 			
 	#=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
 	def ffnat (self, T5,H5,T7,  TDEW,HDEW,TS3,  CPRVAP, IRFTYP):
@@ -174,9 +174,9 @@ class EvapCool_FFNat (EvapCool_Abstract): #Data.IFRSH== 0
 class EvapCool_FFCross (EvapCool_Abstract): #Data.IFRSH== 1
 	#=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
 	def calc_heat_temp (self):
-		return self.ffcross (self.objEvapData.H[5], self.objEvapData.T[5], 
-			self.objEvapData.HDEW, self.objEvapData.TDEW, self.objEvapData.TS3, \
-			self.objEvapData.CPRVAP, self.objEvapData.P[5], self.objEvapData.P[7], self.objEvapData.X, Data.N_EVAP)
+		return self.ffcross (self.objData.H[5], self.objData.T[5], 
+			self.objData.HDEW, self.objData.TDEW, self.objData.TS3, \
+			self.objData.CPRVAP, self.objData.P[5], self.objData.P[7], self.objData.X, Data.N_EVAP)
 		
 	#=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
 	def ffcross(self, H5_S,T5_S,  HDEW_S,TDEW_S,TS3,  CPR,PIN,POUT, X,NUM_ZONE):
@@ -372,9 +372,9 @@ class EvapCool_FFCross (EvapCool_Abstract): #Data.IFRSH== 1
 class EvapCool_FFCount (EvapCool_Abstract): #Data.IFRSH== 2
 	#=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
 	def calc_heat_temp (self):
-		return self.ffcount (self.objEvapData.H[5], self.objEvapData.T[5], 
-			self.objEvapData.HDEW, self.objEvapData.TDEW, self.objEvapData.TS3, \
-			self.objEvapData.CPRVAP, self.objEvapData.P[5], self.objEvapData.P[7], self.objEvapData.X, Data.N_EVAP)
+		return self.ffcount (self.objData.H[5], self.objData.T[5], 
+			self.objData.HDEW, self.objData.TDEW, self.objData.TS3, \
+			self.objData.CPRVAP, self.objData.P[5], self.objData.P[7], self.objData.X, Data.N_EVAP)
 			
 	#=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
 	def ffcount (self, H5_S,T5_S, HDEW_S,TDEW_S,TS3,  CPR,PIN,POUT, X,NUM_ZONE):
