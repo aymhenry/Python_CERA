@@ -659,7 +659,7 @@ class Compressor:
 		#END if 
 		
 		if (IUNITS  != 1  and IUNITS  != 2) :
-			WRITE(6, '(''CHECK COMPRESSOR MAP UNITS##'')')
+			print ("WRITE(6, '(''CHECK COMPRESSOR MAP UNITS##'')'")
 		#END if 
 		#
 		WDOT = POW
@@ -842,7 +842,7 @@ class Compressor:
 		VSUC = V[1]
 		QHILO = 0.0
 		RN = 0.97*GAMA
-		return [HOUT, QHILO, QCAN, VSUC, VV2, TSUC, TDISC, GAMA. RN, ETAS]
+		return [T, HOUT, QHILO, QCAN, VSUC, VV2, TSUC, TDISC, GAMA. RN, ETAS]
 	
 	#=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
 	def progrs(self, ICYCL,H,HOUT,WM,FLOW,QCAN):

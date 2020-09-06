@@ -699,7 +699,7 @@ class Cycle (Adjlod, Condenser, FFEvap, Compressor, Evap2):
 				
 				#
 				#INC = 1
-				for INC in range (1, Data.NC + 1): #DO WHILE(INC  <=  NC)
+				for INC in range (1, NC + 1): #DO WHILE(INC  <=  NC)
 					XL[INC][13] = XL[INC][15] #XL_Temp [INC] 
 					#INC = INC + 1
 
@@ -1155,12 +1155,12 @@ class Cycle (Adjlod, Condenser, FFEvap, Compressor, Evap2):
 				#
 				OLDMAS = Data.MREF
 				#[P1, P3to P5,P7, P9 to P11, P13,P14, P15,P17 to P19 ] = self.compcall (P1 to P6, P12, P16)
-				[HOUT, QHILO, QCAN, VSUC, VV2, TSUC, TDISC, GAMA, RN, ETAS] = self.compcall (H, P, X, T, V,TS1)
+				[T, HOUT, QHILO, QCAN, VSUC, VV2, TSUC, TDISC, GAMA, RN, ETAS] = self.compcall (H, P, X, T, V,TS1)
 				#CALL COMPCALL(H, P, X, T, CV, CP,     HOUT, MEFF,
 				#	QHILO, QCAN, VSUC, V, VV2, TSUC, TDISC,
 				#	TS1, GAMA, RN, ETAS)
 
-				Data.MREF = (Data. MREF + 2.0*OLDMAS)/ 3.0
+				Data.MREF = (Data.MREF + 2.0*OLDMAS)/ 3.0
 				if (Data.MREF >  1.05*OLDMAS): Data.MREF = 1.05*OLDMAS
 				if (Data.MREF <  0.95*OLDMAS): Data.MREF = 0.95*OLDMAS
 
