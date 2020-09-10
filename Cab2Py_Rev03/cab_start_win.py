@@ -9,7 +9,6 @@ from tkinter import messagebox as mb
 
 # User Import ======================
 from cab_classes.Start import Start
-
 #------------------
 class CabApp( Frame ):
 	DATA_FOLDER  = "data_cab"
@@ -87,11 +86,11 @@ class CabApp( Frame ):
 			self.str_file_cycle_out = CabApp.FILE_OUT_CYC
 			
 		if not self.isFileExisits  ( self.str_file_cab_in, strPath):
-			mb.showerror("Error", "Cannot find file:" + self.str_file_cab_in)
+			mb.showerror("Error", "Cannot find file:" + strPath + "\\" + self.str_file_cab_in)
 			return
 		
 		if not self.isFileExisits  ( self.str_file_cab_out, strPath ):
-			mb.showerror("Error", "Cannot find file:" + self.str_file_cab_out)
+			mb.showerror("Error", "Cannot find file:" + strPath + "\\" + self.str_file_cab_out)
 			return
 		
 		self.obj_start.set_filenames( self.str_file_cab_in, 	\

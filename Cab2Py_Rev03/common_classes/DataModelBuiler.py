@@ -46,7 +46,6 @@ class DataModelBuiler (FileAccess):
 	# Output		:
 	#-----------------------------------------------------------
 	def set_init_data (self, strFileName, strPath = ""):
-		strPath = ""
 		super().__init__ (strFileName, "read" ,strPath) 
 
 	#-----------------------------------------------------------
