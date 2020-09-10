@@ -11,8 +11,8 @@ import math, sys, datetime
 
 from .QCtrl import *
 
-from .DataModelBuiler import DataModelBuiler
-from .QData import QData
+from common_classes.DataModelBuiler import DataModelBuiler
+from common_classes.QData import QData
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 # Job 			: Start Cab app
 #
@@ -56,14 +56,14 @@ class Start:
 	#-----------------------------------------------------------
 	def main (self):
 		self.data_prepare ()
-		#TestONLY =====================
-				#obj_test = Test(self.obj_data)
-				#obj_test.config1_input()
-		#TestONLY =====================
+#TestONLY =====================
+#		obj_test = Test(self.obj_data)
+#		obj_test.q12_inputs()
+#TestONLY =====================
 		try:
 			self.calculte ()		# calculate heat rate in Qxx classes
 			self.calculte_cycle ()	# claclulate cycle data
-
+						
 		except ValueError as err_description: # OSError
 			print ("Fatal program error ... system terminated")
 			print (str(err_description) + "\n\n")
@@ -73,6 +73,7 @@ class Start:
 			sys.exit('3100')	# terminat application
 
 		self.view ()			# output results
+		
 	#-----------------------------------------------------------
 	# Job 			: output results a reported form
 	# Input 		:
@@ -131,7 +132,7 @@ class Start:
 
 		# Create related object as the given configration
 		self.obj_control = ""
-
+		
 		# 1: Two door, top - mount refrigerator / freezer
 		if self.obj_data.IRFTYP == 1: # Mode 3	Top - mount refrigerator / freezer
 			self.obj_control = QCtrl_Ql13 (self.obj_data)
@@ -173,6 +174,7 @@ class Start:
 		self.obj_control.adj_unit_common()		# unit adjust in commom in abstract class
 
 		self.obj_control.adjust_units()
+		
 
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
