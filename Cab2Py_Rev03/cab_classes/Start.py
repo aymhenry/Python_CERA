@@ -9,7 +9,7 @@ import math, sys, datetime
 #from .Test import Test
 #TestONLY =====================
 
-from .QCtrl import *
+from cab_classes.QCtrl import *
 
 from common_classes.DataModelBuiler import DataModelBuiler
 from common_classes.QData import QData

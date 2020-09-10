@@ -12,7 +12,7 @@ from cab_classes.Start import Start
 
 #------------------
 class CabApp( Frame ):
-	DATA_FOLDER  = "data"
+	DATA_FOLDER  = "data_cab"
 	FILE_INP_CAB = "Cabinet_dat.csv" 
 	FILE_OUT_CAB = "Cabinet_out.csv"
 	FILE_OUT_CYC = "Cycle_out.csv"
