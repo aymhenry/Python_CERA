@@ -3,8 +3,8 @@ from abc import ABC,abstractmethod
 import datetime
 
 # User Import ======================
-from .FileAccess import FileAccess
-from .Unit import Unit
+from common_classes.FileAccess import FileAccess
+from common_classes.Unit import Unit
 
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # Job 			: Abstract class for all View class

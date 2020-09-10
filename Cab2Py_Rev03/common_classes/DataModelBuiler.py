@@ -14,6 +14,7 @@ class DataModelBuiler (FileAccess):
 	MAX_DATA_FILE_TO_READ = 100		# maximum data file lines to read, this need to be updated if there is any data line more than this
 	CONFIGRATION_COUNT = 7 			# max. number of configrations
 	CONFIGRATION_ROW = 6 			# set row number that has the configration
+	lst_required_data =[ 71,68,71, 44, 47,53,71] # required data for each configration
 	
 	ERR_FOUND_LIST = 100   			# list content error
 	ERR_FOUND_DATA_TYPE = 101   	# data type error
@@ -21,6 +22,7 @@ class DataModelBuiler (FileAccess):
 	ERR_FOUND_DATA_COUNT = 103   	# error in number of parameter for the given file
 	ERR_FOUND_READLINE = 104	   	# error during read data file
 	ERR_FOUND_MAXLIE = 105		   	# lines in file more than expected
+	ERR_FOUND_DATA_TYPE2 = 106   	# more than one decimal point, or (-) sign
 
 	def __init__(self):
 			self.lst_data = []
@@ -44,7 +46,7 @@ class DataModelBuiler (FileAccess):
 	# Output		:
 	#-----------------------------------------------------------
 	def set_init_data (self, strFileName, strPath = ""):
-
+		strPath = ""
 		super().__init__ (strFileName, "read" ,strPath) 
 
 	#-----------------------------------------------------------
@@ -56,10 +58,10 @@ class DataModelBuiler (FileAccess):
 	def build_var_list (self):
 		# if error return
 		if not self.readlines(): return False
-		
+	
 		# check that all input data, set error flag if any
 		self.chk_data_model()
-		
+	
 		# read error flag, after last check, return false if any
 		if self.isError(): return False
 		
@@ -141,6 +143,11 @@ class DataModelBuiler (FileAccess):
 				+ " File access error "	\
 				+  show_extar_err_desc ()
 
+		elif self.m_error == DataModelBuiler.ERR_FOUND_DATA_TYPE2:
+			return "Err " + str(DataModelBuiler.ERR_FOUND_DATA_TYPE2) 	\
+				+ " more than one decimal point, or (-) sign "	\
+				+  show_extar_err_desc ()
+				
 		elif self.m_error == DataModelBuiler.ERR_FOUND_DATA_TYPE:
 			return "Err " + str(DataModelBuiler.ERR_FOUND_DATA_TYPE) 	\
 				+ " data type error, given string not float in input file "	\
@@ -187,14 +194,13 @@ class DataModelBuiler (FileAccess):
 	#			return True  if no error, else Flase 
 	#-----------------------------------------------------------
 	def chk_data_model (self):
-		# Configration from 1 to 8
+		# Configration from 1 to CONFIGRATION_ROW
 		# every configration has number of parameters rquirted.
 		# configration no. 1 count of parameters is lst_required_data[0]
 		# configration not 5 is NA
 
 		# every configration has a set of data, configration no.1 requires 71, 2 requires 68, and so on
 		# no number in this list more than MAX_DATA_FILE_TO_READ, or this constant needs update
-		lst_required_data = [ 71,68,71, 44, 47,53,71]
 		
 		# read feed_back, related number of data to read
 		feed_back = self.getData_from_list (DataModelBuiler.CONFIGRATION_ROW,"int")
@@ -213,12 +219,13 @@ class DataModelBuiler (FileAccess):
 			return False
 
 		# retrive required input count of data
-		self.int_parameter_count = lst_required_data [self.int_configration -1]
+		self.int_parameter_count = self.lst_required_data [self.int_configration -1]
 
-		# if number of data given is not as the required by configration number, return False eith error code
+		# if number of data given is not as the required by configration number, return False with error code
 		if len(self.lst_data) != self.int_parameter_count +1 : #error if not the same number + header row
+			self.m_error_desc = " given (" + str(len(self.lst_data)) + ") required (" + str(self.int_parameter_count +1) + ")"
 			self.m_error = DataModelBuiler.ERR_FOUND_DATA_COUNT
-			return False
+			return False # error in number of parameter for the given file
 
 		# check that all list are number as required, or return False
 		for int_items in range (DataModelBuiler.CONFIGRATION_ROW + 1,self.int_parameter_count ):
@@ -296,7 +303,7 @@ class DataModelBuiler (FileAccess):
 			#set Error Flag
 			self.m_error = DataModelBuiler.ERR_FOUND_LIST
 			return ""
-		
+				
 		# read data from data list
 		str_text = self.lst_data[int_row_number]
 		
@@ -319,8 +326,9 @@ class DataModelBuiler (FileAccess):
 		# i.e. if error exit with error flag
 		if not b_is_int or n_count_muns > 1 or n_count_dec > 1:
 			#set Error Flag
-			self.m_error = DataModelBuiler.ERR_FOUND_DATA_TYPE
-			return "more than one decimal point, or (-) sign"
+			self.m_error_desc = " data given (" + str(str_text) + ")"
+			self.m_error = DataModelBuiler.ERR_FOUND_DATA_TYPE2
+			return 0 # "more than one decimal point, or (-) sign"
 
 		# (-) must be on left. remove (-) from text if any
 		str_text = str_text.replace('-','',1)

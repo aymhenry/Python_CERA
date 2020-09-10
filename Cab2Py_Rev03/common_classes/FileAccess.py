@@ -45,7 +45,7 @@ class FileAccess:
 			
 			# Full name  is path and file name			
 			self.m_name  = strPath + "\\" + strFileName
-				
+			
 			if not (strAccess in FILE_ACCESS): 	# check if the give access is not found in standard list
 				strAccess = "read"  			# if not found make it Read
 			
