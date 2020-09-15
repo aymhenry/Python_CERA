@@ -10,19 +10,19 @@
 
 class QData:
 	
-	def setup_vars( self, arg, lst_var_names, int_confg_row=0, int_para_count=-1, b_set_data_as_string = False):
-		int_count = int_para_count
+	def setup_vars( self, arg, lst_var_names, int_confg_row=0, int_var_names_count=-1, b_set_data_as_string = False):
+		int_para_count = int_var_names_count
 		
-		# if call int_para_count = -1 then use all list items
-		if int_count == -1:
-			int_count = len(lst_var_names) -1
+		# if int_var_names_count = -1 then use all list items
+		if int_para_count == -1:
+			int_para_count = len(lst_var_names) -1
 		
 		# simulate override function in Python
 		if type(arg) is list:
-			self.__setup_vars_list ( arg, lst_var_names, int_confg_row, int_count, b_set_data_as_string)
+			self.__setup_vars_list ( arg, lst_var_names, int_confg_row, int_para_count, b_set_data_as_string)
 			
 		if type(arg) is float:
-			self.__setup_vars_single ( arg, lst_var_names, int_confg_row, int_count, b_set_data_as_string)
+			self.__setup_vars_single ( arg, lst_var_names, int_confg_row, int_para_count, b_set_data_as_string)
 
 			
 	def __setup_vars_single (self, flt_val, lst_var_names, int_confg_row, int_para_count, b_set_data_as_string = False ):
