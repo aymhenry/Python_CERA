@@ -41,7 +41,7 @@ class Comp_Abstract (ABC, Block2, Data):
 		
 	#=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
 	def comp (self, H, P, X, T, MEFF, QHILO, QCAN, V, TAMB):
-		print ("aym =====1================ Data.obj_cdata.CE =", Data.obj_cdata.CE)
+		
 		#	 SUBROUTINE COMP(H, P, X, T, CV, CP, HOUT, MEFF, QHILO,
 		#	           QCAN, VSUC, V, VV2, TSUC, TDISC,    TAMB, GAMA, RN, ETAS)
 		# CV, CP not used, P5.P6
@@ -268,7 +268,7 @@ class Comp_Abstract (ABC, Block2, Data):
 		else:
 			Data.obj_cdata.ETAV = 1.00*(1.0 - Data.obj_cdata.CE*(PR**RINV - 1.0))
 
-
+		print ("aym =====1================ Data.obj_cdata.CE =", Data.obj_cdata.CE)
 		print ("aym ===================== CP =", CP)
 		print ("aym ===================== CV =", CV)
 		print ("aym ===================== GAMA = CP/CV =", GAMA)
@@ -936,7 +936,6 @@ class Comp_ERR (Comp_Abstract): #Data.obj_cdata.IMAP== 1
 	def comp_balance (self):
 		# CALL THEORETICALLY BASED MODEL
 		
-		print ("aym =====2================ Data.obj_cdata.CE =", Data.obj_cdata.CE)
 		lstRes = self.comp (self.objData.H, self.objData.P, 	 self.objData.X, \
 						  self.objData.T, self.objData.MEFF, self.objData.QHILO, \
 						  self.objData.QCAN, self.objData.V, self.objData.TS1 )
@@ -1126,8 +1125,45 @@ class Comp_ERR (Comp_Abstract): #Data.obj_cdata.IMAP== 1
 					CEIJ[I][J] = ( (0.92 - ETAV[I][J] )/0.92)/(PR**(1.0/K) - 1.0)
 				else:
 					CEIJ[I][J] = ( (1.00 - ETAV[I][J] )/1.00)/(PR**(1.0/K) - 1.0)
-				#end if
+				
+				
+				print ("aym I=", I, "J=", J)
+				print ("aym --------------------")
+				R12_TABLE_READING = 200.0 - 27.10795349661135	# kj/kg   200-app result at 0C need to be 200, valid only for RF12
+				MOLAR_WEIGHT = 120.91
 
+				H = H_LIQ
+				print ("		H_LIQ in kJ/k-mole= %5.3f,  kJ/kg=%5.3f,  Reading in ASHRAE kJ/kg = %5.3f" %(H, H/MOLAR_WEIGHT, H/MOLAR_WEIGHT + R12_TABLE_READING) )
+
+				H = H_VAP
+				print ("		H_VAP in kJ/k-mole= %5.3f,  kJ/kg=%5.3f,  Reading in ASHRAE kJ/kg = %5.3f" %(H, H/MOLAR_WEIGHT, H/MOLAR_WEIGHT + R12_TABLE_READING) )
+
+				H= H_SUC				
+				print ("		H_SUC in kJ/k-mole= %5.3f,  kJ/kg=%5.3f,  Reading in ASHRAE kJ/kg = %5.3f" %(H, H/MOLAR_WEIGHT, H/MOLAR_WEIGHT + R12_TABLE_READING) )
+				
+				H= H2S
+				print ("		H2S in kJ/k-mole= %5.3f,  kJ/kg=%5.3f,  Reading in ASHRAE kJ/kg = %5.3f" %(H, H/MOLAR_WEIGHT, H/MOLAR_WEIGHT + R12_TABLE_READING) )
+				
+				print ("aym --------------------")
+				print ("aym PR = P_COND/P_EVAP = ",PR, " P_COND=", P_COND, " P_EVAP=",P_EVAP   )
+				
+				print ("aym CAP[I][J] = ", CAP[I][J])
+				print ("aym  ETAP constatnt = ", ETAP)
+				
+				print ("aym K = ETAP*CP/CV = ", K, " ETAP=", ETAP, " CP=", CP, " CV=", CV)
+				
+				print ("aym T90 = 305.3889K K = ", T90-273.11, "C")
+				
+				print ("aym =============")
+				print ("aym  VSUC/MOLAR_WEIGHT m3/kg =", VSUC/MOLAR_WEIGHT, "  SPEEDN=", SPEEDN, "  DISPL=", DISPL )
+				
+				print ("aym MASS[I][J]  = CAP[I][J]/(H_VAP - H_LIQ)     #kg-mole/hr = ", MASS[I][J])
+				print ("aym ETAV[I][J] = MASS[I][J]*VSUC/(60.0*SPEEDN)/(DISPL/61023.6) = ", ETAV[I][J] )
+				
+				print ("aym CEIJ[I][J] = ( (0.92 - ETAV[I][J] )/0.92)/(PR**(1.0/K) - 1.0) = ", CEIJ[I][J] )
+		
+				print ("aym ---=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n\n")
+		
 				#
 				#          ESTIMATE CYCLINDER TEMPERATURE AND CAN OUTLET TEMPERATURE
 				#
@@ -1157,6 +1193,7 @@ class Comp_ERR (Comp_Abstract): #Data.obj_cdata.IMAP== 1
 			#END DO
 		#END DO
 
+
 		Data.obj_cdata.ETAC = Data.obj_cdata.ETAC/9.0
 		Data.obj_cdata.CE   = Data.obj_cdata.CE/9.0
 
@@ -1164,6 +1201,9 @@ class Comp_ERR (Comp_Abstract): #Data.obj_cdata.IMAP== 1
 			Data.obj_cdata.ETAC = ETAS[3][2]
 			Data.obj_cdata.CE   = CEIJ[3][2]
 
+		print ("aym ===Final============== Data.obj_cdata.ETAC= ETAS[3][2] =", ETAS[3][2])
+		print ("aym ===Final============== Data.obj_cdata.CE  = CEIJ[3][2] =",CEIJ[3][2])
+		print ("aym ===Final===============              Data.obj_cdata.CE =", Data.obj_cdata.CE)
 		return [Data.obj_cdata.ETAC, Data.obj_cdata.CE]
 	
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
