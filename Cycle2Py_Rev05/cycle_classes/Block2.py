@@ -2,7 +2,6 @@
 import math,sys
 
 # User Import
-from Data import Data
 
 # -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  
 # Job 			:
@@ -20,13 +19,515 @@ from Data import Data
 #--         spin	temperature, quality, etc. as a function of entropy and temperature
 #--         vit		calculate specifi volume
 
-class Block2 (Data):
+class BData:
+	#=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
+	#--
+	#--   THIS ROUTINE INITIALIZES THE COMMON BLOCKS CONTAINING INFORMATION
+	#--   ABOUT THE PURE COMPONENTS.  IT IS NOT REFERENCED DIRECTLY BY ANY
+	#--   OTHER SUBROUTINE BUT MUST BE INCLUDED IN THE EXECUTABLE ELEMENT.
+	#--   DATA ARRAYS ARE DIMENSIONED TO ACCOMODATE ADDITIONAL
+	#--   PURE COMPONENTS.
+	#--
+	#--   EXPLANATION OF CONSTANTS:
+	#--      COEFF(I,J) - FOR REFRIGERANT J, COEFFICIENTS OF A, B, CP0
+	#--         CURVE FITS:
+	#--         A = A0 * EXP(A1*T + A2*T*T)  (KJ M**3/KMOL**2)
+	#--         B = B0 + B1*T + B2*T*T  (M**3/KMOL)
+	#--         CP0 = C0 + C1*T + C2*T*T (KJ/KMOL K)
+	#--         (STORED IN ORDER A0,A1,A2,B0,B1,B2,C0,C1,C2)
+	#--      CRIT(I,J) - FOLLOWING INFORMATION FOR REFRIGERANT J:
+	#--         I = 1 - MOLECULAR WEIGHT
+	#--             2 - REFERENCE TEMPERATURE FOR ENTHALPY AND ENTROPY (K)
+	#--             3 - CRITICAL TEMPERATURE (K)
+	#--             4 - CRITICAL PRESSURE (KPA)
+	#--             5 - CRITICAL VOLUME (M**3/KMOL)
+	#--      HREF(J) - REFRIGERANT NAME (ASHRAE DESIGNATION)
+	#--      HZERO(J) - VALUE OF SATURATED LIQUID ENTHALPY OF REFRIGERANT
+	#--         J AT ITS REFERENCE TEMPERATURE (KJ/KMOL)
+	#--      SZERO(J) - VALUE OF SATURATED LIQUID ENTROPY AT REFERENCE
+	#--         TEMPERATURE (KJ/KMOL K)
+	#--      R - GAS CONSTANT (KJ/KMOL K)
+	#--      TOLR - RELATIVE CONVERGENCE TOLERANCE FOR ITERATION LOOPS
+	#--         SHOULD BE AT LEAST 10 TIMES LARGER THAN MACHINE PRECISION
+	#--      ITMAX - MAXIMUM ITERATION COUNT FOR ITERATIVE LOOPS
+	#--      LUP - LOGICAL UNIT TO WHICH ANY WARNING MESSAGES ARE WRITTEN
+	#--
+	#--   A, B COEFFFICIENTS EVALUATED FROM ASHRAE (1981) SATURATION
+	#--   DATA UNLESS INDICATED.
+	#--
+	#--   DATA VALUES UPDATED ON 3/15/94 TO BE CONSISTENT WITH REFPROP 4.0
+	#--
+	#--   REFRIGERANTS NOW ARE:
+	#--       1: R11     2: R12     3: R13     4: n-C5     5: R14     6: R22
+	#--       7: R23     8: R113    9: R114   10: R142B   11: R152A  12: R216A
+	#--      13: R125   14: R143A  15: R134A  16: R123    17: RC318  18: R134
+	#--      19: RC270  20: R141B  21: i-C5   22: R290    23: R600   24: R600A
+	#--      25: R32    26: R1270  27: R124   28: R115    29: CE-216 30: E-125
+	#--      31: R123A  32: R143   33: R218   34: E134
+	#--
+	#--  NOTE: REFPROP 4.0 ALLOWS USE OF A MODIFIED B-W-R EQUATION OF STATE FOR
+	#--        R32, R123, R124, R125, AND R134A AS PURE FULIDS.  THE CSD EQUATION
+	#--        OF STATE IS USED BY REFPROP FOR MIXTURES.
+	#--
+	#--  NOTE: THE FOLLOWING REFRIGERANTS WERE FIT WITH THE OLDER REFPROP (3.0)
+	#--        COEFFICIENTS (BECAUSE OF A BETTER MATCH TO ASHRAE DATA OVER THE
+	#--        -20 F TO + 130 F TEMPERATURE RANGE): R114
+	#--
+	#--  NOTE: THE COEFFICIENTS FOR R12 ARE THE SAME AS USED IN REFPROP 3.O TO
+	#--        PROVIDE CONSISTENCY WITH EARLIER ANALYSES.  THE REFPROP 4.0
+	#--        COEFFICIENTS CHANGE THE ENERGY BY ABOUT 0.001 KWH/DAY.  IT IS NOT
+	#--        WORTH EXPLAINING AWAY DIFFERENCES BETWEEN THE RESULTS IN THE ERA
+	#--        DOCUMENTATION AND A REVISED ERA USING THE REFPROP 4.O COEFFICIENTS
+	#--        FOR R12.	
+
+	#-- Save group ---------------------------------
+	TNEG = 9999.0
+	TPOS = -999.0
+
+	#-- Common HREF1 group ---------------------------------
+	HREF = [] #[[" "] * (34+1)]		# CHARACTER*6 HREF(34),REFH(34)
+	REFH = [] #[[" "] * (34+1)]
+	
+	#-- Common ESDATA group ---------------------------------
+	COEFF = []	
+	CRIT  = [] 
+
+	#-- Common HSZERO group ---------------------------------
+	HZERO = [0.0] * (34+1)
+	SZERO = [0.0] * (34+1)
+
+	#-- Common REF group ---------------------------------
+	TREF= [0.0] * (5+1)
+	HR =  [0.0] * (5+1)
+	SR =  [0.0] * (5+1)
+	VR =  [0.0] * (5+1)
+	
+	#-- Common RDATA2 group ---------------------------------
+	WM =  [0.0] * (5+1)
+	TC =  [0.0] * (5+1) 
+
+	#-- Common ESPAR1 group ---------------------------------
+	F  =  [[0.0] * (5+1) for i in range(5+1)]	# array(Rows, Cols) = [[0] * Cols for i in range(Rows)]
+	AP =  [0.0] * (5+1)
+	BP =  [0.0] * (5+1)
+	DADT = 0.0; DBDT = 0.0; D2ADT= 0.0; D2BDT = 0.0
+	
+	#-- Common CPDATA group ---------------------------------
+	# Create zero base array
+	C = [[0.0] * (2+1) for i in range(5+1)]	# array(Rows, Cols) = [[0] * Cols for i in range(Rows)]
+
+	#-- Common RDATA1 group ---------------------------------
+	# Create zero base array
+	A = [[0.0] * (2+1) for i in range(5+1)]	# array(Rows, Cols) = [[0] * Cols for i in range(Rows)]
+	B = [[0.0] * (2+1) for i in range(5+1)]	# array(Rows, Cols) = [[0] * Cols for i in range(Rows)]
+
+	#-- Common RDATA4 group --------------------------------
+	R = 8.314
+	
+	#-- Common TOL group ----------------------------------
+	TOLR  = 1.0E-7*10 # SHOULD BE AT LEAST 10 TIMES LARGER THAN MACHINE PRECISION
+	ITMAX = 20
+	LUP   = 9
+
+	#-- Common HSPURE group ---------------------------------
+	HP = [0.0] * (5+1)
+	SP = [0.0] * (5+1)
+	CP = [0.0] * (5+1)
+
+	#-- Common TOLSH group ----------------------------------
+	TOLH = 0.010
+	TOLS = 0.001
+	
+	@staticmethod
+	def setup():
+		# Ref 00
+		#   add one more Col and Row, to keep FORTRAN none zero Ref.
+		BData.HREF.append  (" ")
+		BData.REFH.append  (" ")
+		
+		#-- zero based BData.CRIT.append  ([0.0] * 5)
+		#-- zero based BData.COEFF.append ([0.0] * 9)
+		#---------------------------------------
+		# Ref 01
+		#   R11, TRICHLOROFLUOROMETHANE (CFCL3)
+		#
+		BData.HREF.append ("R11")
+		BData.REFH.append ("   R11")
+		
+		BData.CRIT.append  ([137.37, 296.91, 471.2, 4467.0, 0.247])
+		
+		BData.COEFF.append ([ 4967.07,  -2.23098E-3, -5.59203E-7,		\
+					   0.178148,  -1.82363E-4, -2.54131E-8,	\
+					    23.4805,     0.251072, -2.28722E-4 ])
+
+		# Ref 02
+		#  R12, DICHLORODIFLUOROMETHANE (CF2CL2)
+		#
+		BData.HREF.append ("R12")
+		BData.REFH.append ("   R12")
+		
+		BData.CRIT.append ([120.91, 243.39, 384.95, 4180.0, 0.241]) # error last item fixed (was 0.181)
+		BData.COEFF.append ([ 3819.88, -3.31988E-3,  2.41944E-7,	\
+					        0.165350, -2.65758E-4,  9.13878E-8,	\
+					         18.4874,    0.241782, -2.04594E-4])
+		# Ref 03
+		#   R13, CHLOROTRIFLUOROMETHANE (CF3CL)
+		#
+		BData.HREF.append ("R13")
+		BData.REFH.append ("   R13")
+		
+		BData.CRIT.append ([104.46, 191.67, 302.0, 3870.0, 0.181])
+		BData.COEFF.append([ 2157.20, -2.84478E-3, -2.75122E-6,	\
+					  0.129485, -1.93746E-4, -9.01119E-8,	\
+					   13.8691,    0.232370, -1.83095E-4 ])
+		# Ref 04
+		#  n-C5, n-Pentane (C5H12)
+		#
+		BData.HREF.append ("n-C5")
+		BData.REFH.append ("   n-C5")
+		BData.CRIT.append ([72.15, 309.34, 469.5, 3359.9, 0.295])
+		BData.COEFF.append ([6745.80, -2.29793E-3, -0.70747E-6,	\
+			          0.228716, -2.36350E-4, -0.32793E-7,	\
+			           54.7577,    0.143042,  2.53720E-4 ])
+		 
+		# Ref 05
+		#   R14, TETRAFLUOROMETHANE (CF4)
+		#
+		BData.HREF.append ("R14")
+		BData.REFH.append ("   R14")
+		BData.CRIT.append ([88.00, 145.17, 227.5, 3795.0, 0.141])
+		BData.COEFF.append ([ 1272.41, -3.42946E-3, -6.47573E-6,	\
+			           0.099664, -1.57113E-4, -2.95020E-7,	\
+			            14.4296,    0.184530, -9.51890E-5 ])
+		# Ref 06
+		#   R22, CHLORODIFLUOROMETHANE (CHF2CL)
+		#
+		BData.HREF.append ("R22")
+		BData.REFH.append ("   R22")
+		BData.CRIT.append ( [86.47, 232.29, 369.3, 5054.0, 0.169 ] )
+
+		BData.COEFF.append ([2624.62, -2.67304E-3, -1.33238E-6,	\
+			          0.117395, -1.40272E-4, -0.52161E-7,	\
+			           21.9839,    0.127744, -4.78872E-5 ] )
+		# Ref 07
+		#   R23, TRIFLUOROMETHANE (CHF3)
+		#
+		BData.HREF.append ("R23")
+		BData.REFH.append ("   R23")
+		BData.CRIT.append ( [70.01, 191.12, 299.1, 4900.0, 0.133 ] )
+
+		BData.COEFF.append ( [ 1743.89, -3.52595E-3, -1.12774E-6,
+			            0.090205, -1.25602E-4, -0.50675E-7,
+			             23.6029,    0.082287,  3.18265E-5 ] )
+		# Ref 08
+		#   R113, 1,1,2-TRICHLOROTRIFLUOROETHANE (CF2CL-CFCL2)
+		#
+		BData.HREF.append ("R113")
+		BData.REFH.append ("  R113")
+		BData.CRIT.append ( [ 187.38, 320.80, 487.5, 3456.0, 0.329 ] )
+
+		BData.COEFF.append ( [ 7284.48, -2.15870E-3, -8.03754E-7,		\
+			            0.234712, -2.11131E-4, -7.33758E-8,		\
+			             76.2637,    0.119641,  7.18786E-5 ] )
+		# Ref 09
+		#   R114, 1,2-DICHLOROTETRAFLUOROETHANE  (CF2CL-CF2CL): Version 3.0 Refprop
+		#
+		BData.HREF.append ("R114")
+		BData.REFH.append ("  R114")
+		BData.CRIT.append ( [ 170.92, 276.80, 418.80, 3248.0, 0.307 ] )
+
+		BData.COEFF.append ( [ 5929.74, -2.86018E-3, -4.81520E-7,		\
+			            0.221874, -2.88304E-4,  1.81892E-8,		\
+			             37.2482,    0.337339, -2.39995E-4 ] )
+		 
+		# Ref 10
+		#   R142B, 1-CHLORO-1,1-DIFLUOROETHANE (CF2CL-CH3)
+		#
+		BData.HREF.append ("R142B")
+		BData.REFH.append (" R142B")
+		BData.CRIT.append ( [100.49, 264.01, 410.3, 4120.0, 0.231 ] )
+
+		BData.COEFF.append ( [ 4180.75, -2.73043E-3, -5.43638E-7,		\
+			            0.169138, -2.41068E-4,  0.67566E-7,		\
+			             16.3914,    0.271719, -1.58933E-4 ] )
+		# Ref 11
+		#   R152A, 1,1-DIFLUOROETHANE  (CHF2-CH3)
+		#
+		BData.HREF.append ("R152A")
+		BData.REFH.append (" R152A")
+		BData.CRIT.append ( [ 66.05, 248.50, 386.7, 4492.0, 0.181 ] )
+
+		BData.COEFF.append ( [3198.63, -2.96134E-3,  -0.32190E-6,		\
+			           0.133264, -2.03633E-4,  0.777251E-7,		\
+			            22.2832,    0.153987, -3.015434E-6 ] )
+		# Ref 12
+		#   R216A, 1,3-DICHLOROHEXAFLUOROPROPANE [NOT IN REFPROP4.0]
+		#
+		BData.HREF.append ("R216A")
+		BData.REFH.append (" R216A")
+		BData.CRIT.append ( [ 220.93, 233.15, 453.14, 2754.1, 0.3847 ] )
+
+		BData.COEFF.append ( [ 8431.44, -2.45916E-3, -9.91754E-7,		\
+			            0.265720, -2.20418E-4, -1.68111E-7,		\
+			             8.79769,    0.654246, -5.39923E-4 ] )
+		# Ref 13
+		#  R125, PENTAFLUOROETHANE (C2HF5)
+		#
+		BData.HREF.append ("R125")
+		BData.REFH.append ("  R125")
+		BData.CRIT.append ( [120.03, 224.6, 339.4, 3629.0, 0.2099 ] )
+
+		BData.COEFF.append ( [ 3427.92, -3.17461E-3, -1.75729E-6,		\
+			            0.149380, -1.80851E-4, -1.18813E-7,		\
+			            22.65024,    0.295668, -1.69490E-4 ] )
+		# Ref 14
+		#   R143A, 1,1,1-TRIFLUOROETHANE   (CF3-CH3)
+		#
+		BData.HREF.append ("R143A")
+		BData.REFH.append (" R143A")
+		BData.CRIT.append ( [ 84.04, 225.8, 346.3, 3811., 0.194] )
+
+		BData.COEFF.append ( [ 2763.90920, -2.509056E-3, -1.797108E-6,		\
+			             0.133153E0, -1.589538E-4, -0.583311E-7,		\
+			             13.89426E0,     .2554913, -1.300829E-4] )
+		# Ref 15
+		#   R134A:  1,1,1,2-TETRAFLUOROETHANE  (CF3-CH2F)
+		#
+		BData.HREF.append ("R134a")
+		BData.REFH.append (" R134a")
+		BData.CRIT.append ( [ 102.030, 247.0, 374.3, 4067.0, 0.199 ] )
+
+		BData.COEFF.append ( [ 3582.17, -2.81114E-3, -1.44679E-6,		\
+			            0.141750, -1.62763E-4, -.628933E-7,		\
+			             19.4006,    0.258531, -1.29665E-4 ] )
+		# Ref 16
+		#   R123, 1,1-DICHLORO-2,2,2-TRIFLUOROETHANE (CHCL2-CF3)
+		#
+		BData.HREF.append ("R123")
+		BData.REFH.append ("  R123")
+		BData.CRIT.append ( [ 152.93, 301.02, 456.9, 3674.0, 0.278 ] )
+
+		BData.COEFF.append ( [ 6033.29, -2.37891E-3, -0.84728E-6,		\
+			            0.199549, -1.89493E-4, -0.67680E-7,		\
+			             29.2604,    0.302994, -1.92907E-4 ] )
+		 
+		# Ref 17
+		#  RC318, PERFLUOROCYCLOBUTANE (C4F8)
+		#
+		BData.HREF.append ("RC-318")
+		BData.REFH.append ("RC-318")
+		BData.CRIT.append ( [ 200.04, 266.1, 388.4, 2778., 0.3248 ] )
+
+		BData.COEFF.append ( [  6182.614E0, -2.536687E-3, -2.265766E-6,		\
+			              .2255416E0, -1.898425E-4, -2.635465E-7,		\
+			             28.972075E0,     .5333363, -3.557726E-4] )
+		# Ref 18
+		#  R134, 1,1,2,2-TETRAFLOUROETHANE (CHF2-CHF2)
+		#
+		BData.HREF.append ("R134")
+		BData.REFH.append ("  R134")
+		BData.CRIT.append ( [ 102.03, 253.34, 392.1, 4562.0, 0.189 ] )
+
+		BData.COEFF.append ( [ 3547.10, -2.68720E-3, -1.41578E-6,		\
+			             0.13856,  -1.5991E-4, -0.55880E-7,		\
+			             32.5208,    0.222819, -1.06829E-4 ] )
+		# Ref 19
+		#   RC270, CYCLOPROPANE (C3H6)
+		#
+		BData.HREF.append ("RC270")
+		BData.REFH.append (" RC270")
+		BData.CRIT.append ( [42.081, 240.25, 398.30, 5580.0, 0.194 ] )
+
+		BData.COEFF.append ( [ 2745.00, -2.98122E-3,  1.64391E-7,		\
+			            0.125065, -2.01031E-4,   7.8506E-8,		\
+			             8.19470,     0.136885, 0.777583E-4 ] )
+		# Ref 20
+		#  R141b,  1,1-DICHLORO-1-FLUOROETHANE (CFCL2-CH3)
+		#
+		BData.HREF.append ("R141B")
+		BData.REFH.append (" R141b")
+		BData.CRIT.append ( [116.94, 305.35, 477.3, 4120., 0.217 ] )
+
+		BData.COEFF.append ( [ 5422.38, -2.24167E-3, -6.04435E-7,		\
+			            0.180853, -1.61856E-4, -6.23542E-8,		\
+			             35.8434, 0.175268,     0.0 ] )
+		# Ref 21
+		#  i-C5 ISO-PENTANE (C4H9-CH3)
+		#
+		BData.HREF.append ("i-C5")
+		BData.REFH.append ("  i-C5")
+		BData.CRIT.append ( [ 72.150, 300.9, 460.51, 3370.7, 0.306 ] )
+
+		BData.COEFF.append ( [ 6408.1, -2.3216E-3, -0.7087E-6,		\
+			           0.227727, -2.4414E-4, -2.9694E-8,		\
+			             12.216,    0.37563, -5.9925E-5 ] )
+		# Ref 22
+		#  R290,  PROPANE (C3H8)
+		#
+		BData.HREF.append ("R290")
+		BData.REFH.append ("  R290")
+		BData.CRIT.append ( [ 44.10, 231.1, 369.85, 4247.7, 0.220 ] )
+
+		BData.COEFF.append ( [ 2988.28, -2.62902E-3, -1.09706E-6,		\
+			            0.142963, -1.76519E-4, -5.78514E-8,		\
+			            26.88900,   0.1250300,  1.07890E-4 ] )
+		# Ref 23
+		#  R600,  N-BUTANE (C4H10)
+		#
+		BData.HREF.append ("R600")
+		BData.REFH.append ("  R600")
+		BData.CRIT.append ( [ 58.124, 272.6, 425.16, 3796., 0.2548 ] )
+
+		BData.COEFF.append ( [4822.7, -2.6499E-3, -0.4397E-6,		\
+			            0.1908, -2.4836E-4,  0.2846E-7,		\
+			             9.442,     0.3317, -1.1297E-4 ] )
+		# Ref 24
+		#  R600a,  ISOBUTANE [C(CH3)3]
+		#
+		BData.HREF.append ("R600a")
+		BData.REFH.append (" R600a")
+		BData.CRIT.append ( [58.124, 261.39, 407.9, 3630.6, 0.256 ] )
+
+		BData.COEFF.append ([ 4197.24, -2.1894E-3, -1.3004E-6,	\
+			            0.1803, -1.8719E-4, -8.1778E-8,		\
+			           27.6833,   0.199384, 1.06305E-4 ] )
+		# Ref 25
+		#   R32:  DIFLUOROMETHANE (CH2F2)
+		#
+		BData.HREF.append ("R32")
+		BData.REFH.append ("   R32")
+		BData.CRIT.append ( [52.024, 221.40, 351.36, 5791.0, .120 ] )
+
+		BData.COEFF.append ([ 1662.27, -2.19753E-3, -1.88903E-6,	\
+			         0.0779879, -0.75238E-4, -0.53011E-7,	\
+			           29.2127,   0.0192902,  8.91429E-5 ] )
+		# Ref 26
+		#  R1270,  PROPYLENE (C3H6)
+		#
+		BData.HREF.append ("R1270")
+		BData.REFH.append (" R1270")
+		BData.CRIT.append ( [42.09, 255.46, 364.9, 4621.7, 0.1937 ] )
+		BData.HZERO [26] = -8695.95 ; BData.SZERO [26] = 170.53 # DATA HZERO(26),SZERO(26)  -8695.95, 170.53 ] )
+			  
+		BData.COEFF.append ([ 2294.38, -1.57422E-03, -2.98847E-06,\
+			           .1253157, -1.28616E-04, -1.09990E-07,	\
+			              3.856,     0.2321, -1.0308E-4 ] )
+		 
+		# Ref 27
+		#  R124, 1-CHLORO-1,2,2,2-TETRAFLOUROETHANE (C2HF5)
+		#
+		BData.HREF.append ("R124")
+		BData.REFH.append ("  R124")
+		BData.CRIT.append ( [136.48, 259.96, 395.62, 3637., 0.244 ] )
+
+		BData.COEFF.append ([ 4504.401, -2.574376E-3,  -1.4705E-6,	\
+			           0.173954,  -1.79579E-4, -1.04407E-7,		\
+			            30.9777,     0.254206, -9.36414E-5 ] )
+		# Ref 28
+		#   R115, CHLOROPENTAFLOUROETHANE  (CF2CL-CF3)
+		#
+		BData.HREF.append ("R115")
+		BData.REFH.append ("  R115")
+		BData.CRIT.append ( [154.47, 233.98, 353.05, 3153.0, 0.252 ] )
+
+		BData.COEFF.append ([ 3968.734, -2.471498E-3, -2.656280E-6,	\
+			           .1817131, -1.797986E-4, -2.305032E-7,	\
+			            20.0246,  .3765849E0,  -2.703487E-4 ] )
+		# Ref 29
+		# CE-216, FROM JIM SANDS OF ORNL RECEIVED 12] )23] )91
+		#
+		BData.HREF.append ("CE-216")
+		BData.REFH.append ("CE-216")
+		BData.CRIT.append ( [166.02, 233.15, 361.8, 3094.0, 0.272 ] )
+
+		BData.COEFF.append ([ 3808.5,  -0.0017285, -3.81991E-6,	\
+			       0.16412557, -6.60150E-5, -3.83529E-7,	\
+			      -52.9448624,   0.6902447, -0.0006871 ] )
+		# Ref 30
+		# E-125, FROM CYNTHIA GAGE 2-11-93
+		#
+		BData.HREF.append ("E-125")
+		BData.REFH.append (" E-125")
+		BData.CRIT.append ( [136.02, 238.55, 353.8, 3330.0, 0.2385 ] )
+
+		BData.COEFF.append ([ 3112.3, -0.0013240, -4.48727E-6,	\
+			        0.15782070, -0.0001235, -2.51097E-7,	\
+			        31.5556400,  0.3137960, -0.0001836 ] )
+		# Ref 31
+		#   R123a 1,2-DICHLORO-1,1,2-TRIFLUOROETHANE
+		#
+		BData.HREF.append ("R213A")
+		BData.REFH.append (" R123A")
+		BData.CRIT.append ([ 152.93, 303.2, 461.1, 3741.0, 0.2812 ] )
+
+		BData.COEFF.append ([6376.995, -2.691077E-3, -2.524465E-7,	\
+			           .2016864, -2.035804E-4, -3.644260E-8,	\
+			           48.23970,     .1856480,          0.0 ] )
+		# Ref 32
+		#   R143, 1,1,2-TRIFLUOROETHANE (CF2H-CFH2)
+		#
+		BData.HREF.append ("R143")
+		BData.REFH.append ("  R143")
+		BData.CRIT.append ( [84.04, 277.2, 429.9, 4520.0, 0.190 ] )
+
+		BData.COEFF.append ([3680.023, -2.4128619E-3, -1.183791E-6,	\
+			           .1221286, -8.9741778E-5, -1.068718E-7,	\
+			            24.9639,       .187598, -4.031996E-5 ] )
+		# Ref 33
+		#   R218, PERFLUOROPROPANE (C3F8)
+		#
+		BData.HREF.append ("R218")
+		BData.REFH.append ("  R218")
+		BData.CRIT.append ([ 188.03, 236.4, 345.1, 2680.1, 0.2994 ] )
+
+		BData.COEFF.append ([  4486.64, -1.952581E-3, -4.49894E-6,	\
+			             .205911, -1.493288E-4, -4.30009E-7,	\
+			             23.2683,      .536728, -3.97647E-4 ] )
+		# Ref 34
+		#  E134, BIS(DIFLUOROMETHYL) (CHF2-O-CHF2)
+		#
+		BData.HREF.append ("E134")
+		BData.REFH.append ("  E134")
+		BData.CRIT.append ([ 118.03, 279.3, 420.3, 4228.0, 0.224 ] )
+
+		BData.COEFF.append([ 6016.695, -4.051717E-3, 8.906450E-7,		\
+			           .1718950, -2.308880E-4, 2.837796E-8,		\
+			           -26.7633,     .6152671, -6.58095E-4 ] )	
+
+
+class Block2 (BData):
 	# =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  = 
 	# Set Static Vars
 	# =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  = 
 	def __init__(self):
 		self.setup()
+	
+	'''
+	#=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
+	# in Python only, to fix Fortant issue
+	def setArr2dCol(self, arry_2dim, int_col, arr_1dim ):
+		for ncnt in range (len(arry_2dim)):
+			arry_2dim [ncnt][int_col] = arr_1dim [ncnt]
+		return
 
+	#=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
+	def getArr2dCol(self, arry_2dim, int_col):
+		arr_1dim = []
+		for ncnt in range (len(arry_2dim)):
+			arr_1dim.append ( arry_2dim [ncnt][int_col])
+		return arr_1dim
+
+	#=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
+	def getArr3dLevel(self, arry_3dim, int_level):
+		x_direc = len(arry_3dim)
+		y_direc = len(arry_3dim[0])
+		arr_2dim = [[0.0] * (y_direc +1) for i in range(x_direc)]
+		for x in range (x_direc):
+			for y in range (y_direc):
+				arr_2dim [x][y] =( arry_3dim [x][y][int_level])
+		return arr_2dim
+	'''
+	
 	# = . = . = . = . = . = . = . = . = . = . = . = . = . = . = . = . = . = . 
 	def bconst (self, NCIN, IR, FIN):
 		#	  SUBROUTINE BCONST (NCIN,IR,FIN)
@@ -77,29 +578,31 @@ class Block2 (Data):
 		#	  COMMON /HSZERO/ HZERO(34),SZERO(34)
 		#	  COMMON /REF/ TREF(5),HR(5),SR(5),VR(5)
 		
+		#self.setup() # only in Python
+		
 		XV = [0.0] *(5+1)
-		Data.NC  =  NCIN
+		BData.NC  =  NCIN
 		
-		for KR in range(1,Data.NC  +  1):			# DO 100 KR = 1,NC
+		for KR in range(1,BData.NC  +  1):			# DO 100 KR = 1,NC
 
-			Data.WM  [KR]  =  Data.CRIT [ IR[KR] -1] [1-1]	#WM(KR) = CRIT(1,IR(KR))
-			Data.TREF[KR]  =  Data.CRIT [ IR[KR] -1] [2-1]
+			BData.WM  [KR]  =  BData.CRIT [ IR[KR] -1] [1-1]	#WM(KR) = CRIT(1,IR(KR))
+			BData.TREF[KR]  =  BData.CRIT [ IR[KR] -1] [2-1]
 		
-			Data.TC  [KR]  =  Data.CRIT [ IR[KR] -1] [3-1]
-			Data.HR  [KR]  =  0.0	# not required in Python
-			Data.SR  [KR]  =  0.0	# not required in Python
-			Data.VR  [KR]  =  1.0
+			BData.TC  [KR]  =  BData.CRIT [ IR[KR] -1] [3-1]
+			BData.HR  [KR]  =  0.0	# not required in Python
+			BData.SR  [KR]  =  0.0	# not required in Python
+			BData.VR  [KR]  =  1.0
 
-			for J in range(KR+1 ,Data.NC  +  1): 	#DO 98 J = KR + 1,NC
-				Data.F[KR][J]  =  FIN [KR][J]	#	F(KR,J) = FIN(KR,J)
-				Data.F[J] [KR] =  FIN [KR][J]	#98 F(J,KR) = FIN(KR,J)
+			for J in range(KR+1 ,BData.NC  +  1): 	#DO 98 J = KR + 1,NC
+				BData.F[KR][J]  =  FIN [KR][J]	#	F(KR,J) = FIN(KR,J)
+				BData.F[J] [KR] =  FIN [KR][J]	#98 F(J,KR) = FIN(KR,J)
 
-			Data.F[KR][KR]  =  0.0		#F(KR,KR) = 0.0
+			BData.F[KR][KR]  =  0.0		#F(KR,KR) = 0.0
 
 			for KC in range(0, 2+1):		#DO 100 KC = 0,2
-				Data.A[KC][KR-1]  =  Data.COEFF [ IR[KR] -1][KC + 1 -1]		#A(KC,KR) = COEFF(KC + 1,IR(KR))
-				Data.B[KC][KR-1]  =  Data.COEFF [ IR[KR] -1][KC + 4 -1]		#B(KC,KR) = COEFF(KC + 4,IR(KR))
-				Data.C[KC][KR-1]  =  Data.COEFF [ IR[KR] -1][KC + 7 -1]		#  C(KC,KR) = COEFF(KC + 7,IR(KR))
+				BData.A[KC][KR-1]  =  BData.COEFF [ IR[KR] -1][KC + 1 -1]		#A(KC,KR) = COEFF(KC + 1,IR(KR))
+				BData.B[KC][KR-1]  =  BData.COEFF [ IR[KR] -1][KC + 4 -1]		#B(KC,KR) = COEFF(KC + 4,IR(KR))
+				BData.C[KC][KR-1]  =  BData.COEFF [ IR[KR] -1][KC + 7 -1]		#  C(KC,KR) = COEFF(KC + 7,IR(KR))
 
 		#   CALL BUBBLE POINT ROUTINE TO CALCULATE SATURATED LIQUID AND VAPOR
 		#   VOLUMES AND  : CALL ENTHALPY AND ENTROPY ROUTINE TO DETERMINE
@@ -107,19 +610,19 @@ class Block2 (Data):
 		#   TO BE ASSIGNED TO THE SATURATED LIQUID H OR S AT THE REFERENCE
 		#   TEMPERATURE.
 
-		for KR in range(1,Data.NC  +  1) :		#	DO 164 KR = 1,NC
-			X     = [0.0]  * (Data.NC+1)			# DO 160 I = 1,NC	#160 X[I] = 0.0
+		for KR in range(1,BData.NC  +  1) :		#	DO 164 KR = 1,NC
+			X     = [0.0]  * (BData.NC+1)			# DO 160 I = 1,NC	#160 X[I] = 0.0
 			X[KR] = 1.0
 		
 			# [P2, P3 ,P4, P5, P6, P8] = bublt (P1, P2, P3 , P7 )
 			# CALL BUBLT (TREF(KR),X,XV,  P,VR(KR),VV,.  TRUE.,.FALSE.)
-			[X, XV, P, Data.VR[KR], VV, _] = self.bublt (Data.TREF[KR], X, XV, True) 
+			[X, XV, P, BData.VR[KR], VV, _] = self.bublt (BData.TREF[KR], X, XV, True) 
 			
 			#[P5, P6, P7, P8] = self.hcvcps (P1, P2, P3, P4)
-			[HRKR, CV, CPX, VS] = self.hcvcps (1, Data.TREF[KR], Data.VR[KR], X) 	# CALL HCVCPS (1,TREF(KR),VR(KR),X,   HRKR,CV,CPX,VS)
+			[HRKR, CV, CPX, VS] = self.hcvcps (1, BData.TREF[KR], BData.VR[KR], X) 	# CALL HCVCPS (1,TREF(KR),VR(KR),X,   HRKR,CV,CPX,VS)
 			
-			Data.HR[KR]  =  HRKR  -  Data.HZERO [  IR[KR] ]	#HR(KR) = HRKR - HZERO(IR(KR))
-			Data.SR[KR]  =  self.entrop ( Data.TREF[KR], Data.VR[KR], X )  -  Data.SZERO [ IR[KR]]
+			BData.HR[KR]  =  HRKR  -  BData.HZERO [  IR[KR] ]	#HR(KR) = HRKR - HZERO(IR(KR))
+			BData.SR[KR]  =  self.entrop ( BData.TREF[KR], BData.VR[KR], X )  -  BData.SZERO [ IR[KR]]
 		return
 
 	# = . = . = . = . = . = . = . = . = . = . = . = . = . = . = . = . = . = . 
@@ -171,7 +674,7 @@ class Block2 (Data):
 		VPOS = 0.0 # Only in Python set starting value
 		B4  = 0.25 * B
 		B42 = B4 * B4
-		RT  = Data.R * T
+		RT  = BData.R * T
 		#
 		#    STARTING AT A VOLUME OF 12.0*B4 (WHICH HAS A POSITIVE SLOPE
 		#    FOR ALL 'REASONABLE' VALUES OF A, B, T) REDUCE THE VOLUME
@@ -181,7 +684,7 @@ class Block2 (Data):
 		VC = 12.0272727 * B4
 		V  = VC
 		
-		for IT in range (1, Data.ITMAX +1):	# DO 100 IT=1,ITMAX
+		for IT in range (1, BData.ITMAX +1):	# DO 100 IT=1,ITMAX
 			DPDV = DP(RT, V, A, B, B4, B42)
 			if (DPDV <= 0.0):break	# GOTO 116
 
@@ -210,7 +713,7 @@ class Block2 (Data):
 		VPOS = VC
 		V    = 2.0 * A /RT
 
-		for IT in range (1, Data.ITMAX + 1):	#DO 160 IT=1,ITMAX
+		for IT in range (1, BData.ITMAX + 1):	#DO 160 IT=1,ITMAX
 			DPDV = DP(RT,V,A,B,B4,B42)
 			if (DPDV <= 0.0): break	# GOTO 164
 			VPOS = V
@@ -266,22 +769,22 @@ class Block2 (Data):
 		#      A(I)  -  'A' PARAMETER FOR PURE COMPONENT I
 		#      B(I)  -  'B' PARAMETER FOR PURE COMPONENT I
 		#      F(I,J)  -  MIXTURE INTERACTION PARAMETER FOR BINARY PAIR I,J
-		#      Data.DADT  -  TEMPERATURE DERIVATIVE OF A
+		#      BData.DADT  -  TEMPERATURE DERIVATIVE OF A
 		#      DBDT  -  TEMPERATURE DERIVATIVE OF B
 		#      D2ADT2  -  SECOND DERIVATIVE OF A WITH RESPECT TO TEMPERATURE
 		#      D2BDT2  -  SECOND DERIVATIVE OF B WITH RESPECT TO TEMPERATURE
-		#      Data.HP(I)  -  INTEGRAL OF CP(I) WITH RESPECT TO TEMP FOR PURE I
+		#      BData.HP(I)  -  INTEGRAL OF CP(I) WITH RESPECT TO TEMP FOR PURE I
 		#      SP(I)  -  INTEGRAL OF (CP(I)  -  R) / T WITH RESPECT TO TEMP FOR PURE I
 		#      CP(I)  -  PERFECT GAS HEAT CAPACITY FOR COMPONENT I (KJ / (KG MOL K))
 		#
 		#
 
 		#DIMENSION X(5),AJI(5,5),DAJI(5,5),DA(5,5)
-		#COMMON  / NCOMP /  Data.NC
-		#COMMON  / ESPAR1 /  Data.AP(5),BP(5),Data.F(5,5),DADT,DBDT,Data.D2ADT,Data.D2BDT
-		#COMMON  / RDATA1 /  Data.A(0:2,5),Data.B(0:2,5)
-		#COMMON  / CPDATA /  Data.C(0:2,5)
-		#COMMON  / HSPURE /  Data.HP(5),Data.SP(5),Data.CP(5)
+		#COMMON  / NCOMP /  BData.NC
+		#COMMON  / ESPAR1 /  BData.AP(5),BP(5),BData.F(5,5),DADT,DBDT,BData.D2ADT,BData.D2BDT
+		#COMMON  / RDATA1 /  BData.A(0:2,5),BData.B(0:2,5)
+		#COMMON  / CPDATA /  BData.C(0:2,5)
+		#COMMON  / HSPURE /  BData.HP(5),BData.SP(5),BData.CP(5)
 		#COMMON  / REF /  TREF(5),HR(5),SR(5),VR(5)
 		#COMMON  / RDATA4 /  R
 
@@ -292,45 +795,45 @@ class Block2 (Data):
 		AMIX =  0.0
 		BMIX =  0.0
 
-		for I in range(1, Data.NC + 1):	#DO 120 I = 1,NC
-			Data.AP[I]  =  Data.A[0][I-1] *  math.exp((Data.A[1][I-1] + Data.A[2][I-1] * T) * T)
-			Data.BP[I]  =  Data.B[0][I-1] + (Data.B[1][I-1] + Data.B[2][I-1] * T) * T
+		for I in range(1, BData.NC + 1):	#DO 120 I = 1,NC
+			BData.AP[I]  =  BData.A[0][I-1] *  math.exp((BData.A[1][I-1] + BData.A[2][I-1] * T) * T)
+			BData.BP[I]  =  BData.B[0][I-1] + (BData.B[1][I-1] + BData.B[2][I-1] * T) * T
 			
-			AJI[I][I]  =  X[I] * X[I] * Data.AP[I]
+			AJI[I][I]  =  X[I] * X[I] * BData.AP[I]
 			AMIX  =  AMIX + AJI[I][I]
-			BMIX  =  BMIX + X[I] * Data.BP[I]
+			BMIX  =  BMIX + X[I] * BData.BP[I]
 
 			for J in range(1, (I - 1)  +  1):	#DO 120 J  =  1,I - 1
-				AJI[J][I]  =  X[J] * X[I] * (1.0 - Data.F[J][I]) * math.sqrt(Data.AP[J] * Data.AP[I])
+				AJI[J][I]  =  X[J] * X[I] * (1.0 - BData.F[J][I]) * math.sqrt(BData.AP[J] * BData.AP[I])
 				AMIX  =  AMIX + 2.0 * AJI[J][I]
 
 		if IQ >=  1 :
-			Data.DADT  =  0.0
-			Data.DBDT  =  0.0
+			BData.DADT  =  0.0
+			BData.DBDT  =  0.0
 
-			for I in range(1,Data.NC  +  1): 	#DO 140 I  =  1,NC
-				DA[I][I]  =  Data.A[1][I-1] + 2.0 * Data.A[2][I-1] * T
+			for I in range(1,BData.NC  +  1): 	#DO 140 I  =  1,NC
+				DA[I][I]  =  BData.A[1][I-1] + 2.0 * BData.A[2][I-1] * T
 				DAJI[I][I]  =  AJI[I][I] * DA[I][I]
-				Data.DADT  =  Data.DADT + DAJI[I][I]
-				Data.DBDT  =  Data.DBDT + X[I] * (Data.B[1][I-1] + 2.0 * Data.B[2][I-1] * T)
+				BData.DADT  =  BData.DADT + DAJI[I][I]
+				BData.DBDT  =  BData.DBDT + X[I] * (BData.B[1][I-1] + 2.0 * BData.B[2][I-1] * T)
 				
 				for J in range(1, (I - 1)  +  1):	#DO 140 J  =  1,I - 1
-					DA[J][I]  =  0.5 * (Data.A[1][J-1] + Data.A[1][I-1] ) + (Data.A[2][J-1] + Data.A[2][I-1] ) * T
+					DA[J][I]  =  0.5 * (BData.A[1][J-1] + BData.A[1][I-1] ) + (BData.A[2][J-1] + BData.A[2][I-1] ) * T
 					DAJI[J][I]  =  AJI[J][I] * DA[J][I]
-					Data.DADT  =  Data.DADT + 2.0 * DAJI[J][I]
+					BData.DADT  =  BData.DADT + 2.0 * DAJI[J][I]
 
 			if IQ >=  2 :
-				Data.D2ADT  =  0.0
-				Data.D2BDT  =  0.0
+				BData.D2ADT  =  0.0
+				BData.D2BDT  =  0.0
 
-				for I in range(1,Data.NC  +  1):	#DO 160 I  =  1,NC
-					Data.CP[I]  =  Data.C[0][I-1] + (Data.C[1][I-1] + Data.C[2][I-1] * T) * T
+				for I in range(1,BData.NC  +  1):	#DO 160 I  =  1,NC
+					BData.CP[I]  =  BData.C[0][I-1] + (BData.C[1][I-1] + BData.C[2][I-1] * T) * T
 
-					Data.D2BDT  =  Data.D2BDT + 2.0 * X[I] * Data.B[2][I-1]
-					Data.D2ADT  =  Data.D2ADT + DAJI[I][I] * DA[I][I] + 2.0 * AJI[I][I] * Data.A[2][I-1]
+					BData.D2BDT  =  BData.D2BDT + 2.0 * X[I] * BData.B[2][I-1]
+					BData.D2ADT  =  BData.D2ADT + DAJI[I][I] * DA[I][I] + 2.0 * AJI[I][I] * BData.A[2][I-1]
 
 					for J in range(1, (I - 1)  +  1): #DO 160 J  =  1,I - 1
-						Data.D2ADT  =  Data.D2ADT + 2.0 * (DAJI[J][I] * DA[J][I] + AJI[J][I] * (Data.A[2][J-1] + Data.A[2][I-1]))
+						BData.D2ADT  =  BData.D2ADT + 2.0 * (DAJI[J][I] * DA[J][I] + AJI[J][I] * (BData.A[2][J-1] + BData.A[2][I-1]))
 
 			if IQ <=  3 :
 				if T <= 0:
@@ -338,12 +841,12 @@ class Block2 (Data):
 					print ('Application terminated in python\n')
 					sys.exit	#('1030') to show sorce of error
 				
-				for I in range(1,Data.NC  +  1):	#DO 180 I  =  1,NC
+				for I in range(1,BData.NC  +  1):	#DO 180 I  =  1,NC
 					
-					Data.HP[I]  =  (Data.C[0][I-1] + (0.5 * Data.C[1][I-1] + Data.C[2][I-1] / 3.0 * T) * T) * T
-					Data.SP[I]  =  (Data.C[0][I-1] - Data.R) * math.log(T / Data.TREF[I]) \
-						 + Data.C[1][I-1] * (T - Data.TREF[I])		\
-						 + 0.5 * Data.C[2][I-1] * (T * T -  (Data.TREF[I]**2))
+					BData.HP[I]  =  (BData.C[0][I-1] + (0.5 * BData.C[1][I-1] + BData.C[2][I-1] / 3.0 * T) * T) * T
+					BData.SP[I]  =  (BData.C[0][I-1] - BData.R) * math.log(T / BData.TREF[I]) \
+						 + BData.C[1][I-1] * (T - BData.TREF[I])		\
+						 + 0.5 * BData.C[2][I-1] * (T * T -  (BData.TREF[I]**2))
 
 		return [AMIX, BMIX ]
 
@@ -396,7 +899,7 @@ class Block2 (Data):
 				TC[J] = 0.5 * TC[J]
 				break	#GOTO 200
 			
-			TCC = 0.2273291 * AC / (Data.R*BC)
+			TCC = 0.2273291 * AC / (BData.R*BC)
 			FTC[J] = TCC - TC[J]
 	
 			if ( abs( FTC[J] ) < 0.01):
@@ -430,7 +933,7 @@ class Block2 (Data):
 		statement function for GIBBS free energy
 		note that since only differences of GIBBS are used, any terms which would cancel are omitted
 		'''	
-		return Data.R * T * ( -  math.log(V)  \
+		return BData.R * T * ( -  math.log(V)  \
 			+ 0.25 * B * ((8.0 * V - 2.25 * B) * V  \
 			+ 0.1875 * B * B) /  ((V - 0.25 * B)**2)  / (V - 0.25 * B))  \
 			+ A / B * math.log(V / (V + B)) - A / (V + B)
@@ -476,7 +979,7 @@ class Block2 (Data):
 		#
 		#   GENERAL NOMENCLATURE FOR FIRST LETTER OF VARIABLE NAMES
 		#      A,B  -  EQUATION OF STATE PARAMETERS
-		#      Data.F  -  MIXING PARAMETER
+		#      BData.F  -  MIXING PARAMETER
 		#      T  -  TEMPERATURE
 		#      P  -  PRESSURE
 		#      V  -  SPECifIC VOLUME
@@ -497,8 +1000,8 @@ class Block2 (Data):
 		#
 		#IMPLICIT REAL (A - H,O - Z)
 		#LOGICAL LBUB,LCRIT,LV1CON,LV2CON,LXCON,LXPOS,LXNEG,LPPOS,LPNEG,LPPCON
-		#COMMON  / NCOMP /  Data.NC
-		#COMMON  / ESPAR1 /  Data.AP(5),Data.BP(5),Data.F(5,5),Data.DADT,Data.DBDT,Data.D2ADT,D2BDT
+		#COMMON  / NCOMP /  BData.NC
+		#COMMON  / ESPAR1 /  BData.AP(5),BData.BP(5),BData.F(5,5),BData.DADT,BData.DBDT,BData.D2ADT,D2BDT
 		#COMMON  / RDATA4 /  R
 		#COMMON  / TOL /  TOLR,ITMAX,LUP
 		
@@ -527,13 +1030,13 @@ class Block2 (Data):
 		if LBUB:
 			X1 = XL[:]
 			XV = XL[:]
-			#for I in range(1,Data.NC  + 1):
+			#for I in range(1,BData.NC  + 1):
 			#	X1[I] = XL[I]
 			#	XV[I] = XL[I]
 		else:
 			X1 = XV[:]
 			XL = XV[:]		
-			#for I in range(1,Data.NC  + 1):
+			#for I in range(1,BData.NC  + 1):
 			#	X1[I] = XV[I]
 			#	XL[I] = XV[I]
 
@@ -543,7 +1046,7 @@ class Block2 (Data):
 		#   DETERMINE if INPUT TEMPERATURE EXCEEDS CRITICAL POINT;
 		#   if SO, SET ERROR FLAG AND RETURN
 		#
-		loc_TC  =  A1 / (B1 * 4.398909 * Data.R)
+		loc_TC  =  A1 / (B1 * 4.398909 * BData.R)
 	
 		if T > 0.99 * loc_TC :
 			LCRIT = True
@@ -573,7 +1076,7 @@ class Block2 (Data):
 
 		if PLOW <= 0.0:
 			VLOW = 0.8 * B1
-			PC = 0.1049995 * Data.R * loc_TC / B1
+			PC = 0.1049995 * BData.R * loc_TC / B1
 			PLOW = (1.0E-12) * PC
 			PP[1] = PLOW
 		else:
@@ -600,7 +1103,7 @@ class Block2 (Data):
 		#   FOR THE ITERATION.
 		
 		PNEG = 0.0 # In Python 
-		for IT in range (1, Data.ITMAX + 1):	#DO 400 IT = 1,ITMAX
+		for IT in range (1, BData.ITMAX + 1):	#DO 400 IT = 1,ITMAX
 			LV1CON = False
 			LV2CON = False
 
@@ -627,7 +1130,7 @@ class Block2 (Data):
 			else:
 				DGDPL = (FP[2] - FP[1]) / (PL[2] - PL[1])
 				if (DGDPL == 0.0) or \
-					(abs(FP[J] / (PL[J] * DGDPL)) < Data.TOLR):	#GOTO 440
+					(abs(FP[J] / (PL[J] * DGDPL)) < BData.TOLR):	#GOTO 440
 					#Python modification
 					LPPCON = False
 					break
@@ -658,10 +1161,10 @@ class Block2 (Data):
 			#
 			#   FOR A PURE COMPONENT THE ABOVE ITERATION GIVES THE FINAL RESULT
 			#	
-		if Data.NC == 1:	#  440 if (Data.NC == 1)  :
-			if LV1CON : print (Data.LUP,'bublt :volume iteration for parent phase did not converge')
-			if LV2CON : print (Data.LUP,'bublt :volume iteration for incipient phase did not converge')
-			if LPPCON : print (Data.LUP,'bublt :pure material pressure iteration in bublt did not converge')
+		if BData.NC == 1:	#  440 if (BData.NC == 1)  :
+			if LV1CON : print (BData.LUP,'bublt :volume iteration for parent phase did not converge')
+			if LV2CON : print (BData.LUP,'bublt :volume iteration for incipient phase did not converge')
+			if LPPCON : print (BData.LUP,'bublt :pure material pressure iteration in bublt did not converge')
 			P = PP[J]
 			return [XL, XV, P, VL, VV, LCRIT]
 		#
@@ -691,16 +1194,16 @@ class Block2 (Data):
 		#
 		J = 1
 		X2C = X1[:]
-		#for I in range(1, Data.NC +1):	# DO 500 I = 1,Data.NC
+		#for I in range(1, BData.NC +1):	# DO 500 I = 1,BData.NC
 		#	X2C[I] = X1[I]
 
 		LPNEG = False
 		LPPOS = False
 		
 		b_pyth_exit_inner = False
-		for ITP  in range (1, Data.ITMAX + 1): # DO 800 ITP = 1,ITMAX
+		for ITP  in range (1, BData.ITMAX + 1): # DO 800 ITP = 1,ITMAX
 			XX2 = X2C[:]
-			#for I  in range (1, Data.NC + 1): # DO 520 I = 1,Data.NC
+			#for I  in range (1, BData.NC + 1): # DO 520 I = 1,BData.NC
 			#	XX2[I] = X2C[I]
 
 			LXCON = False
@@ -718,8 +1221,8 @@ class Block2 (Data):
 				break # GOTO 800
 
 			#   COMPUTE CHEMICAL POTENTIALS FOR PHASE 1
-			for I in range (1, Data.NC + 1): #DO 540 I = 1,Data.NC
-				U1[I] = self.U_Func (T,X1,I,V1,A1,B1,Data.AP,Data.BP,Data.F)
+			for I in range (1, BData.NC + 1): #DO 540 I = 1,BData.NC
+				U1[I] = self.U_Func (T,X1,I,V1,A1,B1,BData.AP,BData.BP,BData.F)
 
 			#
 			#   ENTER INNER ITERATION LOOP (FOR COMPOSITION OF PHASE 2)
@@ -730,7 +1233,7 @@ class Block2 (Data):
 			C = 0.0 # prevent var is not found
 			LXCON = True # add by python
 			b_pyth_exit_outer = False
-			for IT in range (1, Data.ITMAX + 1):	# DO 600 IT = 1,ITMAX
+			for IT in range (1, BData.ITMAX + 1):	# DO 600 IT = 1,ITMAX
 				LV2CON = False
 
 				#   COMPUTE EQUATION OF STATE COEFFICIENTS FOR PHASE 2
@@ -749,8 +1252,8 @@ class Block2 (Data):
 					break	# GOTO 800
 
 				#  COMPUTE CHEMICAL POTENTIALS OF PHASE 2
-				for I in range (1, Data.NC + 1): #DO 560 I = 1,Data.NC
-					U2[I] = self.U_Func(T,XX2,I,V2, A2, B2,Data.AP,Data.BP,Data.F)
+				for I in range (1, BData.NC + 1): #DO 560 I = 1,BData.NC
+					U2[I] = self.U_Func(T,XX2,I,V2, A2, B2,BData.AP,BData.BP,BData.F)
 
 				#
 				#   CALCULATE THE COMPOSITION OF PHASE 2 FROM THE COMPOSITION
@@ -760,17 +1263,17 @@ class Block2 (Data):
 				#
 				FXSUM = 0.0
 				C = 0.0
-				for I in range (1, Data.NC + 1): 	#DO 580 I = 1,Data.NC
+				for I in range (1, BData.NC + 1): 	#DO 580 I = 1,BData.NC
 					Z[I] = X1[I] * math.exp(U1[I] - U2[I])
 					C = C + Z[I]
 
-				for I in range (1, Data.NC + 1): 	# DO 584 I = 1,Data.NC
+				for I in range (1, BData.NC + 1): 	# DO 584 I = 1,BData.NC
 					X2C[I] = Z[I] / C
 					FX2[I] = X2C[I] - XX2[I]
 					XX2[I] = X2C[I]
 					FXSUM = FXSUM + abs(FX2[I])
 				
-				if (FXSUM < Data.NC * Data.TOLR) :
+				if (FXSUM < BData.NC * BData.TOLR) :
 					# break is done exit 800 loop
 					LXCON = False # add by python
 					break	#GOTO 640
@@ -790,7 +1293,7 @@ class Block2 (Data):
 			#   THE SAME IN BOTH PHASES).
 			#
 
-			if  (abs(FP[1]) <  100.0 * Data.TOLR):
+			if  (abs(FP[1]) <  100.0 * BData.TOLR):
 				b_pyth_exit_inner = True
 				# break is done exit 800 loop
 				break	#GOTO 840
@@ -838,7 +1341,7 @@ class Block2 (Data):
 		
 		# location 800
 		if not b_pyth_exit_inner:
-			print (Data.LUP, 'bublt : mixture pressure iteration in bublt did not converge')
+			print (BData.LUP, 'bublt : mixture pressure iteration in bublt did not converge')
 
 		P = PP[J] # location 840
 		#
@@ -846,13 +1349,13 @@ class Block2 (Data):
 		#   DEPENDING ON WHETHER THE DEW OR BUBBLE POINT WAS CALCULATED.
 		#
 		if (LBUB)  :
-			#for I in range (1, Data.NC + 1): # DO 860 I = 1,Data.NC
+			#for I in range (1, BData.NC + 1): # DO 860 I = 1,BData.NC
 			#	XV[I] = XX2[I]
 			XV = XX2 [:]
 			VL = V1
 			VV = V2
 		else :
-			#for I in range (1, Data.NC + 1): # DO 880 I = 1,Data.NC
+			#for I in range (1, BData.NC + 1): # DO 880 I = 1,BData.NC
 			#	XL[I] = XX2[I]
 			XL = XX2 [:]
 			VL = V2
@@ -862,9 +1365,9 @@ class Block2 (Data):
 		#   PRINT WARNING MESSAGES FOR ANY CASES OF NON - CONVERGENCE OCCURING
 		#   ON FINAL CALL TO EACH ITERATION AND RETURN.
 		#
-		if LV1CON : print (Data.LUP,'bublt : volume iteration for parent phase did not converge')
-		if LV2CON : print (Data.LUP,'bublt : volume iteration for incipient phase did not converge')
-		if LXCON  : print (Data.LUP,'bublt : composition iteration in bublt did not converge')
+		if LV1CON : print (BData.LUP,'bublt : volume iteration for parent phase did not converge')
+		if LV2CON : print (BData.LUP,'bublt : volume iteration for incipient phase did not converge')
+		if LXCON  : print (BData.LUP,'bublt : composition iteration in bublt did not converge')
 
 		return [ XL, XV, P, VL, VV, LCRIT] 
 
@@ -906,7 +1409,7 @@ class Block2 (Data):
 		#
 		#    GENERAL NOMENCLATURE FOR FIRST LETTER OF VARIABLE NAMES
 		#       A,B  -  EQUATION OF STATE PARAMETERS
-		#       Data.F  -  MIXING PARAMETER
+		#       BData.F  -  MIXING PARAMETER
 		#       T  -  TEMPERATURE
 		#       P  -  PRESSURE
 		#       V  -  MOLAR VOLUME
@@ -919,16 +1422,16 @@ class Block2 (Data):
 		#       L  -  LOGICAL VARIABLES SUCH AS NON - CONVERGENCE FLAGS
 		#
 		#    GENERAL NOMENCLATURE FOR SECOND OR THIRD LETTER OF VARIABLES
-		#       A,B  -  COMPONENTS OF MIXTURE; COMPOSITION IS MOLE FRACTION Data.A
+		#       A,B  -  COMPONENTS OF MIXTURE; COMPOSITION IS MOLE FRACTION BData.A
 		#       L  -  LIQUID PHASE
 		#       V  -  VAPOR PHASE
 		#       1  -  PARENT PHASE (PHASE WITH SPECifIED COMPOSITION)
 		#       2  -  INCIPIENT PHASE
-		#       (FOR EXAMPLE UA1 REFERS TO CHEMICAL POTENTIAL OF COMPONENT Data.A
+		#       (FOR EXAMPLE UA1 REFERS TO CHEMICAL POTENTIAL OF COMPONENT BData.A
 		#       IN PHASE 1)
 		#
-		#	  COMMON  / ESPAR1 /  Data.AP(5),Data.BP(5),Data.F(5,5),Data.DADT,Data.DBDT,Data.D2ADT,Data.D2BDT
-		#	  COMMON  / NCOMP /  Data.NC
+		#	  COMMON  / ESPAR1 /  BData.AP(5),BData.BP(5),BData.F(5,5),BData.DADT,BData.DBDT,BData.D2ADT,BData.D2BDT
+		#	  COMMON  / NCOMP /  BData.NC
 		#	  COMMON  / RDATA4 /  R
 		#	  COMMON  / TOL /  TOLR,ITMAX,LUP
 
@@ -965,9 +1468,9 @@ class Block2 (Data):
 		PL = [0.0] * (5+1)
 
 		TC = 340.0
-		# SAVE Data.TNEG,Data.TPOS set as Data vars
-		#Data.TNEG = 9999.0
-		#Data.TPOS = -999.0
+		# SAVE BData.TNEG,BData.TPOS set as Data vars
+		#BData.TNEG = 9999.0
+		#BData.TPOS = -999.0
 
 		#
 		#    STATEMENT FUNCTIONS FOR GIBBS FREE ENERGY AND CHEMICAL POTENTIAL
@@ -983,7 +1486,7 @@ class Block2 (Data):
 		#	+ 0.25 * B * ((8.0 * V - 2.25 * B) * V 	\
 		#	+ 0.1875 * B * B) /  ((V - 0.25*B)**2) / (V - 0.25 * B) 	\
 		#	+ (A / B * math.log(V / (V + B)) \
-		#	- A / (V + B)  ) / (Data.R * T)
+		#	- A / (V + B)  ) / (BData.R * T)
 		
 		
 		#
@@ -993,13 +1496,13 @@ class Block2 (Data):
 		if (LBUB) :
 			X1 = XL [:]
 			XV = XL [:]
-			#for I in range(1, Data.NC + 1 ):   # DO 100 I = 1,Data.NC
+			#for I in range(1, BData.NC + 1 ):   # DO 100 I = 1,BData.NC
 			#	X1[I] = XL[I]
 			#	XV[I] = XL[I]
 		else:
 			X1 = XV [:]
 			XL = XV [:]
-			#for I in range(1, Data.NC + 1 ):   # DO 120 I = 1,Data.NC
+			#for I in range(1, BData.NC + 1 ):   # DO 120 I = 1,BData.NC
 			#	X1[I] = XV[I]
 			#	XL[I] = XV[I]
 		#
@@ -1018,7 +1521,7 @@ class Block2 (Data):
 		[A1, B1] =  self.espar(0, TT[1], X1 ) #	CALL espar (0,TT(1),X1,A1, B1)
 		
 		VL = 0.8 * B1
-		VV = Data.R * TT[1] / P
+		VV = BData.R * TT[1] / P
 		
 		#
 		#    ENTER ITERATION FOR PURE COMPONENT.  THIS ITERATION VARIES
@@ -1026,7 +1529,7 @@ class Block2 (Data):
 		#    A COMBINATION OF SECANT AND REGULI - FALSI METHODS IS USED
 		#    FOR THE ITERATION.
 		#
-		if (Data.NC == 1) :
+		if (BData.NC == 1) :
 			if (P > PC) :
 				LCRIT = True
 				print ("bublp: critical point of pure or pseudo-pure material")
@@ -1039,7 +1542,7 @@ class Block2 (Data):
 			
 			b_python_flag_loop1 = False
 			
-			for  IT in range( 1, Data.ITMAX + 1 ):   # DO 400 IT = 1,ITMAX
+			for  IT in range( 1, BData.ITMAX + 1 ):   # DO 400 IT = 1,ITMAX
 				# [P4, P5] = self.espar [P1, P2, P3]
 				[A1, B1] =  self.espar(0, TT[J], X1 ) #	CALL espar (0,TT(J),X1, A1, B1)
 				LV1CON =  False
@@ -1060,18 +1563,18 @@ class Block2 (Data):
 
 				FT[J] = GL - GV
 
-				if (abs(FT[J]) < 100.0 * Data.TOLR):
+				if (abs(FT[J]) < 100.0 * BData.TOLR):
 					b_python_flag_loop1 = True
 					break	#	GOTO 440
 
 				if (FT[J] < 0.0) :
 					LTNEG = True
 					FTNEG = FT[J]
-					Data.TNEG = TT[J]
+					BData.TNEG = TT[J]
 				else:
 					LTPOS = True
 					FTPOS = FT[J]
-					Data.TPOS = TT[J]
+					BData.TPOS = TT[J]
 
 				if (IT <= 1):
 					TT[2] = 0.95 * TT[1]
@@ -1087,8 +1590,8 @@ class Block2 (Data):
 					#    IF NEXT GUESS FOR TEMPERATURE IS FURTHER FROM SOLUTION THAN
 					#    PREVIOUS BEST GUESS, USE REGULI - FALSI METHOD FOR NEXT GUESS
 					if (LTNEG and LTPOS)  :
-						if (TT[3] < min(Data.TNEG, Data.TPOS)  or  TT[3] > max(Data.TNEG,Data.TPOS)) :
-							TT[3] = Data.TPOS - FTPOS * (Data.TPOS - Data.TNEG) / (FTPOS - FTNEG)
+						if (TT[3] < min(BData.TNEG, BData.TPOS)  or  TT[3] > max(BData.TNEG,BData.TPOS)) :
+							TT[3] = BData.TPOS - FTPOS * (BData.TPOS - BData.TNEG) / (FTPOS - FTNEG)
 					
 					TT[1] = TT[2]
 					FT[1] = FT[2]
@@ -1120,7 +1623,7 @@ class Block2 (Data):
 		#
 		J = 1
 		X2C = X1 [:]
-		#for I  in range(1, Data.NC +1 ):   # DO 500 I = 1,Data.NC
+		#for I  in range(1, BData.NC +1 ):   # DO 500 I = 1,BData.NC
 		#	X2C[I] = X1[I]
 
 		if (LBUB) :
@@ -1134,9 +1637,9 @@ class Block2 (Data):
 		LTPOS =  False
 
 		b_python_flag_loop8 = False
-		for ITT in range(1, Data.ITMAX + 1):   # DO 800 ITT = 1,ITMAX
+		for ITT in range(1, BData.ITMAX + 1):   # DO 800 ITT = 1,ITMAX
 			XX2 = X2C[:]
-			#for I  in range(1, Data.NC +1 ):   # DO 520 I = 1,Data.NC
+			#for I  in range(1, BData.NC +1 ):   # DO 520 I = 1,BData.NC
 			#	XX2[I] = X2C[I]
 				
 			LXCON =  False
@@ -1146,7 +1649,7 @@ class Block2 (Data):
 			#[P5, P7] = self.vit (P1, P2, P3, P4, P5, P6)
 			[V1, LV1CON] = self.vit (TT[J] , P, A1, B1, V1, LBUB)		# CALL VIT (TT(J), P, A1, B1,V1,LBUB,LV1CON)
 			#
-			#    IF VOLUME ITERATION HAS NOT CONVERGED, TRY Data.A NEW TEMPERATURE AND
+			#    IF VOLUME ITERATION HAS NOT CONVERGED, TRY BData.A NEW TEMPERATURE AND
 			#    RETURN TO THE BEGINNING OF THE ITERATION
 			#
 			if (LV1CON  or  LXCON)  :
@@ -1154,8 +1657,8 @@ class Block2 (Data):
 				continue # GOTO 800 exit loop
 			
 			#    COMPUTE CHEMICAL POTENTIALS FOR PHASE 1
-			for I in range(1, Data.NC + 1):   # DO 540 I = 1,Data.NC
-				U1[I] = self.U_Func (TT[J],X1,I,V1,  A1,B1,  Data.AP,Data.BP,Data.F)
+			for I in range(1, BData.NC + 1):   # DO 540 I = 1,BData.NC
+				U1[I] = self.U_Func (TT[J],X1,I,V1,  A1,B1,  BData.AP,BData.BP,BData.F)
 			#
 			#    ENTER INNER ITERATION LOOP (FOR COMPOSITION OF PHASE 2)
 			#
@@ -1165,7 +1668,7 @@ class Block2 (Data):
 			
 			b_python_flag_loop3 = False
 			b_python_flag_outer = False
-			for IT in range(1, Data.ITMAX + 1):   # DO 600 IT = 1,ITMAX
+			for IT in range(1, BData.ITMAX + 1):   # DO 600 IT = 1,ITMAX
 				LV2CON =  False
 				#    COMPUTE EQUATION OF STATE COEFFICIENTS FOR PHASE 2
 				# [P4, P5] = self.espar [P1, P2, P3]
@@ -1174,7 +1677,7 @@ class Block2 (Data):
 				[V2, LV2CON] = self.vit (TT[J], P, A2, B2, V2, not LBUB)		# CALL VIT (TT(J),P, A2, B2, V2,.NOT.LBUB, LV2CON)
 				
 				#
-				#    if VOLUME ITERATION HAS NOT CONVERGED, TRY Data.A NEW TEMPERATURE
+				#    if VOLUME ITERATION HAS NOT CONVERGED, TRY BData.A NEW TEMPERATURE
 				#    AND RETURN TO THE START OF THE TEMPERATURE ITERATION.
 				#
 				if (LV2CON)  :
@@ -1184,22 +1687,22 @@ class Block2 (Data):
 
 				#   COMPUTE CHEMICAL POTENTIALS OF PHASE 2
 
-				for I in range(1, Data.NC + 1):  # DO 560 I = 1,Data.NC
-					U2[I] = self.U_Func (TT[J], XX2,I,V2,  A2,B2,  Data.AP,Data.BP,Data.F)
+				for I in range(1, BData.NC + 1):  # DO 560 I = 1,BData.NC
+					U2[I] = self.U_Func (TT[J], XX2,I,V2,  A2,B2,  BData.AP,BData.BP,BData.F)
 				#
 				#    CALCULATE THE COMPOSITION OF PHASE 2 FROM THE COMPOSITION
 				#    OF PHASE 1 AND THE CHEMICAL POTENTIALS.  THE INNER ITERATION
 				#    LOOP HAS CONVERGED WHEN THE CALCULATED COMPOSITION EQUALS
-				#    (WITHIN Data.A CONVERGENCE TOLERANCE) THE GUESSED VALUE OF X2.
+				#    (WITHIN BData.A CONVERGENCE TOLERANCE) THE GUESSED VALUE OF X2.
 				#
 				FXSUM = 0.0
 				C = 0.0
 
-				for I in range(1, Data.NC + 1):  # DO 580 I = 1,Data.NC
+				for I in range(1, BData.NC + 1):  # DO 580 I = 1,BData.NC
 					Z[I] = X1[I] * math.exp(U1[I] - U2[I])
 					C = C + Z[I]
 
-				for I in range(1, Data.NC + 1):   # DO 584 I = 1,Data.NC
+				for I in range(1, BData.NC + 1):   # DO 584 I = 1,BData.NC
 					X2C[I] = Z[I] / C
 					FX2[I] = X2C[I] - XX2[I]
 					XX2[I] = X2C[I]
@@ -1207,13 +1710,13 @@ class Block2 (Data):
 
 				if(IT <= 1): FXOLD = 1.0E6
 
-				if (FXSUM < Data.NC * Data.TOLR):
+				if (FXSUM < BData.NC * BData.TOLR):
 					b_python_flag_loop3 = True
 					break 	# GO TO 640
 
 				FXDIF = abs(FXSUM - FXOLD)
 				
-				if(FXDIF <= 10.0 * Data.TOLR and IT >= Data.ITMAX):
+				if(FXDIF <= 10.0 * BData.TOLR and IT >= BData.ITMAX):
 					b_python_flag_loop3 = True
 					break 	# GO TO 640
 
@@ -1225,7 +1728,7 @@ class Block2 (Data):
 				
 			#    IF INNER ITERATION LOOP HAS NOT CONVERGED, SET ERROR FLAG
 			if not b_python_flag_loop3:
-				print (IT, FXSUM, Data.NC * Data.TOLR,FXSUM / (Data.NC * Data.TOLR), FXDIF)
+				print (IT, FXSUM, BData.NC * BData.TOLR,FXSUM / (BData.NC * BData.TOLR), FXDIF)
 				LXCON = True
 			#
 			#    END OF ITERATION LOOP FOR PHASE 2 COMPOSITION
@@ -1233,12 +1736,12 @@ class Block2 (Data):
 			# point 640 Con
 			FT[J] = 1.0 - C
 			#
-			#    OUTER (TEMPERATURE) ITERATION HAS CONVERGED WHEN Data.C  =  1.000
+			#    OUTER (TEMPERATURE) ITERATION HAS CONVERGED WHEN BData.C  =  1.000
 			#    (I.E. WHEN THE CHEMICAL POTENTIALS OF EACH COMPONENT ARE
 			#    THE SAME IN BOTH PHASES).
 			#
 
-			if (abs(FT[J]) < 100.0 * Data.TOLR):
+			if (abs(FT[J]) < 100.0 * BData.TOLR):
 				b_python_flag_loop8 = True
 				break	#GOTO 840
 			#
@@ -1250,11 +1753,11 @@ class Block2 (Data):
 				if (FT[J] < 0.0)  :
 					LTNEG = True
 					FTNEG = FT[J]
-					Data.TNEG = TT[J]
+					BData.TNEG = TT[J]
 				else:
 					LTPOS = True
 					FTPOS = FT[J]
-					Data.TPOS = TT[J]
+					BData.TPOS = TT[J]
 			#
 			#    COMPUTE NEW GUESS FOR SATURATION TEMPERATURE.
 			#    FOR THE SECOND ITERATION, COMPUTE AN APPROXIMATE SATURATION
@@ -1282,10 +1785,10 @@ class Block2 (Data):
 				#    FOR THIRD AND SUBSEQUENT ITERATIONS, USE SECANT / REGULI - FALSI
 				TT[3] = TT[2] - FT[2] * (TT[2] - TT[1]) / (FT[2] - FT[1])
 				
-				if ((TT[3] > max(Data.TNEG,Data.TPOS)  or 	\
-					TT[3] < min(Data.TNEG,Data.TPOS))  and  LTNEG  and  LTPOS):
+				if ((TT[3] > max(BData.TNEG,BData.TPOS)  or 	\
+					TT[3] < min(BData.TNEG,BData.TPOS))  and  LTNEG  and  LTPOS):
 					
-					TT[3] = Data.TPOS - FTPOS * (Data.TPOS - Data.TNEG) / (FTPOS - FTNEG)
+					TT[3] = BData.TPOS - FTPOS * (BData.TPOS - BData.TNEG) / (FTPOS - FTNEG)
 			 
 				TT[1] = TT[2]
 				TT[2] = TT[3]
@@ -1295,7 +1798,7 @@ class Block2 (Data):
 		# End of loop  800 CONTINUE
 
 		if not	b_python_flag_loop8 :
-			print (Data.LUP, 'MIXTURE TEMPERATURE ITERATION IN BUBLP DID NOT, CONVERGE')
+			print (BData.LUP, 'MIXTURE TEMPERATURE ITERATION IN BUBLP DID NOT, CONVERGE')
 		
 		# point 840
 		T = TT[J]
@@ -1305,14 +1808,14 @@ class Block2 (Data):
 		#    DEPENDING ON WHETHER THE DEW OR BUBBLE POINT WAS CALCULATED.
 		#
 		if (LBUB)  :
-			#for I in range(1, Data.NC + 1):   # DO 860 I = 1,Data.NC
+			#for I in range(1, BData.NC + 1):   # DO 860 I = 1,BData.NC
 			#	XV[I] = XX2[I]
 			XV = XX2[:]
 			VL = V1
 			VV = V2
 			
 		else:
-			#for I in range(1, Data.NC + 1):   # DO 880 I = 1,Data.NC
+			#for I in range(1, BData.NC + 1):   # DO 880 I = 1,BData.NC
 			#	XL[I] = XX2[I]
 			XL = XX2[:]
 			VL = V2
@@ -1321,13 +1824,13 @@ class Block2 (Data):
 		#    PRINT WARNING MESSAGES FOR ANY CASES OF NON - CONVERGENCE OCCURING
 		#    ON FINAL CALL TO EACH ITERATION AND RETURN.
 		#
-		if (abs(1.0 - VL / VV) < Data.TOLR)  :
+		if (abs(1.0 - VL / VV) < BData.TOLR)  :
 			LCRIT = True
-			print(Data.LUP, 'CRITICAL POINT EXCEEDED IN BUBLP')
+			print(BData.LUP, 'CRITICAL POINT EXCEEDED IN BUBLP')
 		
-		if (LV1CON): print (Data.LUP, 'ITERATION IN BUBLP FOR PARENT PHASE VOLUME DID')
-		if (LV2CON): print (Data.LUP, 'ITERATION IN BUBLP FOR INCIPIENT PHASE VOLUME DID, NOT CONVERGE')
-		if (LXCON) : print (Data.LUP, 'COMPOSITION ITERATION IN BUBLP DID NOT CONVERGE')
+		if (LV1CON): print (BData.LUP, 'ITERATION IN BUBLP FOR PARENT PHASE VOLUME DID')
+		if (LV2CON): print (BData.LUP, 'ITERATION IN BUBLP FOR INCIPIENT PHASE VOLUME DID, NOT CONVERGE')
+		if (LXCON) : print (BData.LUP, 'COMPOSITION ITERATION IN BUBLP DID NOT CONVERGE')
 
 		return [XL,XV   ,T,VL,VV,  LCRIT]
 
@@ -1364,15 +1867,15 @@ class Block2 (Data):
 		[A, B] = self.espar (1, T, X)	#  CALL espar (1,T,X   ,A,B)
 		
 		B4 = 0.25 * B
-		S = (Data.DADT * B - A * Data.DBDT)/ (B**2 ) * math.log((V+B)/V)  +  A * Data.DBDT/B/(V+B) \
-			-Data.R*B4/(V-B4)**2  *(4.0*V-3*B4)		\
-			-Data.R*T*Data.DBDT*0.5*V/(V-B4)**3   *(2.0*V-B4)
+		S = (BData.DADT * B - A * BData.DBDT)/ (B**2 ) * math.log((V+B)/V)  +  A * BData.DBDT/B/(V+B) \
+			-BData.R*B4/(V-B4)**2  *(4.0*V-3*B4)		\
+			-BData.R*T*BData.DBDT*0.5*V/(V-B4)**3   *(2.0*V-B4)
 
-		for I in range (1, Data.NC +1): 	#DO 120 I=1,NC
-			S = S + X[I] * (Data.SP[I] - Data.SR[I] + Data.R * math.log(V/ Data.VR[I]))
+		for I in range (1, BData.NC +1): 	#DO 120 I=1,NC
+			S = S + X[I] * (BData.SP[I] - BData.SR[I] + BData.R * math.log(V/ BData.VR[I]))
 
 			if (X[I] > 0.0 and  X[I]  < 1.0) :
-				S = S - Data.R * X [I] * math.log(X[I])
+				S = S - BData.R * X [I] * math.log(X[I])
 
 		return S
 	
@@ -1406,12 +1909,12 @@ class Block2 (Data):
 		#
 		#
 		#	  IMPLICIT REAL (A - H,O - Z)
-		#	  COMMON  / NCOMP /  Data.NC
-		#	  COMMON  / ESPAR1 /  Data.AP(5),Data.BP(5),Data.F(5,5),    C1,D1,C2,D2
+		#	  COMMON  / NCOMP /  BData.NC
+		#	  COMMON  / ESPAR1 /  BData.AP(5),BData.BP(5),BData.F(5,5),    C1,D1,C2,D2
 		#    simlar to /ESPAR1/        AP(5),BP(5),F(5,5),          DADT,DBDT,D2ADT,D2BDT
-		#	  COMMON  / HSPURE /  HP(5),SP(5),Data.CP(5)
-		#	  COMMON  / REF /  Data.TREF(5),Data.HR(5),SR(5),VR(5)
-		#	  COMMON  / RDATA2 /  Data.WM(5),TC(5)
+		#	  COMMON  / HSPURE /  HP(5),SP(5),BData.CP(5)
+		#	  COMMON  / REF /  BData.TREF(5),BData.HR(5),SR(5),VR(5)
+		#	  COMMON  / RDATA2 /  BData.WM(5),TC(5)
 		#	  COMMON  / RDATA4 /  R
 		#	  DIMENSION X(5)
 		#X = [0.0] * (5+1)
@@ -1433,7 +1936,7 @@ class Block2 (Data):
 		VB4 = V - B4
 		
 		VB43 = VB4**3	#pow(VB4, 3)
-		RT = Data.R * T
+		RT = BData.R * T
 		
 		H  = 0.0 # python in case if IQ =4 H will have no value
 		VS = 0.0 # python in case if IQ =4 H will have no value
@@ -1442,30 +1945,30 @@ class Block2 (Data):
 		
 		if (IQ <= 3) :
 			#    COMPUTE ENTHALPY AS A FUNCTION OF T, V, X
-			H = ( (A + (A * Data.DBDT / B - Data.DADT) * T) * VBL + A * (Data.DBDT * T - B) / VB) / B		\
-				+ 2.0 * RT * V * (2.0 * V - B4) * (B4 - 0.25 * Data.DBDT * T) / VB43
+			H = ( (A + (A * BData.DBDT / B - BData.DADT) * T) * VBL + A * (BData.DBDT * T - B) / VB) / B		\
+				+ 2.0 * RT * V * (2.0 * V - B4) * (B4 - 0.25 * BData.DBDT * T) / VB43
 				
-			for I in range(1, Data.NC + 1):   # DO 120 I = 1,Data.NC
-				H = H + X[I] * (Data.HP[I] - Data.HR[I])
+			for I in range(1, BData.NC + 1):   # DO 120 I = 1,BData.NC
+				H = H + X[I] * (BData.HP[I] - BData.HR[I])
 		
 		if (IQ >= 2) :
 			#    COMPUTE CONSTANT VOLUME HEAT CAPACITY
-			D12 = Data.DBDT * Data.DBDT
-			CV = (Data.R * V * ((0.375 * D12 * T / VB4 	\
-				+ 0.5 * Data.D2BDT * T + Data.DBDT) * (B4 - 2.0 * V)	\
+			D12 = BData.DBDT * BData.DBDT
+			CV = (BData.R * V * ((0.375 * D12 * T / VB4 	\
+				+ 0.5 * BData.D2BDT * T + BData.DBDT) * (B4 - 2.0 * V)	\
 				+ 0.125 * D12 * T) / VB43						\
-				+ ((1.0 / VB + VBL / B) * (A * Data.D2BDT * B 	\
-				+ 2.0 * (Data.DADT * Data.DBDT * B - A * D12)) / B	\
-				- Data.D2ADT * VBL - A * D12 / (VB **2)) / B) * T - Data.R
+				+ ((1.0 / VB + VBL / B) * (A * BData.D2BDT * B 	\
+				+ 2.0 * (BData.DADT * BData.DBDT * B - A * D12)) / B	\
+				- BData.D2ADT * VBL - A * D12 / (VB **2)) / B) * T - BData.R
 
-			for I in range( Data.NC + 1):   # DO 160 I = 1,Data.NC
-				CV = CV + X[I] * Data.CP[I]
+			for I in range( BData.NC + 1):   # DO 160 I = 1,BData.NC
+				CV = CV + X[I] * BData.CP[I]
 
 			if (IQ == 3  or  IQ == 5):
 				#    COMPUTE SPECIFIC HEAT AT CONSTANT PRESSURE USING CV
 				Y = B4 / V
-				DPDT = 2.0 * Data.R / VB4 * ( - 1.0 + ( - 0.25 * T * Data.DBDT + (V * V * (1.0 + 0.75 * T * Data.DBDT / VB4))		\
-					/ VB4) / VB4) + (Data.R + ( - Data.DADT + A * Data.DBDT / VB) / VB) / V
+				DPDT = 2.0 * BData.R / VB4 * ( - 1.0 + ( - 0.25 * T * BData.DBDT + (V * V * (1.0 + 0.75 * T * BData.DBDT / VB4))		\
+					/ VB4) / VB4) + (BData.R + ( - BData.DADT + A * BData.DBDT / VB) / VB) / V
 
 				#DPDV = ( - RT * (1.0 + (4.0 + (4.0 + ( - 4.0 + Y) * Y) * Y) * Y) / (pow(1.0 - Y,4))	\
 				#	+ A * (2.0 * V + B) / (VB *VB)) / (V * V )
@@ -1477,8 +1980,8 @@ class Block2 (Data):
 				
 				# COMPUTE VELOCITY OF SOUND USING C'S AND VOLUME DERIVATIVE OF P
 				WMOL = 0.0
-				for I in range(1, Data.NC+1 ):   # DO 180 I = 1,Data.NC
-					WMOL = WMOL + X[I] * Data.WM[I]
+				for I in range(1, BData.NC+1 ):   # DO 180 I = 1,BData.NC
+					WMOL = WMOL + X[I] * BData.WM[I]
 				
 				VS = V * math.sqrt( - 1000.0 * CP * DPDV / (WMOL * CV))
 
@@ -1544,7 +2047,7 @@ class Block2 (Data):
 				
 		VL = math.log(V)
 		PL = math.log(P)
-		RT = Data.R * T
+		RT = BData.R * T
 		B4 = 0.25 * para_B
 		
 		B4L = math.log(B4)
@@ -1553,7 +2056,7 @@ class Block2 (Data):
 			VL = B4L + 0.5
 		
 		
-		TC = para_A / (para_B * 4.398909 * Data.R)
+		TC = para_A / (para_B * 4.398909 * BData.R)
 
 		PC = 0.02386944 * para_A / pow(para_B, 2)
 
@@ -1574,7 +2077,7 @@ class Block2 (Data):
 		#    THE PRESSURE CALCULATED FROM THE EQUATION OF STATE AGREES
 		#    WITH THE INPUT PRESSURE.
 		#
-		for IT in range(1, Data.ITMAX + 1 ):   # DO 100 IT = 1,ITmath.max
+		for IT in range(1, BData.ITMAX + 1 ):   # DO 100 IT = 1,ITmath.max
 			if (  ( (VL > VCL) == LLIQ ) and  P < PC):
 				VL = VCL
 			VLS = VL
@@ -1594,8 +2097,8 @@ class Block2 (Data):
 				else:
 					FVDP = (P2 - P) / DPDLV
 					#print ("Ayman Check .. need to be 100* TOLR, this value is not possible" )
-					#if (abs(FVDP / P) < 0.001 * Data.TOLR) :
-					if (abs(FVDP / P) <  Data.TOLR) :
+					#if (abs(FVDP / P) < 0.001 * BData.TOLR) :
+					if (abs(FVDP / P) <  BData.TOLR) :
 						VS = math.exp(VL)
 						return [VS, LVCON]
 					else:
@@ -1607,7 +2110,7 @@ class Block2 (Data):
 					VL = VL + 0.5
 				else:
 					FVDPL = (math.log(P2) - PL) * P2 / DPDLV
-					if (abs(FVDPL) < 0.001 * Data.TOLR)  :
+					if (abs(FVDPL) < 0.001 * BData.TOLR)  :
 						VS = math.exp(VL)
 						return	[VS, LVCON]
 
@@ -1652,7 +2155,7 @@ class Block2 (Data):
 		T2 = TSAT + FT1 / CV
 		V = VSAT
 
-		for IT in range(1, Data.ITMAX + 1 ):   # DO 200 IT = 1,ITmath.max
+		for IT in range(1, BData.ITMAX + 1 ):   # DO 200 IT = 1,ITmath.max
 			# [P4, P5] = self.espar [P1, P2, P3]
 			[A, B] = self.espar (2, T2, X )					#CALL espar (2,T2,X, A, B)
 			#[P5, P7] = self.vit (P1, P2, P3, P4, P5, P6)
@@ -1660,7 +2163,7 @@ class Block2 (Data):
 
 			SSP = self.entrop (T2,V,X)
 			FT2 = S - SSP
-			if (abs(FT2) < Data.TOLS  or  abs(FT2 - FT1) < 0.02 * Data.TOLS):
+			if (abs(FT2) < BData.TOLS  or  abs(FT2 - FT1) < 0.02 * BData.TOLS):
 				return [T2, V]
 
 			T3 = T2 - FT2 * (T2 - T1) / (FT2 - FT1)
@@ -1668,7 +2171,7 @@ class Block2 (Data):
 			T2 = T3
 			FT1 = FT2
 
-		print (Data.LUP, 'SINGLE PHASE ITERATION IN SPIN DID NOT CONVERGE' )
+		print (BData.LUP, 'SINGLE PHASE ITERATION IN SPIN DID NOT CONVERGE' )
 		return [T2, V]
 
 	# = . = . = . = . = . = . = . = . = . = . = . = . = . = . = . = . = . = . 
@@ -1697,7 +2200,7 @@ class Block2 (Data):
 		T2 = TSAT + FT1 / CP
 		V  = VSAT
 
-		for IT in range (1, Data.ITMAX + 1) : # DO 200 IT=1,ITMAX
+		for IT in range (1, BData.ITMAX + 1) : # DO 200 IT=1,ITMAX
 			# [P4, P5] = self.espar [P1, P2, P3]
 			[A, B] =  self.espar(2, T2, X ) #CALL espar (2,T2,X,A,B)
 			
@@ -1709,7 +2212,7 @@ class Block2 (Data):
 
 			FT2 = H - HSP
 			
-			if (abs(FT2) < Data.TOLH  or  abs(FT2-FT1) < 0.02 * Data.TOLH):
+			if (abs(FT2) < BData.TOLH  or  abs(FT2-FT1) < 0.02 * BData.TOLH):
 				return [T2,V]
 
 			T3 = T2 - FT2 * (T2-T1) / (FT2-FT1)
@@ -1717,7 +2220,7 @@ class Block2 (Data):
 			T2 = T3
 			FT1 = FT2
 
-		print (Data.LUP,'SINGLE PHASE ITERATION IN HPIN DID NOT CONVERGE')
+		print (BData.LUP,'SINGLE PHASE ITERATION IN HPIN DID NOT CONVERGE')
 		return [T2,V]
 
 	# = . = . = . = . = . = . = . = . = . = . = . = . = . = . = . = . = . = . 
@@ -1759,10 +2262,10 @@ class Block2 (Data):
 		#         COMPOSITION IN EQUILIBRIUM WITH SATURATED VAPOR AT THE
 		#         GIVEN P, XV.
 		#
-		#	  IMPLICIT REAL (Data.A - H,O - Z)
+		#	  IMPLICIT REAL (BData.A - H,O - Z)
 		#	  LOGICAL LCRIT,LCONV
 		#	  DIMENSION X(5),XL(5),XV(5),XLB(5),XVB(5),XLD(5),XVD(5)
-		#	  COMMON  / NCOMP /  Data.NC
+		#	  COMMON  / NCOMP /  BData.NC
 		#	  COMMON  / TOL /  TOLR,ITMAX,LUP
 		#	  COMMON  / TOLSH /  TOLH,TOLS
 		#
@@ -1797,7 +2300,7 @@ class Block2 (Data):
 			#    SINGLE PHASE LIQUID
 			#
 			XL = X[:]
-			#for I in range(1, Data.NC + 1):   # DO 120 I = 1,Data.NC
+			#for I in range(1, BData.NC + 1):   # DO 120 I = 1,BData.NC
 			#	XL[I] = X[I]
 				
 			VV = VVBUB
@@ -1810,7 +2313,7 @@ class Block2 (Data):
 			#    SINGLE PHASE VAPOR
 			#
 			XV = X[:]
-			#for I in range(1,Data.NC):   # DO 140 I = 1,Data.NC
+			#for I in range(1,BData.NC):   # DO 140 I = 1,BData.NC
 			#	XV[I] = X[I]
 				
 			VL = VLDEW
@@ -1822,9 +2325,9 @@ class Block2 (Data):
 		else:
 			#    TWO PHASE
 			#
-			NCC = Data.NC
-			for I in range(1, Data.NC + 1):   # DO 210 I = 1,Data.NC
-				if (X[I] < Data.TOLR):
+			NCC = BData.NC
+			for I in range(1, BData.NC + 1):   # DO 210 I = 1,BData.NC
+				if (X[I] < BData.TOLR):
 					NCC = NCC - 1
 					
 				XLB[I] = X[I]
@@ -1839,7 +2342,7 @@ class Block2 (Data):
 			SLD = self.entrop (TDEW,VLDEW,XLD)
 			
 			b_python_flag = False
-			for IT in range(1, int(Data.ITMAX/2) + 1):	# DO 260 IT = 1,ITMAX / 2
+			for IT in range(1, int(BData.ITMAX/2) + 1):	# DO 260 IT = 1,ITMAX / 2
 				#
 				#    COMPUTE QUALITY BASED ON ENTHALPY; COMPUTED SEPARATELY FOR
 				#    BUBBLE AD DEW POINT CONDITIONS.
@@ -1857,7 +2360,7 @@ class Block2 (Data):
 				TLINEB = 0.0
 				TLINED = 0.0
 				
-				for I in range(1, Data.NC + 1):   # DO 214 I = 1,Data.NC
+				for I in range(1, BData.NC + 1):   # DO 214 I = 1,BData.NC
 					if (XLB[I] != XVB[I]):
 						IXQCB = IXQCB + 1
 						XQCB  = XQCB  + ( X[I] - XLB[I] ) / ( XVB[I] - XLB[I] )
@@ -1890,7 +2393,7 @@ class Block2 (Data):
 				#    CHECK FOR CONVERGENCE
 				#
 				LCONV = True
-				for I in range(1, Data.NC + 1):   # DO 220 I = 1,Data.NC
+				for I in range(1, BData.NC + 1):   # DO 220 I = 1,BData.NC
 					if ( abs ( XVB[I] - XVD[I] ) > 0.0001):
 						LCONV =  False
 					
@@ -1914,8 +2417,8 @@ class Block2 (Data):
 					DTSUMB = 0.0
 					DTSUMD = 0.0
 					
-					for J in range(1, (Data.NC-1) + 1):  		# DO 222 J = 1,Data.NC - 1
-						for K in range(  J+1 , Data.NC +1 ):		# DO 222 K = J + 1,Data.NC
+					for J in range(1, (BData.NC-1) + 1):  		# DO 222 J = 1,BData.NC - 1
+						for K in range(  J+1 , BData.NC +1 ):		# DO 222 K = J + 1,BData.NC
 							DTSUMB = DTSUMB + ( ( X[J] - XLB[J] ) * ( XVB[K] - XLB[K] ) 	\
 								- ( X[K] - XLB[K] ) * ( XVB[J] - XLB[J] ) ) ** 2
 								
@@ -1926,7 +2429,7 @@ class Block2 (Data):
 					DXBUB = 0.0
 					DXDEW = 0.0
 					
-					for I in range( 1, Data.NC +1 ):   # DO 223 I = 1,Data.NC
+					for I in range( 1, BData.NC +1 ):   # DO 223 I = 1,BData.NC
 						DXBUB = DXBUB + ( XLB[I] - XVB[I]) ** 2
 						DXDEW = DXDEW + ( XLD[I] - XVD[I]) ** 2
 			  
@@ -1948,7 +2451,7 @@ class Block2 (Data):
 				#    AND CARRY OUT CORRESPONDING BUBBLE AND DEW POINT CALCULATIONS.
 				#
 				
-				for I in range(1, Data.NC + 1):   # DO 224 I = 1,Data.NC
+				for I in range(1, BData.NC + 1):   # DO 224 I = 1,BData.NC
 					XLB2I = X[I] + TLAVG * (WTB * XQSB + WTD * XQSD)	\
 						* (WTB * (XLB[I] - XVB[I]) / TLINEB + WTD * (XLD[I] - XVD[I]) / TLINED)
 						
@@ -1970,9 +2473,9 @@ class Block2 (Data):
 
 				# 260   CONTINUE
 				
-			# WRITE (LUP,1000) S,P,   (X(I),I = 1,Data.NC)
+			# WRITE (LUP,1000) S,P,   (X(I),I = 1,BData.NC)
 			if not b_python_flag :
-				print (Data.LIP, "ROUTINE SPIN DID NOT CONVERGE S, P, X",S, P, X[1:Data.NC] )
+				print (BData.LIP, "ROUTINE SPIN DID NOT CONVERGE S, P, X",S, P, X[1:BData.NC] )
 			
 			# 280	CONTINUE
 			
@@ -1982,7 +2485,7 @@ class Block2 (Data):
 			XL = XLB[:]
 			XV = XVB[:]
 			
-			#for I in range(1,Data.NC):   # DO 284 I = 1,Data.NC
+			#for I in range(1,BData.NC):   # DO 284 I = 1,BData.NC
 			#	XL[I] = XLB[I]
 			#	XV[I] = XVB[I]
 		
@@ -2067,7 +2570,7 @@ class Block2 (Data):
 		
 		if (H <= HL) :
 			#   SINGLE PHASE LIQUID
-			#for I in range(1, Data.NC + 1): # DO 120 I=1,NC
+			#for I in range(1, BData.NC + 1): # DO 120 I=1,NC
 			#	XL[I] = X[I]
 
 			XL = X[:]
@@ -2079,7 +2582,7 @@ class Block2 (Data):
 			
 		elif (H >= HV) :
 			#   SINGLE PHASE VAPOR
-			#for I in range(1, Data.NC + 1): # DO 140 I=1,NC
+			#for I in range(1, BData.NC + 1): # DO 140 I=1,NC
 			#	XV[I] = X[I]
 
 			XV = X[:]
@@ -2092,9 +2595,9 @@ class Block2 (Data):
 		else:
 
 			#   TWO PHASE
-			NCC = Data.NC
-			for I in range(1, Data.NC + 1): # DO 210 I=1,NC
-				if (X[I] < Data.TOLR): NCC = NCC-1
+			NCC = BData.NC
+			for I in range(1, BData.NC + 1): # DO 210 I=1,NC
+				if (X[I] < BData.TOLR): NCC = NCC-1
 				
 				XLB[I] = X [I]
 				XVB[I] = XV[I]
@@ -2110,7 +2613,7 @@ class Block2 (Data):
 			[HLD, CV, CP, VSND] = self.hcvcps( 1, TDEW, VLDEW, XLD)  # CALL HCVCPS (1,TDEW,VLDEW,XLD  ,HLD,CV,CP,VSND)
 			
 			b_python_flag = False
-			for IT in range(1, int(Data.ITMAX/2 + 1)): #DO 260 IT=1,ITMAX/2
+			for IT in range(1, int(BData.ITMAX/2 + 1)): #DO 260 IT=1,ITMAX/2
 				#   COMPUTE QUALITY BASED ON ENTHALPY; COMPUTED SEPARATELY FOR
 				#   BUBBLE AD DEW POINT CONDITIONS.
 				#
@@ -2127,7 +2630,7 @@ class Block2 (Data):
 				TLINEB= 0.0
 				TLINED= 0.0
 				
-				for I in range(1, Data.NC + 1): #DO 214 I=1,NC
+				for I in range(1, BData.NC + 1): #DO 214 I=1,NC
 					if (XLB[I] != XVB[I] ):
 						IXQCB = IXQCB + 1
 						XQCB  = XQCB  +( X[I] - XLB[I] ) / ( XVB[I] - XLB[I] )
@@ -2158,7 +2661,7 @@ class Block2 (Data):
 				#   CHECK FOR CONVERGENCE
 				#
 				LCONV = True
-				for I in range (1, Data.NC + 1): # DO 220 I=1,NC
+				for I in range (1, BData.NC + 1): # DO 220 I=1,NC
 					if (abs(XVB[I] - XVD[I] ) > 0.0001): LCONV = False
 					
 				if (abs(XQCB-XQHB) > 0.0001): LCONV = False
@@ -2178,8 +2681,8 @@ class Block2 (Data):
 					DTSUMB = 0.0
 					DTSUMD = 0.0
 					
-					for J in range (1, (Data.NC-1) + 1):	#DO 222 J=1,NC-1
-						for K in range (J+1, (Data.NC + 1) ): #DO 222 K=J+1,NC
+					for J in range (1, (BData.NC-1) + 1):	#DO 222 J=1,NC-1
+						for K in range (J+1, (BData.NC + 1) ): #DO 222 K=J+1,NC
 							DTSUMB = DTSUMB + ((X[J] - XLB[J] ) * ( XVB[K] - XLB[K])	\
 								- (X[K] - XLB[K]) * (XVB[J] - XLB[J] ) )**2
 								
@@ -2189,7 +2692,7 @@ class Block2 (Data):
 					DXBUB = 0.0
 					DXDEW = 0.0
 					
-					for I in range(1, Data.NC + 1): #DO 223 I=1,NC
+					for I in range(1, BData.NC + 1): #DO 223 I=1,NC
 						DXBUB = DXBUB + ( XLB[I] - XVB[I] ) **2
 						DXDEW = DXDEW + ( XLD[I] - XVD[I] ) **2
 						
@@ -2210,7 +2713,7 @@ class Block2 (Data):
 				#   AND CARRY OUT CORRESPONDING BUBBLE AND DEW POINT CALCULATIONS.
 				#
 				
-				for I in range(1,Data.NC + 1): # DO 224 I=1,NC
+				for I in range(1,BData.NC + 1): # DO 224 I=1,NC
 					XLB2I = X[I] + TLAVG * ( WTB * XQHB + WTD * XQHD)	\
 						* ( WTB * ( XLB[I] - XVB[I] ) / TLINEB + WTD * ( XLD[I] - XVD[I] ) / TLINED)
 						
@@ -2234,7 +2737,7 @@ class Block2 (Data):
 				# loop ===260   CONTINUE
 				
 			if not b_python_flag:
-				print (Data.LUP, 'ROUTINE HPIN DID NOT CONVERGE; H,P,X:', H,P,  X ) # print array x
+				print (BData.LUP, 'ROUTINE HPIN DID NOT CONVERGE; H,P,X:', H,P,  X ) # print array x
 				#1000 FORMAT (1X,'ROUTINE HPIN DID NOT CONVERGE; H,P,X:',2F12.4,5F8.5)
 			
 			# come at this point 280   CONTINUE
@@ -2242,7 +2745,7 @@ class Block2 (Data):
 			#   SOLUTION HAS CONVERGED; WRITE OUTPUT VARIABLES.
 			#
 			
-			#for I in range(1,Data.NC + 1): #DO 284 I=1,NC
+			#for I in range(1,BData.NC + 1): #DO 284 I=1,NC
 			#	XL[I] = XLB[I]
 			#	XV[I] = XVB[I]
 			XL = XLB [:]
@@ -2276,7 +2779,7 @@ class Block2 (Data):
 		DB = BP[K] - B
 		SQAK= math.sqrt( AP[K] )
 		
-		for I in range (1, Data.NC + 1 ):# DO 120 I=1,NC
+		for I in range (1, BData.NC + 1 ):# DO 120 I=1,NC
 			DA = DA + 2.0 * X[I] * math.sqrt( AP[I] ) * SQAK
 			if (I != K): DA= DA - 2.0 * X[I] * F[K][I] * SQAK * math.sqrt( AP[I] )
 			#120 CONTINUE
@@ -2285,8 +2788,15 @@ class Block2 (Data):
 		
 		U = - math.log(V) 	\
 			- ( math.log ( (V+B) / V ) * ( A * (1.0-DB/B) + DA ) 	\
-			+ A * (DB+B)/(V+B))/(B* Data.R * T)	\
+			+ A * (DB+B)/(V+B))/(B* BData.R * T)	\
 			+ (8.0 * V * BP[K] *( 8.0 * V-B ) / B4V + B * (16.0 * V - 3.0 * B))/(B4V*B4V)
 		return U
 
 	# = . = . = . = . = . = . = . = . = . = . = . = . = . = . = . = . = . = . 
+
+#-----------------------------------------------------------
+# Job 			: 
+#
+# Editor		: aymhenry@gmail.com
+#-----------------------------------------------------------
+

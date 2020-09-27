@@ -2,10 +2,10 @@
 import math, sys, datetime
 
 # User import
-from Data import Data
-from Block2 import Block2
+from .Data import Data
+from .Block2 import Block2
 
-class Evap2 (Block2):
+class HeatExch (Block2, Data):
 	#=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
 	def lowevp(self, ICYCL,ICNTRL,H,  P,X,T,  XQ,XL,XV, VL,VV,HL, TS3, TS5, DPF, ETHX2  ):
 		# Input    ICYCL,ICNTRL,H,  P,X,T,  XQ,XL,XV, TS5, DPF , ETHX2
@@ -81,9 +81,9 @@ class Evap2 (Block2):
 			#[P5, P6, P7, P8] = self.hcvcps (P1, P2, P3, P4)
 			[HDEW,CV,CP,VS] = self.hcvcps (1,TDEW,VV[9],X) #  CALL HCVCPS(1,TDEW,VV[9],X,   HDEW,CV,CP,VS)
 
-			Data.CREF = Data.MREF * (HDEW-HBUB)/(TDEW-TBUB+0.001)
-			if(Data.CREF  <=  0.1) :
-				Data.CREF = 1000000.0  ####   5/9/94
+			Data.obj_cdata.CREF = Data.obj_cdata.MREF * (HDEW-HBUB)/(TDEW-TBUB+0.001)
+			if(Data.obj_cdata.CREF  <=  0.1) :
+				Data.obj_cdata.CREF = 1000000.0  ####   5/9/94
 			#END if
 
 			T[10] = TS5
@@ -102,7 +102,7 @@ class Evap2 (Block2):
 			T[10] = T[6]
 		#END if
 
-		if(Data.ITYPE  ==  1):  ETHX = 0
+		if(Data.obj_cdata.ITYPE  ==  1):  ETHX = 0
 		
 		#
 		#          BEGIN ITERATION FOR TEMPERATURE AT POINT 10
@@ -157,26 +157,26 @@ class Evap2 (Block2):
 			#
 			#          DETERMINE CMIN AND CMAX
 			#
-			if(Data.CFMF  <=  Data.CREF) :
-				CMIN = Data.CFMF
-				CMAX = Data.CREF
+			if(Data.obj_cdata.CFMF  <=  Data.obj_cdata.CREF) :
+				CMIN = Data.obj_cdata.CFMF
+				CMAX = Data.obj_cdata.CREF
 			else:
-				CMIN = Data.CREF
-				CMAX = Data.CFMF
+				CMIN = Data.obj_cdata.CREF
+				CMAX = Data.obj_cdata.CFMF
 			#END if
 
 			CAPRAT = CMIN/CMAX
 			if(CMIN  <=  0.0): CMIN=0.001
 
-			FNTU = Data.UAF/CMIN
+			FNTU = Data.obj_cdata.UAF/CMIN
 			if(FNTU  <  0.0): FNTU = 0.0
 
 			#
 			#          CALCULATE EFFECTIVENESS
 			#
-			Data.UAFZ = Data.UAF
+			Data.obj_cdata.UAFZ = Data.obj_cdata.UAF
 			if(IFREZ2  ==  1) :
-				if Data.IFREZ ==0:
+				if Data.obj_cdata.IFREZ ==0:
 					#SELECT CASE (IFREZ)
 					#CASE (0)
 					TAVE = (T[8] + T[9])/2.0
@@ -184,7 +184,7 @@ class Evap2 (Block2):
 					if(T[9]  <  -1000.0): TAVE = T[8]   ### Jan 20, 1993
 					if(TAVE  >  TS5): TAVE = TS5 - 1.0
 
-					QMAX = 0.90*Data.MREF*(H(7)- H[6])       ## 5/9/94
+					QMAX = 0.90*Data.obj_cdata.MREF*(H(7)- H[6])       ## 5/9/94
 					HRAD = SIGMA*(TAVE + TS5)*(TAVE**2 + TS5**2)*EPS
 					DELTAT = TS5 - TAVE
 
@@ -201,12 +201,12 @@ class Evap2 (Block2):
 					#              HRAD = (1.0 - FRACT_FZ)*HRAD
 					#              HNAT = 0.5*HNAT
 					UAIR = HRAD + HNAT
-					if(Data.IWALL_FZ  ==  1) :
+					if(Data.obj_cdata.IWALL_FZ  ==  1) :
 						UAIR = 1.0/(1.0/UAIR + 0.1389/20.44)
 					#END if
 
-					QFREZ = Data.UAF*UAIR*DELTAT
-					Data.UAFZ = Data.UAF * UAIR
+					QFREZ = Data.obj_cdata.UAF*UAIR*DELTAT
+					Data.obj_cdata.UAFZ = Data.obj_cdata.UAF * UAIR
 					
 					TENV = (TROOM + 459.6)/1.8
 					
@@ -215,22 +215,22 @@ class Evap2 (Block2):
 
 					if(QFREZ  >  QMAX): QFREZ = QMAX
 
-				elif Data.IFREZ ==1:
+				elif Data.obj_cdata.IFREZ ==1:
 					#CASE (1)
 					EXFR = self.efcross (CAPRAT,FNTU) # CALL EFCROSS(CAPRAT,FNTU,EXFR)
 
 					QFREZ = EXFR*CMIN*(TS5 - T[8])
-					ETAF = EXFR
+					Data.obj_cdata.ETAF = EXFR
 
-				elif Data.IFREZ ==2:
+				elif Data.obj_cdata.IFREZ ==2:
 					#CASE (2)
 					XX = 1.0 - CAPRAT
 					XXX = EXP(-FNTU*XX)
 					EXFR = (1.0-XXX)/(1.0-CAPRAT*XXX)
 					QFREZ = EXFR*CMIN*(TS5 - T[8])
-					ETAF = EXFR
+					Data.obj_cdata.ETAF = EXFR
 				#END SELECT
-				TS6 = TS5 - QFREZ/Data.CFMF
+				TS6 = TS5 - QFREZ/Data.obj_cdata.CFMF
 
 				if(IFREZ  ==  0): TS6 = 0.9*TAVE + 0.1*TS5
 			else:
@@ -241,7 +241,7 @@ class Evap2 (Block2):
 			#
 			#          UPDATE ENTHALPY ACROSS EVAPORATOR
 			#
-			H[9] = H[8] + QFREZ/Data.MREF
+			H[9] = H[8] + QFREZ/Data.obj_cdata.MREF
 
 			#[P4, P5, P6, P7, P8, P9, P10, P11] = self.hpin ( P1,P2,P3 )
 			[T[9], XQ[9], XL_Temp, XV_Temp, VL[9],VV[9],HL,HV] = self.hpin ( H[9],P[9],X )
@@ -309,9 +309,9 @@ class Evap2 (Block2):
 
 			if(abs(ERROR)  <  TOL_FRZ): break #GO TO 20
 
-			Data.CREF = Data.MREF*abs((H[9] - H[8])/(T[9]-T[8]+0.0001))
-			if(Data.CREF  <=  0.1) :
-				Data.CREF = 1000000.0  ####   /5/9/94
+			Data.obj_cdata.CREF = Data.obj_cdata.MREF*abs((H[9] - H[8])/(T[9]-T[8]+0.0001))
+			if(Data.obj_cdata.CREF  <=  0.1) :
+				Data.obj_cdata.CREF = 1000000.0  ####   /5/9/94
 			#END if
 			ITER = ITER + 1
 
@@ -408,165 +408,78 @@ class Evap2 (Block2):
 		return
 
 	#=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
-	def mixair ( self, CAP,QFF,QFZ,  TFF,TFZ,CFME) :
-		#[P7, P8] = self.mixair (P1 to P6)
-		#	  SUBROUTINE MIXAIR(CAP,QFF,QFZ,TFF,TFZ,CFME   ,TIN,X)
+	def exf (self, LOC, AREA, U, CMIN, CMAX):
+		# [P6, P7] = self.exf (P1 ... P5)
+		#	  SUBROUTINE EXF(LOC, AREA, U, CMIN, CMAX, EFF, DEFFDA)
 		#     ******************************************************************
-		#     *     CALCULATE INLET TEMPERATURE TO THE EVAPORATOR              *
+		#     *    CALCULATE COUNTER FLOW EFFICIENCY PARAMETERS                *
 		#     ******************************************************************
-
-		#          SET UP THE QUADRATIC EQUATION COEFFICIENTS
 		#
-		#	  COMMON /FEVAP / UTPE,USUPE,ATOTE, FF_AIR, UAFF, uafz
+		#	  REAL NTU
+
+		#	  DIMENSION coff_A(4,6), EFF_CROSS(2)
+		#
+		#	DATA (coff_A(I,1),I=1,4)/2.394292,2.410798,2.399687,2.359642/
+		#	DATA (coff_A(I,2),I=1,4)/-1.19402,-2.23391,-2.96882,-3.37650/
+		#	DATA (coff_A(I,3),I=1,4)/-1.45067,0.825900,2.367080,3.04862/
+
+		#	DATA (coff_A(I,4),I=1,4)/1.938453,0.051006,-1.23009,-1.63421/
+		#	DATA (coff_A(I,5),I=1,4)/-0.81305,-0.11891,0.373338,0.468741/
+		#	DATA (coff_A(I,6),I=1,4)/0.118651,0.023360,-0.04886,-0.05492/
+		#
+		#          CALCULATE NTU AND CAPACITY RATIO
+		#
+		EFF_CROSS = [0.0] * (2+1)
+		coff_A = [	\
+			[2.394292, -1.19402,	-1.45067,	1.938453,	-0.81305,	0.118651],	\
+			[2.410798, -2.23391,	0.825900,	0.051006,	-0.11891,	0.023360],	\
+			[2.399687, -2.96882,	2.367080,	-1.23009,	0.373338,	-0.04886],	\
+			[2.359642, -3.37650,	3.048620,	-1.63421,	0.468741,	-0.05492]	\
+			]
+
+		NTU = AREA*U/CMIN
+		CRAT = CMIN/CMAX
+
+		if LOC == 1 :		   #Counter-flow
+			XX = 1.0 - CRAT
+			XXX = math.exp(-NTU*XX)
+			EFF = (1.0 - XXX)/(1.0 - CRAT*XXX)
+			DEFFDA = (U/CMIN)*XX*XXX*(1.0 - CRAT*EFF)/(1.0 - CRAT*XXX)
 		
-		A = 1.08  *CFME * (TFF - TFZ)/CAP
-		B = - (A + 1.0)
-		C = QFF/(QFF+QFZ)
-		
-		# Solve the quadratic equation
-		X = - B/(2.0*A) - math.sqrt(B**2 - 4.0*A*C)/(2.0*A)
-		TIN = X*TFF + (1.0 - X)*TFZ
-		Data.FF_AIR = X
-		return [TIN,X]
+		int_row = 0
+		if LOC == 2 :			#Cross-flow
+			if (CRAT  >=  0.00  and  CRAT <=  0.25): int_row = 1
+			if (CRAT  >   0.25  and  CRAT <=  0.50): int_row = 2
+			if (CRAT  >   0.50  and  CRAT <=  0.75): int_row = 3
+			if (CRAT  >   0.75  and  CRAT <=  1.00): int_row = 4
 
-	#=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
-	def inter2 (self, X,PA,TAI,HAI,VAI,PB,HBO,TDEW,HDEW,VDEW,ETA ):
-		#  [P13, P14, P15] = self.inter2 ( P1, ... to .. P12)
-		#	  SUBROUTINE INTER2(X,PA,TAI,HAI,VAI,PB,HBO,TDEW,HDEW,VDEW,ETA,
-		#	 .                  TBI,HBI,QACT)
-		#     ******************************************************************
-		#     *    ITERATES TO SOLVE FOR INTERCHANGER HEAT TRANSFER KNOWING    *
-		#     *    THE INLET STATE OF ONE STREAM AND OUTLET STATE OF THE       *
-		#     *    OTHER FOR A COUNTERFLOW HEAT EXCHANGER.                     *
-		#     *    EQUAL MASS FLOW RATES OF THE SAME FLUID                     *
-		#     ******************************************************************
-		#
-		LCONV = False
-		#DIMENSION X(5),XL(5),XV[5]
-		#
-		#          KNOWN: INLET STATE OF STREAM A
-		#                 OUTLET STATE OF STREAM B
-		#
-		#          GUESS THE INLET STATE FOR STREAM B
-		#
-		HBI = HDEW - 5.0
-		ITER = 0
-		HTOL = 1000.0
-		while (ITER <=100 and  HTOL > 0.001):
-			# [P4, P5, P6, P7, P8, P9, P10, P11] = self.hpin ( P1,P2,P3 )
-			[TBI,XQBI,XL,XV,VL,VV,HL,HV] = self.hpin ( HBI,PB,X ) # CALL HPIN(HBI,PB,X,  TBI,XQBI,XL,XV,VL,VV,HL,HV)    !State at BI
+			if (NTU <=  0.0): NTU = 0.0
+			
+			for L in range (1, 2+1): #DO L = 1, 2
+				BETA = math.log10(NTU+1.0)
+				EFFA = 0.0
+				EFFB = 0.0
 
-			#
-			#          DETERMINE EXIT STATE OF STREAM A if AT TBI
-			#
-			VGUESS = VAI
+				for J in range (1, 6+1): # DO J = 1, 6
+					EX = 1.0*J
+					if (int_row  ==  1):
+						EFFA = 1.0 - math.exp(-NTU)
+					else:
+						EFFA = EFFA + coff_A[int_row-1-1][J-1] * BETA**EX
+					#END if
+					EFFB = EFFB + coff_A[int_row -1][J-1] * BETA**EX
+				#END DO
 
-			# [P4, P5] = self.espar [P1, P2, P3]
-			[AA, BB] = self.espar (0,TBI,X) #  CALL ESPAR(0,TBI,X,AA,BB)
+				FRAC = (CRAT-(int_row-1)*0.25)/(int_row *0.25-(int_row-1)*0.25)
+				EFFECT = EFFA + FRAC*(EFFB-EFFA)
+				
+				if (EFFECT  >  1.0): EFFECT = 1.0
 
-			#[P5, P7] = self.vit (P1, P2, P3, P4, P5, P6)
-			[VGUESS, LCONV] = self.vit (TBI,PA,AA,BB,VGUESS,True) # CALL VIT(TBI,PA,AA,BB,VGUESS,True,LCONV)
+				EFF_CROSS[L] = EFFECT
+				NTU = 0.9*NTU
+			#END DO
+			EFF = EFF_CROSS[1]
+			DEFFDA = 10.0*(EFF_CROSS[1] - EFF_CROSS[2])/AREA
 
-			VAOSTR = VGUESS
-
-			#[P5, P6, P7, P8] = self.hcvcps (P1, P2, P3, P4)
-			[HAOSTR,CV,CP,VSND] = self.hcvcps (1,TBI,VAOSTR,X) #  CALL HCVCPS(1,TBI,VAOSTR,X,  HAOSTR,CV,CP,VSND)
-
-			DHAMAX = HAI - HAOSTR
-			#
-			#          DETERMINE EXIT STATE OF STREAM B if AT TAI
-			#
-			VGUESS = VDEW * TAI/TDEW
-
-			# [P4, P5] = self.espar [P1, P2, P3]
-			[AA,BB] = self.espar (0,TAI,X) #  CALL ESPAR(0,TAI,X,AA,BB)
-
-			#[P5, P7] = self.vit (P1, P2, P3, P4, P5, P6)
-			[VGUESS, LCONV] = self.vit (TAI,PB,AA,BB,VGUESS,True) #  CALL VIT(TAI,PB,AA,BB,VGUESS,True,LCONV)
-
-			VBOSTR = VGUESS
-
-			#[P5, P6, P7, P8] = self.hcvcps (P1, P2, P3, P4)
-			[HBOSTR,CV,CP,VSND] = self.hcvcps (1,TAI,VBOSTR,X) # CALL HCVCPS(1,TAI,VBOSTR,X,  HBOSTR,CV,CP,VSND)
-
-			DHBMAX = HBI - HBOSTR
-			#
-			#          DETERMINE THE HEAT TRANSFER FOR THE GUESSED INLET STATE HBI
-			#
-			QMAX = min(DHAMAX,DHBMAX)
-			QACT = ETA * QMAX
-			#
-			#          ADJUST THE STREAM B ENTHALPY GUESS
-			#
-			DELTA = QACT / (HBO-HBI)
-			HTOL = abs(1.0-DELTA)
-			HBI2 = HBO - (HBO-HBI)*DELTA
-
-			if(HBI2 > 1.1 * HBI): HBI2 = 1.1 * HBI
-			if(HBI2 < 0.9 * HBI): HBI2 = 0.9 * HBI
-			HBI = HBI2
-
-			ITER = ITER + 1
-		#END DO
-
-		return [TBI,HBI,QACT]
-
-	#=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
-	def inter1 (self, X,P4,T4 ,H4,V4,P7 ,T7,H7,V7, ETHX1):
-		#  P11 = self.inter1 ( P1, ... to .. P10)
-		#	  SUBROUTINE INTER1(X,P4,T4,H4,V4,P7,T7,H7,V7,ETHX1,QACT)
-		#     ******************************************************************
-		#     *    INTERCHANGER FOR SUBCOOLING CONDENSER LIQUID                *
-		#     *    USED WHEN THE INLET STATES OF BOTH STREAMS SPECIFIED        *
-		#     ******************************************************************
-		#
-		#     STATEPOINTS:  4 = CONDENSER OUTLET,
-		#                   6 = LIQUID OUTLET FROM INTERCHANGER
-		#                   7 = OUTLET FROM FRESH FOOD EVAPORATOR
-		#                  13 = LOW PRESSURE SIDE OUTLET FROM INTERCHANGER
-		#
-		LCONV = False
-		#
-		#          DETERMINE STATE 6 FOR CASE OF REFRIGERANT EXIT TEMP=T[7]
-		#
-		P6STAR = P4
-		T6STAR = T7
-		VGUESS = V4
-
-		# [P4, P5] = self.espar [P1, P2, P3]
-		[A6STAR,B6STAR] = self.espar (0,T6STAR,X) #  CALL ESPAR(0,T6STAR,X,A6STAR,B6STAR)
-
-		#[P5, P7] = self.vit (P1, P2, P3, P4, P5, P6)
-		[VGUESS, LCONV] = self.vit (T6STAR,P6STAR,A6STAR,B6STAR,VGUESS,True) #  CALL VIT(T6STAR,P6STAR,A6STAR,B6STAR,VGUESS,True,LCONV)
-
-		V6STAR = VGUESS
-
-		#[P5, P6, P7, P8] = self.hcvcps (P1, P2, P3, P4)
-		[H6STAR,CV,CP,VS] = self.hcvcps (1,T6STAR,V6STAR,X) #  CALL HCVCPS(1,T6STAR,V6STAR,X,  H6STAR,CV,CP,VS)
-		#
-		#
-		#          DETERMINE STATE 13 if REFRIGERANT EXIT TEMP=T(4)
-		#          FOR THE CASE OF EVAPORATOR EXIT SUPERHEAT SPECIFIED
-		#
-		P13STR = P7
-		T13STR = T4
-		VGUESS = V7*T13STR/T7
-
-		# [P4, P5] = self.espar [P1, P2, P3]
-		[A13STR,B13STR] = self.espar (0,T13STR,X)	# CALL ESPAR(0,T13STR,X,A13STR,B13STR)
-
-		#[P5, P7] = self.vit (P1, P2, P3, P4, P5, P6)
-		[VGUESS, LCONV] = self.vit (T13STR,P13STR,A13STR,B13STR,VGUESS, False) #CALL VIT(T13STR,P13STR,A13STR,B13STR,VGUESS,.FALSE.,LCONV)
-		V13STR = VGUESS
-
-		#[P5, P6, P7, P8] = self.hcvcps (P1, P2, P3, P4)
-		[H13STR,CV,CP,VS] = self.hcvcps (1,T13STR,V13STR,X) # CALL HCVCPS(1,T13STR,V13STR,X,   H13STR,CV,CP,VS)
-		#
-		#          FIND THE MAXIMUM AND ACTUAL HEAT TRANSFER
-		#
-		DELH1 = H4 - H6STAR
-		DELH2 = H13STR - H7
-		QBEST = min(DELH1,DELH2)
-		QACT = ETHX1*QBEST
-
-		return QACT
+		if(DEFFDA <=  0.0): DEFFDA = 0.0001
+		return [EFF, DEFFDA]
