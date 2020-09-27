@@ -1150,7 +1150,8 @@ class Comp_ERR (Comp_Abstract): #Data.IMAP== 1
 			Data.ETAC = ETAS[3][2]
 			Data.CE   = CEIJ[3][2]
 
-		return [DISPL , SPEEDN]
+		#return [DISPL , SPEEDN]
+		return [Data.ETAC, Data.CE]
 	
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # Job 			: Compressor Type : Efficiency Model
