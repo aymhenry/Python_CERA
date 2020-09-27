@@ -1190,9 +1190,6 @@ class Comp_ERR (Comp_Abstract): #Data.obj_cdata.IMAP== 1
 			for J in range (1, 3+1): #DO J = 1, 3
 				Data.obj_cdata.ETAC = Data.obj_cdata.ETAC + ETAS[I][J]
 				Data.obj_cdata.CE   = Data.obj_cdata.CE   + CEIJ[I][J]
-			#END DO
-		#END DO
-
 
 		Data.obj_cdata.ETAC = Data.obj_cdata.ETAC/9.0
 		Data.obj_cdata.CE   = Data.obj_cdata.CE/9.0
@@ -1202,10 +1199,10 @@ class Comp_ERR (Comp_Abstract): #Data.obj_cdata.IMAP== 1
 			Data.obj_cdata.CE   = CEIJ[3][2]
 
 		print ("aym ===Final============== Data.obj_cdata.ETAC= ETAS[3][2] =", ETAS[3][2])
-
+		
 		print ("aym ===Final============== Data.obj_cdata.CE  = CEIJ[3][2] =",CEIJ[3][2])
 		print ("aym ===Final===============              Data.obj_cdata.CE =", Data.obj_cdata.CE)
-		return 
+		return [Data.obj_cdata.ETAC, Data.obj_cdata.CE]
 	
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # Job 			: Compressor Type : Efficiency Model

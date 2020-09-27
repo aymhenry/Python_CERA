@@ -339,8 +339,7 @@ class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
 		Data.obj_cdata.IREAD = 0
 		Data.obj_cdata.DISPL = Cycle.obj_parameter.DISPLC
 		
-		#Claculate Data.obj_cdata.EFFC, Data.obj_cdata.CE
-		self.objCompType.map(Data.obj_cdata.ICOMP, Data.obj_cdata.ICOOL, Data.obj_cdata.EER, Data.obj_cdata.SIZE, Data.obj_cdata.DISPL, Data.obj_cdata.SPEEDN)
+		[Data.obj_cdata.EFFC, Data.obj_cdata.CE ] = self.objCompType.map(Data.obj_cdata.ICOMP, Data.obj_cdata.ICOOL, Data.obj_cdata.EER, Data.obj_cdata.SIZE, Data.obj_cdata.DISPL, Data.obj_cdata.SPEEDN)
 		
 		
 		#if (Data.obj_cdata.IMAP  ==  1) :
