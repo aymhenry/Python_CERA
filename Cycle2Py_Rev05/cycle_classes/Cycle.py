@@ -331,62 +331,8 @@ class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
 			Cycle.obj_parameter.AIRTMP[10] = False
 			Cycle.obj_parameter.AIRTMP[11] = False
 
-		'''
-		#	OPEN OUTPUT FILE
-		objCycOut = FileAccess (Cycle.FILE_CYCLE_OUT,  "write")  # IO_Cycle Tag
-		objCycOut.write_or_terminate (" ") 
-
-		now = datetime.datetime.now( )
-
-		if (Cycle.obj_parameter.NCYC  !=  2) :
-			objCycOut.write_or_terminate( ( now.strftime( "%H %M %S %d %b %Y" ) ) + " - Python Output aymhenry@gmail")
-
-		
-		#	OUTPUT INFORMATION ON TYPE OF CYCLE
-		if (Cycle.obj_parameter.ICYCL  ==  1) :
-			if (Cycle.obj_parameter.ICYCLS  ==  1) :
-				objCycOut.write_or_terminate('STANDARD ONE EVAPORATOR CYCLE')
-			else:
-				if (Data.obj_cdata.ITYPE  ==  1  or  Data.obj_cdata.ITYPE  ==  4) :
-					objCycOut.write_or_terminate('DUAL EVAP CYCLE: FRESH FOOD LOOP')
-				else:
-					objCycOut.write_or_terminate('DUAL EVAP CYCLE: FREEZER LOOP')
-
-		if (Cycle.obj_parameter.ICYCL  ==  2) :
-			if (Cycle.obj_parameter.ICYCLS  ==  2) :
-				objCycOut.write_or_terminate('LORENZ CYCLE')
-			else:
-				objCycOut.write_or_terminate('DUAL EVAP CYCLE')
-
-		if (Cycle.obj_parameter.ICYCL  ==  3) :
-			if (Cycle.obj_parameter.NCYC  ==  1) :
-				objCycOut.write_or_terminate('DUAL LOOP CYCLE - FREEZER')
-			else:
-				objCycOut.write_or_terminate(" ")
-				objCycOut.write_or_terminate('DUAL LOOP CYCLE - FRESH FOOD')
-
-		objCycOut.write_or_terminate(" ")
-		'''
 		
 		if (Data.obj_cdata.ITYPE  ==  3): Data.obj_cdata.ITYPE = 1
-
-		'''
-		#	OUTPUT REFRIGERATION MIXTURE INFORMATION
-		
-		#X2 = 100.0 * Cycle.obj_parameter.XM[1]
-
-		objCycOut.write_or_terminate('THE REFRIGERANT MIXTURE CONSISTS OF  %4.0f OF %s'    %(100.0 * Cycle.obj_parameter.XM[1], Data.HREF[ Cycle.obj_parameter.IR[1] ])  )
-				
-		if (Cycle.obj_parameter.NC >  1) :
-			for I in range (2, Cycle.obj_parameter.NC+1) : 
-				X2 = 100.0 * Cycle.obj_parameter.XM[I]
-				objCycOut.write_or_terminate('THE REFRIGERANT MIXTURE CONSISTS OF  %4.0f OF %s'    %(X2, Data.HREF[ Cycle.obj_parameter.IR[1] ])  ) # fixed in python
-
-				
-
-		objCycOut.write_or_terminate(" ")
-		objCycOut.write_or_terminate("OUTPUT RESULTS")
-		'''
 		
 		#	INITIALIZE COMPRESSOR MAP ANALYSIS
 		DUTYR = 0.5
@@ -551,18 +497,7 @@ class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
 				
 				self.objEvapType.iterat_call_exit_p13()
 				
-				'''
-				if (Data.obj_cdata.ISPEC  !=  2):
-					[Cycle.obj_parameter.T[13], Cycle.obj_parameter.XQ13, Cycle.obj_parameter.XL_Temp,  \
-						Cycle.obj_parameter.XV_Temp, Cycle.obj_parameter.VL13, Cycle.obj_parameter.V[13], Cycle.obj_parameter.HL, Cycle.obj_parameter.HV] \
-						= self.hpin ( Cycle.obj_parameter.H[13],Cycle.obj_parameter.P[13],Cycle.obj_parameter.X )
-						
-					self.setArr2dCol (Cycle.obj_parameter.XL, 13, Cycle.obj_parameter.XL_Temp)
-					self.setArr2dCol (Cycle.obj_parameter.XV, 13, Cycle.obj_parameter.XV_Temp )
-				'''
-
 				Cycle.obj_parameter.XQ[13] = 1.0
-
 
 				self.showMsg ("Liquid line state after heat loss to cabinet & mullion (C) - point 16 ", Cycle.obj_parameter.T[16] - 273.11)
 				self.showMsg ("Superheated gas leaving hight temp interchanger (C) - point 13 ", Cycle.obj_parameter.T[13] - 273.11)
@@ -701,14 +636,7 @@ class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
 
 			# calc. point 13 Temp
 			self.objEvapType.iterat_call_exit_p13()
-			'''
-			if (Data.obj_cdata.ISPEC  !=  2) :
-				[Cycle.obj_parameter.T[13],XQ13,Cycle.obj_parameter.XL_Temp, Cycle.obj_parameter.XV_Temp, L13,Cycle.obj_parameter.V[13],HL,HV] = self.hpin ( Cycle.obj_parameter.H[13],Cycle.obj_parameter.P[13],Cycle.obj_parameter.X )
-
-				self.setArr2dCol (Cycle.obj_parameter.XL, 13, Cycle.obj_parameter.XL_Temp )
-				self.setArr2dCol (Cycle.obj_parameter.XV, 13, Cycle.obj_parameter.XV_Temp )
-			'''
-
+	
 			Cycle.obj_parameter.XQ[13] = 1.0
 
 			self.showMsg ("superheated gas leaving the high temp interchanger (C) - point 13", Cycle.obj_parameter.T[13] - 273.11)
@@ -1123,7 +1051,6 @@ class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
 				if (Cycle.obj_parameter.IDFRST  ==  0) :
 					QFF = QFF + Cycle.obj_parameter.FROSTF
 					QFZ = QFZ + Cycle.obj_parameter.FROSTF
-				# End if
 
 				Data.obj_cdata.CAPE = QFRSH/1.0548 - 3.413 * Data.obj_cdata.FANE - 3.413 * Data.obj_cdata.DFSTCYC	\
 					- 3.413 * Data.obj_cdata.FFCYC	- 3.413 * Data.obj_cdata.FZCYC	\
@@ -1132,7 +1059,6 @@ class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
 				Data.obj_cdata.DUTYC = (QFF + QFZ)/Data.obj_cdata.CAPE
 				if (Data.obj_cdata.DUTYC >  1.0): Data.obj_cdata.DUTYC = 1.0
 				DUTYR = Data.obj_cdata.DUTYC
-			# End if
 
 			if (ICYCL  ==  2) :
 				QFF = QFF - Cycle.obj_parameter.FROSTF
@@ -1145,25 +1071,9 @@ class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
 					- Data.obj_cdata.Q_HXS_FZ/1.0548
 
 				if (Data.obj_cdata.CAPZ  <=  0.0) :
-					#CALL window (10, 15, 15, 65, 32, 1)
-					#CALL gotoxy (22,12)
-					#CALL print ('Incorrect SolutION -- ',22,-2)
-					#CALL print ('Check Mass Flow',15,-2)
 					self.showError ("Incorrect Solution, Check Mass Flow")
-
-					#CALL gotoxy (22,13)
-					#CALL print ('SolutION being Terminated',25,-2)
-					#CALL setatr[1]
-					#CALL gotoxy (0, 24)
-					#CALL print (' ', 1, -2)
 					self.showError ("Solution being Terminated")
-
-					# say beep CALL WARBLE
-					# say beep CALL WARBLE
-					# say beep CALL WARBLE
-
 					sys.exit(100)	#STOP ' '
-				# End if
 
 				Data.obj_cdata.DUTYZ = QFZ/Data.obj_cdata.CAPZ
 
@@ -1180,7 +1090,7 @@ class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
 				DUTYR = max(Data.obj_cdata.DUTYE, Data.obj_cdata.DUTYZ)
 
 				if (DUTYR >  1.0): DUTYR = 1.0
-			# End if
+
 
 			if (ICYCL  ==  3) :
 				if (N  ==  1) :
@@ -1198,12 +1108,11 @@ class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
 					Data.obj_cdata.DUTYE = QFF/Data.obj_cdata.CAPE
 					Data.obj_cdata.DUTYC = min(Data.obj_cdata.DUTYE,1.0)
 					Data.obj_cdata.DUTYE = Data.obj_cdata.DUTYC
-				# End if
+
 
 				DUTYR = Data.obj_cdata.DUTYC
-			# End if
+
 			else :
-				#CASE DEFAULT					!One door type units
 				if (Cycle.obj_parameter.IDFRST  ==  0): QFZ = QFZ + Cycle.obj_parameter.FROSTF
 				Data.obj_cdata.CAPE = QFRSH/1.0548 - 3.413 * (Data.obj_cdata.FANE + Data.obj_cdata.DFSTCYC + Data.obj_cdata.FZCYC)	\
 					+ Data.obj_cdata.Q_FF_IN_WALL - Data.obj_cdata.CAPE_IN_WALL						\
@@ -1213,7 +1122,6 @@ class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
 				Data.obj_cdata.DUTYC = min(Data.obj_cdata.DUTYE,1.0)
 				DUTYR = Data.obj_cdata.DUTYC
 
-		#END SELECT
 		return [QFF,QFZ,DUTYR]
 
 	#=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
