@@ -1205,7 +1205,7 @@ class Comp_ERR (Comp_Abstract): #Data.obj_cdata.IMAP== 1
 
 		print ("aym ===Final============== Data.obj_cdata.CE  = CEIJ[3][2] =",CEIJ[3][2])
 		print ("aym ===Final===============              Data.obj_cdata.CE =", Data.obj_cdata.CE)
-		return [Data.obj_cdata.ETAC, Data.obj_cdata.CE]
+		return 
 	
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # Job 			: Compressor Type : Efficiency Model
