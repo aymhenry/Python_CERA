@@ -12,7 +12,8 @@ from common_classes.DataModelBuiler import DataModelBuiler
 # Editor		: aymhenry@gmail.com
 #-----------------------------------------------------------
 class CycleDataModelBuiler (DataModelBuiler):
-	DataModelBuiler.lst_required_data =[ 107-1,105, 105,105] # required data for each configration
+	# Type 2 is not supported
+	DataModelBuiler.lst_required_data =[ 107-1, 0, 105,105] # required data for each configration
 	DataModelBuiler.MAX_DATA_FILE_TO_READ = 150		# maximum data file lines to read, this need to be updated if there is any data line more than this	
 	
 	DataModelBuiler.CONFIGRATION_COUNT = 4			# max. number of configrations
@@ -40,7 +41,7 @@ class CycleDataModelBuiler (DataModelBuiler):
 			'FFASH','FFAUX','FZASH','FZAUX','OTHERW','TROOM','FFTEMP','FZTEMP','FFQ','FZQOFF','FFSEN','FFLAT','FROSTF','FZSEN','FZLAT','FROSTZ','FFPENA','FZPENA','FFHTQ','FZHTQ','FFREFQ','FZREFQ','QMUL']
 
 		
-		lst_config2 = ['TITLE','TITLE2','FILERA','ICYCL','IRFTYP','IDFRST','HRSOFF',  'TOL_FRSH','TOL_FRZ','TOL_COND','TOL_MASS','TOL_HX','N_EVAP','N_COND',    'ICOMP','IMAP','I_CYCLE','T_CYCLE','I_VALVE','IR[1][1]','IR[2][1]','IR[3][1]','NC[1]','F[1][2][1]','F[1][3][1]','F[2][3][1]','X[1][1]','X[2][1]','X[3][1]','ICONDI[1]','TS1[1]','CFMCI[1]','FNPWRC[1]','DPC[1]','UDSCI[1]','UTPCI[1]','USCCI[1]','ATOTCI[1]','DTSBCI[1]','CONDHT[1]','CONDVP[1]','ISPECI[1]','IFRSHI[1]','TS3[1]','CFMEI[1]','FNPWRE[1]','DPE[1]','UTPEI[1]','USUPEI[1]','ATOTEI[1]','DTSPEI[1]','MREFI[1]','SPEEDI[1]','TSPECI[1]','DISPLC[1]','SIZEN[1]','SPDNOM[1]','EERN[1]','ICOOLN[1]','CEI[1]','SEFFI[1]','MEFF[1]','ELOSS[1]','QCAN[1]','QHILO[1]','SUPIHX[1]','ETHX[1]','UA_FF','UA_FZ','UA_ML','UA_FF_CND','UA_FZ_CND','UA_FF_HXS','UA_FZ_HXS','FRACT_FF','FRACT_FZ','IWALL_FF','IWALL_FZ','DFSTCYC','FFCYC','FZCYC','OUTCYC','FFASH','FFAUX','FZASH','FZAUX','OTHERW','TROOM','FFTEMP','FZTEMP','FFQ','FZQOFF','FFSEN','FFLAT','FROSTF','FZSEN','FZLAT','FROSTZ','FFPENA','FZPENA','FFHTQ','FZHTQ','FFREFQ','FZREFQ','QMUL']
+		lst_config2 = ['TITLE','TITLE2','FILERA','ICYCL']
 		lst_config3 = ['TITLE','TITLE2','FILERA','ICYCL','IRFTYP','IDFRST','HRSOFF',  'TOL_FRSH','TOL_FRZ','TOL_COND','TOL_MASS','TOL_HX','N_EVAP','N_COND',    'ICOMP','IMAP','I_CYCLE','T_CYCLE','I_VALVE','IR[1][1]','IR[2][1]','IR[3][1]','NC[1]','F[1][2][1]','F[1][3][1]','F[2][3][1]','X[1][1]','X[2][1]','X[3][1]','ICONDI[1]','TS1[1]','CFMCI[1]','FNPWRC[1]','DPC[1]','UDSCI[1]','UTPCI[1]','USCCI[1]','ATOTCI[1]','DTSBCI[1]','CONDHT[1]','CONDVP[1]','ISPECI[1]','IFRSHI[1]','TS3[1]','CFMEI[1]','FNPWRE[1]','DPE[1]','UTPEI[1]','USUPEI[1]','ATOTEI[1]','DTSPEI[1]','MREFI[1]','SPEEDI[1]','TSPECI[1]','DISPLC[1]','SIZEN[1]','SPDNOM[1]','EERN[1]','ICOOLN[1]','CEI[1]','SEFFI[1]','MEFF[1]','ELOSS[1]','QCAN[1]','QHILO[1]','SUPIHX[1]','ETHX[1]','UA_FF','UA_FZ','UA_ML','UA_FF_CND','UA_FZ_CND','UA_FF_HXS','UA_FZ_HXS','FRACT_FF','FRACT_FZ','IWALL_FF','IWALL_FZ','DFSTCYC','FFCYC','FZCYC','OUTCYC','FFASH','FFAUX','FZASH','FZAUX','OTHERW','TROOM','FFTEMP','FZTEMP','FFQ','FZQOFF','FFSEN','FFLAT','FROSTF','FZSEN','FZLAT','FROSTZ','FFPENA','FZPENA','FFHTQ','FZHTQ','FFREFQ','FZREFQ','QMUL']
 		#lst_config4 same as 2
 		

@@ -3,6 +3,7 @@ import math, sys, datetime
 
 # User Import ======================
 
+from .View import *
 from .CycleType import *
 
 from .CycleDataModelBuiler import CycleDataModelBuiler
@@ -20,7 +21,7 @@ class Start:
 
 	def __init__ (self):
 		self.obj_data = None	# object to save data
-		self.obj_control = None	# object to point to object control on data
+		self.obj_control = None	# object to control data
 
 		self.str_FILE_CYC_INPUT = Start.FILE_CYC_INPUT		
 		self.str_FILE_CYCLE_OUTPUT = Start.FILE_CYC_OUTPUT
@@ -45,13 +46,11 @@ class Start:
 	# Output		:
 	#-----------------------------------------------------------
 	def main (self):
-		self.data_prepare ()
+		self.data_prepare ()  # assign value to obj_data
 
 		try:
-			#print ("aym @ 51 self.calculte")
-			self.calculte ()		# calculate heat rate 
-			#self.calculte_cycle ()	# claclulate cycle data
-						
+			obj_param = self.calculte ()		# calculate heat rate 
+									
 		except ValueError as err_description: # OSError
 			print ("Fatal program error ... system terminated")
 			print (str(err_description) + "\n\n")
@@ -60,8 +59,23 @@ class Start:
 			print ("=======================================\n\n")
 			sys.exit('3100')	# terminat application
 
-		print ("aym @ 51 self.view")
-		#self.view ()			# output results
+		self.view_cycle_res(obj_param)	# View cycle calculation results
+		
+		print ("aym @ 63 self.view")
+		self.view()	# View all data
+
+	#-----------------------------------------------------------
+	# Job 			: output results of cycle calculations
+	# Input 		:
+	#
+	# Output		:
+	#-----------------------------------------------------------
+	def view_cycle_res (self, obj_param):
+		print ("aym--  self.obj_data.ICYCL=", self.obj_data.ICYCL)
+		
+		obj_view_cycle = ViewCycle( self.obj_data, obj_param, self.str_FILE_CYCLE_OUTPUT, self.str_path_cyc_out)
+		obj_view_cycle.show_rep ()
+
 		
 	#-----------------------------------------------------------
 	# Job 			: output results a reported form
@@ -70,7 +84,8 @@ class Start:
 	# Output		:
 	#-----------------------------------------------------------
 	def view (self):
-		self.obj_control.view( self.str_FILE_CYCLE_OUTPUT, str_path_cyc_out)
+		obj_view = View( self.obj_data, self.str_FILE_CYCLE_OUTPUT, self.str_path_cyc_out)
+		obj_view.show_rep ()
 
 	#-----------------------------------------------------------
 	# Job 			: Calaculte heat balance, the main app target.
@@ -79,16 +94,8 @@ class Start:
 	# Output		:
 	#-----------------------------------------------------------
 	def calculte (self):
-		self.obj_control.calculte()
+		return self.obj_control.calculte()
 
-	#-----------------------------------------------------------
-	# Job 			: Calculte cycle data
-	# Input 		:
-	#
-	# Output		:
-	#-----------------------------------------------------------
-	def calculte_cycle (self):
-		self.obj_control.calculte_cycle()
 	#-----------------------------------------------------------
 	# Job 			: Preprae the main data object & control object
 	# Input 		:
@@ -122,6 +129,7 @@ class Start:
 
 		# Create related object as the given configration
 		self.obj_control = ""
+		
 			
 		# 1: Standard
 		if self.obj_data.ICYCL == 1: 
@@ -129,6 +137,9 @@ class Start:
 						
 		# 2: Lorenz
 		elif self.obj_data.ICYCL == 2:
+			print ( "Type 2 is not supported." )	# print error description
+			sys.exit('9001')							# terminate
+			
 			# INCTRL: 	0 = none, 
 			#			1 = adjust evaporator areas,
 			#			2 = adjust fresh food section tempeature,
@@ -144,7 +155,8 @@ class Start:
 			
 			else:
 				self.obj_control = Type_2Lorenz_ctrlOthers (self.obj_data)
-
+			
+			
 		# 3: Dual Loop
 		elif self.obj_data.ICYCL == 3: 
 			self.obj_control = Type_3DualLoop (self.obj_data)

@@ -1,5 +1,5 @@
 # Python import
-import math, sys, datetime
+import math, sys
 from abc import ABC,abstractmethod
 
 # User import
@@ -13,16 +13,11 @@ from .EvapType import *
 from .EvapCooling import *
 from .CondCooling import *
 
-from common_classes.FileAccess import FileAccess
-
 #=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
 class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
-	FILE_ERROR_OUT = 'ERROR.OUT'
-	FILE_CYCLE_OUT = "CYCLE.OUT"
 
 	obj_parameter = None
-	#obj_cdata = None
-	
+		
 	def __init__ (self, obj_parameter, obj_cdata):
 		Block2.setup() # setup data in Boock2
 		
@@ -68,11 +63,12 @@ class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
 		Cycle.obj_parameter.TE= [0.0] * (3+1)
 		Cycle.obj_parameter.TC= [0.0] * (3+1)
 		
+		'''
 		Cycle.obj_parameter.AIRTMP = [True,  #add new item to start list at 1	\
 			False, False, True,  False, False,	\
 			True,  False, False, False, False,	\
 			False, True,  False, True,  False]
-			
+				
 		# in python add extra item for item 0
 		Cycle.obj_parameter.HSTATE = ['','COMP IN','COMP DIS','COND IN','COND DEW',	\
 					'COND BUB','COND OUT','LIQ LINE',	\
@@ -85,7 +81,8 @@ class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
 					'SUBCOOL ','EVAP IN ', 'EVAP DEW','EVAP OUT','HX OUT  ']		
 
 		# in python add extra item for item 0
-		Cycle.obj_parameter.LPNT  = [0,1,2,14,3,11,4,16,6,10,8,9,5,12,7,13]
+		#Cycle.obj_parameter.LPNT  = [0,1,2,14,3,11,4,16,6,10,8,9,5,12,7,13]
+		'''
 		
 		#create basic objects according to the specifications of cycle
 		self.create_basic_obj()
@@ -96,6 +93,11 @@ class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
 		self.objEvapCool = None  # evaporator cooling method
 		self.objCondType = None  # Condenser cooling method
 		self.objCompType = None  # Condenser cooling method
+		
+		print ("aym  Data.obj_cdata.IMAP =", Data.obj_cdata.IMAP)
+		print ("aym  Data.obj_cdata.ICOND=", Data.obj_cdata.ICOND)
+		print ("aym  Data.obj_cdata.IFRSH=", Data.obj_cdata.IFRSH)
+		print ("aym  Data.obj_cdata.ISPEC=", Data.obj_cdata.ISPEC)
 		
 		if (Data.obj_cdata.IMAP ==  0) : #Map
 			self.objCompType = Comp_Map(Cycle.obj_parameter)
@@ -312,13 +314,14 @@ class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
 		#			XV(I,J) - VAPOR PHASE COMPOSITION AT STATE J
 		#			XQ - QUALITY
 		#
-
+		Cycle.obj_parameter.str_err = "" # errors description only in Python
+		
 		IRET = 6
 		#	!! Don't allow adjustment to freezer evap if not one-door refrigerator
 		if (Cycle.obj_parameter.IRFTYPE  !=  6): IRET = 7
 
-		IRFTYP = Cycle.obj_parameter.IRFTYPE
-		if (Cycle.obj_parameter.IRFTYPE  ==  7): IRFTYP = 1
+		Cycle.obj_parameter.IRFTYP = Cycle.obj_parameter.IRFTYPE
+		if (Cycle.obj_parameter.IRFTYPE  ==  7): Cycle.obj_parameter.IRFTYP = 1
 
 		#	SET UP LOGICAL VECTOR ON AIR TEMPERATURES
 		if (Cycle.obj_parameter.ICYCL  ==  2) :
@@ -328,11 +331,9 @@ class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
 			Cycle.obj_parameter.AIRTMP[10] = False
 			Cycle.obj_parameter.AIRTMP[11] = False
 
+		'''
 		#	OPEN OUTPUT FILE
 		objCycOut = FileAccess (Cycle.FILE_CYCLE_OUT,  "write")  # IO_Cycle Tag
-		objError = FileAccess (Cycle.FILE_ERROR_OUT, "write" ) # IM tag
-
-		objError.write_or_terminate ('ENTERING SUBROUTINE CYCLE')
 		objCycOut.write_or_terminate (" ") 
 
 		now = datetime.datetime.now( )
@@ -340,6 +341,7 @@ class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
 		if (Cycle.obj_parameter.NCYC  !=  2) :
 			objCycOut.write_or_terminate( ( now.strftime( "%H %M %S %d %b %Y" ) ) + " - Python Output aymhenry@gmail")
 
+		
 		#	OUTPUT INFORMATION ON TYPE OF CYCLE
 		if (Cycle.obj_parameter.ICYCL  ==  1) :
 			if (Cycle.obj_parameter.ICYCLS  ==  1) :
@@ -364,37 +366,35 @@ class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
 				objCycOut.write_or_terminate('DUAL LOOP CYCLE - FRESH FOOD')
 
 		objCycOut.write_or_terminate(" ")
-
+		'''
+		
 		if (Data.obj_cdata.ITYPE  ==  3): Data.obj_cdata.ITYPE = 1
 
+		'''
 		#	OUTPUT REFRIGERATION MIXTURE INFORMATION
 		
-		
-		X2 = 100.0 * Cycle.obj_parameter.XM[1]
+		#X2 = 100.0 * Cycle.obj_parameter.XM[1]
 
-		
-		#org -objCycOut.write_or_terminate('THE REFRIGERANT MIXTURE CONSISTS OF  %4.0f OF %s'    %(X2, Data.obj_cdata.HREF[ Cycle.obj_parameter.IR[1] ])  )
-		objCycOut.write_or_terminate('THE REFRIGERANT MIXTURE CONSISTS OF  %4.0f OF %s'    %(X2, Data.HREF[ Cycle.obj_parameter.IR[1] ])  )
+		objCycOut.write_or_terminate('THE REFRIGERANT MIXTURE CONSISTS OF  %4.0f OF %s'    %(100.0 * Cycle.obj_parameter.XM[1], Data.HREF[ Cycle.obj_parameter.IR[1] ])  )
 				
 		if (Cycle.obj_parameter.NC >  1) :
 			for I in range (2, Cycle.obj_parameter.NC+1) : 
 				X2 = 100.0 * Cycle.obj_parameter.XM[I]
-		#		objCycOut.write_or_terminate('THE REFRIGERANT MIXTURE CONSISTS OF  %4.0f OF %s'    %(X2, Data.obj_cdata.HREF[ Cycle.obj_parameter.IR[1] ])  ) # fixed in python
 				objCycOut.write_or_terminate('THE REFRIGERANT MIXTURE CONSISTS OF  %4.0f OF %s'    %(X2, Data.HREF[ Cycle.obj_parameter.IR[1] ])  ) # fixed in python
 
 				
 
 		objCycOut.write_or_terminate(" ")
 		objCycOut.write_or_terminate("OUTPUT RESULTS")
-
+		'''
+		
 		#	INITIALIZE COMPRESSOR MAP ANALYSIS
 		DUTYR = 0.5
 		Data.obj_cdata.IREAD = 0
 		Data.obj_cdata.DISPL = Cycle.obj_parameter.DISPLC
 		
-		print ("aym ===before DData.obj_cdata.CE ", Data.obj_cdata.CE )
 		[Data.obj_cdata.EFFC, Data.obj_cdata.CE ] = self.objCompType.map(Data.obj_cdata.ICOMP, Data.obj_cdata.ICOOL, Data.obj_cdata.EER, Data.obj_cdata.SIZE, Data.obj_cdata.DISPL, Data.obj_cdata.SPEEDN)
-		print ("aym ===after DData.obj_cdata.CE ", Data.obj_cdata.CE )
+		
 		
 		#if (Data.obj_cdata.IMAP  ==  1) :
 		#	[Data.obj_cdata.EFFC, Data.obj_cdata.CE ] =self.map(Data.obj_cdata.ICOMP, Data.obj_cdata.ICOOL, Data.obj_cdata.EER, Data.obj_cdata.SIZE, Data.obj_cdata.DISPL, Data.obj_cdata.SPEEDN)
@@ -421,8 +421,8 @@ class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
 		self.objEvapType.calc_evap_exit_p7()
 
 		Cycle.obj_parameter.JC = 1
-		LCCON = True
-		LQUIT = False
+		Cycle.obj_parameter.LCCON = True
+		Cycle.obj_parameter.LQUIT = False
 
 		#	SET UP TEMPERATURES AND CABINET LOADS FOR INLET TEMPERATURE
 		#	CALCULATION FOR EVAPORATOR OF A STANDARD DESIGN (TYPE 1)
@@ -434,7 +434,7 @@ class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
 		FLWREF = Data.obj_cdata.FLOW
 		FLOW2 = Data.obj_cdata.FLOW
 		Data.obj_cdata.MREF = Data.obj_cdata.MREF/(2.20462*WMAVG)
-		MREFSV= Data.obj_cdata.MREF
+		Cycle.obj_parameter.MREFSV= Data.obj_cdata.MREF
 
 		#	BEGIN ITERATION FOR CONDENSER OUTLET TEMPERATURE
 		self.shwfig(Cycle.obj_parameter.ICYCL)
@@ -446,7 +446,7 @@ class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
 	
 		self.showError ("Python, check later, ICNT set in cond method, limit Cycle.obj_parameter.ITMAXC to ", Cycle.obj_parameter.ITMAXC )
 		
-		while (Data.obj_cdata.IC  <=  Cycle.obj_parameter.ITMAXC  and  LCCON): 
+		while (Data.obj_cdata.IC  <=  Cycle.obj_parameter.ITMAXC  and  Cycle.obj_parameter.LCCON): 
 			
 			if (Cycle.obj_parameter.ICAB  ==  1) :
 				[Cycle.obj_parameter.TS3,Cycle.obj_parameter.TS5] = self.adjlod(Cycle.obj_parameter.ICYCL,Data.obj_cdata.IC,  Cycle.obj_parameter.TS3,Cycle.obj_parameter.TS5,  Cycle.obj_parameter.FROSTF,Cycle.obj_parameter.FROSTF,Cycle.obj_parameter.IDFRST)
@@ -477,14 +477,15 @@ class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
 			self.showMsg ("Conderser Temp TC (C) ", Cycle.obj_parameter.TC[Cycle.obj_parameter.JC] - 273.11 )
 
 			if (LCRIT) :
-				objCycOut.write_or_terminate ('CRITICAL TEMPERATURE EXCEEDED IN CONDENSER')
-				objCycOut = "" # close file
-				return
+				#objCycOut.write_or_terminate ('CRITICAL TEMPERATURE EXCEEDED IN CONDENSER')
+				#objCycOut = "" # close file
+				Cycle.obj_paramete.str_err = "CRITICAL TEMPERATURE EXCEEDED IN CONDENSER"
+				return  Cycle.obj_parameter
 
 			#	ENTHALPY AT STATE 4 (CONDENSER OUTLET)
 			[Cycle.obj_parameter.H[4],CV,CP,VSND] = self.hcvcps (1,Cycle.obj_parameter.TC[Cycle.obj_parameter.JC],Cycle.obj_parameter.V[4],Cycle.obj_parameter.X)
 			Cycle.obj_parameter.JE=1
-			LECON=True
+			Cycle.obj_parameter.LECON=True
 			
 			#	ACCOUNT FOR HEAT LOSS FROM LIQUID LINE
 			Cycle.obj_parameter.H[16] = Cycle.obj_parameter.H[4] - Data.obj_cdata.CONDHT[Cycle.obj_parameter.NCYC]/ Data.obj_cdata.MREF/DUTYR
@@ -503,15 +504,15 @@ class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
 			#	enter iteration for evaporator outlet temperature
 			Data.obj_cdata.IE = 1
 			print ("aym Cycle.obj_parameter.ITMAXE=",Cycle.obj_parameter.ITMAXE)
-			while ( (Data.obj_cdata.IE  <=  Cycle.obj_parameter.ITMAXE)  and  LECON ): #DO WHILE (Data.obj_cdata.IE  <=  ITMAXE  and  LECON)
+			while ( (Data.obj_cdata.IE  <=  Cycle.obj_parameter.ITMAXE)  and  Cycle.obj_parameter.LECON ): #DO WHILE (Data.obj_cdata.IE  <=  ITMAXE  and  Cycle.obj_parameter.LECON)
 				print ("\naym Data.obj_cdata.IE=", Data.obj_cdata.IE)
 				self.showMsg ("Iteration Count for (OR EVAPORATOR OUTLET TEMPERATURE) ",Data.obj_cdata.IE)
 
-				I_ERROR_INTER = 0
+				Cycle.obj_parameter.I_ERROR_INTER = 0
 				# Python comment, only if case of IHX, system may return 1
 				if self.objEvapType.iterat_evap_exit_p7()==1:
-					LECON = False
-					I_ERROR_INTER = 1
+					Cycle.obj_parameter.LECON = False
+					Cycle.obj_parameter.I_ERROR_INTER = 1
 					continue
 
 				#	determine the bubble point at the evap exit pressure
@@ -607,23 +608,23 @@ class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
 				#	FIND DUTY CYCLE, NET CAPACITY AND AVERAGE FREEZER LOAD if ICYCL = 1
 				if (Data.obj_cdata.IC  !=  1) :
 					[QFF, QFZ, DUTYR] \
-						= self.dutfnd (Cycle.obj_parameter.ICAB, IRFTYP,Cycle.obj_parameter.ICYCL, Cycle.obj_parameter.NCYC, \
+						= self.dutfnd (Cycle.obj_parameter.ICAB, Cycle.obj_parameter.IRFTYP,Cycle.obj_parameter.ICYCL, Cycle.obj_parameter.NCYC, \
 						Cycle.obj_parameter.QFRSH, Cycle.obj_parameter.QFREZ, Cycle.obj_parameter.FROSTF,\
 						Cycle.obj_parameter.FROSTF,Cycle.obj_parameter.TS3,   Cycle.obj_parameter.TS5,  \
 						Cycle.obj_parameter.T,     Cycle.obj_parameter.IDFRST )
 
 				#	CALCULATE FRESH FOOD EVAPORATOR HEAT TRANSFER.
 				#	TEST FOR STANDARD DESIGN.
-				if (IRFTYP  <=  3) :
+				if (Cycle.obj_parameter.IRFTYP  <=  3) :
 					if (Cycle.obj_parameter.ICYCL  ==  1  and  Cycle.obj_parameter.ICAB	!=  0  and  Data.obj_cdata.IFRSH  !=  0) :
 						if (Data.obj_cdata.IC  ==  1) :
 							TIN = 0.15*TFF + 0.85*TFZ
-							FF_FRACT = 0.0 # in Python only
+							Cycle.obj_parameter.FF_FRACT = 0.0 # in Python only
 						else:
 							Data.obj_cdata.CAPE = Cycle.obj_parameter.QFRSH/1.0548 - 3.413 * Data.obj_cdata.FANE - 3.413*(Data.obj_cdata.DFSTCYC + Data.obj_cdata.FZCYC)
 							CFMA = Data.obj_cdata.CFME/(1.08*1.8961)
 							QFM = QFF + 3.413 * Data.obj_cdata.DUTYC * Data.obj_cdata.FFCYC
-							[TIN,FF_FRACT] = self.mixair (Data.obj_cdata.CAPE, QFM, QFZ, TFF, TFZ, CFMA)
+							[TIN, Cycle.obj_parameter.FF_FRACT] = self.mixair (Data.obj_cdata.CAPE, QFM, QFZ, TFF, TFZ, CFMA)
 
 						Cycle.obj_parameter.TS3 = (TIN + 459.6)/1.8
 
@@ -666,8 +667,8 @@ class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
 
 				Data.obj_cdata.ETAE = Cycle.obj_parameter.QFRSH/Cycle.obj_parameter.QMAXE
 				
-				if (ICONE  ==  1): LECON = False
-				if (Cycle.obj_parameter.TE[Cycle.obj_parameter.JE]  <=  Cycle.obj_parameter.TEMIN):  LECON = False
+				if (ICONE  ==  1): Cycle.obj_parameter.LECON = False
+				if (Cycle.obj_parameter.TE[Cycle.obj_parameter.JE]  <=  Cycle.obj_parameter.TEMIN):  Cycle.obj_parameter.LECON = False
 					
 				Data.obj_cdata.IE = Data.obj_cdata.IE + 1
 
@@ -745,11 +746,11 @@ class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
 			
 			print ("aym =====3================ self.obj_cdata.CE =", self.obj_cdata.CE)
 			# CALL COMPRESSOR MODEL
-			[Cycle.obj_parameter.T, HOUT, Cycle.obj_parameter.QHILO, Cycle.obj_parameter.QCAN,VSUC,  VV2, TSUC, TDISC, GAMA, RN, ETAS] \
+			[Cycle.obj_parameter.T, HOUT, Cycle.obj_parameter.QHILO, Cycle.obj_parameter.QCAN,VSUC,  VV2, Cycle.obj_parameter.TSUC, Cycle.obj_parameter.TDISC, GAMA, RN, Cycle.obj_parameter.ETAS] \
 				= self.objCompType.comp_balance()
 			
 			# repeted code, get it out of IF
-			FLOW2 = FLWREF * Data.obj_cdata.MREF/MREFSV
+			FLOW2 = FLWREF * Data.obj_cdata.MREF/ Cycle.obj_parameter.MREFSV
 			
 			#	SHOW THE PROGRESS IN THE SOLUTION
 			self.progrs (Cycle.obj_parameter.ICYCL,Cycle.obj_parameter.H,HOUT,WMAVG,FLOW2,Cycle.obj_parameter.QCAN)
@@ -878,22 +879,22 @@ class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
 
 				Data.obj_cdata.ETAC = QTOTC/QMAXC
 			else:
-				LCCON = False
+				Cycle.obj_parameter.LCCON = False
 
 			Data.obj_cdata.IC = Data.obj_cdata.IC + 1
 			
 			if Data.obj_cdata.INCTRL in [0,3]:
 				if (Data.obj_cdata.IC  <=  4) :
-					LCCON = True
+					Cycle.obj_parameter.LCCON = True
 					ICONC = 0
 
 			if Data.obj_cdata.INCTRL in [1,2,4]:
 				if (Data.obj_cdata.IC  <=  10) :
-					LCCON = True
+					Cycle.obj_parameter.LCCON = True
 					ICONC = 0
 					
-			#if (not LECON): LCCON = False #only in Puthon
-			#if (LQUIT): LCCON = False #if key pressed in lowevp ,ethod then exit, cancel in Python
+			#if (not Cycle.obj_parameter.LECON): Cycle.obj_parameter.LCCON = False #only in Puthon
+			#if (LQUIT): Cycle.obj_parameter.LCCON = False #if key pressed in lowevp ,ethod then exit, cancel in Python
 			
 			
 		#END DO IC loop
@@ -1025,7 +1026,8 @@ class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
 		VSUC = VSUC/WMAVG
 		Data.obj_cdata.W = (HOUT - Cycle.obj_parameter.H[1])/(1.0 - Cycle.obj_parameter.QCAN)
 		Data.obj_cdata.QE = Cycle.obj_parameter.H[7] - Cycle.obj_parameter.H[5]
-		QC = Cycle.obj_parameter.H[14] - Cycle.obj_parameter.H[4]
+		Cycle.obj_parameter.QC = Cycle.obj_parameter.H[14] - Cycle.obj_parameter.H[4]
+		
 		Data.obj_cdata.QZ = Cycle.obj_parameter.H[9] - Cycle.obj_parameter.H[8]
 		Data.obj_cdata.COPR = (Data.obj_cdata.QE + Data.obj_cdata.QZ)/Data.obj_cdata.W
 		
@@ -1034,8 +1036,8 @@ class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
 		TL2 = Cycle.obj_parameter.TS5
 		DENOM = TH * (Data.obj_cdata.QE * (1./TL1-1./TH)+ Data.obj_cdata.QZ * (1./TL2-1./TH))
 		COPI = (Data.obj_cdata.QE+ Data.obj_cdata.QZ)/DENOM
-		PR = Cycle.obj_parameter.P[2]/Cycle.obj_parameter.P[1]
-		TSUPC = Cycle.obj_parameter.T[2] - Cycle.obj_parameter.T[3]
+		Cycle.obj_parameter.PR = Cycle.obj_parameter.P[2]/Cycle.obj_parameter.P[1]
+		Cycle.obj_parameter.TSUPC = Cycle.obj_parameter.T[2] - Cycle.obj_parameter.T[3]
 		
 		#
 		#	CORRECT COP DUR TO CYCLING LOSSES
@@ -1047,268 +1049,10 @@ class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
 			TMID_COND = (Cycle.obj_parameter.T[3] + Cycle.obj_parameter.T[11])/2.0
 			TMID_EVAP = (Cycle.obj_parameter.T[8] + Cycle.obj_parameter.T[9])/2.0
 			Data.obj_cdata.CORR_COP = self.cyclos (Data.obj_cdata.I_VALVE, Data.obj_cdata.T_CYCLE)
-
-		#
-		#	OUTPUT WARNING IF CONVERGENCE FORCED BY HOT KEY <F10>.
-		#
-		if (LQUIT):
-			objCycOut.write_or_terminate ("Convergence forced after, iterations ", Data.obj_cdata.IC)
-			
-			#WRITE(IO_Cycle,'('' CONVERGENCE FORCED AFTER '',I2,
-			#	'' ITERATIONS''/)') Data.obj_cdata.IC
-		#
-		#	PRINT ERROR MESSAGES if NON-CONVERGENCE
-		#
-		if (LECON  or  LCCON  or  I_ERROR_INTER  > 0) :
-			LWIND = 5
-			if (LECON  and  LCCON): LWIND = 7
-			#CALL WINDOW(8,8+LWIND,20,60,32,1)
-			if (LECON) :
-				#Cycle.obj_parameter.TE[1] = Cycle.obj_parameter.TE[1] - 273.11
-				#Cycle.obj_parameter.TE[2] = Cycle.obj_parameter.TE[2] - 273.11
-
-				# WRITE (IO_Cycle,2200) Cycle.obj_parameter.TE[1],Cycle.obj_parameter.TE[2]'
-				objCycOut.write_or_terminate  ('EVAPORATOR ITERATION DID NOT CONVERGE,  %9.3f, %9.3f ' %( Cycle.obj_parameter.TE[1]-273.11,Cycle.obj_parameter.TE[2]-273.11) )
-
-				#CALL GOTOXY(22,11)
-				#CALL PRINT('EVAPORATOR ITERATION DID NOT CONVERGE$',37,-2)
-				self.showError ("EVAPORATOR ITERATION DID NOT CONVERGE", "")
-
-			if (LCCON) :
-				#Cycle.obj_parameter.TC[1] = Cycle.obj_parameter.TC[1] - 273.11
-				#Cycle.obj_parameter.TC[2] = Cycle.obj_parameter.TC[2] - 273.11
-
-				#'WRITE (IO_Cycle,2202) Cycle.obj_parameter.TC[1],Cycle.obj_parameter.TC[2]'
-				objCycOut.write_or_terminate  ('CONDENSER ITERATION DID NOT CONVERGE,  %9.3f, %9.3f ' %( Cycle.obj_parameter.TC[1]-273.11,Cycle.obj_parameter.TC[2] -273.11) )
-				self.showError ('CONDENSER ITERATION DID NOT CONVERGE ,  %9.3f, %9.3f ' %( Cycle.obj_parameter.TC[1]-273.11,Cycle.obj_parameter.TC[2]-273.11))
-
-
-			if (I_ERROR_INTER >  0) :
-				#"WRITE (IO_Cycle,2203)"
-				objCycOut.write_or_terminate  ('INTERCHANGER SUPERHEAT NOT POSSIBLE')
-			
-				self.showError ("INTERCHANGER SUPERHEAT NOT POSSIBLE")
-
-			# say beep CALL WARBLE
-			# say beep CALL WARBLE
-			# say beep CALL WARBLE
-
-			#READ( * , * )
-			input("Press Enter to continue...")
-
-
-		#
-		#	OUTPUT RESULTS.  BEGIN BY CONVERTING TO ENGLISH UNITS.
-		#
-
-		TENV = (Data.obj_cdata.TROOM + 459.6)/1.8
-
-		if (Cycle.obj_parameter.T[16] <  TENV):  Data.obj_cdata.I_LIQUID_LINE = 1
-
-		#WRITE (IO_Cycle,1010)
-		objCycOut.write_or_terminate (",STATE, T(C), T(C), P, H, V, S, XL, XV, XQ")
-		objCycOut.write_or_terminate (",,AIR,   REF, (KPa), (KJ/KG), (M3/KG), (KJ/KG-C), (MASS FRAC),(MASS FRAC),(MASS FRAC)")
-		print (",STATE, T(C),T(C), P, H, V, S, XL, XV, XQ")
-		print (",,AIR,   REF, (KPA), (KJ/KG), (M3/KG), (KJ/KG-C), (MASS FRAC),(MASS FRAC),(MASS FRAC)")
-
-		K = 1
-		if (Cycle.obj_parameter.ICYCL  ==  2) :
-			while (K <= 15): #DO WHILE (K  <=  15)
-				J = Cycle.obj_parameter.LPNT[K]
-				Cycle.obj_parameter.TS[J] = Cycle.obj_parameter.TS[J] - 273.11
-				Cycle.obj_parameter.T[J] = Cycle.obj_parameter.T[J] - 273.11
-				Cycle.obj_parameter.V[J] = Cycle.obj_parameter.V[J]/10.0
-
-				if (Cycle.obj_parameter.XQ[J] >  1.0): Cycle.obj_parameter.XQ[J] = 1.0
-				if (Cycle.obj_parameter.XQ[J] <  0.0): Cycle.obj_parameter.XQ[J] = 0.0
-				
-				if (Cycle.obj_parameter.AIRTMP[K]) :
-					#WRITE (8,1020) K,HSTATE(K),TS[J],Cycle.obj_parameter.T[J],P[J],H[J],Cycle.obj_parameter.V[J],'
-					objCycOut.write_or_terminate ( "%d, %s , %9.3f, %9.3f, %9.3f, %9.3f, %9.3f, %9.3f, %s, %s, %s"	\
-						%(K,Cycle.obj_parameter.HSTATE[K],Cycle.obj_parameter.TS[J],Cycle.obj_parameter.T[J],Cycle.obj_parameter.P[J],Cycle.obj_parameter.H[J],Cycle.obj_parameter.V[J],  Cycle.obj_parameter.S[J],Cycle.obj_parameter.XL[1][J],Cycle.obj_parameter.XV[1][J],Cycle.obj_parameter.XQ[J]) )
-					print ( "%d, %d, %s , %9.3f, %9.3f, %9.3f, %9.3f, %9.3f, %9.3f, %s, %s, %s"	\
-						%(K,J,Cycle.obj_parameter.HSTATE[K],Cycle.obj_parameter.TS[J],Cycle.obj_parameter.T[J],Cycle.obj_parameter.P[J],Cycle.obj_parameter.H[J],Cycle.obj_parameter.V[J],  Cycle.obj_parameter.S[J],Cycle.obj_parameter.XL[1][J],Cycle.obj_parameter.XV[1][J],Cycle.obj_parameter.XQ[J]) )
-				else:
-					#'WRITE (8,1021) K,HSTATE(K),		Cycle.obj_parameter.T[J],Cycle.obj_parameter.P[J],H[J],Cycle.obj_parameter.V[J],') print ('S[J],Cycle.obj_parameter.XL(1,J),Cycle.obj_parameter.XV(1,J),Cycle.obj_parameter.XQ[J]')
-					objCycOut.write_or_terminate ( " %d, %s,  N/A, %9.3f, %9.3f, %9.3f, %9.3f, %9.3f, %s, %s, %s"	\
-						%(K,Cycle.obj_parameter.HSTATE[K], Cycle.obj_parameter.T[J],Cycle.obj_parameter.P[J],Cycle.obj_parameter.H[J],Cycle.obj_parameter.V[J],  Cycle.obj_parameter.S[J],Cycle.obj_parameter.XL[1][J],Cycle.obj_parameter.XV[1][J],Cycle.obj_parameter.XQ[J]) )
-					print ( "%d,%d, %s , N/A, %9.3f, %9.3f, %9.3f, %9.3f, %9.3f, %9.3f, %s, %s, %s"	\
-						%(K,J,Cycle.obj_parameter.HSTATE[K], Cycle.obj_parameter.T[J],Cycle.obj_parameter.P[J],Cycle.obj_parameter.H[J],Cycle.obj_parameter.V[J],  Cycle.obj_parameter.S[J],Cycle.obj_parameter.XL[1][J],Cycle.obj_parameter.XV[1][J],Cycle.obj_parameter.XQ[J]) )
-					
-				# End if
-				K = K + 1
-			#END DO
-		else:
-			M = 0
-			K = 0
-			while (M <= 14): #DO WHILE (M  <=  14)
-				M = M + 1
-				J = Cycle.obj_parameter.LPNT[M]
-
-				Cycle.obj_parameter.TS[J] = Cycle.obj_parameter.TS[J] - 273.11
-				Cycle.obj_parameter.T[J] = Cycle.obj_parameter.T[J] - 273.11
-				Cycle.obj_parameter.V[J] = Cycle.obj_parameter.V[J]/10.0
-				if (Cycle.obj_parameter.XQ[J] >  1.0): Cycle.obj_parameter.XQ[J] = 1.0
-				if (Cycle.obj_parameter.XQ[J] <  0.0): Cycle.obj_parameter.XQ[J] = 0.0
-
-				if (M  >=  9  and  M  <=  11): continue
-				K = K + 1
-				if ( Cycle.obj_parameter.AIRTMP[M] ) :
-					#WRITE (8,1020) K,MSTATE(K),TS[J],Cycle.obj_parameter.T[J],Cycle.obj_parameter.P[J],H[J],Cycle.obj_parameter.V[J],'  'Cycle.obj_parameter.S[J],Cycle.obj_parameter.XL(1,J),Cycle.obj_parameter.XV(1,J),XQ[J]
-					objCycOut.write_or_terminate ( "%d, %s, %9.3f, %9.3f, %9.3f, %9.3f, %9.3f, %9.3f, %s, %s, %s"	\
-						%(K,Cycle.obj_parameter.MSTATE[K], Cycle.obj_parameter.TS[J],Cycle.obj_parameter.T[J],Cycle.obj_parameter.P[J],Cycle.obj_parameter.H[J],Cycle.obj_parameter.V[J],  Cycle.obj_parameter.S[J],Cycle.obj_parameter.XL[1][J],Cycle.obj_parameter.XV[1][J],Cycle.obj_parameter.XQ[J]) )
-						
-					print ("%d,%d, %s , %9.3f, %9.3f, %9.3f, %9.3f, %9.3f, %9.3f, %s, %s, %s"	\
-						%(K,J, Cycle.obj_parameter.MSTATE[K], Cycle.obj_parameter.TS[J],Cycle.obj_parameter.T[J],Cycle.obj_parameter.P[J],Cycle.obj_parameter.H[J],Cycle.obj_parameter.V[J],  Cycle.obj_parameter.S[J],Cycle.obj_parameter.XL[1][J],Cycle.obj_parameter.XV[1][J],Cycle.obj_parameter.XQ[J]) )
-				else:
-					
-					#WRITE (8,1021) K,MSTATE(K),		Cycle.obj_parameter.T[J],P[J],H[J],Cycle.obj_parameter.V[J],'\	'S[J],Cycle.obj_parameter.XL(1,J),Cycle.obj_parameter.XV(1,J),XQ[J]
-					objCycOut.write_or_terminate ( "%d, %s , N/A, %9.3f, %9.3f, %9.3f, %9.3f, %9.3f, %s, %s, %s"	\
-						%(K, Cycle.obj_parameter.MSTATE[K],  Cycle.obj_parameter.T[J],Cycle.obj_parameter.P[J],Cycle.obj_parameter.H[J],Cycle.obj_parameter.V[J],  Cycle.obj_parameter.S[J],Cycle.obj_parameter.XL[1][J],Cycle.obj_parameter.XV[1][J],Cycle.obj_parameter.XQ[J]) )
-					print ("%d,%d, %s , N/A, %9.3f, %9.3f, %9.3f, %9.3f, %9.3f, %s, %s, %s"	\
-						%(K,J, Cycle.obj_parameter.MSTATE[K], Cycle.obj_parameter.T[J],Cycle.obj_parameter.P[J],Cycle.obj_parameter.H[J],Cycle.obj_parameter.V[J],  Cycle.obj_parameter.S[J],Cycle.obj_parameter.XL[1][J],Cycle.obj_parameter.XV[1][J],Cycle.obj_parameter.XQ[J]) )						
-						
-				# End if
-			#END DO
-
-		# End if
-
-		#
-		#	NORMALIZE BY THE MASS FLOW
-		#
-
-		Data.obj_cdata.FLOW = Data.obj_cdata.FLOW * Data.obj_cdata.MREF/MREFSV
-		Data.obj_cdata.DISP = Data.obj_cdata.DISP/1.6387E-05
-		Data.obj_cdata.W = 0.4302 * Data.obj_cdata.W * Data.obj_cdata.FLOW * 1.0548
-		Data.obj_cdata.QZ = 0.4302 * Data.obj_cdata.QZ * Data.obj_cdata.FLOW * 1.0548
-		Data.obj_cdata.QE = 0.4302 * Data.obj_cdata.QE * Data.obj_cdata.FLOW * 1.0548
-		QC = 0.4302 * QC * Data.obj_cdata.FLOW * 1.0548
-		#
-		#	REST OF THE CONVERSIONS
-		#
-		TSUC = TSUC - 273.11
-		TDISC = TDISC - 273.11
-		Data.obj_cdata.ETAE = 100. * Data.obj_cdata.ETAE
-		Cycle.obj_parameter.FSUPE = 100. * Cycle.obj_parameter.FSUPE
 		
-		Data.obj_cdata.ETAF = 100. * Data.obj_cdata.ETAF
-		Data.obj_cdata.ETAC = 100. * Data.obj_cdata.ETAC
-		
-		Cycle.obj_parameter.FSUBC = 100. * Cycle.obj_parameter.FSUBC
-		Cycle.obj_parameter.FSUPC = 100. * Cycle.obj_parameter.FSUPC
-		#
-		#	OUTPUT SUMMARY TABLE OF RESULTS
-		#
-		#WRITE(8,1025)
-		objCycOut.write_or_terminate  ('CYCLE PERFORMANCE SUMMARY')
-		if (Data.obj_cdata.ITYPE  ==  1) :
-			#WRITE(8,1105) Data.obj_cdata.QE, Data.obj_cdata.QE/3.6'
-			objCycOut.write_or_terminate  ('EVAPORATOR CAPACITY,  %9.3f, KJ/HR,  %9.3f, W' %( Data.obj_cdata.QE, Data.obj_cdata.QE/3.6) )
-		else:
-			#WRITE(8,1030) Data.obj_cdata.QE, Data.obj_cdata.QE/3.6'
-			#WRITE(8,1035) Data.obj_cdata.QZ, Data.obj_cdata.QZ/3.6')
-			objCycOut.write_or_terminate  ('FRESH FOOD EVAPORATOR CAPACITY,  %9.3f, KJ/HR,  %9.3f, W' %( Data.obj_cdata.QE, Data.obj_cdata.QE/3.6) )
-			objCycOut.write_or_terminate  ('FREEZER EVAPORATOR CAPACITY,     %9.3f, KJ/HR,  %9.3f, W' %( Data.obj_cdata.QZ, Data.obj_cdata.QZ/3.6) )
-			
-		# End if
-
-		#WRITE(8,1040) QC, QC/3.6
-		#WRITE(8,1045) Data.obj_cdata.W, Data.obj_cdata.W/3.6')
-		#WRITE(8,1050) Data.obj_cdata.COPR
-		
-		objCycOut.write_or_terminate  ('CONDENSER HEAT REJECTION RATE,  %9.3f, KJ/HR,  %9.3f, W' %( QC, QC/3.6) )
-		objCycOut.write_or_terminate  ('COMPRESSOR POWER REQUIREMENT,     %9.3f, KJ/HR,  %9.3f, W' %(Data.obj_cdata.W, Data.obj_cdata.W/3.6 ) )
-		objCycOut.write_or_terminate  ('COEFFICIENT OF PERFORMANCE,     %9.3f' %( Data.obj_cdata.COPR) )
-
-		if (IRFTYP  <=  3  and  Cycle.obj_parameter.ICYCL  ==  1  and  Cycle.obj_parameter.ICAB  !=  0
-								and  Data.obj_cdata.IFRSH  !=  0):
-			#WRITE(8,1055) FF_FRACT
-			objCycOut.write_or_terminate  ('FRACTION AIR TO FRESH FOOD,     %9.3f, (SINGLE EVAPORATOR CYCLE)' %( FF_FRACT) )
-
-		#write(8, '( )')
-		objCycOut.write_or_terminate (" ")
-		
-		if (Data.obj_cdata.IMAP  ==  1) :
-			objCycOut.write_or_terminate  ('ESTIMATED COMPRESSION EFFICIENCY, %9.3f, (COMPRESSOR EER MODEL)' %( ETAS) )
-			objCycOut.write_or_terminate  ('ESTIMATED MOTOR-PUMP EFFICIENCY,  %9.3f, (COMPRESSOR EER MODEL)' %( Data.obj_cdata.EFFC/ETAS) )
-			objCycOut.write_or_terminate  ('ESTIMATED CLEARANCE VOLUME,       %9.3f, (COMPRESSOR EER MODEL)' %( Data.obj_cdata.CE) )
-			objCycOut.write_or_terminate  ('ESTIMATED SHELL LOSS,       %9.3f, (COMPRESSOR EER MODEL)' %( Cycle.obj_parameter.QCAN) )
-			objCycOut.write_or_terminate  ('ESTIMATED DISC TUBE HEAT LOSS,       %9.3f, (COMPRESSOR EER MODEL)' %( Cycle.obj_parameter.QHILO) )
-			
-			#WRITE(8,2215) ETAS
-			#WRITE(8,2211) Data.obj_cdata.EFFC/ETAS
-			#WRITE(8,2212) Data.obj_cdata.CE
-			#WRITE(8,2213) Cycle.obj_parameter.QCAN
-			#WRITE(8,2214) Cycle.obj_parameter.QHILO
-		# End if
-
-		objCycOut.write_or_terminate ("HEAT EXCHANGER PERFORMANCE SUMMARY")
-		objCycOut.write_or_terminate ("EXCHANGER, EFFECTIVENESS, SUBCOOLED FRACTION, SUPERHEATED FRACTION")
-		#WRITE(8,1060)
-		#WRITE(8,1065)
-
-		if (Data.obj_cdata.ITYPE  ==  1) :
-			if (Data.obj_cdata.IFRSH  !=  0) :
-				#WRITE(8,1110) Data.obj_cdata.ETAE,FSUPE
-				objCycOut.write_or_terminate  ('EVAPORATOR,     %9.3f, N/A, ,%9.3f' %(Data.obj_cdata.ETAE,Cycle.obj_parameter.FSUPE ) )
-			else:
-				#WRITE(8,1111) FSUPE
-				objCycOut.write_or_terminate  ('EVAPORATOR,     , N/A, N/A, %9.3f ' %(Cycle.obj_parameter.FSUPE ) )
-		else:
-			if (Data.obj_cdata.IFRSH  !=  0) :
-				#WRITE(8,1070) Data.obj_cdata.ETAE,FSUPE
-				objCycOut.write_or_terminate  ('FRESH FOOD EVAP.,     %9.3f, N/A, %9.3f ' %(Data.obj_cdata.ETAE,Cycle.obj_parameter.FSUPE ) )
-			else:
-				#WRITE(8,1071) FSUPE
-				objCycOut.write_or_terminate  ('FRESH FOOD EVAP.,  , N/A, N/A, %9.3f ' %(Cycle.obj_parameter.FSUPE ) )
-				
-			if (Data.obj_cdata.IFREZ  !=  0) :
-				#WRITE(8,1075) Data.obj_cdata.ETAF
-				objCycOut.write_or_terminate  ('FREEZER EVAP.,   %9.3f, N/A,  ---- ' %( Data.obj_cdata.ETAF ) )
-			else:
-				#WRITE(8,1076)
-				objCycOut.write_or_terminate  (' ' )
-			# End if
-		# End if
-
-		if (Data.obj_cdata.ICOND  !=  0) :
-			#WRITE(8,1080) Data.obj_cdata.ETAC,FSUBC,FSUPC
-			objCycOut.write_or_terminate  ('CONDENSER,     %9.3f,%9.3f, %9.3f ' %(Data.obj_cdata.ETAC,Cycle.obj_parameter.FSUBC,Cycle.obj_parameter.FSUPC ) )
-		else:
-			#WRITE(8,1081) FSUBC,FSUPC
-			objCycOut.write_or_terminate  ('CONDENSER,     , N/A, %9.3f,%9.3f ' %(Cycle.obj_parameter.FSUBC,Cycle.obj_parameter.FSUPC ) )
-		
-		objCycOut.write_or_terminate ("COMPRESSOR PERFORMANCE SUMMARY")
-		objCycOut.write_or_terminate ('REFRIGERANT MASS FLOW RATE.,   %9.3f, KG/HR' %( Data.obj_cdata.FLOW * 0.45359 ) )
-		
-		if (Data.obj_cdata.IMAP != 0): 
-			objCycOut.write_or_terminate ('VOLUMETRIC EFFICIENCY,   %9.3f' %(  Data.obj_cdata.ETAV * 0.45359 ) )
-
-		objCycOut.write_or_terminate ('PRESSURE RATIO,   %9.3f' %( PR ) )
-		
-		if (Data.obj_cdata.IMAP != 0) :
-			objCycOut.write_or_terminate ('SUCTION PORT TEMPERATURE (C),   %9.3f' %( TSUC ) )
-			objCycOut.write_or_terminate ('DISCHARGE PORT TEMPERATURE (C),   %9.3f' %( TDISC ) )
-			objCycOut.write_or_terminate ('DISCHARGE SUPERHEAT (C),   %9.3f' %( TSUPC ) )
-		# End if
-
-		#WRITE(8,'(A1)') CHAR[12]
-		objCycOut.write_or_terminate (" ")
-		#
-		#	OUTPUT A FIGURE OF THE RESULTS
-		#
-		#CALL OUTPUT(ICYCL,Cycle.obj_parameter.T,Data.obj_cdata.W,QC,Data.obj_cdata.QE,Data.obj_cdata.QZ)
-		self.showError (" Check cycle fig number ...")
-		#
-		#	return TO CALLER
-		#
-		#WRITE(Data.obj_cdata.IM_Err,'(''LEAVING CYCLE WITH IC: '',I5,''  Data.obj_cdata.IE: '',I5)') Data.obj_cdata.IC, Data.obj_cdata.IE")
-		self.showMsg("LEAVING CYCLE WITH IC:" + str(Data.obj_cdata.IC) + str(Data.obj_cdata.IE) )
-		
-		#CLOSE(IO_Cycle)
-		#CLOSE(IM_Err)
-		
-		return
+		print ("aym inside cycle ===============", Cycle.obj_parameter.T)
+		dir (Cycle.obj_parameter)
+		return Cycle.obj_parameter
 
 	#=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
 	def cyclos ( self, I_VALVE, T_CYCLE):

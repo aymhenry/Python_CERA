@@ -3,7 +3,6 @@ import math
 from abc import ABC,abstractmethod
 
 # User Import ======================
-#from .View import *
 
 from common_classes.QData import QData
 from common_classes.Unit import Unit
@@ -11,7 +10,7 @@ from cycle_classes.Cycle import *
 from cycle_classes.CycleUtil import *
 
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-# Job 			: Abstract Class from Control Q class
+# Job 			: Abstract Class from Control class
 #
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
@@ -19,6 +18,7 @@ class CycleType_Abstract (ABC, CycleUtil):
 
 	def __init__ (self, objdata):
 		self.obj_data = objdata
+		
 		self.setup_vars_for_all_types()
 		self.setup_vars_extra ()
 		
@@ -33,15 +33,6 @@ class CycleType_Abstract (ABC, CycleUtil):
 	def adjust_units (self):
 		pass
 		
-	#-----------------------------------------------------------
-	# Job 			: Output data from obj_data data store. (individual for every sub-class)
-	# Input 		: str_file_cab : cabinet data file name to save to
-	#				str_file_cycle : cycle data file name to save to
-	# Output		:
-	#-----------------------------------------------------------
-	@abstractmethod
-	def view (self, str_file_cycle, str_path_cycle = ""):
-		pass
 
 	#-----------------------------------------------------------
 	# Job 			: inialize extra varibale in obj_data object with value (individual for every sub-class)
@@ -281,9 +272,6 @@ class CycleType_Abstract (ABC, CycleUtil):
 		self.obj_data.DISPLC[lng_item] = self.obj_data.DISPLC[lng_item] / 16.3871 # from cm3 to cu-inch compressor displacement
 	
 		self.obj_data.CE = self.obj_data.CEI[lng_item]
-
-		print ("aym   ===4=== self.obj_data.CEI", self.obj_data.CEI)
-		print ("aym   ===5=== self.obj_data.CE", self.obj_data.CE)
 		
 		self.obj_data.SEFF  = self.obj_data.SEFFI[lng_item]
 		self.obj_data.FANE  = self.obj_data.FNPWRE[lng_item]
@@ -354,7 +342,7 @@ class CycleType_Abstract (ABC, CycleUtil):
 		obj_cycle = Cycle (obj_parameter_data, self.obj_data)
 		
 		obj_parameter_data.NCYC = 1 #number of call to cycle (1=Single or 2= Dual cycle)
-		obj_cycle.cycle()
+		return obj_cycle.cycle()
 		
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # Job 			: Analisis Cycle Type 1 - Standard 
@@ -362,6 +350,7 @@ class CycleType_Abstract (ABC, CycleUtil):
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 class Type_1Standard (CycleType_Abstract):
+	'''
 	def view (self, str_file_cycle, str_path_cycle = ""):	
 		# SET UP PARAMETERS FOR SUMMARY OUTPUT
 		#
@@ -376,9 +365,9 @@ class Type_1Standard (CycleType_Abstract):
 		self.obj_data.COPRN[N]  = self.obj_data.COPR
 		self.obj_data.COPCYC[N] = self.obj_data.CORR_COP
 					
-		obj_view = View(self.obj_data, str_file_cycle, str_path_cycle)
+		obj_view = ViewCycle(self.obj_data, str_file_cycle, str_path_cycle)
 		obj_view.show_rep()
-
+	'''
 	def calculte (self):
 		self.obj_data.ITYPE = 1
 		self.obj_data.TS5 = -300.0
@@ -389,8 +378,8 @@ class Type_1Standard (CycleType_Abstract):
 		self.obj_data.XEXITE = self.obj_data.QUALTY[1]
 		self.obj_data.DTSUPI = self.obj_data.SUPIHX[1]
 		
-		self.call_cycle (1)
-		
+		return self.call_cycle (1)
+				
 	def setup_vars_extra (self):
 		self.setup_vars()
 		
@@ -407,9 +396,6 @@ class Type_1Standard (CycleType_Abstract):
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 class Type_2Lorenz (CycleType_Abstract):
-	def view (self, str_file_cycle, str_path_cycle = ""):
-		obj_view = View(self.obj_data, str_file_cycle, str_path_cycle)
-		obj_view.show_rep()
 
 	def calculte (self):
 		pass
@@ -461,9 +447,6 @@ class Type_2Lorenz_ctrlOthers (Type_2Lorenz):
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 class Type_3DualLoop (CycleType_Abstract):
-	def view (self, str_file_cycle, str_path_cycle = ""):
-		obj_view = View(self.obj_data, str_file_cycle, str_path_cycle)
-		obj_view.show_rep()
 		
 	def calculte (self):
 		pass
@@ -489,9 +472,6 @@ class Type_3DualLoop (CycleType_Abstract):
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 class Type_4DualEvap (CycleType_Abstract):
-	def view (self, str_file_cycle, str_path_cycle = ""):
-		obj_view = View(self.obj_data, str_file_cycle, str_path_cycle)
-		obj_view.show_rep()
 		
 	def calculte (self):
 		pass

@@ -1155,7 +1155,7 @@ class Comp_ERR (Comp_Abstract): #Data.obj_cdata.IMAP== 1
 				print ("aym T90 = 305.3889K K = ", T90-273.11, "C")
 				
 				print ("aym =============")
-				print ("aym  VSUC/MOLAR_WEIGHT m3/kg =", VSUC/MOLAR_WEIGHT, "  SPEEDN=", SPEEDN, "  DISPL=", DISPL )
+				print ("aym  VSUC=", VSUC , "VSUC/MOLAR_WEIGHT m3/kg =", VSUC/MOLAR_WEIGHT, "  SPEEDN=", SPEEDN, "  DISPL=", DISPL )
 				
 				print ("aym MASS[I][J]  = CAP[I][J]/(H_VAP - H_LIQ)     #kg-mole/hr = ", MASS[I][J])
 				print ("aym ETAV[I][J] = MASS[I][J]*VSUC/(60.0*SPEEDN)/(DISPL/61023.6) = ", ETAV[I][J] )
@@ -1202,6 +1202,7 @@ class Comp_ERR (Comp_Abstract): #Data.obj_cdata.IMAP== 1
 			Data.obj_cdata.CE   = CEIJ[3][2]
 
 		print ("aym ===Final============== Data.obj_cdata.ETAC= ETAS[3][2] =", ETAS[3][2])
+
 		print ("aym ===Final============== Data.obj_cdata.CE  = CEIJ[3][2] =",CEIJ[3][2])
 		print ("aym ===Final===============              Data.obj_cdata.CE =", Data.obj_cdata.CE)
 		return [Data.obj_cdata.ETAC, Data.obj_cdata.CE]
