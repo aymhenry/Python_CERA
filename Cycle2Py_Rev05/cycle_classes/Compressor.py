@@ -1,20 +1,23 @@
 # Python import
-import math, sys, datetime
+import math, sys
 from abc import ABC,abstractmethod
 
 # User import
 from .Data import Data
 from .Block2 import Block2
+from .CompMap import CompMap
+
+from common_classes.FileAccess import FileAccess
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # Job 			: Abstract Class from Evaprator configration
 #
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 class Comp_Abstract (ABC, Block2, Data):
-	FILE_COMPMAP_DAT = 'COMPMAP.DAT'
-	
+	FLDER_COMPMAP_DAT = sys.path[0] + "\\" + "compmap"
 	#=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
-	def __init__ (self, objdata):
+	def __init__ (self, objdata, str_Comp_File =""):
+		self.str_Comp_File = str_Comp_File
 		self.objData = objdata
 
 	# Abstract methods
@@ -295,7 +298,7 @@ class Comp_Abstract (ABC, Block2, Data):
 class Comp_Map (Comp_Abstract): #Data.obj_cdata.IMAP== 0
 	def comp_balance (self):
 		OLDMAS = Data.obj_cdata.MREF
-		lstRes = self.compcall (self.objData.H, self.objData.P, self.objData.X, self.objData.T, self.objData.TS1)
+		lstRes = self.compcall (self.objData.H, self.objData.P, self.objData.X, self.objData.T, self.objData.V,   self.objData.TS1)
 
 		Data.obj_cdata.MREF = (Data.obj_cdata. MREF + 2.0*OLDMAS)/ 3.0
 		if (Data.obj_cdata.MREF >  1.05*OLDMAS): Data.obj_cdata.MREF = 1.05*OLDMAS
@@ -431,75 +434,17 @@ class Comp_Map (Comp_Abstract): #Data.obj_cdata.IMAP== 0
 		#	  LOGICAL         LCRIT, LCONV
 		#	  COMMON /MAPDAT/ IMAP, ICOMP, ICOOL, EER, SIZE, DISPL, EFFC,
 		#	 .                SPEEDN, IREAD
-		#
-		#
-		#
-		
-		def inastk (h_FileHanndle, strType="" ):
-			# * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-			# * THIS ROUTINE READS IN ONE LINE OF INPUT DATA AND SCREENS OUT *
-			# * ALL LINES THAT BEGIN WITH AN ASTERICK *
-			# * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-			DATA_TYPES = {'int':'i', 'float':'f', 'string:':'s'} #Input types
-			if not ( strType in DATA_TYPES ): # fixed if bad required type
-				strType = "string" # set it as string
-
-			while True:
-				is_can_read = h_FileHanndle.readline( )	# if you can read, gives true
-				if is_can_read:
-					str_text = h_FileHanndle.getText( )
-					if str_text == "":
-						h_FileHanndle.terminate( 'EAR App Error: End of file for input file' )
-
-					elif str_text [0] == "*":
-						continue
-
-					else:
-						break
-				else: # error in reading file stop app.
-					h_FileHanndle.terminate ( "EAR App Error: Can't read input file" )
-
-			if strType == "string":
-				return str_text # String return the value
-
-			# else number is required
-			str_text = str_text.strip( )	# remove space
-
-			# check that no more than one(-) & ".",
-			n_count_muns = str_text.count("-")
-			n_count_dec = str_text.count(".")
-
-			b_is_int = str_text.replace( '.','',1 ).replace( '-','',1 ).isdigit( )
-
-			if not b_is_int or n_count_muns > 1 or n_count_dec > 1:
-				h_FileHanndle.terminate ( "EAR App Error: Data Error, Required Number, given Text ->" + str_text + "<-" )
-				return 0
-
-			# (-) must be on left.
-			str_text = str_text.replace('-','',1)
-
-			flt_value = float(str_text)
-			if  n_count_muns ==1 :
-				flt_value = -1.0 * flt_value
-
-			if strType == "float":
-				return flt_value
-
-			int_value = int( flt_value )
-
-			return int_value # int return
-		
-				
+					
 		# INCOMP =15 not requirted in Python
 		QLOSS = 1.00
-		TEDATA= [0.0] * (20+1)
-		TCDATA= [0.0] * (20+1)
+		Data.obj_cdata.TEDATA= [0.0] * (20+1)
+		Data.obj_cdata.TCDATA= [0.0] * (20+1)
 		
 		X     = [0.0] * (5+1)
 		XX    = [0.0] * (5+1)
 		
-		CAPAC = [[0.0] * (20+1) for i in range(20+1)]	# array(Rows, Cols) = [[0] * Cols for i in range(Rows)]
-		POWER = [[0.0] * (20+1) for i in range(20+1)]	# array(Rows, Cols) = [[0] * Cols for i in range(Rows)]
+		Data.obj_cdata.CAPAC = [[0.0] * (20+1) for i in range(20+1)]	# array(Rows, Cols) = [[0] * Cols for i in range(Rows)]
+		Data.obj_cdata.POWER = [[0.0] * (20+1) for i in range(20+1)]	# array(Rows, Cols) = [[0] * Cols for i in range(Rows)]
 		#============Python commnet : data description and sample data
 		'''
 			SAMPLE CALORIMETER-BASED MAP 
@@ -551,46 +496,57 @@ class Comp_Map (Comp_Abstract): #Data.obj_cdata.IMAP== 0
 		'''
 		#==============================================================
 		if (Data.obj_cdata.IREAD == 0) :
-			objCompMap = FileAccess (Compcall.FILE_COMPMAP_DAT) # open file for read
-	
-			if objCompMap.isError():	# if file not found or other error
-				print('Execution Terminated.')
-				print (objCompMap.err_description() )
-				objCompMap = "" # close habdler
+			obj_comp_map = CompMap (self.str_Comp_File, self.FLDER_COMPMAP_DAT)
+
+			if obj_comp_map.isError():
+				print (obj_comp_map.err_description())
 				sys.exit('6000')
-	
+				
+			obj_comp_map.readMapData()
+			if obj_comp_map.isError():
+				print (obj_comp_map.err_description())
+				sys.exit('6001')
+				
 			# Python comment:
 			# NEVAP : I3 number of data points along evaporating temperature axis
 			# NCOND : I3 number of data points along condensing temperature axis 
 			# Data.obj_cdata.ICOMP : I1 compressor type (1 - reciprocating; 2 - rotary) 
 			# IUNITS : I1 units for capacity, temperature data, and mass flow (1 - btu/hr, deg f, lb/hr; 2 - kcal/hr, deg c, kg/hr) power data must be in watts
 			
-			NEVAP = inastk ( objCompMap, "int" ) 
-			NCOND = inastk ( objCompMap, "int" ) 
-			Data.obj_cdata.ICOMP = inastk ( objCompMap, "int" ) 
-			IUNITS = inastk ( objCompMap, "int" ) 
+			NEVAP = obj_comp_map.getX_count ()
+			NCOND = NEVAP #obj_comp_map.getY_count () 
+			
+			Data.obj_cdata.ICOMP = 1 # no info in file
+			Data.obj_cdata.IUNITS = obj_comp_map.getUnit ()
 
 			# Python commnet : read EVAPORATING TEMPERATURE - x axis
-			for II in range (1, NEVAP+1 ):
-				TEDATA[II] = inastk ( objCompMap, "float" ) 
+			#for II in range (1, NEVAP+1 ):
+			#	TEDATA[II] = inastk ( objCompMap, "float" ) 
+			
+			Data.obj_cdata.TEDATA = obj_comp_map.getX_values ()
 				
 			# READ COMPRESSOR CAPACITY DATA
 
-			for I in range (1, NCOND +1) : #DO I = 1,NCOND
-				TCDATA[I] = inastk ( objCompMap, "float" ) # Python commnet: first number is COND TEMP (y axis)
+			#for I in range (1, NCOND +1) : #DO I = 1,NCOND
+			#	TCDATA[I] = inastk ( objCompMap, "float" ) # Python commnet: first number is COND TEMP (y axis)
 				
-				for J in range (1, NEVAP+1 ):
-					CAPAC[I][J] = inastk ( objCompMap, "float" )
+			#	for J in range (1, NEVAP+1 ):
+			#		CAPAC[I][J] = inastk ( objCompMap, "float" )
+					
+			Data.obj_cdata.TCDATA = obj_comp_map.getY1_values ()
+			Data.obj_cdata.CAPAC = obj_comp_map.getCapacity ()
 				
 			# READ COMPRESSOR POWER DATA
-			for I in range (1, NCOND +1) : #DO I = 1,NCOND
-				DUMMY = inastk ( objCompMap, "float" ) # Python commnet: first number is COND TEMP (y axis)
+			#for I in range (1, NCOND +1) : #DO I = 1,NCOND
+			#	DUMMY = inastk ( objCompMap, "float" ) # Python commnet: first number is COND TEMP (y axis)
 				
-				for J in range (1, NEVAP+1 ):
-					POWER[I][J] = inastk ( objCompMap, "float" )
-					
-			Data.obj_cdata.IREAD=1
-			del(objCompMap) 	# close file
+			#	for J in range (1, NEVAP+1 ):
+			#		POWER[I][J] = inastk ( objCompMap, "float" )
+			
+			Data.obj_cdata.POWER = obj_comp_map.getPower ()
+			
+			Data.obj_cdata.IREAD = 1
+			del(obj_comp_map) 	# close file
 			
 		#
 		#          DETERMINE THE SATURATION TEMPERATURES CORRESPONDING TO PSUCT, PDISC
@@ -676,11 +632,11 @@ class Comp_Map (Comp_Abstract): #Data.obj_cdata.IMAP== 0
 		#          CHECK if  TCOND AND/OR TEVAP IS OFF MAP DATA
 		#
 		ICOND = 1
-		if (TCOND  <  TCDATA[1]): ICOND = 0
-		if (TCOND  >  TCDATA[NCOND]): ICOND = NCOND
+		if (TCOND  <  Data.obj_cdata.TCDATA[1]): ICOND = 0
+		if (TCOND  >  Data.obj_cdata.TCDATA[NCOND]): ICOND = NCOND
 		IEVAP = 1
-		if (TEVAP  <  TEDATA[1]): IEVAP = 0
-		if (TEVAP  >  TEDATA[NEVAP] ): IEVAP = NEVAP
+		if (TEVAP  <  Data.obj_cdata.TEDATA[1]): IEVAP = 0
+		if (TEVAP  >  Data.obj_cdata.TEDATA[NEVAP] ): IEVAP = NEVAP
 		 
 		#
 		#          THIS CODING WILL INTERPOLATE IF DATA IS WITHIN THE MAP OR
@@ -693,31 +649,29 @@ class Comp_Map (Comp_Abstract): #Data.obj_cdata.IMAP== 0
 				I = 1
 				while (TCOND  >  TCDATA[I]):
 					I = I + 1
-				#END DO
-				
+					
 				ICOND = I - 1
 		 
 			else:
 				ICOND = 1
-			#END if 
 		 
 			I = 1
 			if (IEVAP  ==  1) :
 				while (TEVAP  >  TEDATA[I]):
 					I = I + 1
-				#END DO
+
 				IEVAP = I - 1
 		 
 			else:
 				IEVAP = 1
-			#END if 
+
 			#
 			#          COMPRESSOR CAPACITY INTERPOLATION
 			#
-			DELTC = TCDATA[ICOND+1] - TCDATA[ICOND]
-			DELTE = TEDATA[IEVAP+1] - TEDATA[IEVAP]
+			DELTC = Data.obj_cdata.TCDATA[ICOND+1] - Data.obj_cdata.TCDATA[ICOND]
+			DELTE = Data.obj_cdata.TEDATA[IEVAP+1] - Data.obj_cdata.TEDATA[IEVAP]
 			
-			FRAC = (TCOND-TCDATA[ICOND])/DELTC
+			FRAC = (TCOND - Data.obj_cdata.TCDATA[ICOND])/DELTC
 			CAP1 = CAPAC[ICOND][IEVAP]   + ( CAPAC[ICOND+1][IEVAP]  - CAPAC[ICOND][IEVAP]   ) * FRAC
 			CAP2 = CAPAC[ICOND][IEVAP+1] + ( CAPAC[ICOND+1][IEVAP+1]- CAPAC[ICOND][IEVAP+1] ) * FRAC
 			
@@ -726,12 +680,12 @@ class Comp_Map (Comp_Abstract): #Data.obj_cdata.IMAP== 0
 			#
 			#          COMPRESSOR POWER INTERPOLATION
 			#
-			FRAC = (TCOND-TCDATA[ICOND])/DELTC
-			POW1 = POWER[ICOND][IEVAP]   + (POWER[ICOND+1][IEVAP]  - POWER[ICOND][IEVAP]   ) * FRAC
-			POW2 = POWER[ICOND][IEVAP+1] + (POWER[ICOND+1][IEVAP+1]- POWER[ICOND][IEVAP+1] ) * FRAC
+			FRAC = (TCOND - Data.obj_cdata.TCDATA[ICOND])/DELTC
+			POW1 = Data.obj_cdata.POWER[ICOND][IEVAP]   + (Data.obj_cdata.POWER[ICOND+1][IEVAP]  - Data.obj_cdata.POWER[ICOND][IEVAP]   ) * FRAC
+			POW2 = Data.obj_cdata.POWER[ICOND][IEVAP+1] + (Data.obj_cdata.POWER[ICOND+1][IEVAP+1]- Data.obj_cdata.POWER[ICOND][IEVAP+1] ) * FRAC
 			FRAC = (TEVAP-TEDATA[IEVAP] )/DELTE
 			POW = POW1 + (POW2-POW1)*FRAC
-		#END if 
+ 
 		#
 		#          TCOND GREATER THAN OR EQUAL THE MAXIMUM CONDENSING TEMP DATA POINT
 		#
@@ -739,7 +693,7 @@ class Comp_Map (Comp_Abstract): #Data.obj_cdata.IMAP== 0
 			if (IEVAP <=  1) :
 				I = 1
 				if (IEVAP  ==  1) :
-					while (TEVAP  >  TEDATA[I]):
+					while (TEVAP  >  Data.obj_cdata.TEDATA[I]):
 						I = I + 1
 					#END DO
 					IEVAP = I-1
@@ -749,12 +703,12 @@ class Comp_Map (Comp_Abstract): #Data.obj_cdata.IMAP== 0
 				
 				#          COMPRESSOR CAPACITY CALCULATION
 				#
-				DELTC = TCDATA[ICOND] - TCDATA[ICOND-1]
-				DELTE = TEDATA[IEVAP+1] - TEDATA[IEVAP]
-				FRAC = (TCOND-TCDATA[ICOND])/DELTC
+				DELTC = Data.obj_cdata.TCDATA[ICOND] - Data.obj_cdata.TCDATA[ICOND-1]
+				DELTE = Data.obj_cdata.TEDATA[IEVAP+1] - Data.obj_cdata.TEDATA[IEVAP]
+				FRAC = (TCOND - Data.obj_cdata.TCDATA[ICOND])/DELTC
 				FRAC2 = FRAC
-				CAP1 = CAPAC[ICOND][IEVAP]   + (CAPAC[ICOND][IEVAP]   - CAPAC[ICOND-1][IEVAP]   ) * FRAC
-				CAP2 = CAPAC[ICOND][IEVAP+1] + (CAPAC[ICOND][IEVAP+1] - CAPAC[ICOND-1][IEVAP+1] ) * FRAC
+				CAP1 = Data.obj_cdata.CAPAC[ICOND][IEVAP]   + (CAPAC[ICOND][IEVAP]   - Data.obj_cdata.CAPAC[ICOND-1][IEVAP]   ) * FRAC
+				CAP2 = Data.obj_cdata.CAPAC[ICOND][IEVAP+1] + (CAPAC[ICOND][IEVAP+1] - Data.obj_cdata.CAPAC[ICOND-1][IEVAP+1] ) * FRAC
 				
 				FRAC = (TEVAP-TEDATA[IEVAP] )/DELTE
 				CAP = CAP1 + (CAP2-CAP1)*FRAC
@@ -766,7 +720,7 @@ class Comp_Map (Comp_Abstract): #Data.obj_cdata.IMAP== 0
 				POW1 = POWER[ICOND][IEVAP]   + (POWER[ICOND][IEVAP]   - POWER[ICOND-1][IEVAP]   ) * FRAC
 				POW2 = POWER[ICOND][IEVAP+1] + (POWER[ICOND][IEVAP+1] - POWER[ICOND-1][IEVAP+1] ) * FRAC
 			
-				FRAC = (TEVAP-TEDATA[IEVAP] )/DELTE
+				FRAC = (TEVAP - Data.obj_cdata.TEDATA[IEVAP] )/DELTE
 				POW = POW1 + (POW2-POW1)*FRAC
 			else:
 				#
@@ -925,6 +879,7 @@ class Comp_Map (Comp_Abstract): #Data.obj_cdata.IMAP== 0
 		 
 		return [TSP, WDOT, MDOT, QSHELL, SPEED]
 
+#=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	def map (self, ICOMP, ICOOL, EER, SIZE, DISPL , SPEEDN):
 		return [0.0,0.0]
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
