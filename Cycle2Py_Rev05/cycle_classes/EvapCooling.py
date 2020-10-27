@@ -95,8 +95,8 @@ class EvapCool_Abstract (ABC, HeatExch, Data):
 class EvapCool_FFNat (EvapCool_Abstract): #Data.obj_cdata.IFRSH== 0 
 	#=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
 	def calc_heat_temp (self):
-		return self.ffnat (self.objData.T5,self.objData.H5,self.objData.T7,
-			self.objData.TDEW,self.objData.HDEW,self.objData.TS3,	\
+		return self.ffnat (self.objData.T[5],   self.objData.H[5],  self.objData.T[7],
+			self.objData.TDEW,   self.objData.HDEW,  self.objData.TS3,	\
 			self.objData.CPRVAP, self.objData.IRFTYP)
 			
 	#=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
@@ -111,16 +111,16 @@ class EvapCool_FFNat (EvapCool_Abstract): #Data.obj_cdata.IFRSH== 0
 		SIGMA = 2.04326E-7
 		EPS   = 0.8
 		
-		TENV = (TROOM + 459.6)/1.8
+		TENV = (Data.obj_cdata.TROOM + 459.6)/1.8
 		TAVE = (T5+T7)/2.0
 		
 		TAIR = TS3
-		FZTMPK = (FZTEMP + 459.6)/1.8
+		FZTMPK = (Data.obj_cdata.FZTEMP + 459.6)/1.8
 		
 		HRAD = SIGMA*(TAVE + TAIR)*(TAVE**2 + TAIR**2)*EPS
 
 		# get the net evaporator area
-		AEVAP = ATOTE
+		AEVAP = Data.obj_cdata.ATOTE
 		if (IRFTYP == 6): AEVAP = ATOTE + ATOTE
 		
 		# calculate the natural convection heat transfer coefficient
@@ -137,10 +137,10 @@ class EvapCool_FFNat (EvapCool_Abstract): #Data.obj_cdata.IFRSH== 0
 		# Calculate combined air-side heat transfer coefficient
 		UAIR = HRAD + HNAT
 		
-		if (obj_data.IWALL_FF == 1):
+		if (Data.obj_cdata.IWALL_FF == 1):
 			UAIR = 1.0/(1.0/UAIR + 0.1389/20.44)
 		
-		Q_IN_WALL = 1.0548 * 1.8 * UA_FF * (TENV - TAVE)/AEVAP + Q_HXS_FF/AEVAP
+		Q_IN_WALL = 1.0548 * 1.8 * Data.obj_cdata.UA_FF * (TENV - TAVE)/AEVAP + Data.obj_cdata.Q_HXS_FF/AEVAP
 		
 		# Calculate the heat transfer assuming that the air side
 		#  resistance dominates
@@ -472,7 +472,7 @@ class EvapCool_FFCount (EvapCool_Abstract): #Data.obj_cdata.IFRSH== 2
 						ILOOK = 0
 						while (LOOKING_FOR_AREA):
 							ILOOK = ILOOK + 1
-							[EFFTPC,DEXDAR] = self.ext (1,ADUM,Data.obj_cdata.UTPE,CMINTP,CMAXTP)
+							[EFFTPC,DEXDAR] = self.exf (1,ADUM,Data.obj_cdata.UTPE,CMINTP,CMAXTP)
 							#CALL EXF(1,ADUM,Data.obj_cdata.UTPE,CMINTP,CMAXTP,  EFFTPC,DEXDAR)
 
 							ERROR = abs(EFFTPC - EFF_TPC)

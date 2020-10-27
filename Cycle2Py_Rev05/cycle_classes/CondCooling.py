@@ -95,9 +95,6 @@ class CondCool_Abstract (ABC, HeatExch, Data):
 		# Check convergence
 		ERRORT = abs( TCNEW - TC[JC] )
 		ERRORM = abs( Data.obj_cdata.MREF - Data.obj_cdata.MROLD)/Data.obj_cdata.MREF 
-
-		print ("aym limit=", Data.obj_cdata.TOL_COND, "ERRORT",ERRORT)
-		print ("aym limit=", Data.obj_cdata.TOL_MASS, "ERRORM",ERRORM)
 		
 		if(ERRORT < Data.obj_cdata.TOL_COND and ERRORM <= Data.obj_cdata.TOL_MASS): ICONC = 1
 
@@ -109,7 +106,7 @@ class CondCool_Abstract (ABC, HeatExch, Data):
 
 		return [ TS2, TC, JC, ICONC]
 
-class CondCool_CNat (CondCool_Abstract): #Data.obj_cdata.ICOND== 0 
+class CondCool_CNat (CondCool_Abstract): #Data.obj_cdata.ICOND= 0 
 	#=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
 	def cond_balance (self, CPRLIQ):
 		# replace TBUB with Cycle.obj_data.T[11]
@@ -118,10 +115,10 @@ class CondCool_CNat (CondCool_Abstract): #Data.obj_cdata.ICOND== 0
 		# replace TDEW with Cycle.obj_data.T[3]
 		# replace HDEW with Cycle.obj_data.H[3]
 		return self.cnat (self.objData.TS1, 
-				self.objData.TS3, self.objData.TS5, \
-				self.objData.T[14], self.objData.H[14], \
-				self.objData.T[3],  self.objData.H[3],  self.objData.T, \
-				self.objData.T[11], self.objData.H[11], CPRLIQ )	
+						self.objData.TS3, self.objData.TS5, \
+						self.objData.T[14], self.objData.H[14], \
+						self.objData.T[3],  self.objData.H[3],  self.objData.T, \
+						self.objData.T[11], self.objData.H[11], CPRLIQ )	
 		
 		
 		
@@ -184,15 +181,16 @@ class CondCool_CNat (CondCool_Abstract): #Data.obj_cdata.ICOND== 0
 		Data.obj_cdata.Q_CND_FF = 1.8 * Data.obj_cdata.UA_FF_CND*(TCND - TS3)*1.0548
 		Data.obj_cdata.Q_CND_FZ = 1.8 * Data.obj_cdata.UA_FZ_CND*(TCND - TS5)*1.0548
 
-		TFZ = 0.5*(T(8) + T(9))
-		TFF = 0.5*(T(5) + T(12))
+		TFZ = 0.5* ( T[8] + T[9] )
+		TFF = 0.5* ( T[5] + T[12])
 		Data.obj_cdata.Q_HXS_FF = 1.8 * Data.obj_cdata.UA_FF_HXS*(TCND - TFF)*1.0548
 		Data.obj_cdata.Q_HXS_FZ = 1.8 * Data.obj_cdata.UA_FZ_HXS*(TCND - TFZ)*1.0548
 
 		if (TS5 < -290.0) : Data.obj_cdata.Q_CND_FZ = 0
 		if (TS5 < -290.0) : Data.obj_cdata.Q_HXS_FZ = 0
 
-		Q_IN_WALL = (Q_CND_FF + Data.obj_cdata.Q_CND_FZ)/Data.obj_cdata.ATOTC + (Data.obj_cdata.Q_HXS_FF + Data.obj_cdata.Q_HXS_FZ)/Data.obj_cdata.ATOTC
+		Q_IN_WALL = (Data.obj_cdata.Q_CND_FF + Data.obj_cdata.Q_CND_FZ)/Data.obj_cdata.ATOTC \
+			+ (Data.obj_cdata.Q_HXS_FF + Data.obj_cdata.Q_HXS_FZ)/Data.obj_cdata.ATOTC
 
 		QDSNEC = Data.obj_cdata.MREF*(H14-HDEW)
 		ADSNEC = QDSNEC/(UAIR*DELTAT + Q_IN_WALL)
@@ -210,7 +208,7 @@ class CondCool_CNat (CondCool_Abstract): #Data.obj_cdata.ICOND== 0
 		Data.obj_cdata.UDSC = UAIR
 		Data.obj_cdata.UACOND = Data.obj_cdata.ATOTC * Data.obj_cdata.UDSC
 
-		if (FSUP == 1.0): return [QDSC, QTPC, QSCC, QTOTC, FSUP, FSUB]
+		if (FSUP == 1.0): return [0.0, QDSC, QTPC, QSCC, QTOTC, FSUP, FSUB] ## add extra return value 0.0 to be compatibale with sister methods
 
 		# calculate the heat transfer coefficients for the two-phase and subcooling regions
 		TAVE = (TDEW+TBUB)/2.0
@@ -249,7 +247,9 @@ class CondCool_CNat (CondCool_Abstract): #Data.obj_cdata.ICOND== 0
 		FSUB = 0.0
 		Data.obj_cdata.UTPC = UAIR
 		Data.obj_cdata.UACOND = Data.obj_cdata.ATOTC*(FSUP * Data.obj_cdata.UDSC + (1.0 - FSUP) * Data.obj_cdata.UTPC)
-		if (QTPC < QTPNEC): return [QDSC, QTPC, QSCC, QTOTC, FSUP, FSUB]
+		
+		# add extra return value 0.0 to be compatibale with sister methods
+		if (QTPC < QTPNEC): return [0.0, QDSC, QTPC, QSCC, QTOTC, FSUP, FSUB]
 
 		# calculate the remaining surface area
 		ANET = Data.obj_cdata.ATOTC - (ADSNEC+ATPC)
@@ -266,8 +266,10 @@ class CondCool_CNat (CondCool_Abstract): #Data.obj_cdata.ICOND== 0
 		FSUB = ANET/Data.obj_cdata.ATOTC
 		Data.obj_cdata.USCC = UAIR
 		Data.obj_cdata.UACOND = Data.obj_cdata.ATOTC*(FSUP * Data.obj_cdata.UDSC + FSUB * Data.obj_cdata.USCC + (1.0 - FSUP - FSUB)*Data.obj_cdata.UTPC)
+		
+		
 		# add extra return value 0.0 to be compatibale with sister methods
-		return [0.0, QDSC, QTPC, QSCC, QTOTC, FSUP, FSUB]
+		return [0.0, QDSC,QTPC,QSCC, QTOTC,FSUP,FSUB]
 
 class CondCool_CCross (CondCool_Abstract): #Data.obj_cdata.ICOND== 1 
 	#=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
@@ -347,7 +349,7 @@ class CondCool_CCross (CondCool_Abstract): #Data.obj_cdata.ICOND== 1
 
 			EFF_SUB = QSUB/QMAX
 
-			[ EFFSCC,DEXDAR] = self.ext (2,Data.obj_cdata.ATOTC,Data.obj_cdata.USCC,CMINSC,CMAXSC)
+			[ EFFSCC,DEXDAR] = self.exf (2,Data.obj_cdata.ATOTC,Data.obj_cdata.USCC,CMINSC,CMAXSC)
 			#CALL EXF(2,Data.obj_cdata.ATOTC,Data.obj_cdata.USCC,CMINSC,CMAXSC,  EFFSCC,DEXDAR)
 
 			if(EFFSCC  <=  EFF_SUB) :                      #Need more area
@@ -385,7 +387,7 @@ class CondCool_CCross (CondCool_Abstract): #Data.obj_cdata.ICOND== 1
 					QMAX = CMINSC*(TBUB - TAIR)
 					EFF_SUB = QSUB/QMAX
 
-					[ EFFSCC,DEXDAR] = self.ext (2,ASCC,Data.obj_cdata.USCC,CMINSC,CMAXSC)
+					[ EFFSCC,DEXDAR] = self.exf (2,ASCC,Data.obj_cdata.USCC,CMINSC,CMAXSC)
 					#CALL EXF(2,ASCC,Data.obj_cdata.USCC,CMINSC,CMAXSC,  EFFSCC,DEXDAR)
 
 					ERROR = abs(QTOL)
@@ -560,7 +562,7 @@ class CondCool_CCross (CondCool_Abstract): #Data.obj_cdata.ICOND== 1
 		Data.obj_cdata.UACOND = Data.obj_cdata.ATOTC*(FSUP*Data.obj_cdata.UDSC + FSUB*Data.obj_cdata.USCC + (1.0 - FSUP - FSUB)*Data.obj_cdata.UTPC)
 		return  [  CPRVAP, QDSC, QTPC, QSCC, QTOTC, FSUP, FSUB]
 
-class CondCool_CCount(CondCool_Abstract): #Data.obj_cdata.ICOND== 1 
+class CondCool_CCount(CondCool_Abstract): #Data.obj_cdata.ICOND== 2
 	#=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
 	def cond_balance (self, CPRLIQ):
 		# replace TBUB with Cycle.obj_data.T[11]
@@ -657,7 +659,7 @@ class CondCool_CCount(CondCool_Abstract): #Data.obj_cdata.ICOND== 1
 			QSUB = CRSC  *(TBUB - TCSUB)
 
 			EFF_SUB = QSUB/QMAX
-			[EFFSCC,DEXDAR] = self.ext (1,Data.obj_cdata.ATOTC,Data.obj_cdata.USCC,CMINSC,CMAXSC)
+			[EFFSCC,DEXDAR] = self.exf (1,Data.obj_cdata.ATOTC,Data.obj_cdata.USCC,CMINSC,CMAXSC)
 			#CALL EXF(1,Data.obj_cdata.ATOTC,Data.obj_cdata.USCC,CMINSC,CMAXSC,  EFFSCC,DEXDAR)
 
 			if(EFFSCC  <  EFF_SUB) :                      #Need more area
@@ -674,7 +676,7 @@ class CondCool_CCount(CondCool_Abstract): #Data.obj_cdata.ICOND== 1
 				LOOKING_FOR_AREA = True
 
 				while (LOOKING_FOR_AREA):
-					[EFFSCC,DEXDAR] = self.ext (1,ASCC,Data.obj_cdata.USCC,CMINSC,CMAXSC)
+					[EFFSCC,DEXDAR] = self.exf (1,ASCC,Data.obj_cdata.USCC,CMINSC,CMAXSC)
 					#CALL EXF(1,ASCC,Data.obj_cdata.USCC,CMINSC,CMAXSC, EFFSCC,DEXDAR)
 					ERROR = abs(EFFSCC - EFF_SUB)
 
@@ -730,7 +732,7 @@ class CondCool_CCount(CondCool_Abstract): #Data.obj_cdata.ICOND== 1
 				QDUM = Data.obj_cdata.MREF*(HDEW - HBUB)
 
 				EFF_TPC = QDUM/QMAX
-				[EFFTPC,DEXDAR] = self.ext (1,ALEFT,Data.obj_cdata.UTPC,CMINTP,CMAXTP)
+				[EFFTPC,DEXDAR] = self.exf (1,ALEFT,Data.obj_cdata.UTPC,CMINTP,CMAXTP)
 				#CALL EXF(1,ALEFT,Data.obj_cdata.UTPC,CMINTP,CMAXTP, EFFTPC,DEXDAR)
 
 
@@ -750,7 +752,7 @@ class CondCool_CCount(CondCool_Abstract): #Data.obj_cdata.ICOND== 1
 					ILOOK = 0
 					while (LOOKING_FOR_AREA):
 						ILOOK = ILOOK + 1
-						[EFFTPC,DEXDAR] = self.ext (1,ADUM,Data.obj_cdata.UTPC,CMINTP,CMAXTP)
+						[EFFTPC,DEXDAR] = self.exf (1,ADUM,Data.obj_cdata.UTPC,CMINTP,CMAXTP)
 						#CALL EXF(1,ADUM,Data.obj_cdata.UTPC,CMINTP,CMAXTP, EFFTPC,DEXDAR)
 						ERROR = abs(EFFTPC - EFF_TPC)
 

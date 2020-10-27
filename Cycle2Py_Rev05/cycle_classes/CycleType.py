@@ -80,7 +80,7 @@ class CycleType_Abstract (ABC, CycleUtil):
 		self.obj_data.I_LIQUID_LINE = 0
 		
 		# get compressor file name
-		self.obj_data.FILMAP1 = self.getCompressorFileName (self.obj_data.FILMAP1_CODE)
+		self.obj_data.FILMAP1 = self.getCompressorFileName (self.obj_data.FILMAP1_CODE) + ".cmp"
 		
 		# Binary interaction parameter (BIP) 
 		for int_ref in range (1, 2+1):
@@ -368,6 +368,7 @@ class Type_1Standard (CycleType_Abstract):
 		obj_view = ViewCycle(self.obj_data, str_file_cycle, str_path_cycle)
 		obj_view.show_rep()
 	'''
+	
 	def calculte (self):
 		self.obj_data.ITYPE = 1
 		self.obj_data.TS5 = -300.0
@@ -439,8 +440,7 @@ class Type_2Lorenz_5solindVLV (Type_2Lorenz):
 class Type_2Lorenz_ctrlOthers (Type_2Lorenz):
 	def adjust_input (self):
 		super.adjust_input()
-	
-		
+
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # Job 			: Analisis Cycle Type 3 - Dual Loop 
 #

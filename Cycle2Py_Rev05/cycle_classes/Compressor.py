@@ -90,12 +90,11 @@ class Comp_Abstract (ABC, Block2, Data):
 		#CALL BUBLP(P[2], XL[1][2], X, TDEW, XXX, VDEW, .FALSE., LCRIT)
 		
 		#          CALCULATE ISENTROPIC CONDITIONS BASED ON SHELL INLET
-		#
 		SSUC = self.entrop(TSUC,VSUC,X)
-
 		
 		#[P4 .. P11] = self.spin (P1, P2, P3 )
 		[T[2],XQ[2], XL,XV,VL2, VV2,SL,SV] = self.spin (SSUC,P[2],X ) #	CALL SPIN (SSUC,P[2],X,T[2],  XQ[2],XL[1][2],XV[1][2],VL2, VV2,SL,SV)
+		
 		
 		if(XQ[2] < 1.0) :
 			#[P5, P6, P7, P8] = self.hcvcps (P1, P2, P3, P4)
@@ -229,7 +228,7 @@ class Comp_Abstract (ABC, Block2, Data):
 				RN = 0.97*GAMA
 				RINV = 1.0/RN
 				PR = P[2]/P[1]
-				H[2]=HSUC+(H[2]-HSUC)/SEFF
+				H[2]=HSUC+(H[2]-HSUC)/Data.obj_cdata.SEFF
 				#
 				#               RE-CALCULATE SUCTION TEMPERATURE AND COMPARE
 				#               WITH OLD VALUE
@@ -247,11 +246,9 @@ class Comp_Abstract (ABC, Block2, Data):
 					TSUC = T1P
 					HSUC = H1P
 					VSUC = VV2
-				#End if
-			#END DO
-			#
+
 			#          CORRECT DISCHARGE CONDITION FOR CAN LOSS
-			#
+			
 			HDISC = H[2]
 			#[P4, P5, P6, P7, P8, P9, P10, P11] = self.hpin ( P1,P2,P3 )
 			[TDISC, XQ[2], XL, XV, VL2, VV2, HL2, HV2] = self.hpin ( HDISC, P[2], X )
@@ -262,25 +259,12 @@ class Comp_Abstract (ABC, Block2, Data):
 			[T[2], XQ[2], XL, XV, VL2, VV2, HL2, HV2] = self.hpin ( H[2], P[2], X )
 			#CALL HPIN(H[2], P[2], X,   T[2], XQ[2], XL[1][2], XV[1][2], VL2, VV2, HL2, HV2)
 		
-		#End if
-		#
+
 		#          CALCULATE MASS FLOW RATE
-		#
 		if(Data.obj_cdata.ICOMP == 1) :
 			Data.obj_cdata.ETAV = 0.92*(1.0 - Data.obj_cdata.CE*(PR**RINV - 1.0))
 		else:
 			Data.obj_cdata.ETAV = 1.00*(1.0 - Data.obj_cdata.CE*(PR**RINV - 1.0))
-
-		print ("aym =====1================ Data.obj_cdata.CE =", Data.obj_cdata.CE)
-		print ("aym ===================== CP =", CP)
-		print ("aym ===================== CV =", CV)
-		print ("aym ===================== GAMA = CP/CV =", GAMA)
-		print ("aym ===================== RN=0.97*GAMA =", RN)
-
-		print ("aym ===================== RINV =1/RN=", RINV)
-		print ("aym ===================== PR =", PR)
-		print ("aym ===================== Data.obj_cdata.CE =", Data.obj_cdata.CE)
-		print ("aym Data.obj_cdata.ETAV = 0.92*(1.0 - Data.obj_cdata.CE*(PR**RINV - 1.0))=", Data.obj_cdata.ETAV)
 		
 		Data.obj_cdata.DISP = Data.obj_cdata.MREF * VSUC/(60.0 * Data.obj_cdata.SPEED * Data.obj_cdata.ETAV)
 		
@@ -329,9 +313,9 @@ class Comp_Map (Comp_Abstract): #Data.obj_cdata.IMAP== 0
 		
 		#	  COMMON /PARMS/  ICOND, IFRSH, IFREZ, DISP, SPEED, CE, CREF, MREF,
 		#	 .                ETAV, SEFF
-		#
+
+
 		# determine isentropic compressor performance
-		#
 		XL= [0.0] * (5+1) # modification in Python
 		XV= [0.0] * (5+1)
 		
@@ -368,7 +352,7 @@ class Comp_Map (Comp_Abstract): #Data.obj_cdata.IMAP== 0
 			[HL2, CV, CP, VS] = self.hcvcps (1, T2S, VL2, XL2S)
 			#CALL HCVCPS(1, T2S, VL2, XL2S[1][2], HL2, CV, CP, VS)
 			
-			[HL2, CV, CP, VS] = self.hcvcps (1, T2S, VV2, XV2S)
+			[HV2, CV, CP, VS] = self.hcvcps (1, T2S, VV2, XV2S)
 			#CALL HCVCPS(1, T2S, VV2, XV2S[1][2],  HV2, CV, CP, VS)
 			
 			H2S = XQ2S*HV2 + (1.0-XQ2S)*HL2
@@ -378,7 +362,7 @@ class Comp_Map (Comp_Abstract): #Data.obj_cdata.IMAP== 0
 			#CALL HCVCPS(1, T2S, VV2, XV2S[1][2], HV2, CV, CP, VS)
 			
 			H2S = HV2
-		#END if 
+ 
 		#
 		#          CALCULATE ISENTROPIC POWER REQUIREMENT
 		#
@@ -386,10 +370,11 @@ class Comp_Map (Comp_Abstract): #Data.obj_cdata.IMAP== 0
 		#
 		#          DETERMINE ACTUAL COMPRESSOR PERFORMANCE
 		#
-		#[ P8, P9, P10, P11 , P12] = self.compmap (P1..P7 )
-		[ TSUC, WDOT, Data.obj_cdata.MREF, QSHELL, Data.obj_cdata.SPEED] = self.compmap (P[1], P[2], T[1], V[1], TAMB, X, GAMA )
+		#[ P8, P9, P10, P11] = self.compmap (P1..P7, P12 )
+		[ TSUC, WDOT, Data.obj_cdata.MREF, QSHELL] = self.compmap (P[1], P[2], T[1], V[1], TAMB, X, GAMA, Data.obj_cdata.SPEED )
 		#CALL COMPMAP(P[1], P[2], T[1], V[1], TAMB, X, GAMA, TSUC, WDOT, Data.obj_cdata.MREF, QSHELL, Data.obj_cdata.SPEED)
-		#
+		
+		
 		#          CALCULATE REFRIGERANT EXIT ENTHALPY AND TEMPERATURE
 		#
 		fact = QSHELL / WDOT  # useless not used anywhere
@@ -398,6 +383,7 @@ class Comp_Map (Comp_Abstract): #Data.obj_cdata.IMAP== 0
 		HOUT = H[2] # send to output
 		QCAN = QSHELL/WDOT
 		
+				
 		#[P4, P5, P6, P7, P8, P9, P10, P11] = self.hpin ( P1,P2,P3 )
 		[T[2], XQ[2], XL, XV, VL2, VV2,  HL2, HV2] = self.hpin ( H[2], P[2], X )
 		#CALL HPIN(H[2], P[2], X, T[2], XQ[2], XL[1][2], XV[1][2], VL2, VV2,  HL2, HV2)
@@ -414,13 +400,14 @@ class Comp_Map (Comp_Abstract): #Data.obj_cdata.IMAP== 0
 		VSUC = V[1]
 		QHILO = 0.0
 		RN = 0.97*GAMA
+		
 		return [T, HOUT, QHILO, QCAN, VSUC, VV2, TSUC, TDISC, GAMA. RN, ETAS]
 	
 	#=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
-	def compmap (self, PSUCT, PDISC, TSUCT, VSUCT, TAMB, X, GAMA):
+	def compmap (self, PSUCT, PDISC, TSUCT, VSUCT, TAMB, X, GAMA, SPEED):
 		#	  SUBROUTINE COMPMAP (PSUCT, PDISC, TSUCT, VSUCT, TAMB, X, GAMA,
 		#	 .                    TSP, WDOT, MDOT, QSHELL, SPEED)
-		#[ P8, P9, P10, P11 , P12] = self.compmap (P1..P7 )
+		#[ P8, P9, P10, P11 ] = self.compmap (P1..P7, P12 )
 		#     ******************************************************************
 		#     *    CALCULATES COMPRESSOR PERFORMANCE BASED ON TABULAR MAP      *
 		#     *    DATA AND CORRECTS FOR SUCTION TEMPERATURE OTHER THAN 90F    *
@@ -439,12 +426,11 @@ class Comp_Map (Comp_Abstract): #Data.obj_cdata.IMAP== 0
 		QLOSS = 1.00
 		Data.obj_cdata.TEDATA= [0.0] * (20+1)
 		Data.obj_cdata.TCDATA= [0.0] * (20+1)
-		
-		X     = [0.0] * (5+1)
 		XX    = [0.0] * (5+1)
 		
 		Data.obj_cdata.CAPAC = [[0.0] * (20+1) for i in range(20+1)]	# array(Rows, Cols) = [[0] * Cols for i in range(Rows)]
 		Data.obj_cdata.POWER = [[0.0] * (20+1) for i in range(20+1)]	# array(Rows, Cols) = [[0] * Cols for i in range(Rows)]
+		
 		#============Python commnet : data description and sample data
 		'''
 			SAMPLE CALORIMETER-BASED MAP 
@@ -510,144 +496,111 @@ class Comp_Map (Comp_Abstract): #Data.obj_cdata.IMAP== 0
 			# Python comment:
 			# NEVAP : I3 number of data points along evaporating temperature axis
 			# NCOND : I3 number of data points along condensing temperature axis 
-			# Data.obj_cdata.ICOMP : I1 compressor type (1 - reciprocating; 2 - rotary) 
-			# IUNITS : I1 units for capacity, temperature data, and mass flow (1 - btu/hr, deg f, lb/hr; 2 - kcal/hr, deg c, kg/hr) power data must be in watts
-			
 			NEVAP = obj_comp_map.getX_count ()
-			NCOND = NEVAP #obj_comp_map.getY_count () 
+			NCOND = obj_comp_map.getY_count () 
 			
-			Data.obj_cdata.ICOMP = 1 # no info in file
+			# this input is cancelled in Python, compressor type is defined in basic entry data.
+			# changing type in middle of process is not acceptable
+			# user can re-enter basic entry data to use another type.
+			# Data.obj_cdata.ICOMP : I1 compressor type (1 - reciprocating; 2 - rotary) 
+			# Data.obj_cdata.ICOMP  = obj_comp_map.getType ()
+			
+			# IUNITS : I1 units for capacity, temperature data, and mass flow (1 - btu/hr, deg f, lb/hr; 2 - kcal/hr, deg c, kg/hr) power data must be in watts
 			Data.obj_cdata.IUNITS = obj_comp_map.getUnit ()
 
 			# Python commnet : read EVAPORATING TEMPERATURE - x axis
 			#for II in range (1, NEVAP+1 ):
 			#	TEDATA[II] = inastk ( objCompMap, "float" ) 
-			
-			Data.obj_cdata.TEDATA = obj_comp_map.getX_values ()
-				
-			# READ COMPRESSOR CAPACITY DATA
 
 			#for I in range (1, NCOND +1) : #DO I = 1,NCOND
 			#	TCDATA[I] = inastk ( objCompMap, "float" ) # Python commnet: first number is COND TEMP (y axis)
 				
 			#	for J in range (1, NEVAP+1 ):
 			#		CAPAC[I][J] = inastk ( objCompMap, "float" )
-					
-			Data.obj_cdata.TCDATA = obj_comp_map.getY1_values ()
-			Data.obj_cdata.CAPAC = obj_comp_map.getCapacity ()
-				
-			# READ COMPRESSOR POWER DATA
+
 			#for I in range (1, NCOND +1) : #DO I = 1,NCOND
 			#	DUMMY = inastk ( objCompMap, "float" ) # Python commnet: first number is COND TEMP (y axis)
 				
 			#	for J in range (1, NEVAP+1 ):
 			#		POWER[I][J] = inastk ( objCompMap, "float" )
 			
+			Data.obj_cdata.TEDATA = obj_comp_map.getX_values ()
+			Data.obj_cdata.TCDATA = obj_comp_map.getY1_values ()
+			
+			# READ COMPRESSOR CAPACITY DATA
+			Data.obj_cdata.CAPAC = obj_comp_map.getCapacity ()
+				
+			# READ COMPRESSOR POWER DATA
 			Data.obj_cdata.POWER = obj_comp_map.getPower ()
 			
 			Data.obj_cdata.IREAD = 1
 			del(obj_comp_map) 	# close file
 			
-		#
-		#          DETERMINE THE SATURATION TEMPERATURES CORRESPONDING TO PSUCT, PDISC
-		#
-		# [P2, P3 ,P4, P5, P6, P8] = self.bublp (P1, P2, P3 , P7 )
-		[XX, X, TEVAPK, VL, VDEW, LCRIT] = self.bublp (PSUCT, XX, X , False )
-		#CALL BUBLP(PSUCT, XX, X, TEVAPK, VL, VDEW, False, LCRIT)
 		
-		[ X, XX, TCONDK, VBUB, VV, LCRIT] = self.bublp (PDISC, X, XX , True )
-		#CALL BUBLP(PDISC, X, XX, TCONDK, VBUB, VV, True, LCRIT)
-		#
-		#          DETERMINE THE ENTHALPIES AT EACH PRESSURE FOR THE FOLLOWING:
-		#            VAPOR - 90F
-		#            LIQUID - 90F
-		#
-		 
-		TEMPV = (90.0+459.67)/1.8
+		# DETERMINE THE SATURATION TEMPERATURES CORRESPONDING TO PSUCT, PDISC
+		[XX, X, TEVAPK, VL, VDEW, LCRIT] = self.bublp (PSUCT, XX, X, False)
+		[X, XX, TCONDK, VBUB, VV, LCRIT] = self.bublp (PDISC, X, XX, True )
+	
+		#  DETERMINE THE ENTHALPIES AT EACH PRESSURE FOR THE FOLLOWING:
+		# 	VAPOR - 90F
+		# 	LIQUID - 90F 
+		# use the same value, confirmed from Fortarn !!!
+		TEMPV = (90.0+459.67)/1.8 # convert from Deg-F to K
 		TEMPL = (90.0+459.67)/1.8
-		#
-		#          FIRST CALCULATE THE SPECIFIC VOLUMES
-		#
-		VGUESS = VDEW*TEMPV/TEVAPK
-		# [P4, P5] = self.espar (P1 to P3)
-		[A, B] = self.espar (0, TEMPV, X)		#CALL ESPAR(0, TEMPV, X, A, B)
 		
-		#[P5, P7] = self.vit (P1, P2, P3, P4, P5, P6)
+		# FIRST CALCULATE THE SPECIFIC VOLUMES
+		VGUESS = VDEW * TEMPV / TEVAPK
+		[A, B] = self.espar (0, TEMPV, X)
 		[VGUESS, LCONV] = self.vit (TEMPV, PSUCT, A, B, VGUESS, False)
-		#CALL VIT(TEMPV, PSUCT, A, B, VGUESS, False, LCONV)
-		
 		VVAP = VGUESS    # vapor specific volume
 
 		VGUESS = VBUB
-		[A, B] = self.espar (0, TEMPL, X)	#CALL ESPAR(0, TEMPL, X, A, B)
-		
-		#[P5, P7] = self.vit (P1, P2, P3, P4, P5, P6)
+		[A, B] = self.espar (0, TEMPL, X)
 		[VGUESS, LCONV] = self.vit (TEMPL, PDISC, A, B, VGUESS, True)
-		#CALL VIT(TEMPL, PDISC, A, B, VGUESS, True, LCONV)
-		
 		VLIQ = VGUESS    # liquid specific volume
-		#
-		#          VAPOR ENTERING THE COMPRESSOR
-		#
 		
-		#[P5, P6, P7, P8] = self.hcvcps (P1, P2, P3, P4)
+		# VAPOR ENTERING THE COMPRESSOR
 		[HIN, CV, CP, VS] = self.hcvcps (1, TEMPV, VVAP, X)
-		#CALL HCVCPS(1, TEMPV, VVAP, X, HIN, CV, CP, VS)
 		
-		#
-		#          LIQUID LEAVING CONDENSER
-		#
-		#[P5, P6, P7, P8] = self.hcvcps (P1, P2, P3, P4)
+		# LIQUID LEAVING CONDENSER
 		[HOUT, CV, CP, VS] = self.hcvcps (1, TEMPL, VLIQ, X)
-		#CALL HCVCPS(1, TEMPL, VLIQ, X,  HOUT, CV, CP, VS)
-		#
-		#           DETERMINE ISENTROPIC COMPRESSION ENTHALPY (HS)
-		#
+
+		# DETERMINE ISENTROPIC COMPRESSION ENTHALPY (HS)
 		SSUC = self.entrop(TEMPV, VVAP, X)
-		#[P4 .. P11] = self.spin (P1, P2, P3 )
 		[TS, XQS, XLS, XVS, VLS, VVS, SL, SV] = self.spin (SSUC, PDISC, X)
-		#CALL SPIN (SSUC, PDISC, X, TS, XQS, XLS, XVS, VLS, VVS, SL, SV)
 		
 		VGUESS = VVAP
-		[AE, BE] = self.espar (00, TS, X)	#CALL ESPAR(0, TS, X, AE, BE)
-		
-		#[P5, P7] = self.vit (P1, P2, P3, P4, P5, P6)
+		[AE, BE] = self.espar (0, TS, X)
 		[VGUESS, LCONV] = self.vit (TS, PDISC, AE, BE, VGUESS, False)
-		#CALL VIT(TS, PDISC, AE, BE, VGUESS, False, LCONV)
-		
-		#[P5, P6, P7, P8] = self.hcvcps (P1, P2, P3, P4)
 		[HS, CVF, CPF, VSND] = self.hcvcps (1, TS, VGUESS, X)
-		#CALL HCVCPS(1, TS, VGUESS, X,   HS, CVF, CPF, VSND)
-		#
-		#           CONVERT THE SATURATION TEMPERATURES TO CORRESSPOND TO MAP DATA UNITS
-		#
-		if (IUNITS  ==  1) :
-			TEVAP = TEVAPK*1.8 - 459.67
+		
+		
+		#  CONVERT THE SATURATION TEMPERATURES TO CORRESSPOND TO MAP DATA UNITS
+		if (Data.obj_cdata.IUNITS  ==  1) :
+			TEVAP = TEVAPK*1.8 - 459.67 #convert from Deg K to C
 			TCOND = TCONDK*1.8 - 459.67
 		else:
-			TEVAP = TEVAPK - 273.16
-			TCOND = TCONDK - 273.16
-		#END if 
-		#
-		#          CHECK if  TCOND AND/OR TEVAP IS OFF MAP DATA
-		#
+			TEVAP = TEVAPK  - 273.16  #convert from Deg K to C
+			TCOND = TCONDK  - 273.16
+
+		#  CHECK IF TCOND AND/OR TEVAP IS OFF MAP DATA
 		ICOND = 1
 		if (TCOND  <  Data.obj_cdata.TCDATA[1]): ICOND = 0
 		if (TCOND  >  Data.obj_cdata.TCDATA[NCOND]): ICOND = NCOND
+		
 		IEVAP = 1
 		if (TEVAP  <  Data.obj_cdata.TEDATA[1]): IEVAP = 0
 		if (TEVAP  >  Data.obj_cdata.TEDATA[NEVAP] ): IEVAP = NEVAP
 		 
-		#
-		#          THIS CODING WILL INTERPOLATE IF DATA IS WITHIN THE MAP OR
-		#          EXTROPOLATE IF TCOND AND/OR TEVAP ARE/IS LESS THAN MAP DATA
-		#
-		#          DETERMINE LOCATION WITHIN MAP
-		#
-		if (ICOND <=  1  and IEVAP <=  1) :
+
+		# THIS CODING WILL INTERPOLATE IF DATA IS WITHIN THE MAP OR
+		#  EXTROPOLATE IF TCOND AND/OR TEVAP ARE/IS LESS THAN MAP DATA
+		
+		# DETERMINE LOCATION WITHIN MAP
+		if (ICOND <=  1 and IEVAP <=  1) :
 			if (ICOND  ==  1) :
 				I = 1
-				while (TCOND  >  TCDATA[I]):
+				while (TCOND  >  Data.obj_cdata.TCDATA[I]):
 					I = I + 1
 					
 				ICOND = I - 1
@@ -657,7 +610,7 @@ class Comp_Map (Comp_Abstract): #Data.obj_cdata.IMAP== 0
 		 
 			I = 1
 			if (IEVAP  ==  1) :
-				while (TEVAP  >  TEDATA[I]):
+				while (TEVAP  >  Data.obj_cdata.TEDATA[I]):
 					I = I + 1
 
 				IEVAP = I - 1
@@ -665,125 +618,124 @@ class Comp_Map (Comp_Abstract): #Data.obj_cdata.IMAP== 0
 			else:
 				IEVAP = 1
 
-			#
-			#          COMPRESSOR CAPACITY INTERPOLATION
-			#
+			# COMPRESSOR CAPACITY INTERPOLATION
 			DELTC = Data.obj_cdata.TCDATA[ICOND+1] - Data.obj_cdata.TCDATA[ICOND]
 			DELTE = Data.obj_cdata.TEDATA[IEVAP+1] - Data.obj_cdata.TEDATA[IEVAP]
 			
 			FRAC = (TCOND - Data.obj_cdata.TCDATA[ICOND])/DELTC
-			CAP1 = CAPAC[ICOND][IEVAP]   + ( CAPAC[ICOND+1][IEVAP]  - CAPAC[ICOND][IEVAP]   ) * FRAC
-			CAP2 = CAPAC[ICOND][IEVAP+1] + ( CAPAC[ICOND+1][IEVAP+1]- CAPAC[ICOND][IEVAP+1] ) * FRAC
+			CAP1 = Data.obj_cdata.CAPAC[ICOND][IEVAP]   + ( Data.obj_cdata.CAPAC[ICOND+1][IEVAP]  \
+				- Data.obj_cdata.CAPAC[ICOND][IEVAP]   ) * FRAC
+				
+			CAP2 = Data.obj_cdata.CAPAC[ICOND][IEVAP+1] + ( Data.obj_cdata.CAPAC[ICOND+1][IEVAP+1]- \
+				Data.obj_cdata.CAPAC[ICOND][IEVAP+1] ) * FRAC
 			
-			FRAC = (TEVAP-TEDATA[IEVAP] )/DELTE
-			CAP = CAP1 + (CAP2-CAP1)*FRAC
-			#
-			#          COMPRESSOR POWER INTERPOLATION
-			#
+			FRAC = (TEVAP - Data.obj_cdata.TEDATA[IEVAP] )/DELTE
+			CAP = CAP1 + (CAP2-CAP1) * FRAC
+
+			# COMPRESSOR POWER INTERPOLATION
 			FRAC = (TCOND - Data.obj_cdata.TCDATA[ICOND])/DELTC
 			POW1 = Data.obj_cdata.POWER[ICOND][IEVAP]   + (Data.obj_cdata.POWER[ICOND+1][IEVAP]  - Data.obj_cdata.POWER[ICOND][IEVAP]   ) * FRAC
 			POW2 = Data.obj_cdata.POWER[ICOND][IEVAP+1] + (Data.obj_cdata.POWER[ICOND+1][IEVAP+1]- Data.obj_cdata.POWER[ICOND][IEVAP+1] ) * FRAC
-			FRAC = (TEVAP-TEDATA[IEVAP] )/DELTE
+			FRAC = (TEVAP - Data.obj_cdata.TEDATA[IEVAP] )/DELTE
 			POW = POW1 + (POW2-POW1)*FRAC
  
-		#
-		#          TCOND GREATER THAN OR EQUAL THE MAXIMUM CONDENSING TEMP DATA POINT
-		#
+ 
+		# TCOND GREATER THAN OR EQUAL THE MAXIMUM CONDENSING TEMP DATA POINT
 		if (ICOND  ==  NCOND) :
 			if (IEVAP <=  1) :
 				I = 1
 				if (IEVAP  ==  1) :
 					while (TEVAP  >  Data.obj_cdata.TEDATA[I]):
 						I = I + 1
-					#END DO
 					IEVAP = I-1
 				else:
 					IEVAP = 1
-				#END if 
 				
-				#          COMPRESSOR CAPACITY CALCULATION
-				#
-				DELTC = Data.obj_cdata.TCDATA[ICOND] - Data.obj_cdata.TCDATA[ICOND-1]
+				#  COMPRESSOR CAPACITY CALCULATION
+				DELTC = Data.obj_cdata.TCDATA[ICOND]   - Data.obj_cdata.TCDATA[ICOND-1]
 				DELTE = Data.obj_cdata.TEDATA[IEVAP+1] - Data.obj_cdata.TEDATA[IEVAP]
+				
 				FRAC = (TCOND - Data.obj_cdata.TCDATA[ICOND])/DELTC
 				FRAC2 = FRAC
+				
 				CAP1 = Data.obj_cdata.CAPAC[ICOND][IEVAP]   + (CAPAC[ICOND][IEVAP]   - Data.obj_cdata.CAPAC[ICOND-1][IEVAP]   ) * FRAC
 				CAP2 = Data.obj_cdata.CAPAC[ICOND][IEVAP+1] + (CAPAC[ICOND][IEVAP+1] - Data.obj_cdata.CAPAC[ICOND-1][IEVAP+1] ) * FRAC
 				
-				FRAC = (TEVAP-TEDATA[IEVAP] )/DELTE
+				FRAC = (TEVAP - Data.obj_cdata.TEDATA[IEVAP] )/DELTE
 				CAP = CAP1 + (CAP2-CAP1)*FRAC
-				#
-				#          COMPRESSOR POWER CALCULATION
-				#
-				FRAC = (TCOND-TCDATA[ICOND])/DELTC
+
+				#  COMPRESSOR POWER CALCULATION
+				FRAC = (TCOND - Data.obj_cdata.TCDATA[ICOND])/DELTC
 				
-				POW1 = POWER[ICOND][IEVAP]   + (POWER[ICOND][IEVAP]   - POWER[ICOND-1][IEVAP]   ) * FRAC
-				POW2 = POWER[ICOND][IEVAP+1] + (POWER[ICOND][IEVAP+1] - POWER[ICOND-1][IEVAP+1] ) * FRAC
+				POW1 = Data.obj_cdata.POWER[ICOND][IEVAP]   + (POWER[ICOND][IEVAP]   - POWER[ICOND-1][IEVAP]   ) * FRAC
+				POW2 = Data.obj_cdata.POWER[ICOND][IEVAP+1] + (POWER[ICOND][IEVAP+1] - POWER[ICOND-1][IEVAP+1] ) * FRAC
 			
 				FRAC = (TEVAP - Data.obj_cdata.TEDATA[IEVAP] )/DELTE
 				POW = POW1 + (POW2-POW1)*FRAC
+				
 			else:
-				#
-				#          COMPRESSOR CAPACITY CALCULATION
-				#
-				DELTC = TCDATA[ICOND] - TCDATA[ICOND-1]
-				DELTE = TEDATA(IEVAP) - TEDATA[IEVAP-1]
-				FRAC = (TCOND-TCDATA[ICOND] )/DELTC
+				# COMPRESSOR CAPACITY CALCULATION
+				DELTC = Data.obj_cdata.TCDATA[ICOND] - Data.obj_cdata.TCDATA[ICOND-1]
+				DELTE = Data.obj_cdata.TEDATA(IEVAP) - Data.obj_cdata.TEDATA[IEVAP-1]
+				FRAC = (TCOND- Data.obj_cdata.TCDATA[ICOND] )/DELTC
 				
-				CAP1 = CAPAC[ICOND][IEVAP-1] + (CAPAC[ICOND][IEVAP-1] - CAPAC[ICOND-1][IEVAP-1] ) * FRAC
-				CAP2 = CAPAC[ICOND][IEVAP]   + (CAPAC[ICOND][IEVAP]   - CAPAC[ICOND-1][IEVAP]   )  * FRAC
+				CAP1 = Data.obj_cdata.CAPAC[ICOND][IEVAP-1] + (CAPAC[ICOND][IEVAP-1] - CAPAC[ICOND-1][IEVAP-1] ) * FRAC
+				CAP2 = Data.obj_cdata.CAPAC[ICOND][IEVAP]   + (CAPAC[ICOND][IEVAP]   - CAPAC[ICOND-1][IEVAP]   )  * FRAC
 				
-				FRAC = (TEVAP - TEDATA[IEVAP])/DELTE
+				FRAC = (TEVAP - Data.obj_cdata.TEDATA[IEVAP])/DELTE
 				CAP = CAP2 + (CAP2-CAP1)*FRAC
-				#
+
 				#          COMPRESSOR POWER CALCULATION
-				#
-				FRAC = (TCOND-TCDATA[ICOND])/DELTC
-				POW1 = POWER[ICOND][IEVAP-1] + (POWER[ICOND][IEVAP-1]- POWER[ICOND-1][IEVAP-1] )*FRAC
-				POW2 = POWER[ICOND][IEVAP]   + (POWER[ICOND][IEVAP]  - POWER[ICOND-1][IEVAP]   )*FRAC
+				FRAC = (TCOND - Data.obj_cdata.TCDATA[ICOND])/DELTC
+				POW1 = Data.obj_cdata.POWER[ICOND][IEVAP-1] \
+					+ (Data.obj_cdata.POWER[ICOND][IEVAP-1] - Data.obj_cdata.POWER[ICOND-1][IEVAP-1] )*FRAC
+					
+				POW2 = Data.obj_cdata.POWER[ICOND][IEVAP]   \
+					+ (Data.obj_cdata.POWER[ICOND][IEVAP]  - Data.obj_cdata.POWER[ICOND-1][IEVAP]   )*FRAC
 				
-				FRAC = (TEVAP-TEDATA[IEVAP])/DELTE
+				FRAC = (TEVAP - Data.obj_cdata.TEDATA[IEVAP])/DELTE
 				POW = POW2 + (POW2-POW1)*FRAC
-			#END if 
-		#END if 
-		#
-		#          CONDENSING TEMPERATURE NOT GREATER THAN MAXIMUM OF MAP DATA
-		#          EVAPORATING TEMPERATURE GREATER THAN MAXIMUM OF MAP DATA
+
+
+		# CONDENSING TEMPERATURE NOT GREATER THAN MAXIMUM OF MAP DATA
+		#   EVAPORATING TEMPERATURE GREATER THAN MAXIMUM OF MAP DATA
 		#
 		if (IEVAP  ==  NEVAP  and ICOND  <  NCOND) :
 			if (ICOND  ==  1) :
 				I = 1
-				while (TCOND > TCDATA[I]):
+				while (TCOND > Data.obj_cdata.TCDATA[I]):
 					I = I + 1
-				#END DO
 				ICOND = I - 1
 			else:
 				ICOND = 1
-			#END if 
-			#
-			#          COMPRESSOR CAPACITY CALCULATION
-			#
-			DELTC = TCDATA[ICOND+1] - TCDATA[ICOND]
-			DELTE = TEDATA[IEVAP] - TEDATA[IEVAP-1]
-			FRAC = (TCOND-TCDATA[ICOND])/DELTC
+
+			#  COMPRESSOR CAPACITY CALCULATION
+			DELTC = Data.obj_cdata.TCDATA[ICOND+1] - Data.obj_cdata.TCDATA[ICOND]
+			DELTE = Data.obj_cdata.TEDATA[IEVAP]   - Data.obj_cdata.TEDATA[IEVAP-1]
+			FRAC = (TCOND - Data.obj_cdata.TCDATA[ICOND])/DELTC
 			
-			CAP1 = CAPAC[ICOND][IEVAP-1] + (CAPAC[ICOND+1][IEVAP-1] - CAPAC[ICOND][IEVAP-1] ) * FRAC
-			CAP2 = CAPAC[ICOND][IEVAP]   + (CAPAC[ICOND+1][IEVAP]   - CAPAC[ICOND][IEVAP]   ) * FRAC
+			CAP1 = Data.obj_cdata.CAPAC[ICOND][IEVAP-1] + (Data.obj_cdata.CAPAC[ICOND+1][IEVAP-1] \
+				- Data.obj_cdata.CAPAC[ICOND][IEVAP-1] ) * FRAC
+				
+			CAP2 = Data.obj_cdata.CAPAC[ICOND][IEVAP]   + (Data.obj_cdata.CAPAC[ICOND+1][IEVAP]   \
+				- Data.obj_cdata.CAPAC[ICOND][IEVAP]   ) * FRAC
 			
-			FRAC = (TEVAP-TEDATA[IEVAP] )/DELTE
+			FRAC = (Data.obj_cdata.TEVAP - Data.obj_cdata.TEDATA[IEVAP] )/DELTE
 			CAP = CAP2 + (CAP2-CAP1)*FRAC
-			#
-			#          COMPRESSOR POWER CALCULATION
-			#
-			FRAC = (TCOND-TCDATA[ICOND])/DELTC
+
+			#  COMPRESSOR POWER CALCULATION
+			FRAC = (TCOND - Data.obj_cdata.TCDATA[ICOND])/DELTC
 			
-			POW1 = POWER[ICOND][IEVAP-1] + (POWER[ICOND+1][IEVAP-1] - POWER[ICOND][IEVAP-1] ) * FRAC
-			POW2 = POWER[ICOND][IEVAP]   + (POWER[ICOND+1][IEVAP]   - POWER[ICOND][IEVAP] )   * FRAC			
+			POW1 = Data.obj_cdata.POWER[ICOND][IEVAP-1] + (Data.obj_cdata.POWER[ICOND+1][IEVAP-1] \
+				- Data.obj_cdata.POWER[ICOND][IEVAP-1] ) * FRAC
+				
+			POW2 = Data.obj_cdata.POWER[ICOND][IEVAP]   + (Data.obj_cdata.POWER[ICOND+1][IEVAP]   \
+				- Data.obj_cdata.POWER[ICOND][IEVAP] )   * FRAC			
 			
-			FRAC = (TEVAP-TEDATA[IEVAP] )/DELTE
+			FRAC = (TEVAP - Data.obj_cdata.TEDATA[IEVAP] )/DELTE
 			POW = POW2 + (POW2-POW1)*FRAC
-		#END if 
-		 
+		
+		
 		## handle off-speed operation (use Danfoss variable speed data)
 		REL_CAP = -0.046073 + 1.41364 * SPEED - 0.366744 * SPEED * SPEED
 		CAP = CAP * REL_CAP
@@ -793,66 +745,47 @@ class Comp_Map (Comp_Abstract): #Data.obj_cdata.IMAP== 0
 		REL_POW = 0.9535 + 0.04565 * SPEED
 		POW = POW * REL_POW
 		
-		#
-		#          CONVERT THE CAPACITY TO KJ/HR
-		#
-		if (IUNITS  ==  1) :
+		# CONVERT THE CAPACITY TO KJ/HR
+		if (Data.obj_cdata.IUNITS  ==  1) :
 			CAP = CAP*1.0548
 		else:
 			CAP = CAP*4.184
-		#END if 
 		
-		if (IUNITS  != 1  and IUNITS  != 2) :
-			#print ("WRITE(6, '(''CHECK COMPRESSOR MAP UNITS##'')'")
+		if (Data.obj_cdata.IUNITS  != 1  and Data.obj_cdata.IUNITS  != 2) :
 			print ("###CHECK COMPRESSOR MAP UNITS###")
-		#END if 
-		#
+		
+		
 		WDOT = POW
-		#
-		#          CONVERT TO KJ/HR
-		#
+
+		#  CONVERT TO KJ/HR
 		WDOT = WDOT/1000.0*3600.0
 		WDOT90 = WDOT
-		#
-		#          CALCULATE THE MASS FLOW RATE IN MOLES/HR
-		#
+
+		# CALCULATE THE MASS FLOW RATE IN MOLES/HR
 		MDOT = CAP/(HIN-HOUT)
 		MDOT90 = MDOT
-		#
-		#          CORRECT MASS FLOW RATE FOR SUCTION TEMPERATURE OTHER THAN 90 F
-		#
+
+		#  CORRECT MASS FLOW RATE FOR SUCTION TEMPERATURE OTHER THAN 90 F
 		T90 = (90 + 459.67) / 1.8
 		MDOT = MDOT90 * VVAP / VSUCT
-		#
-		#          ESTIMATE EFFECT ON COMPRESSOR POWER AS RATIO OF
-		#          SUCTION PLENUM TEMPERATURES
-		#
+
+		# ESTIMATE EFFECT ON COMPRESSOR POWER AS RATIO OF
+		#  SUCTION PLENUM TEMPERATURES
 		EFFS = MDOT90 * (HS - HIN) / WDOT90
 		
-		#[P5, P6, P7, P8] = self.hcvcps (P1, P2, P3, P4)
+		
 		[ HSUCT, CV, CP, VS] = self.hcvcps (1, TSUCT, VSUCT, X)
-		#CALL HCVCPS(1, TSUCT, VSUCT, X, HSUCT, CV, CP, VS)
-		 
 		SSUC = self.entrop(TSUCT, VSUCT, X)
-		#[P4 .. P11] = self.spin (P1, P2, P3 )
 		[TS, XQS, XLS, XVS, VLS, VVS, SL, SV] = self.spin (SSUC, PDISC, X)
-		#CALL SPIN (SSUC, PDISC, X, TS, XQS, XLS, XVS, VLS, VVS, SL, SV)
+		
 		VGUESS = VSUCT
-		
-		[AE, BE] = self.espar (0, TS, X)	#		CALL ESPAR(0, TS, X, AE, BE)
-		
-		#[P5, P7] = self.vit (P1, P2, P3, P4, P5, P6)
+		[AE, BE] = self.espar (0, TS, X)	
 		[VGUESS, LCONV] = self.vit (TS, PDISC, AE, BE, VGUESS, False)
-		#CALL VIT(TS, PDISC, AE, BE, VGUESS, False, LCONV)
+		[HS, CVF, CPF, VSND] = self.hcvcps (1, TS, VGUESS, X)
 		
-		#[P5, P6, P7, P8] = self.hcvcps (P1, P2, P3, P4)
-		[ CVF, CPF, VSND] = self.hcvcps (1, TS, VGUESS, X, HS)
-		#CALL HCVCPS(1, TS, VGUESS, X, HS,  CVF, CPF, VSND)
-		 
 		WDOT = MDOT * (HS - HSUCT) / EFFS
-		#
-		#          ESTIMATE SHELL HEAT LOSS INCLUDING EFFECT OF DIFFERENT AMBIENT
-		#
+		
+		# ESTIMATE SHELL HEAT LOSS INCLUDING EFFECT OF DIFFERENT AMBIENT
 		if  (Data.obj_cdata.ICOMP  ==  1) :                    # Reciprocating compressor
 			DELTIN = 67.0
 			TSUCTF = TSUCT * 1.8 - 459.67
@@ -862,22 +795,24 @@ class Comp_Map (Comp_Abstract): #Data.obj_cdata.IMAP== 0
 		else:                                     # Rotary compressor
 			 DELTIN = 30.0
 			 TSP = TSUCT + DELTIN / 1.8
-		#END if 
+
 	
 		EXP = (GAMA - 1.0) / GAMA
 		PRAT = PDISC / PSUCT
 		TSP90 = (90.0 + DELTIN + 459.67) / 1.8
+		
 		AAA = PRAT**EXP
 		TMAX90= TSP90 * AAA
 		TMAX = TSP * AAA
+		
 		T90K = (90.0 + 459.67) / 1.8
 		RATIO = (TMAX - TAMB) / (TMAX90 - T90K)
 
-		QLOSS = 0.90
+		QLOSS = 0.90  # useless 
 		QLOSS = 0.80
 		QSHELL = WDOT * QLOSS * RATIO
-		 
-		return [TSP, WDOT, MDOT, QSHELL, SPEED]
+		
+		return [TSP, WDOT, MDOT, QSHELL]
 
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	def map (self, ICOMP, ICOOL, EER, SIZE, DISPL , SPEEDN):
@@ -1081,44 +1016,7 @@ class Comp_ERR (Comp_Abstract): #Data.obj_cdata.IMAP== 1
 				else:
 					CEIJ[I][J] = ( (1.00 - ETAV[I][J] )/1.00)/(PR**(1.0/K) - 1.0)
 				
-				
-				print ("aym I=", I, "J=", J)
-				print ("aym --------------------")
-				R12_TABLE_READING = 200.0 - 27.10795349661135	# kj/kg   200-app result at 0C need to be 200, valid only for RF12
-				MOLAR_WEIGHT = 120.91
-
-				H = H_LIQ
-				print ("		H_LIQ in kJ/k-mole= %5.3f,  kJ/kg=%5.3f,  Reading in ASHRAE kJ/kg = %5.3f" %(H, H/MOLAR_WEIGHT, H/MOLAR_WEIGHT + R12_TABLE_READING) )
-
-				H = H_VAP
-				print ("		H_VAP in kJ/k-mole= %5.3f,  kJ/kg=%5.3f,  Reading in ASHRAE kJ/kg = %5.3f" %(H, H/MOLAR_WEIGHT, H/MOLAR_WEIGHT + R12_TABLE_READING) )
-
-				H= H_SUC				
-				print ("		H_SUC in kJ/k-mole= %5.3f,  kJ/kg=%5.3f,  Reading in ASHRAE kJ/kg = %5.3f" %(H, H/MOLAR_WEIGHT, H/MOLAR_WEIGHT + R12_TABLE_READING) )
-				
-				H= H2S
-				print ("		H2S in kJ/k-mole= %5.3f,  kJ/kg=%5.3f,  Reading in ASHRAE kJ/kg = %5.3f" %(H, H/MOLAR_WEIGHT, H/MOLAR_WEIGHT + R12_TABLE_READING) )
-				
-				print ("aym --------------------")
-				print ("aym PR = P_COND/P_EVAP = ",PR, " P_COND=", P_COND, " P_EVAP=",P_EVAP   )
-				
-				print ("aym CAP[I][J] = ", CAP[I][J])
-				print ("aym  ETAP constatnt = ", ETAP)
-				
-				print ("aym K = ETAP*CP/CV = ", K, " ETAP=", ETAP, " CP=", CP, " CV=", CV)
-				
-				print ("aym T90 = 305.3889K K = ", T90-273.11, "C")
-				
-				print ("aym =============")
-				print ("aym  VSUC=", VSUC , "VSUC/MOLAR_WEIGHT m3/kg =", VSUC/MOLAR_WEIGHT, "  SPEEDN=", SPEEDN, "  DISPL=", DISPL )
-				
-				print ("aym MASS[I][J]  = CAP[I][J]/(H_VAP - H_LIQ)     #kg-mole/hr = ", MASS[I][J])
-				print ("aym ETAV[I][J] = MASS[I][J]*VSUC/(60.0*SPEEDN)/(DISPL/61023.6) = ", ETAV[I][J] )
-				
-				print ("aym CEIJ[I][J] = ( (0.92 - ETAV[I][J] )/0.92)/(PR**(1.0/K) - 1.0) = ", CEIJ[I][J] )
-		
-				print ("aym ---=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n\n")
-		
+						
 				#
 				#          ESTIMATE CYCLINDER TEMPERATURE AND CAN OUTLET TEMPERATURE
 				#
@@ -1153,10 +1051,6 @@ class Comp_ERR (Comp_Abstract): #Data.obj_cdata.IMAP== 1
 			Data.obj_cdata.ETAC = ETAS[3][2]
 			Data.obj_cdata.CE   = CEIJ[3][2]
 
-		print ("aym ===Final============== Data.obj_cdata.ETAC= ETAS[3][2] =", ETAS[3][2])
-		
-		print ("aym ===Final============== Data.obj_cdata.CE  = CEIJ[3][2] =",CEIJ[3][2])
-		print ("aym ===Final===============              Data.obj_cdata.CE =", Data.obj_cdata.CE)
 		return [Data.obj_cdata.ETAC, Data.obj_cdata.CE]
 	
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

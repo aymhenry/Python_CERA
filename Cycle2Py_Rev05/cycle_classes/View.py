@@ -58,15 +58,18 @@ class ViewCycle:
 		if isOnlyTest :
 			print ("	Error : ", strMsg)
 		else:
-			#print('{}\t\t{}'.format(strMsg, fltValue))
-			print ("	Error : ", strMsg + "\t\t %10.3f"  %(fltValue))	
+			#print('{},,{}'.format(strMsg, fltValue))
+			print ("	Error : ", strMsg + ",, %10.3f"  %(fltValue))	
 		print ("=====================================================================\n\n")
 
-	#-----------------------------------------------------------
+	#=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
+	def print_width ( self, arr_data):
+		col_width = 10
+		print ("".join(str(word)[:8].ljust(col_width) for word in arr_data) )
+	
+	#=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
 	def show_rep( self ):
 		print ("Show cycle result in View Class ... later ...")
-
-						
 			
 		#	SET UP LOGICAL VECTOR ON AIR TEMPERATURES
 		if (self.obj_parameter.ICYCL  ==  2) :
@@ -141,7 +144,7 @@ class ViewCycle:
 		if (self.obj_parameter.LECON  or  self.obj_parameter.LCCON  or  self.obj_parameter.I_ERROR_INTER  > 0) :
 			LWIND = 5
 			if (self.obj_parameter.LECON  and  self.obj_parameter.LCCON): LWIND = 7
-			#CALL WINDOW(8,8+LWIND,20,60,32,1)
+
 			if (self.obj_parameter.LECON) :
 
 				objCycOut.write_or_terminate  ('EVAPORATOR ITERATION DID NOT CONVERGE,  %9.3f, %9.3f ' %( self.obj_parameter.TE[1]-273.11,self.obj_parameter.TE[2]-273.11) )
@@ -167,15 +170,18 @@ class ViewCycle:
 
 		if (self.obj_parameter.T[16] <  TENV):  self.Data.I_LIQUID_LINE = 1
 
-		#WRITE (IO_Cycle,1010)
+
 		objCycOut.write_or_terminate (",STATE, T(C), T(C), P, H, V, S, XL, XV, XQ")
 		objCycOut.write_or_terminate (",,AIR,   REF, (KPa), (KJ/KG), (M3/KG), (KJ/KG-C), (MASS FRAC),(MASS FRAC),(MASS FRAC)")
-		print (",STATE, T(C),T(C), P, H, V, S, XL, XV, XQ")
-		print (",,AIR,   REF, (KPA), (KJ/KG), (M3/KG), (KJ/KG-C), (MASS FRAC),(MASS FRAC),(MASS FRAC)")
+		
+		#print (",STATE, T(C), T(C), P, H, V, S, XL, XV, XQ")
+		self.print_width (['#','Point','STATE', 'T(C)', 'T(C)', 'P', 'H', 'V', 'S', 'XL', 'XV', 'XQ'])
+		#print (",,AIR,   REF, (KPA), (KJ/KG), (M3/KG), (KJ/KG-C), (MASS FRAC),(MASS FRAC),(MASS FRAC)")
+		self.print_width (['','','','AIR',   'REF', 'KPA', 'KJ/KG', 'M3/KG', 'kJ/kg-C', 'MASS-FRAC','MASS-FRAC','MASS-FRAC'])
 
 		K = 1
 		if (self.obj_parameter.ICYCL  ==  2) :
-			while (K <= 15): #DO WHILE (K  <=  15)
+			while (K <= 15):
 				J = self.obj_parameter.LPNT[K]
 				self.obj_parameter.TS[J] = self.obj_parameter.TS[J] - 273.11
 				self.obj_parameter.T[J] = self.obj_parameter.T[J] - 273.11
@@ -185,25 +191,32 @@ class ViewCycle:
 				if (self.obj_parameter.XQ[J] <  0.0): self.obj_parameter.XQ[J] = 0.0
 				
 				if (self.obj_parameter.AIRTMP[K]) :
-					#WRITE (8,1020) K,HSTATE(K),TS[J],self.obj_parameter.T[J],P[J],H[J],self.obj_parameter.V[J],'
+
 					objCycOut.write_or_terminate ( "%d, %s , %9.3f, %9.3f, %9.3f, %9.3f, %9.3f, %9.3f, %s, %s, %s"	\
 						%(K,self.obj_parameter.HSTATE[K],self.obj_parameter.TS[J],self.obj_parameter.T[J],self.obj_parameter.P[J],self.obj_parameter.H[J],self.obj_parameter.V[J],  self.obj_parameter.S[J],self.obj_parameter.XL[1][J],self.obj_parameter.XV[1][J],self.obj_parameter.XQ[J]) )
-					print ( "%d, %d, %s , %9.3f, %9.3f, %9.3f, %9.3f, %9.3f, %9.3f, %s, %s, %s"	\
-						%(K,J,self.obj_parameter.HSTATE[K],self.obj_parameter.TS[J],self.obj_parameter.T[J],self.obj_parameter.P[J],self.obj_parameter.H[J],self.obj_parameter.V[J],  self.obj_parameter.S[J],self.obj_parameter.XL[1][J],self.obj_parameter.XV[1][J],self.obj_parameter.XQ[J]) )
+
+					#print ( "%d,%d, %s , %9.3f, %9.3f, %9.3f, %9.3f, %9.3f, %9.3f, %s, %s, %s"	\
+					#	%(K,J,self.obj_parameter.HSTATE[K],self.obj_parameter.TS[J],self.obj_parameter.T[J],self.obj_parameter.P[J],self.obj_parameter.H[J],self.obj_parameter.V[J],  self.obj_parameter.S[J],self.obj_parameter.XL[1][J],self.obj_parameter.XV[1][J],self.obj_parameter.XQ[J]) )						
+					
+					self.print_width ([ K,J,self.obj_parameter.HSTATE[K], self.obj_parameter.TS[J], 
+										self.obj_parameter.T[J], self.obj_parameter.P[J], self.obj_parameter.H[J],
+										self.obj_parameter.V[J], self.obj_parameter.S[J], self.obj_parameter.XL[1][J], 
+										self.obj_parameter.XV[1][J],self.obj_parameter.XQ[J] ])
 				else:
-					#'WRITE (8,1021) K,HSTATE(K),		self.obj_parameter.T[J],self.obj_parameter.P[J],H[J],self.obj_parameter.V[J],') print ('S[J],self.obj_parameter.XL(1,J),self.obj_parameter.XV(1,J),self.obj_parameter.XQ[J]')
+					
 					objCycOut.write_or_terminate ( " %d, %s,  N/A, %9.3f, %9.3f, %9.3f, %9.3f, %9.3f, %s, %s, %s"	\
 						%(K,self.obj_parameter.HSTATE[K], self.obj_parameter.T[J],self.obj_parameter.P[J],self.obj_parameter.H[J],self.obj_parameter.V[J],  self.obj_parameter.S[J],self.obj_parameter.XL[1][J],self.obj_parameter.XV[1][J],self.obj_parameter.XQ[J]) )
-					print ( "%d,%d, %s , N/A, %9.3f, %9.3f, %9.3f, %9.3f, %9.3f, %9.3f, %s, %s, %s"	\
-						%(K,J,self.obj_parameter.HSTATE[K], self.obj_parameter.T[J],self.obj_parameter.P[J],self.obj_parameter.H[J],self.obj_parameter.V[J],  self.obj_parameter.S[J],self.obj_parameter.XL[1][J],self.obj_parameter.XV[1][J],self.obj_parameter.XQ[J]) )
+					#print ( "%d,%d, %s , N/A, %9.3f, %9.3f, %9.3f, %9.3f, %9.3f, %9.3f, %s, %s, %s"	\
+					#	%(K,J,self.obj_parameter.HSTATE[K], self.obj_parameter.T[J],self.obj_parameter.P[J],self.obj_parameter.H[J],self.obj_parameter.V[J],  self.obj_parameter.S[J],self.obj_parameter.XL[1][J],self.obj_parameter.XV[1][J],self.obj_parameter.XQ[J]) )
+
+					self.print_width ( [K,J, self.obj_parameter.HSTATE[K], 'N/A', self.obj_parameter.T[J],self.obj_parameter.P[J],self.obj_parameter.H[J],self.obj_parameter.V[J],  self.obj_parameter.S[J],self.obj_parameter.XL[1][J],self.obj_parameter.XV[1][J],self.obj_parameter.XQ[J] ] )
 					
-				# End if
 				K = K + 1
-			#END DO
+			
 		else:
 			M = 0
 			K = 0
-			while (M <= 14): #DO WHILE (M  <=  14)
+			while (M <= 14): 
 				M = M + 1
 				J = self.obj_parameter.LPNT[M]
 
@@ -216,24 +229,22 @@ class ViewCycle:
 				if (M  >=  9  and  M  <=  11): continue
 				K = K + 1
 				if ( self.obj_parameter.AIRTMP[M] ) :
-					#WRITE (8,1020) K,MSTATE(K),TS[J],self.obj_parameter.T[J],self.obj_parameter.P[J],H[J],self.obj_parameter.V[J],'  'self.obj_parameter.S[J],self.obj_parameter.XL(1,J),self.obj_parameter.XV(1,J),XQ[J]
+					
 					objCycOut.write_or_terminate ( "%d, %s, %9.3f, %9.3f, %9.3f, %9.3f, %9.3f, %9.3f, %s, %s, %s"	\
 						%(K,self.obj_parameter.MSTATE[K], self.obj_parameter.TS[J],self.obj_parameter.T[J],self.obj_parameter.P[J],self.obj_parameter.H[J],self.obj_parameter.V[J],  self.obj_parameter.S[J],self.obj_parameter.XL[1][J],self.obj_parameter.XV[1][J],self.obj_parameter.XQ[J]) )
-						
-					print ("%d,%d, %s , %9.3f, %9.3f, %9.3f, %9.3f, %9.3f, %9.3f, %s, %s, %s"	\
-						%(K,J, self.obj_parameter.MSTATE[K], self.obj_parameter.TS[J],self.obj_parameter.T[J],self.obj_parameter.P[J],self.obj_parameter.H[J],self.obj_parameter.V[J],  self.obj_parameter.S[J],self.obj_parameter.XL[1][J],self.obj_parameter.XV[1][J],self.obj_parameter.XQ[J]) )
+
+					#print ("%d,%d, %s , %9.3f, %9.3f, %9.3f, %9.3f, %9.3f, %9.3f, %s, %s, %s"	\
+					#	%(K,J, self.obj_parameter.MSTATE[K], self.obj_parameter.TS[J],self.obj_parameter.T[J],self.obj_parameter.P[J],self.obj_parameter.H[J],self.obj_parameter.V[J],  self.obj_parameter.S[J],self.obj_parameter.XL[1][J],self.obj_parameter.XV[1][J],self.obj_parameter.XQ[J]) )						
+					self.print_width ([K,J, self.obj_parameter.MSTATE[K], self.obj_parameter.TS[J],self.obj_parameter.T[J],self.obj_parameter.P[J],self.obj_parameter.H[J],self.obj_parameter.V[J],  self.obj_parameter.S[J],self.obj_parameter.XL[1][J],self.obj_parameter.XV[1][J],self.obj_parameter.XQ[J] ] )
 				else:
 					
-					#WRITE (8,1021) K,MSTATE(K),		self.obj_parameter.T[J],P[J],H[J],self.obj_parameter.V[J],'\	'S[J],self.obj_parameter.XL(1,J),self.obj_parameter.XV(1,J),XQ[J]
+					
 					objCycOut.write_or_terminate ( "%d, %s , N/A, %9.3f, %9.3f, %9.3f, %9.3f, %9.3f, %s, %s, %s"	\
 						%(K, self.obj_parameter.MSTATE[K],  self.obj_parameter.T[J],self.obj_parameter.P[J],self.obj_parameter.H[J],self.obj_parameter.V[J],  self.obj_parameter.S[J],self.obj_parameter.XL[1][J],self.obj_parameter.XV[1][J],self.obj_parameter.XQ[J]) )
-					print ("%d,%d, %s , N/A, %9.3f, %9.3f, %9.3f, %9.3f, %9.3f, %s, %s, %s"	\
-						%(K,J, self.obj_parameter.MSTATE[K], self.obj_parameter.T[J],self.obj_parameter.P[J],self.obj_parameter.H[J],self.obj_parameter.V[J],  self.obj_parameter.S[J],self.obj_parameter.XL[1][J],self.obj_parameter.XV[1][J],self.obj_parameter.XQ[J]) )						
+					#print ("%d,%d, %s , N/A, %9.3f, %9.3f, %9.3f, %9.3f, %9.3f, %s, %s, %s"	\
+					#	%(K,J, self.obj_parameter.MSTATE[K], self.obj_parameter.T[J],self.obj_parameter.P[J],self.obj_parameter.H[J],self.obj_parameter.V[J],  self.obj_parameter.S[J],self.obj_parameter.XL[1][J],self.obj_parameter.XV[1][J],self.obj_parameter.XQ[J]) )						
 						
-				# End if
-			#END DO
-
-		# End if
+					self.print_width ( [K,J, self.obj_parameter.MSTATE[K], 'N/A', self.obj_parameter.T[J],self.obj_parameter.P[J],self.obj_parameter.H[J],self.obj_parameter.V[J],  self.obj_parameter.S[J],self.obj_parameter.XL[1][J],self.obj_parameter.XV[1][J],self.obj_parameter.XQ[J] ] )						
 
 		#
 		#	NORMALIZE BY THE MASS FLOW
@@ -278,7 +289,6 @@ class ViewCycle:
 								and  self.Data.IFRSH  !=  0):
 			objCycOut.write_or_terminate  ('FRACTION AIR TO FRESH FOOD,     %9.3f, (SINGLE EVAPORATOR CYCLE)' %( self.obj_parameter.FF_FRACT) )
 
-		#write(8, '( )')
 		objCycOut.write_or_terminate (" ")
 		
 		if (self.Data.IMAP  ==  1) :
@@ -331,6 +341,6 @@ class ViewCycle:
 		#
 		#	OUTPUT A FIGURE OF THE RESULTS
 		#
-		self.showError (" Check cycle fig number ...")
+		#self.showError (" Check cycle fig number ...")
 		print ("LEAVING CYCLE WITH IC:" + str(self.Data.IC) + str(self.Data.IE) )
 

@@ -74,8 +74,8 @@ class Evap_Abstract (ABC, HeatExch, CycleUtil, Data):
 	#
 	# Output		:
 	#-----------------------------------------------------------
-	def enthal(self,HBUB,HDEW,XSPEC ):
-		#	[P4, P5, P6] = self.enthal ( P1, P2, P3)
+	def enthal(self, HBUB,HDEW,XSPEC, X, P ):
+		#	P6 = self.enthal ( P1, P2, P3, P4, P5)
 		#	SUBROUTINE ENTHAL( HBUB,HDEW,XSPEC,  X,P,H)
 		#     ******************************************************************
 		#     *    ITERATES TO DETERMINE THE ENTHALPY.                         *
@@ -99,7 +99,8 @@ class Evap_Abstract (ABC, HeatExch, CycleUtil, Data):
 			if (HGUESS > HDEW): HGUESS = HDEW*0.99
 
 			# [P4, P5, P6, P7, P8, P9, P10, P11] = self.hpin ( P1,P2,P3 )
-			[T,XCALC,XL,XV,Cycle.obj_data.VL,Cycle.obj_data.V,HL,HV] = self.hpin ( HGUESS,P,X )	#CALL HPIN(HGUESS,P,X,  T,XCALC,XL,XV,Cycle.obj_data.VL,Cycle.obj_data.V,HL,HV)
+			[T,XCALC,XL,XV, VL, V,HL,HV] =\
+				self.hpin ( HGUESS, P,X )	#CALL HPIN(HGUESS,P,X,  T,XCALC,XL,XV,VL,V,HL,HV)
 
 			if (XCALC < 0.0): XCALC = 0.001
 			if (XCALC > 1.0): XCALC = 0.999
@@ -114,7 +115,7 @@ class Evap_Abstract (ABC, HeatExch, CycleUtil, Data):
 
 		H = HGUESS
 
-		return [X,P, H ]
+		return H
 
 	#-----------------------------------------------------------
 	# job interchanger for subcooling condenser liquid 
@@ -362,14 +363,16 @@ class EvapSuper (Evap_Abstract): #Data.obj_cdata.ISPEC== 1
 			self.objData.XL[INC][7] = 0.0
 			self.objData.XV[INC][7] = self.objData.X[INC]
 	
-	def iterat_evap_subcool_p7 (self):
-		self.evap_subcool_p7()
+
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # Job 			: Evaporator output for IHX superheat, Evap. output pressure point (7)
 #
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 class EvapIHX (Evap_Abstract): #Data.obj_cdata.ISPEC == 2
+	def iterat_call_exit_p13 (self):
+		self.call_exit_p13()
+		
 	def calc_evap_exit_p7 (self):
 		self.objData.T[15] = self.objData.TS3 - 2.0
 		self.objData.T[13] = self.objData.T[15] + Data.obj_cdata.DTSUPI
@@ -379,7 +382,7 @@ class EvapIHX (Evap_Abstract): #Data.obj_cdata.ISPEC == 2
 			self.objData.T[15] = self.objData.T[13] - Data.obj_cdata.DTSUPI
 
 		# [P2, P3 ,P4, P5, P6, P8] = bublt (P1, P2, P3 , P7 )
-		[ self.objData.XL_Temp,self.objData.X,self.objData.P[15],self.objData.VL[15],self.objData.V[15], LCRIT] = self.bublt(self.objData.T[15], self.objData.XL_Temp,self.objData.X, False)
+		[ self.objData.XL_Temp,self.objData.X,self.objData.P[15],self.objData.VL[15],self.objData.V[15], LCRIT] = self.bublt(self.objData.T[15], self.objData.XL_Temp, self.objData.X, False)
 		self.setArr2dCol (self.objData.XL, 15, self.objData.XL_Temp)
 		
 		self.objData.TE[1] = self.objData.T[15]
@@ -387,7 +390,7 @@ class EvapIHX (Evap_Abstract): #Data.obj_cdata.ISPEC == 2
 		self.objData.P[7] = self.objData.P[15]
 
 	def iterat_evap_exit_p7 (self):
-		[self.objData.XL_Temp,self.objData.X,self.objData.P[15],self.objData.VL[15],self.objData.V[15], LCRIT] = bublt (self.objData.T[15], self.objData.XL_Temp,self.objData.X,self.objData.P[15], False )
+		[self.objData.XL_Temp,self.objData.X,self.objData.P[15],self.objData.VL[15],self.objData.V[15], LCRIT] = self.bublt (self.objData.T[15], self.objData.XL_Temp, self.objData.X, False )
 		self.setArr2dCol (self.objData.XL, 15, self.objData.XL_Temp)
 		
 		self.objData.P[13] = self.objData.P[15]
@@ -449,7 +452,7 @@ class EvapQual (Evap_Abstract): # Data.obj_cdata.ISPEC== 3
 
 	def iterat_evap_exit_p7 (self):
 		self.objData.XQ[15] = 1.0
-		[self.objData.XL_Temp, self.objData.X, self.objData.P[15], self.objData.VL[15], self.objData.V[15], LCRIT] = bublt (self.objData.T[15], self.objData.XL_Temp,self.objData.X,self.objData.P[15] , False )
+		[self.objData.XL_Temp, self.objData.X, self.objData.P[15], self.objData.VL[15], self.objData.V[15], LCRIT] = self.bublt (self.objData.T[15], self.objData.XL_Temp,self.objData.X, False )
 		self.setArr2dCol (self.objData.XL, 15, self.objData.XL_Temp)
 		
 		self.objData.P[7] = self.objData.P[15]
@@ -458,9 +461,11 @@ class EvapQual (Evap_Abstract): # Data.obj_cdata.ISPEC== 3
 	def iterat_evap_enthalpy_p7 (self):
 		self.objData.XQ[7] = Data.obj_cdata.XEXITE
 
-		[ self.objData.X,self.objData.P[7],self.objData.H[7] ] = self.enthal ( HBUB15,self.objData.H[15],self.objData.XQ[7] )	
+		self.objData.H[7] = self.enthal ( self.objData.HBUB15, self.objData.H[15], self.objData.XQ[7], self.objData.X,  self.objData.P[7] )	
 
-		[self.objData.T[7],self.objData.XQ[7],self.objData.XL_Temp, self.objData.XV_Temp,  self.objData.VL[7],self.objData.VV[7],HL7,HV7] = self.hpin ( self.objData.H[7],self.objData.P[7],self.objData.X)
+		[self.objData.T[7],self.objData.XQ[7],self.objData.XL_Temp, self.objData.XV_Temp, self.objData.VL[7],self.objData.VV[7],HL7,HV7] = \
+			self.hpin ( self.objData.H[7], self.objData.P[7], self.objData.X)
+
 		self.setArr2dCol (self.objData.XL, 7, self.objData.XL_Temp)
 		self.setArr2dCol (self.objData.XV, 7, self.objData.XV_Temp )
 		
@@ -468,5 +473,5 @@ class EvapQual (Evap_Abstract): # Data.obj_cdata.ISPEC== 3
 		self.objData.T[7] = self.objData.TE[self.objData.JE]
 	
 	def iterat_evap_subcool_p7 (self):
-		evap_subcool_p7()
+		self.evap_subcool_p7()
 	

@@ -25,11 +25,11 @@ class DataModelBuiler (FileAccess):
 	ERR_FOUND_DATA_TYPE2 = 106   	# more than one decimal point, or (-) sign
 
 	def __init__(self):
-			self.lst_data = []
-			self.obj_qdata = QData ()
-			self.int_parameter_count = None 	# number of parameter for the selected configration
+		self.lst_data = []
+		self.obj_qdata = QData ()
+		self.int_parameter_count = None 	# number of parameter for the selected configration
 
-			self.int_configration = None 		# configration selected
+		self.int_configration = None 		# configration selected
 
 	#-----------------------------------------------------------
 	# Job 			: get created data class

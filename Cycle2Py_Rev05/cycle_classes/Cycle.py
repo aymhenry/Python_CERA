@@ -33,7 +33,7 @@ class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
 		Cycle.obj_parameter.JE = 0
 		Cycle.obj_parameter.JC = 0
 		Cycle.obj_parameter.ITMAXC = 100
-		Cycle.obj_parameter.ITMAXE = 40
+		Cycle.obj_parameter.ITMAXE = 20 #40
 		
 		Cycle.obj_parameter.TS = [0.0] *(16+1)
 		Cycle.obj_parameter.WMAVGL = [0.0] *(16+1)
@@ -100,7 +100,7 @@ class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
 		print ("aym  Data.obj_cdata.ISPEC=", Data.obj_cdata.ISPEC)
 		
 		if (Data.obj_cdata.IMAP ==  0) : #Map
-			self.objCompType = Comp_Map(Cycle.obj_parameter)
+			self.objCompType = Comp_Map(Cycle.obj_parameter, Data.obj_cdata.FILMAP1)
 			
 		elif (Data.obj_cdata.IMAP  ==  1) : # ERR
 			self.objCompType = Comp_ERR(Cycle.obj_parameter)
@@ -449,9 +449,13 @@ class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
 
 			#	enter iteration for evaporator outlet temperature
 			Data.obj_cdata.IE = 1
+			
 			print ("aym Cycle.obj_parameter.ITMAXE=",Cycle.obj_parameter.ITMAXE)
+			
 			while ( (Data.obj_cdata.IE  <=  Cycle.obj_parameter.ITMAXE)  and  Cycle.obj_parameter.LECON ): #DO WHILE (Data.obj_cdata.IE  <=  ITMAXE  and  Cycle.obj_parameter.LECON)
+				
 				print ("\naym Data.obj_cdata.IE=", Data.obj_cdata.IE)
+				
 				self.showMsg ("Iteration Count for (OR EVAPORATOR OUTLET TEMPERATURE) ",Data.obj_cdata.IE)
 
 				Cycle.obj_parameter.I_ERROR_INTER = 0
@@ -466,7 +470,7 @@ class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
 
 				#	determine the bubble and dew point enthalpies
 				[Cycle.obj_parameter.H[15] , CV, CP, VS] = self.hcvcps (1, Cycle.obj_parameter.T[15], Cycle.obj_parameter.V[15], Cycle.obj_parameter.X)	
-				[HBUB15, CV, CP, VS] = self.hcvcps (1, TBUB15, VBUB15, Cycle.obj_parameter.X)	
+				[Cycle.obj_parameter.HBUB15, CV, CP, VS] = self.hcvcps (1, TBUB15, VBUB15, Cycle.obj_parameter.X)	
 				
 				for INC in range (1, Cycle.obj_parameter.NC + 1): 
 					Cycle.obj_parameter.XL[INC][13] = Cycle.obj_parameter.XL[INC][15] 
@@ -672,7 +676,6 @@ class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
 			
 			self.showMsg ("compressor inlet (saturated vapor) (C) - point 1", Cycle.obj_parameter.T[1] - 273.11)
 			
-			print ("aym =====3================ self.obj_cdata.CE =", self.obj_cdata.CE)
 			# CALL COMPRESSOR MODEL
 			[Cycle.obj_parameter.T, HOUT, Cycle.obj_parameter.QHILO, Cycle.obj_parameter.QCAN,VSUC,  VV2, Cycle.obj_parameter.TSUC, Cycle.obj_parameter.TDISC, GAMA, RN, Cycle.obj_parameter.ETAS] \
 				= self.objCompType.comp_balance()
@@ -757,7 +760,7 @@ class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
 				
 				Cycle.obj_parameter.V[14] = (1.0-Cycle.obj_parameter.XQ[14])*Cycle.obj_parameter.VL[14] + Cycle.obj_parameter.XQ[14]*Cycle.obj_parameter.VV[14]
 
-				[_, QDSC,QTPC,QSCC,QTOTC, Cycle.obj_parameter.FSUPC, Cycle.obj_parameter.FSUBC ] = self.objCondType.cond_balance(CPRLIQ)
+				[CPRVAP, QDSC,QTPC,QSCC, QTOTC,Cycle.obj_parameter.FSUPC, Cycle.obj_parameter.FSUBC ] = self.objCondType.cond_balance(CPRLIQ)
 				
 				
 				#[ Cycle.obj_parameter.TS2,Cycle.obj_parameter.TC, Cycle.obj_parameter.JC, ICONC] = self.cond (Cycle.obj_parameter.T,Cycle.obj_parameter.H,   Cycle.obj_parameter.TS1,Cycle.obj_parameter.TC,QDSC,   QTPC,QSCC,Cycle.obj_parameter.JC, ICONC )
@@ -978,8 +981,6 @@ class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
 			TMID_EVAP = (Cycle.obj_parameter.T[8] + Cycle.obj_parameter.T[9])/2.0
 			Data.obj_cdata.CORR_COP = self.cyclos (Data.obj_cdata.I_VALVE, Data.obj_cdata.T_CYCLE)
 		
-		print ("aym inside cycle ===============", Cycle.obj_parameter.T)
-		dir (Cycle.obj_parameter)
 		return Cycle.obj_parameter
 
 	#=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=

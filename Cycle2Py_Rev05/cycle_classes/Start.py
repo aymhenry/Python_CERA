@@ -48,6 +48,8 @@ class Start:
 	def main (self):
 		self.data_prepare ()  # assign value to obj_data
 
+		obj_param = self.calculte ()		# calculate heat rate 
+		'''
 		try:
 			obj_param = self.calculte ()		# calculate heat rate 
 									
@@ -55,9 +57,11 @@ class Start:
 			print ("Fatal program error ... system terminated")
 			print (str(err_description) + "\n\n")
 			print ("=======================================")
-			print ("Expected resone, none propoer input data")
+			print ("Expected reasone, none propoer input data")
 			print ("=======================================\n\n")
-			sys.exit('3100')	# terminat application
+			print ("						  sys.exit('3100')	# terminat application")
+			print ("=======================================\n\n")
+		'''
 
 		self.view_cycle_res(obj_param)	# View cycle calculation results
 		
@@ -70,9 +74,7 @@ class Start:
 	#
 	# Output		:
 	#-----------------------------------------------------------
-	def view_cycle_res (self, obj_param):
-		print ("aym--  self.obj_data.ICYCL=", self.obj_data.ICYCL)
-		
+	def view_cycle_res (self, obj_param):	
 		obj_view_cycle = ViewCycle( self.obj_data, obj_param, self.str_FILE_CYCLE_OUTPUT, self.str_path_cyc_out)
 		obj_view_cycle.show_rep ()
 
