@@ -120,8 +120,6 @@ class CondCool_CNat (CondCool_Abstract): #Data.obj_cdata.ICOND= 0
 						self.objData.T[3],  self.objData.H[3],  self.objData.T, \
 						self.objData.T[11], self.objData.H[11], CPRLIQ )	
 		
-		
-		
 	#=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
 	def cnat (self, TS1,TS3,TS5,  T14,H14,T3, H3,T,TBUB, HBUB,CPRLIQ):
 		# [ P12,P13,P14,P15, P16, P17 ] = self.cnat (P1 to P11 )
@@ -260,7 +258,7 @@ class CondCool_CNat (CondCool_Abstract): #Data.obj_cdata.ICOND= 0
 		# calculate the subcooling heat transfer
 		QSCC = UAIR*ANET*DELTAT + ANET*Q_IN_WALL
 
-		if (QSCC .GT. QSCMAX): QSCC = QSCMAX
+		if (QSCC > QSCMAX): QSCC = QSCMAX
 
 		QTOTC = QDSC + QTPC + QSCC
 		FSUB = ANET/Data.obj_cdata.ATOTC
