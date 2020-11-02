@@ -166,14 +166,22 @@ class Comp_Abstract (ABC, Block2, Data):
 			TDISC = TSUC*(P[2]/P[1])**(1.0-1.0/RN)
 			
 			[AMIX, BMIX] = self.espar (0, TDISC, X) #  CALL ESPAR(0, TDISC, X, AMIX, BMIX)
-			VVD = R*TDISC/P[2]
+
+			#VVD = R * TDISC / P[2]
+			VVD = R * TDISC / P[2] /1000 # must be in Pa
+
+
 			#[P5, P7] = self.vit (P1, P2, P3, P4, P5, P6)
 			[VVD, LCRIT] = self.vit (TDISC, P[2], AMIX, BMIX, VVD, False)
+			print ("aym    VVD =", VVD)
 			#CALL VIT(TDISC, P[2], AMIX, BMIX, VVD, .FALSE., LCRIT)
 			
 			[HDISC, CV, CP, DUM1] = self.hcvcps (1, TDISC, VVD, X) # CALL HCVCPS (1, TDISC, VVD, X, HDISC, CV, CP, DUM1)
 
-			ETA_ISEN = (H2S - H_SUC)/(HDISC - H_SUC)
+			#ETA_ISEN = (H2S - H_SUC)/(HDISC - H_SUC)
+			ETA_ISEN = 0.6
+			print ("aym  chk=======    ETA_ISEN", ETA_ISEN)
+
 
 			if(Data.obj_cdata.ICOOL == 0) :
 				RATIO = 0.68 - 0.05 * Data.obj_cdata.EER
@@ -1007,6 +1015,8 @@ class Comp_ERR (Comp_Abstract): #Data.obj_cdata.IMAP== 1
 
 				# not the ETAV in common
 				ETAV[I][J] = MASS[I][J]*VSUC/(60.0*SPEEDN)/(DISPL/61023.6)
+				# Fractional Speed (-) input value - changed from 1 (bad value) to 3450
+				#ETAV[I][J] = MASS[I][J] * VSUC / (60.0 * 3450) / (DISPL / 61023.6)
 
 				K = ETAP*CP/CV
 				PR = P_COND/P_EVAP
@@ -1015,7 +1025,6 @@ class Comp_ERR (Comp_Abstract): #Data.obj_cdata.IMAP== 1
 					CEIJ[I][J] = ( (0.92 - ETAV[I][J] )/0.92)/(PR**(1.0/K) - 1.0)
 				else:
 					CEIJ[I][J] = ( (1.00 - ETAV[I][J] )/1.00)/(PR**(1.0/K) - 1.0)
-				
 						
 				#
 				#          ESTIMATE CYCLINDER TEMPERATURE AND CAN OUTLET TEMPERATURE
