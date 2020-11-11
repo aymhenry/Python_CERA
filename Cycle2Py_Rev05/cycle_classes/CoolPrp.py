@@ -4,7 +4,7 @@ from CoolProp.CoolProp import PhaseSI, PropsSI, get_global_param_string
 # User import
 
 
-class CoolProb:
+class CoolPrp:
     # Class Startic vars
     # Error internal code
     ERR_NOT_FOUND = 0  # no error code
@@ -14,7 +14,7 @@ class CoolProb:
 
     def setup(self, strFluid):
         # member varbiable
-        self.m_error = CoolProb.ERR_FUILD_NOT_FOUND
+        self.m_error = CoolPrp.ERR_FUILD_NOT_FOUND
         self.m_error_desc = ""
         self.m_fluid = None
 
@@ -23,7 +23,7 @@ class CoolProb:
         # CP.PropsSI('D','T',300,'P',101325,'HEOS::R32[0.697615]&R125[0.302385]')
         if strFluid in lstFluid:
             self.m_fluid = strFluid
-            self.m_error = CoolProb.ERR_NOT_FOUND
+            self.m_error = CoolPrp.ERR_NOT_FOUND
         else:
             self.m_error_desc = strFluid
 
@@ -35,7 +35,7 @@ class CoolProb:
     # -----------------------------------------------------------
     def isError(self):
         # return true if error, else return false
-        return self.m_error != CoolProb.ERR_NOT_FOUND
+        return self.m_error != CoolPrp.ERR_NOT_FOUND
 
     # -----------------------------------------------------------
     # Job 			: descript the error occured if any
@@ -44,67 +44,74 @@ class CoolProb:
     # Output		: text of error number and error description
     # -----------------------------------------------------------
     def err_description(self):
-        if self.m_error == CoolProb.ERR_FUILD_NOT_FOUND:
-            return "Err " + str(CoolProb.ERR_FUILD_NOT_FOUND) + \
+        if self.m_error == CoolPrp.ERR_FUILD_NOT_FOUND:
+            return "Err " + str(CoolPrp.ERR_FUILD_NOT_FOUND) + \
                 " Fuild is not supported: " + str(self.m_error_desc)
 
-        elif self.m_error == CoolProb.ERR_PROB_ERROR:
-            return "Err " + str(CoolProb.ERR_PROB_ERROR) + \
+        elif self.m_error == CoolPrp.ERR_PROB_ERROR:
+            return "Err " + str(CoolPrp.ERR_PROB_ERROR) + \
                 " Call Prop error, error in parameters " + str(self.m_error_desc)
 
-        elif self.m_error == CoolProb.ERR_PROB_NOT_FOUND:
-            return "Err " + str(CoolProb.ERR_PROB_NOT_FOUND) + \
+        elif self.m_error == CoolPrp.ERR_PROB_NOT_FOUND:
+            return "Err " + str(CoolPrp.ERR_PROB_NOT_FOUND) + \
                 " Property not supported: " + str(self.m_error_desc)
 
-        elif self.m_error == CoolProb.ERR_NOT_FOUND:
+        elif self.m_error == CoolPrp.ERR_NOT_FOUND:
             return "No error."
         else:
-            return "No error description, info. number CoolProb:" + \
+            return "No error description, info. number CoolPrp:" + \
                 str(self.m_error)
 
     # -----------------------------------------------------------
     # Job 			: get of of the properties 'P','T','V','V','H','S','CP','CV'
-    # Input 		: getProb code of required property, referance properties
+    # Input 		: getProp code of required property, referance properties
     #
     # Output		: text of error number and error description
     # -----------------------------------------------------------
-    def Property(self, getProb, P=None, T=None, V=None, D=None,
-                 H=None, S=None, Q=None):
+    def Property(self, getProp, P=None, T=None, V=None, D=None,
+                 H=None, S=None, X=None):
         MAX_PARA = 2
-        lst_prob_io = ['P', 'T', 'V', 'D', 'H', 'S']  # probs for input/output
-        lst_prob_o = ['CP', 'CV']  # probs for output only
-        lst_prob_i = ['Q']  # probs for input only
+        lst_prob_io = ['P', 'T', 'V', 'D', 'H', 'S']  # props for input/output
+        lst_prob_o = ['CP', 'CV']  # props for output only
+        lst_prob_i = ['Q']  # props for input only
 
-        getProb_adj = getProb.upper()
+        # adjust X (quality) - CoolPrp use Q for quality
+        if X != None:
+            Q = X
+        else:
+            Q = None
+            
+        getProp_adj = getProp.upper()
 
-        if getProb_adj not in lst_prob_io + lst_prob_o:
-            self.m_error = CoolProb.ERR_PROB_NOT_FOUND
-            self.m_error_desc = "Property: " + getProb
+        # Check that input property in good, else raise an error
+        if getProp_adj not in lst_prob_io + lst_prob_o:
+            self.m_error = CoolPrp.ERR_PROB_NOT_FOUND
+            self.m_error_desc = "Property: " + getProp
             return
 
         # adjust id for Cp and Cv
-        if getProb_adj in lst_prob_o:
-            getProb_adj = getProb_adj + "MASS"
+        if getProp_adj in lst_prob_o:
+            getProp_adj = getProp_adj + "MASS"
 
-        # adjust V (volume) - coolprob use D for dencity
-        if getProb == 'V':
-            getProb_adj = "D"
+        # adjust V (volume) - CoolPrp use D for dencity
+        if getProp == 'V':
+            getProp_adj = "D"
 
         # get two referance parameters
         int_count = 0
 
         try:
-            str_command = "PropsSI(" + "'" + getProb_adj + "'"
-            for prob in lst_prob_io + lst_prob_i:
-                if eval(prob + " !=None"):
+            str_command = "PropsSI(" + "'" + getProp_adj + "'"
+            for prop in lst_prob_io + lst_prob_i:
+                if eval(prop + " !=None"):
                     int_count = int_count + 1
 
-                    if prob == 'V':  # CoolProb use D for dencity
+                    if prop == 'V':  # CoolPrp use D for dencity
                         prob_code = "D"
-                        prob_val = 1 / eval(prob)
+                        prob_val = 1 / eval(prop)
                     else:
-                        prob_code = prob
-                        prob_val = eval(prob)
+                        prob_code = prop
+                        prob_val = eval(prop)
 
                     str_command = str_command + ", " + "'" + \
                         prob_code + "'" + ", " + str(prob_val)
@@ -115,12 +122,12 @@ class CoolProb:
             str_command = str_command + ', self.m_fluid)'
 
             result = eval(str_command)
-            if getProb == 'V':
+            if getProp == 'V':
                 result = 1 / result
 
             return result
         except BaseException:
-            self.m_error = CoolProb.ERR_PROB_ERROR
+            self.m_error = CoolPrp.ERR_PROB_ERROR
             self.m_error_desc = str_command
             return None
 
@@ -184,7 +191,7 @@ class CoolProb:
 
 # =====================
 def main():
-    objCP = CoolProb()
+    objCP = CoolPrp()
     objCP.setup("R12")
 
     if objCP.isError():
@@ -211,28 +218,28 @@ def main():
     P1 = 535130  # Pa
     print("Given P1=", P1, "  T1=", T1)
     print("----------------------------------------")
-    print("V-liq  by T ", objCP.Property('V', T=T1, Q=0), 'kg/m3')
-    print("V-gas  by T ", objCP.Property('V', T=T1, Q=1), 'm3/kg')
-    print("D-liq  by T ", objCP.Property('D', T=T1, Q=0), 'kg/m3')
-    print("D-gas  by T ", objCP.Property('D', T=T1, Q=1), 'm3/kg')
+    print("V-liq  by T ", objCP.Property('V', T=T1, X=0), 'kg/m3')
+    print("V-gas  by T ", objCP.Property('V', T=T1, X=1), 'm3/kg')
+    print("D-liq  by T ", objCP.Property('D', T=T1, X=0), 'kg/m3')
+    print("D-gas  by T ", objCP.Property('D', T=T1, X=1), 'm3/kg')
 
     print("----------------------------------------")
-    print("V-liq  by P ", objCP.Property('V', P=P1, Q=0), 'm3/kg')
-    print("D-liq  by P ", objCP.Property('D', P=P1, Q=0), 'kg/m3')
-    print("V-liq  by P ", objCP.Property('V', P=P1, Q=1), 'm3/kg')
-    print("D-liq  by P ", objCP.Property('D', P=P1, Q=1), 'kg/m3')
+    print("V-liq  by P ", objCP.Property('V', P=P1, X=0), 'm3/kg')
+    print("D-liq  by P ", objCP.Property('D', P=P1, X=0), 'kg/m3')
+    print("V-liq  by P ", objCP.Property('V', P=P1, X=1), 'm3/kg')
+    print("D-liq  by P ", objCP.Property('D', P=P1, X=1), 'kg/m3')
 
     print("----------------------------------------")
     Tsat = 315.14934314624594
-    print("Sat-Temp for P = 1006800 Pa by P Q=0",
-          objCP.Property('T', P=1006800, Q=0), 'K')
-    print("Sat-Temp for P = 1006800 Pa by P Q=1",
-          objCP.Property('T', P=1006800, Q=1), 'K')
+    print("Sat-Temp for P = 1006800 Pa by P X=0",
+          objCP.Property('T', P=1006800, X=0), 'K')
+    print("Sat-Temp for P = 1006800 Pa by P X=1",
+          objCP.Property('T', P=1006800, X=1), 'K')
 
-    print("Sat-Temp for T = 315.15 Pa by P Q=0",
-          objCP.Property('P', T=Tsat, Q=0), 'Pa')
-    print("Sat-Temp for T = 315.15 Pa by P Q=1",
-          objCP.Property('P', T=Tsat, Q=1), 'Pa')
+    print("Sat-Pressure for T = 315.15 Pa by P X=0",
+          objCP.Property('P', T=Tsat, X=0), 'Pa')
+    print("Sat-Pressure for T = 315.15 Pa by P X=1",
+          objCP.Property('P', T=Tsat, X=1), 'Pa')
 
     print("Phase at T=373 K, P = 1013250 Pa: (confirmed)",
           objCP.isLiquidPhase_byPressTemp(1013250, TK_C + 100))
@@ -279,13 +286,11 @@ def main():
     print("H       by T, V  ", objCP.Property("h", T=T1, V=V), 'J/kg')
 
     print("========================================")
-
+    print ("T1 = ", T1)
+    print("H       by T, X  ", objCP.Property("h", T=T1, X=0), 'J/kg')
+    if objCP.isError():
+        print ("Error: " + objCP.err_description())
 
 # =====================
 if __name__ == '__main__':
     main()
-    print("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-")
-    objCP = CoolProb()
-    objCP.setup("R12")
-
-    print(objCP.Property("V", P=101325, T=300, V=.02))
