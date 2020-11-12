@@ -76,10 +76,7 @@ class CoolPrp:
         lst_prob_i = ['Q']  # props for input only
 
         # adjust X (quality) - CoolPrp use Q for quality
-        if X != None:
-            Q = X
-        else:
-            Q = None
+        Q = X
             
         getProp_adj = getProp.upper()
 
