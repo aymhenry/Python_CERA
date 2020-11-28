@@ -97,8 +97,8 @@ class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
 
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
     def create_basic_obj(self):
-        self.objEvapType = None  # evaporator type
-        self.objEvapCool = None  # evaporator cooling method
+        self.objEvapType = None  # Evaporator type
+        self.objEvapCool = None  # Evaporator cooling method
         self.objCondType = None  # Condenser cooling method
         self.objCompType = None  # Condenser cooling method
 
@@ -358,13 +358,15 @@ class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
         Data.obj_cdata.IREAD = 0
         Data.obj_cdata.DISPL = Cycle.obj_parameter.DISPLC
 
+        # SPEEDN replaced by SPEED bug in Fortant Source
+        # SPEED = Fraction speed * speed (3450 rpm)
         [Data.obj_cdata.EFFC,
          Data.obj_cdata.CE] = self.objCompType.map(Data.obj_cdata.ICOMP,
                                                    Data.obj_cdata.ICOOL,
                                                    Data.obj_cdata.EER,
                                                    Data.obj_cdata.SIZE,
                                                    Data.obj_cdata.DISPL,
-                                                   Data.obj_cdata.SPEEDN)
+                                                   Data.obj_cdata.SPEED)
 
         # if (Data.obj_cdata.IMAP  ==  1) :
         #	[Data.obj_cdata.EFFC, Data.obj_cdata.CE ] =self.map(Data.obj_cdata.ICOMP, Data.obj_cdata.ICOOL, Data.obj_cdata.EER, Data.obj_cdata.SIZE, Data.obj_cdata.DISPL, Data.obj_cdata.SPEEDN)
