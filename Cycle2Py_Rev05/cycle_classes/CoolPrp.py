@@ -12,6 +12,10 @@ class CoolPrp:
     ERR_PROB_NOT_FOUND = 500   # Property not supported
     ERR_PROB_ERROR = 510   # Property not supported
 
+    PHASE_TWO = "twophase"
+    PHASE_LIQ = "liquid"
+    PHASE_GAS = "gas"
+    
     def setup(self, strFluid):
         # member varbiable
         self.m_error = CoolPrp.ERR_FUILD_NOT_FOUND
@@ -174,18 +178,39 @@ class CoolPrp:
     # Job 			: Check if liquied or gas phase
     # Input 		: fltPressure pressure in Pascal, temperature in K
     #
-    # Output		: True if liquid
+    # Output		: String descript the phase gas, liquid or twophase
+    #                   supercritical_gas
     # -----------------------------------------------------------
 
-    def isLiquidPhase_byPressTemp(self, flt_P_Pascal, flt_Temp_K):
+    def phase_byPressTemp(self, flt_P_Pascal, flt_Temp_K):
         if self.isError():
             return None
 
-        str_phase = PhaseSI("P", flt_P_Pascal, "T", flt_Temp_K, self.m_fluid)
-        #str_phase =  PropsSI("P", flt_P_Pascal, "T", flt_Temp_K, self.m_fluid)
-        return str_phase
+        return PhaseSI("P", flt_P_Pascal, "T", flt_Temp_K, self.m_fluid)
 
+    # -----------------------------------------------------------
+    # Job 			: Check if liquied or gas phase
+    # Input 		: phase in string, as return from phase function
+    #
+    # Output		: True or false
+    # -----------------------------------------------------------
+    def is_gas_phase (self, strPhase):
+        if CoolPrp.PHASE_GAS in (strPhase):
+            return True
+        else:
+            return False
 
+    def is_liquid_phase (self, strPhase):
+        if CoolPrp.PHASE_LIQ in (strPhase):
+            return True
+        else:
+            return False
+
+    def is_two_phase (self, strPhase):
+        if CoolPrp.PHASE_TWO in (strPhase):
+            return True
+        else:
+            return False            
 # =====================
 def main():
     objCP = CoolPrp()
@@ -239,7 +264,7 @@ def main():
           objCP.Property('P', T=Tsat, X=1), 'Pa')
 
     print("Phase at T=373 K, P = 1013250 Pa: (confirmed)",
-          objCP.isLiquidPhase_byPressTemp(1013250, TK_C + 100))
+          objCP.phase_byPressTemp(1013250, TK_C + 100))
 
     print("========================================")
     print("---others=-=-=-=-=")
@@ -288,6 +313,13 @@ def main():
     if objCP.isError():
         print ("Error: " + objCP.err_description())
 
+    print("========================================")
+    print ("Output ->",objCP.phase_byPressTemp (1013250, 273+100))
+    print ("Is Gas ->",objCP.is_gas_phase(objCP.phase_byPressTemp (1013250, 273+100)))
+
+    print("========================================")
+    print ("Ouput  ->",objCP.phase_byPressTemp (1013250, 273+00 ))
+    print ("Is liquid ->", objCP.is_liquid_phase(objCP.phase_byPressTemp (1013250, 273+00)))
 # =====================
 if __name__ == '__main__':
     main()
