@@ -238,7 +238,7 @@ def comp(objCP, H1, P1, P2, T1, T12, MEFF, QHILO, QCAN,
 
         # [T2, XQ[2], XL, XV, VL2, VV2, HL2, HV2] = self.hpin(H2, P2, X)
         T2 = objCP.Property('T', H=H2, P=P2)  # K
-        VV2 = objCP.Property('T', H=H2, P=P2)  # K
+        VV2 = objCP.Property('V', H=H2, P=P2)  # m3/kg
 
     # calculate mass flow rate
     if(ICOMP == 1):
