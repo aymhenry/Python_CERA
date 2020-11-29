@@ -40,7 +40,7 @@
     ==Test 1 =========================
     #-- Function Name: comp ===============
         #-- inputs:
-            arg no 1 =  <CoolPrp.CoolPrp object at 0x00C76388>
+            arg no 1 =  <CoolPrp.CoolPrp object at 0x02AE6388>
             H1 =  196401.49183146743
             P1 =  123050.0
             P2 =  928180.0
@@ -81,7 +81,7 @@
     ==Test 2 =========================
     #-- Function Name: comp ===============
         #-- inputs:
-            arg no 1 =  <CoolPrp.CoolPrp object at 0x00C76388>
+            arg no 1 =  <CoolPrp.CoolPrp object at 0x02AE6388>
             H1 =  196401.49183146743
             P1 =  123050.0
             P2 =  928180.0
@@ -110,7 +110,7 @@
       QHILO  0.0
       QCAN   0.0
       ................m3/kg
-      VV2    280.41139340315004
+      VV2    0.0007273342627909525
       VSUC   0.02527842089025558
       ................Other
       GAMA   1.606715909388518
@@ -121,6 +121,7 @@
 
     ==Test 3 =========================
     Not Applicable for IMPA=0
+
 
 
 
