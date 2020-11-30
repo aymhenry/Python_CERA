@@ -38,32 +38,37 @@ def comp(objCP, H1, P1, P2, T1, T12, MEFF, QHILO, QCAN,
         
     # [T2, XQ[2], XL, XV, VL2, VV2, SL, SV] = self.spin(SSUC, P2, X)
     T2 = objCP.Property('T', S=SSUC, P=P2)  # K
-    VV2 = objCP.Property('V', S=SSUC, P=P2)  # m3/kg
+    
+    #===Deleted ===========================================
+    # VV2 = objCP.Property('V', S=SSUC, P=P2)  # m3/kg
 
-    # if(XQ[2] < 1.0):   
-    if objCP.is_two_phase(objCP.phase_byPressTemp (P2, T2)):
-        # [HL2, CV, CP, VS] = self.hcvcps(1, T2, VL2, XL)
-        HL2 = objCP.Property('H', T=T2, V=VL2)  # j/kg
+    # # if(XQ[2] < 1.0):   
+    # if objCP.is_two_phase(objCP.phase_byPressTemp (P2, T2)):
+        # # [HL2, CV, CP, VS] = self.hcvcps(1, T2, VL2, XL)
+        # HL2 = objCP.Property('H', T=T2, V=VL2)  # j/kg
 
-        # [HV2, CV, CP, VS] = self.hcvcps(3, T2, VV2, XV)
-        HV2 = objCP.Property('H', T=T2, V=VV2)  # j/kg
-        CV = objCP.Property('CV', T=T2, V=VV2)  # j/kg/K
-        CP = objCP.Property('CP', T=T2, V=VV2)  # j/kg/K
+        # # [HV2, CV, CP, VS] = self.hcvcps(3, T2, VV2, XV)
+        # HV2 = objCP.Property('H', T=T2, V=VV2)  # j/kg
+        # CV = objCP.Property('CV', T=T2, V=VV2)  # j/kg/K
+        # CP = objCP.Property('CP', T=T2, V=VV2)  # j/kg/K
 
-        # In Python Only: calculate quality
-        Sgas = objCP.Property('S', P=P2, X=0)  # j/kg/K
-        Slqu = objCP.Property('S', P=P2, X=1)  # j/kg/K
-        X = (SSUC - Slqu)/(Sgas - Slqu)
+        # # In Python Only: calculate quality
+        # Sgas = objCP.Property('S', P=P2, X=0)  # j/kg/K
+        # Slqu = objCP.Property('S', P=P2, X=1)  # j/kg/K
+        # X = (SSUC - Slqu)/(Sgas - Slqu)
 
-        # H2 = XQ[2] * HV2 + (1.0 - XQ[2]) * HL2
-        H2 = X * HV2 + (1.0 - X) * HL2
-    else:
-        # [H2, CV, CP, VS] = self.hcvcps(3, T2, VV2, X)
-        H2 = objCP.Property('H', T=T2, V=VV2)  # j/kg
-        CV = objCP.Property('CV', T=T2, V=VV2)  # j/kg/K
-        CP = objCP.Property('CP', T=T2, V=VV2)  # j/kg/K
-
-    HISEN = H2
+        # # H2 = XQ[2] * HV2 + (1.0 - XQ[2]) * HL2
+        # H2 = X * HV2 + (1.0 - X) * HL2
+    # else:
+        # # [H2, CV, CP, VS] = self.hcvcps(3, T2, VV2, X)
+        # H2 = objCP.Property('H', T=T2, V=VV2)  # j/kg
+        # CV = objCP.Property('CV', T=T2, V=VV2)  # j/kg/K
+        # CP = objCP.Property('CP', T=T2, V=VV2)  # j/kg/K
+    #===Deleted ===========================================
+    
+    H2 = objCP.Property('H', T=T2, S=SSUC) # j/kg
+    VV2 = objCP.Property('V', T=T2, S=SSUC) # j/kg
+    # HISEN = H2
 
     # select model
     if(IMAP == 1):  # Map model
@@ -173,30 +178,35 @@ def comp(objCP, H1, P1, P2, T1, T12, MEFF, QHILO, QCAN,
             #SSUC = objCP.Property('S', T=TSUC, P=P1)  # S in j/kg/K             
             # [T2, XQ[2], XL, XV, VL2, VV2, SL, SV] = self.spin(SSUC, P2, X)
             T2 = objCP.Property('T', S=SSUC, P=P2)  # K           
-
+            
+            #===Deleted ===========================================        
             # if(XQ[2] < 1.0):
-            if objCP.is_two_phase(objCP.phase_byPressTemp (P2, T2)):
-                # [HL2, CV, CP, VS] = self.hcvcps(1, T2, VL2, XL)
-                HL2 = objCP.Property('H', T=T2, V=VL2)  # j/kg
+            # if objCP.is_two_phase(objCP.phase_byPressTemp (P2, T2)):
+                # # [HL2, CV, CP, VS] = self.hcvcps(1, T2, VL2, XL)
+                # HL2 = objCP.Property('H', T=T2, V=VL2)  # j/kg
                 
-                # [HV2, CV, CP, VS] = self.hcvcps(3, T2, VV2, XV)
-                HV2 = objCP.Property('H', T=T2, V=VV2)  # j/kg
-                CV = objCP.Property('CV', T=T2, V=VV2)  # j/kg/K
-                CP = objCP.Property('CP', T=T2, V=VV2)  # j/kg/K
+                # # [HV2, CV, CP, VS] = self.hcvcps(3, T2, VV2, XV)
+                # HV2 = objCP.Property('H', T=T2, V=VV2)  # j/kg
+                # CV = objCP.Property('CV', T=T2, V=VV2)  # j/kg/K
+                # CP = objCP.Property('CP', T=T2, V=VV2)  # j/kg/K
 
-                # In Python Only: calculate quality
-                Sgas = objCP.Property('S', P=P2, X=0)  # j/kg/K
-                Slqu = objCP.Property('S', P=P2, X=1)  # j/kg/K
-                X = (SSUC - Slqu)/(Sgas - Slqu)
+                # # In Python Only: calculate quality
+                # Sgas = objCP.Property('S', P=P2, X=0)  # j/kg/K
+                # Slqu = objCP.Property('S', P=P2, X=1)  # j/kg/K
+                # X = (SSUC - Slqu)/(Sgas - Slqu)
         
-                # H2 = XQ[2] * HV2 + (1.0 - XQ[2]) * HL2
-                H2 = X * HV2 + (1.0 - X) * HL2
-            else:
-                # [H2, CV, CP, VS] = self.hcvcps(3, T2, VV2, X)
-                H2 = objCP.Property('H', T=T2, P=P2)  # j/kg
-                CV = objCP.Property('CV', T=T2, P=P2)  # j/kg/K
-                CP = objCP.Property('CP', T=T2, P=P2)  # j/kg/K
-
+                # # H2 = XQ[2] * HV2 + (1.0 - XQ[2]) * HL2
+                # H2 = X * HV2 + (1.0 - X) * HL2
+            # else:
+                # # [H2, CV, CP, VS] = self.hcvcps(3, T2, VV2, X)
+                # H2 = objCP.Property('H', T=T2, P=P2)  # j/kg
+                # CV = objCP.Property('CV', T=T2, P=P2)  # j/kg/K
+                # CP = objCP.Property('CP', T=T2, P=P2)  # j/kg/K
+            #===Deleted ===========================================
+            H2 = objCP.Property('H', T=T2, S=SSUC)  # j/kg
+            CV = objCP.Property('CV', T=T2, S=SSUC)  # j/kg/K
+            CP = objCP.Property('CP', T=T2, S=SSUC)  # j/kg/K
+            
             # determine isentropic efficiency
             GAMA = CP / CV
             RN = 0.97 * GAMA
