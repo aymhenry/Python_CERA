@@ -1,0 +1,20 @@
+#-- Function Name: test ===============
+    #-- inputs:
+        arg no 1 =  3
+        arg no 2 =  6
+        arg no 3 =  3
+    #-- Output:
+        Result = 12
+
+
+test(3, 6, 3) = 12
+#-- Function Name: test ===============
+    #-- inputs:
+        arg no 1 =  3
+        arg3 =  5
+        arg2 =  7
+    #-- Output:
+        Result = 15
+
+
+test(3, arg3=5, arg2=7) = 15

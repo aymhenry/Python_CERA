@@ -147,9 +147,10 @@ Simply run xxx_Test.py function. Example :-
 
 ## Available function for test
 
-| Function          |   Type   |     Test function      |      Sample output | Status(Approved/Draft) |
-| :---------------- | :------: | :--------------------: | -----------------: | ---------------------: |
-| comp.py           | Function |      comp_Test.py      |           comp.txt |                  Draft |
-| CompMap.py        |  Class   |    CompMap_Test.py     |        CompMap.txt |                  Draft |
-| read_comp_file.py | Function | read_comp_file_Test.py | read_comp_file.txt |                  Draft |
-| CoolPrp.py        |  Class   |    CoolPrp_Test.py     |        CoolPrp.txt |    Approved (by Ayman) |
+| Function / Class  |   Type   |     Test function      |      Sample output | Dependency | Status(Approved/Draft) |
+| :---------------- | :------: | :--------------------: | -----------------: | ---------: | ---------------------- |
+| comp.py           | Function |      comp_Test.py      |           comp.txt |       None | Draft                  |
+| CompMap.py        |  Class   |    CompMap_Test.py     |        CompMap.txt | FileAccess | Draft                  |
+| read_comp_file.py | Function | read_comp_file_Test.py | read_comp_file.txt | CompMap.py | Draft                  |
+| CoolPrp.py        |  Class   |    CoolPrp_Test.py     |        CoolPrp.txt |       None | Approved (by Ayman)    |
+| decoration.py     | Function |   decoration_Test.py   |     decoration.txt |       None | Approved (by Ayman)    |
