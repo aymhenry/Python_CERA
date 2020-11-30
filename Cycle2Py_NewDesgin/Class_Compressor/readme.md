@@ -69,9 +69,9 @@ Another help file is required to complete the test, all those help function are 
 Example of this is (FileAccess.py) which read/write data to external file, of (*.cmp) files which has a decoded data for compressor, also the decoration functions.
 
 ## Availabile function for test
-| Function      | Test function   | Sample output     | Status(Approved/Draft)  |
-|:--------------|:---------------:|------------------:|------------------------:|
-| comp.py       | Test_comp.py    | Test_comp_data.py | Draft                   |
+| Function      | Test function   | Sample output      | Status(Approved/Draft)  |
+|:--------------|:---------------:|-------------------:|------------------------:|
+| comp.py       | Test_comp.py    | Test_comp_data.txt | Draft                   |
 
 ## Testing function
 Simply run Test_xxx.py function. Example :-
