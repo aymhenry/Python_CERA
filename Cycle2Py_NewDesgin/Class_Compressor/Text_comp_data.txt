@@ -1,6 +1,3 @@
-# Tesing method : comp
-    run comp.py
-
 # Input vars
     T1 = 296     # K suction temp.
     T12 = 249.5  # K discharge temp.
@@ -16,7 +13,7 @@
     # MEFF used only in case of IMAP = 0 (MAP) or 2 (Efficiency Model)
     MEFF = 0.8  # MEFF - MECHANICAL EFFICIENCY
 
-    QHILO = 0.0 # QHILO - NORMALIZED HEAT LOSS FROM DISCHARGE LINE INSIDE
+    QHILO = 0.0 # QHILO - NORMALIZED HEAT LOSS FROM DISCHANGE LINE INSIDE
     QCAN = 0.0  # QCAN - COMPRESSOR SHELL LOSS NORMALIZED TO POWER INPUT
     IMAP = 1 # Compressor Analysis method values 0 MAP, 1 ERR, 2 Efficiency mode
 
@@ -121,9 +118,3 @@
 
     ==Test 3 =========================
     Not Applicable for IMPA=0
-
-
-
-
-
-

@@ -42,7 +42,7 @@ def show_input_output (show= None):
     return warper_fun_name
 
 
-# @show_input_output ("ff")     
+# @show_input_output ("ALL")     
 # def test (arg1, arg2, arg3):
     # return arg1 + arg2 + arg3
     
