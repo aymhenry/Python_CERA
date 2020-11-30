@@ -17,10 +17,11 @@ In Fortran there was function (comp) which is used in to server two types of com
 
 - Function.
 
-  * CompMap by method (compmap) which localted in (Compressor) class. and only in case of IMAP = 0 (see above)
+  * CompMap is called by method (compmap) which located in (Compressor) class. and only in case of IMAP = 0 (see above)
   * CompMap function is to decode data in (*.cmp) files. every one (.cmp) has data for one compressor.
   * (*.cmp) file will be localted in (compmap) folder located in the same folder of (CompMap) class.
-  * 
+
+    
 
 - This class inherits class (FileAccess).
 
@@ -47,27 +48,29 @@ In Fortran there was function (comp) which is used in to server two types of com
   * Capacity. Capacity data example
 
     COND TEMP (F) 	EVAPORATING TEMPERATURE(F)
-    			-40		-30		-20 	10		0		10
-    	70		370.4	500.5	659.3	851.1	1080.8	1353.5
-    	80		358.1	488.2	647.0	838.8	1068.5	1341.2
-    	90		344.3	474.4	633.1	824.9	1054.6	1327.2
-    	100		328.9	458.9	617.7	809.4	1039.0	1311.6
-    	110		311.8	441.8	600.4	792.1	1021.6	1294.1
-    	120		292.9	422.8	581.4	772.9	1002.3	1274.6
-    	130		272.1	401.9	560.3	751.8	980.9	1253.0
+    
+                -40		-30		-20 	10		0		10
+        70		370.4	500.5	659.3	851.1	1080.8	1353.5
+        80		358.1	488.2	647.0	838.8	1068.5	1341.2
+        90		344.3	474.4	633.1	824.9	1054.6	1327.2
+        100		328.9	458.9	617.7	809.4	1039.0	1311.6
+        110		311.8	441.8	600.4	792.1	1021.6	1294.1
+        120		292.9	422.8	581.4	772.9	1002.3	1274.6
+        130		272.1	401.9	560.3	751.8	980.9	1253.0
 
   * Power Power Data Example
 
-    COMPRESSOR POWER (WATTS)
-    	COND TEMP(F) 	EVAPORATING TEMPERATURE (F)
-    			-40 	-30		-20		-10		0 		10
-    	70		65.5	75.6	84.8	92.3	97.7	100.1
-    	80		69.1	80.9	91.9	101.7	109.5	114.7
-    	90		72.2	85.7	98.5	110.4	120.6	128.6
-    	100		74.6	89.8	104.6	118.5	131.1	141.8
-    	110		76.4	93.3	110.0	126.0	141.0	154.2
-    	120		77.3	96.1	114.7	132.9	150.2	166.0
-    	130		77.3	98.1	118.7	139.0	158.6	177.0
+	COMPRESSOR POWER (WATTS)
+  
+		COND TEMP(F) 	EVAPORATING TEMPERATURE (F)
+				-40 	-30		-20		-10		0 		10
+		70		65.5	75.6	84.8	92.3	97.7	100.1
+		80		69.1	80.9	91.9	101.7	109.5	114.7
+		90		72.2	85.7	98.5	110.4	120.6	128.6
+		100		74.6	89.8	104.6	118.5	131.1	141.8
+		110		76.4	93.3	110.0	126.0	141.0	154.2
+		120		77.3	96.1	114.7	132.9	150.2	166.0
+		130		77.3	98.1	118.7	139.0	158.6	177.0
 
 ## Tester files
 
