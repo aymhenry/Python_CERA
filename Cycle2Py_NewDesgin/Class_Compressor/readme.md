@@ -79,10 +79,10 @@ In Fortran there was function (comp) which is used in to server two types of com
 ## Tester files
 
 * All class methods was taken as separate functions in separate file. Example (comp.py) with will be (comp method) in (compressor) class.
-* Every function will have a separate file for test. Example (Test_comp.py) to test (comp.py).
+* Every function will have a separate file for test. Example (comp_Test.py) to test (comp.py).
   * Inputs variable, and description, and proposed test value.
   * Output values, to approve function output.    
-* Every function will have a separate file for sample output. Example (Test_comp_data.txt). also could have other information to tester.
+* Every function will have a separate file for sample output. Example (comp.txt). also could have other information to tester.
         
 
 ## Python Decoration function
@@ -141,15 +141,15 @@ Example of this is (FileAccess.py) which read/write data to external file, of (*
 
 ## Testing function
 
-Simply run Test_xxx.py function. Example :-
+Simply run xxx_Test.py function. Example :-
 
-    python Test_comp.py
+    python comp_Test.py
 
 ## Available function for test
 
-| Function          |   Type   |     Test function      |                 Sample output | Status(Approved/Draft) |
-| :---------------- | :------: | :--------------------: | ----------------------------: | ---------------------: |
-| comp.py           | Function |      Test_comp.py      |            Test_comp_data.txt |                  Draft |
-| CompMap.py        |  Class   |    Test_CompMap.py     |         Test_CompMap_data.txt |                  Draft |
-| read_comp_file.py | Function | Test_read_comp_file.py | Test_read_comp_file._data.txt |                  Draft |
-| CoolPrp.py        |  Class   |    Test_CoolPrp.py     |    Test+Test_CoolPrp_data.txt |    Approved (by Ayman) |
+| Function          |   Type   |     Test function      |      Sample output | Status(Approved/Draft) |
+| :---------------- | :------: | :--------------------: | -----------------: | ---------------------: |
+| comp.py           | Function |      comp_Test.py      |           comp.txt |                  Draft |
+| CompMap.py        |  Class   |    CompMap_Test.py     |        CompMap.txt |                  Draft |
+| read_comp_file.py | Function | read_comp_file_Test.py | read_comp_file.txt |                  Draft |
+| CoolPrp.py        |  Class   |    CoolPrp_Test.py     |        CoolPrp.txt |    Approved (by Ayman) |
