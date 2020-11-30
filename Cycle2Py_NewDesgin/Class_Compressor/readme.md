@@ -53,30 +53,23 @@ In Fortran there was function (comp) which is used in to server two types of com
   
     COND TEMP (F) 	EVAPORATING TEMPERATURE(F)
   
+    
+  
     ​			-40		-30		-20 	10		0		10
     ​	70		370.4	500.5	659.3	851.1	1080.8	1353.5
     ​	80		358.1	488.2	647.0	838.8	1068.5	1341.2
     ​	90		344.3	474.4	633.1	824.9	1054.6	1327.2
     ​	100		328.9	458.9	617.7	809.4	1039.0	1311.6
-  ​	110		311.8	441.8	600.4	792.1	1021.6	1294.1
+    ​	110		311.8	441.8	600.4	792.1	1021.6	1294.1
     ​	120		292.9	422.8	581.4	772.9	1002.3	1274.6
-  ​	130		272.1	401.9	560.3	751.8	980.9	1253.0
-  
-    |      | -40   | -30   | -20  | 10   | 0      | 10     |
-    | ---- | ----- | ----- | ---- | ---- | ------ | ------ |
-    | 70   | 370.4 | 500.5 |      |      | 851.1  | 1353.5 |
-    | 80   | 358.1 | 488.2 |      |      | 838.8  | 1341.2 |
-    | 90   | 344.3 | 474.4 |      |      | 824.9  | 1327.2 |
-    | 100  | 328.9 | 458.9 |      |      | 1039.0 | 1311.6 |
-    | 110  | 311.8 | 441.8 |      |      | 1021.6 | 1294.1 |
-    | 120  | 292.9 | 422.8 |      |      | 1002.3 | 1274.6 |
-    | 130  | 272.1 | 401.9 |      |      | 980.9  | 1253.0 |
-    |      |       |       |      |      |        |        |
+    ​	130		272.1	401.9	560.3	751.8	980.9	1253.0
   
     
   
   * Power Power Data Example
   
+    
+    
     COMPRESSOR POWER (WATTS)
     	COND TEMP(F) 	EVAPORATING TEMPERATURE (F)
     			-40 	-30		-20		-10		0 		10
@@ -159,7 +152,8 @@ Simply run Test_xxx.py function. Example :-
 
 ## Available function for test
 
-| Function   |   Type   |  Test function  |         Sample output | Status(Approved/Draft) |
-| :--------- | :------: | :-------------: | --------------------: | ---------------------: |
-| comp.py    | Function |  Test_comp.py   |    Test_comp_data.txt |                  Draft |
-| CompMap.py |  Class   | Test_CompMap.py | Test_CompMap_data.txt |                  Draft |
+| Function          |   Type   |     Test function      |                 Sample output | Status(Approved/Draft) |
+| :---------------- | :------: | :--------------------: | ----------------------------: | ---------------------: |
+| comp.py           | Function |      Test_comp.py      |            Test_comp_data.txt |                  Draft |
+| CompMap.py        |  Class   |    Test_CompMap.py     |         Test_CompMap_data.txt |                  Draft |
+| read_comp_file.py | Function | Test_read_comp_file.py | Test_read_comp_file._data.txt |                  Draft |
