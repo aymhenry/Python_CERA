@@ -9,13 +9,13 @@ from .Block2 import Block2
 from .CompMap import CompMap
 
 from common_classes.FileAccess import FileAccess
+
+
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # Job 			: Abstract Class from Evaprator configration
 #
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-
-
 class Comp_Abstract (ABC, Block2, Data):
     FLDER_COMPMAP_DAT = sys.path[0] + "\\" + "compmap"
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
@@ -66,7 +66,29 @@ class Comp_Abstract (ABC, Block2, Data):
         #	 COMMON/PARMS/ICOND,IFRSH,IFREZ,DISP,SPEED,CE,CREF,MREF,ETAV,SEFF
         #	 COMMON / MAPDAT / IMAP, ICOMP, ICOOL, EER, SIZE, DISPL, EFFC,
         #	                  SPEEDN, IREAD
-
+        
+        print ("\n aym ==============================")
+        print ("aym H=", H)
+        print ("aym P=", P)
+        print ("aym X=", X)
+        print ("aym T=", T)
+        print ("aym MEFF=", MEFF)
+        print ("aym QHILO=", QHILO)
+        print ("aym QCAN=", QCAN)
+        print ("aym V=", V)
+        print ("aym TAMB=", TAMB)
+        print ("aym IMAP=", Data.obj_cdata.IMAP)
+        print ("aym EER =", Data.obj_cdata.EER)
+        
+        print ("aym ICOOL = ", Data.obj_cdata.ICOOL)
+        print ("aym ICOMP = ", Data.obj_cdata.ICOMP)
+        print ("aym  EFFC = ", Data.obj_cdata.EFFC)
+        print ("aym  SEFF = ", Data.obj_cdata.SEFF)
+        print ("aym    CE = ", Data.obj_cdata.CE)
+        print ("aym SPEED = ", Data.obj_cdata.SPEED)
+        print ("aym  MREF = ", Data.obj_cdata.MREF)
+        print ("aym ==========================\n")
+        
         R = 8.314
         TOLS = 0.1
 
@@ -425,7 +447,7 @@ class Comp_Map (Comp_Abstract):  # Data.obj_cdata.IMAP== 0
         #
         # [ P8, P9, P10, P11] = self.compmap (P1..P7, P12 )
         [TSUC, WDOT, Data.obj_cdata.MREF, QSHELL] = self.compmap(
-            P[1], P[2], T[1], V[1], TAMB, X, GAMA, Data.obj_cdata.SPEED)
+            P[1], P[2], T[1], V[1], TAMB, X, GAMA, Data.obj_cdata.SPEEDN)
         # CALL COMPMAP(P[1], P[2], T[1], V[1], TAMB, X, GAMA, TSUC, WDOT,
         # Data.obj_cdata.MREF, QSHELL, Data.obj_cdata.SPEED)
 
@@ -515,7 +537,7 @@ class Comp_Map (Comp_Abstract):  # Data.obj_cdata.IMAP== 0
 			CAPACITY DATA, BTU/HR
 
 			COND TEMP (F) 	EVAPORATING TEMPERATURE(F)
-					-40		-30		-20 	10		0		10
+					-40		-30		-20 	10	0	10
 			70		370.4	500.5	659.3	851.1	1080.8	1353.5
 			80		358.1	488.2	647.0	838.8	1068.5	1341.2
 			90		344.3	474.4	633.1	824.9	1054.6	1327.2
@@ -527,7 +549,7 @@ class Comp_Map (Comp_Abstract):  # Data.obj_cdata.IMAP== 0
 
 			COMPRESSOR POWER (WATTS)
 			COND TEMP(F) 	EVAPORATING TEMPERATURE (F)
-					-40 	-30		-20		-10		0 		10
+					-40 	-30		-20		-10	0	10
 			70		65.5	75.6	84.8	92.3	97.7	100.1
 			80		69.1	80.9	91.9	101.7	109.5	114.7
 			90		72.2	85.7	98.5	110.4	120.6	128.6
@@ -890,13 +912,13 @@ class Comp_Map (Comp_Abstract):  # Data.obj_cdata.IMAP== 0
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     def map(self, ICOMP, ICOOL, EER, SIZE, DISPL, SPEEDN):
         return [0.0, 0.0]
+
+
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # Job 			: Compressor Type : EER
 #
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-
-
 class Comp_ERR (Comp_Abstract):  # Data.obj_cdata.IMAP== 1
     def comp_balance(self):
         # CALL THEORETICALLY BASED MODEL
@@ -1102,9 +1124,11 @@ class Comp_ERR (Comp_Abstract):  # Data.obj_cdata.IMAP== 1
                 ETAS[I][J] = MASS[I][J] * (H2S - H_SUC) / PWR[I][J]
 
                 # not the ETAV in common
-                ETAV[I][J] = MASS[I][J] * VSUC / \
-                    (60.0 * SPEEDN) / (DISPL / 61023.6)
-                # Fractional Speed (-) input value - changed from 1 (bad value) to 3450
+                ETAV[I][J] = MASS[I][J] * VSUC \
+                            /(60.0 * SPEEDN) / (DISPL / 61023.6)
+                
+                # modification by Dr Omar    
+                # Fractional Speed (-) input value -is 1 
                 #ETAV[I][J] = MASS[I][J] * VSUC / (60.0 * 3450) / (DISPL / 61023.6)
 
                 K = ETAP * CP / CV
@@ -1150,16 +1174,15 @@ class Comp_ERR (Comp_Abstract):  # Data.obj_cdata.IMAP== 1
         if (not EXISTS):
             Data.obj_cdata.ETAC = ETAS[3][2]
             Data.obj_cdata.CE = CEIJ[3][2]
-
+        
         return [Data.obj_cdata.ETAC, Data.obj_cdata.CE]
+
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # Job 			: Compressor Type : Efficiency Model
 #
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-
-
 class Comp_EMOD (Comp_Abstract):  # Data.obj_cdata.IMAP== 2
     def comp_balance(self):
         # CALL THEORETICALLY BASED MODEL
