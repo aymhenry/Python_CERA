@@ -147,11 +147,19 @@ Simply run xxx_Test.py function. Example :-
 
 ## Available function for test
 
-| Function / Class  |   Type   |     Test function      |      Sample output | Dependency | Status(Approved/Draft) |
-| :---------------- | :------: | :--------------------: | -----------------: | ---------: | ---------------------- |
-| comp.py           | Function |      comp_Test.py      |           comp.txt |       None | Draft                  |
-| CompMap.py        |  Class   |    CompMap_Test.py     |        CompMap.txt | FileAccess | Draft                  |
-| read_comp_file.py | Function | read_comp_file_Test.py | read_comp_file.txt | CompMap.py | Draft                  |
-| CoolPrp.py        |  Class   |    CoolPrp_Test.py     |        CoolPrp.txt |       None | Approved (by Ayman)    |
-| decoration.py     | Function |   decoration_Test.py   |     decoration.txt |       None | Approved (by Ayman)    |
-| interpolation.py  | Function | interpolation_Test.py  |  interpolation.txt |       None | Approved (by Ayman)    |
+| File Name                  |   Type   |     Test function      |      Sample output |                          Dependency | Status(Approved/Draft)              |
+| :------------------------- | :------: | :--------------------: | -----------------: | ----------------------------------: | ----------------------------------- |
+| comp.py                    | Function |      comp_Test.py      |           comp.txt |                                None | Draft                               |
+| CompMap.py                 |  Class   |    CompMap_Test.py     |        CompMap.txt |                          FileAccess | Draft                               |
+| read_comp_file.py          | Function | read_comp_file_Test.py | read_comp_file.txt |                          CompMap.py | Draft                               |
+| CoolPrp.py                 |  Class   |    CoolPrp_Test.py     |        CoolPrp.txt |                                None | Approved (by Ayman)                 |
+| decoration.py              | Function |   decoration_Test.py   |     decoration.txt |                                None | Approved (by Ayman)                 |
+| interpolation.py           | Function | interpolation_Test.py  |  interpolation.txt |                                None | Approved (by Ayman)                 |
+| CompressorClass_methods.py |  method  |  func_compmap_Test.py  |   func_compmap.txt | interpolation.py, read_comp_file.py | Draft                               |
+| CompressorClass_methods.py |  method  | func_compcall_Test.py  |  func_compcall.txt |                      compmap method | Draft (**Error in output results)** |
+
+------
+
+## Complete Class: Compressor
+
+**will be complied in one file, with separate test, after approving all class method.** 
