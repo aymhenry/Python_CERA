@@ -1,9 +1,6 @@
-
-
 ==Test 1 =========================
-#-- Function Name: comp ===============
-    #-- inputs:
-        arg no 1 =  <CoolPrp.CoolPrp object at 0x02F46148>
+    #-- Inputs for Function Name: comp
+        arg no 1 =  <CoolPrp.CoolPrp object at 0x03066148>
         H1 =  196401.49183146743
         P1 =  123050.0
         P2 =  928180.0
@@ -32,7 +29,7 @@
   QHILO  -3388.3198977108036
   QCAN   16711.98457433579
   ................m3/kg
-  VV2    0.02527842089025558
+  VV2    0.02527842090395492
   VSUC   0.16924029131100593
   ................Other
   GAMA   1.13670426118834
@@ -42,9 +39,8 @@
 
 
 ==Test 2 =========================
-#-- Function Name: comp ===============
-    #-- inputs:
-        arg no 1 =  <CoolPrp.CoolPrp object at 0x02F46148>
+    #-- Inputs for Function Name: comp
+        arg no 1 =  <CoolPrp.CoolPrp object at 0x03066148>
         H1 =  196401.49183146743
         P1 =  123050.0
         P2 =  928180.0
@@ -65,23 +61,22 @@
         ICOOL =  1
         ICOMP =  1
   ................ K
-  T2     280.41139340315004
+  T2     280.41139342608574
   TSUC   248.06176364182318
-  TDISC  280.41139340315004
+  TDISC  280.41139342608574
   ................j/kg
-  HOUT   206976.61493547607
+  HOUT   206976.61495716078
   QHILO  0.0
   QCAN   0.0
   ................m3/kg
-  VV2    0.0007273342627909525
-  VSUC   0.02527842089025558
+  VV2    0.0007273342628314083
+  VSUC   0.02527842090395492
   ................Other
-  GAMA   1.606715909388518
-  RN     1.5585144321068622
+  GAMA   1.606715909420568
+  RN     1.558514432137951
   ETAS   0
-  DISP   8.184417302123101e-07
+  DISP   8.184417306540168e-07
 
 
 ==Test 3 =========================
 Not Applicable for IMPA=0
-Press any key to continue . . .
