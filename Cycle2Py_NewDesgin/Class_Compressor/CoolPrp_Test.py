@@ -105,6 +105,12 @@ print("H       by T, X  ", objCP.Property("h", T=T1, X=0), 'J/kg')
 if objCP.isError():
     print ("Error: " + objCP.err_description())
 
+# print("================Create an Error======================")
+# print ("T1 = ", T1)
+# print("H       by T, P  ", objCP.Property("h", T=Tsat, X=2), 'J/kg')
+# if objCP.isError():
+    # print ("Error: " + objCP.err_description())
+    
 print("========================================")
 print ("Output ->",objCP.phase_byPressTemp (1013250, 273+100))
 print ("Is Gas ->",objCP.is_gas_phase(objCP.phase_byPressTemp (1013250, 273+100)))

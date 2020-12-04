@@ -139,24 +139,31 @@ The following example shows how to use decoration function
 Another help file is required to complete the test, all those help function are not related to the basic function of the class.
 Example of this is (FileAccess.py) which read/write data to external file, of (*.cmp) files which has a decoded data for compressor, also the decoration functions.
 
-## Testing function
+## Testing function output
 
 Simply run xxx_Test.py function. Example :-
 
-    python comp_Test.py
+    python filename_Test.py
+
+## Using Python (**unittest**) Module
+Some function will be tested also using Python **unittest**. to use this :-
+	1. A predefined value inputs and output is given.
+	2. The function needs to evaluate this predefined values to pass the Tests.
+
+	python filename_Test2.py
 
 ## Available function for test
 
-| File Name                  |   Type   |     Test function      |      Sample output |                          Dependency | Status(Approved/Draft)              |
-| :------------------------- | :------: | :--------------------: | -----------------: | ----------------------------------: | ----------------------------------- |
-| comp.py                    | Function |      comp_Test.py      |           comp.txt |                                None | Draft                               |
-| CompMap.py                 |  Class   |    CompMap_Test.py     |        CompMap.txt |                          FileAccess | Draft                               |
-| read_comp_file.py          | Function | read_comp_file_Test.py | read_comp_file.txt |                          CompMap.py | Draft                               |
-| CoolPrp.py                 |  Class   |    CoolPrp_Test.py     |        CoolPrp.txt |                                None | Approved (by Ayman)                 |
-| decoration.py              | Function |   decoration_Test.py   |     decoration.txt |                                None | Approved (by Ayman)                 |
-| interpolation.py           | Function | interpolation_Test.py  |  interpolation.txt |                                None | Approved (by Ayman)                 |
-| CompressorClass_methods.py |  method  |  func_compmap_Test.py  |   func_compmap.txt | interpolation.py, read_comp_file.py | Draft                               |
-| CompressorClass_methods.py |  method  | func_compcall_Test.py  |  func_compcall.txt |                      compmap method | Draft (**Error in output results)** |
+| File Name                  |   Type   |           Test function           |      Sample output |                          Dependency | Status(Approved/Draft)              |
+| :------------------------- | :------: | :-------------------------------: | -----------------: | ----------------------------------: | ----------------------------------- |
+| comp.py                    | Function |           comp_Test.py            |           comp.txt |                                None | Draft                               |
+| CompMap.py                 |  Class   |          CompMap_Test.py          |        CompMap.txt |                          FileAccess | Draft                               |
+| read_comp_file.py          | Function |      read_comp_file_Test.py       | read_comp_file.txt |                          CompMap.py | Draft                               |
+| CoolPrp.py                 |  Class   | CoolPrp_Test.py, CoolPrp_Test2.py |        CoolPrp.txt |                                None | Approved (by Ayman)                 |
+| decoration.py              | Function |        decoration_Test.py         |     decoration.txt |                                None | Approved (by Ayman)                 |
+| interpolation.py           | Function |       interpolation_Test.py       |  interpolation.txt |                                None | Approved (by Ayman)                 |
+| CompressorClass_methods.py |  method  |       func_compmap_Test.py        |   func_compmap.txt | interpolation.py, read_comp_file.py | Draft                               |
+| CompressorClass_methods.py |  method  |       func_compcall_Test.py       |  func_compcall.txt |                      compmap method | Draft (**Error in output results)** |
 
 ------
 
