@@ -147,8 +147,9 @@ Simply run xxx_Test.py function. Example :-
 
 ## Using Python (**unittest**) Module
 Some function will be tested also using Python **unittest**. to use this :-
-	1. A predefined value inputs and output is given.
-	2. The function needs to evaluate this predefined values to pass the Tests.
+
+1. A predefined value inputs and output is given.
+2. The function needs to evaluate this predefined values to pass the Tests.
 
 	python filename_Test2.py
 
