@@ -155,16 +155,16 @@ Some function will be tested also using Python **unittest**. to use this :-
 
 ## Available function for test
 
-| File Name                  |   Type   |           Test function           |      Sample output |                          Dependency | Status(Approved/Draft)              |
-| :------------------------- | :------: | :-------------------------------: | -----------------: | ----------------------------------: | ----------------------------------- |
-| comp.py                    | Function |           comp_Test.py            |           comp.txt |                                None | Draft                               |
-| CompMap.py                 |  Class   |          CompMap_Test.py          |        CompMap.txt |                          FileAccess | Draft                               |
-| read_comp_file.py          | Function |      read_comp_file_Test.py       | read_comp_file.txt |                          CompMap.py | Draft                               |
-| CoolPrp.py                 |  Class   | CoolPrp_Test.py, CoolPrp_Test2.py |        CoolPrp.txt |                                None | Approved (by Ayman)                 |
-| decoration.py              | Function |        decoration_Test.py         |     decoration.txt |                                None | Approved (by Ayman)                 |
-| interpolation.py           | Function |       interpolation_Test.py       |  interpolation.txt |                                None | Approved (by Ayman)                 |
-| CompressorClass_methods.py |  method  |       func_compmap_Test.py        |   func_compmap.txt | interpolation.py, read_comp_file.py | Draft                               |
-| CompressorClass_methods.py |  method  |       func_compcall_Test.py       |  func_compcall.txt |                      compmap method | Draft (**Error in output results)** |
+| File Name                  |   Type   |           Test function           |      Sample output |                          Dependency | Status(Approved/Draft) |
+| :------------------------- | :------: | :-------------------------------: | -----------------: | ----------------------------------: | ---------------------- |
+| comp.py                    | Function |           comp_Test.py            |           comp.txt |                                None | Approved (by Omar)     |
+| CompMap.py                 |  Class   |          CompMap_Test.py          |        CompMap.txt |                          FileAccess | Approved (by Ayman)    |
+| read_comp_file.py          | Function |      read_comp_file_Test.py       | read_comp_file.txt |                          CompMap.py | Approved (by Ayman)    |
+| CoolPrp.py                 |  Class   | CoolPrp_Test.py, CoolPrp_Test2.py |        CoolPrp.txt |                                None | Approved (by Ayman)    |
+| decoration.py              | Function |        decoration_Test.py         |     decoration.txt |                                None | Approved (by Ayman)    |
+| interpolation.py           | Function |       interpolation_Test.py       |  interpolation.txt |                                None | Approved (by Ayman)    |
+| CompressorClass_methods.py |  method  |       func_compmap_Test.py        |   func_compmap.txt | interpolation.py, read_comp_file.py | Approved (by Omar)     |
+| CompressorClass_methods.py |  method  |       func_compcall_Test.py       |  func_compcall.txt |                      compmap method | Approved (by Omar)     |
 
 ------
 
