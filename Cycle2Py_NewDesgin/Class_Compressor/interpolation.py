@@ -15,12 +15,12 @@ def interpolation (x_value, y_value, x_series, y_series, data):
             return y1 + (x_value - x1) * (y2 - y1) / (x2 - x1)
 
     if len(x_series) != len(data[0]) or len(y_series) != len(data):
-        print ("error1 ")
+        raise ValueError ("Reading value out of range, 1")
         return None
 
     if x_value > max(x_series) or y_value > max(y_series)\
             or x_value < min(x_series) or y_value < min(y_series):
-        print ("error2 ")
+        raise ValueError ("Reading value out of range, 2")
         return None
 
     x_pos = find_nerest_index(x_value, x_series) - 1

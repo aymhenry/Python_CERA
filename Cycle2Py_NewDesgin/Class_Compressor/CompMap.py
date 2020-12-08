@@ -10,7 +10,9 @@ from FileAccess import FileAccess
 
 class CompMap (FileAccess):
     TRY_COUNT = 120
-
+    UNIT_SI = 1
+    UNIT_ENG = 2
+    
     def __init__(self, strFileName, strPath="", is_one_dim=False):
         # member varbiable for compressor
         self.arr_x_values = None
@@ -220,7 +222,7 @@ class CompMap (FileAccess):
         if self.isError():
             return
 
-        self.arr_x_values = [0.0] * (self.int_x_values + 1)  # base value is 1
+        self.arr_x_values = [0.0] * (self.int_x_values )  # base value is 0
 
         for ncnt in range(0, self.int_x_values):
 
@@ -232,25 +234,25 @@ class CompMap (FileAccess):
                     return
                 Value = self.getRec()
 
-            self.arr_x_values[ncnt + 1] = Value
+            self.arr_x_values[ncnt] = Value
 
     # -----------------------------------------------------------
     def read_Ydata(self):
         if self.isError():
             return
 
-        self.arr_y1_values = [0.0] * (self.int_y12_values + 1)  # base is 1
-        self.arr_y2_values = [0.0] * (self.int_y12_values + 1)
+        self.arr_y1_values = [0.0] * (self.int_y12_values)  # base is 0
+        self.arr_y2_values = [0.0] * (self.int_y12_values)
 
         for ncnt in range(0, self.int_y12_values):
             if not self.readrecord():
                 return
 
-            self.arr_y1_values[ncnt + 1] = self.getRec()
+            self.arr_y1_values[ncnt] = self.getRec()
 
             if not self.readrecord():
                 return
-            self.arr_y2_values[ncnt + 1] = self.getRec()
+            self.arr_y2_values[ncnt] = self.getRec()
 
     # -----------------------------------------------------------
     def readCapacity(self):
@@ -259,10 +261,10 @@ class CompMap (FileAccess):
 
         if self.is_one_dim:
             self.arr_capacity = [0.0] * \
-                (self.int_x_values * self.int_y12_values + 1)
+                (self.int_x_values * self.int_y12_values)
         else:
-            self.arr_capacity = [[0.0] * (self.int_x_values + 1)
-                                 for i in range(self.int_y12_values + 1)]
+            self.arr_capacity = [[0.0] * (self.int_x_values)
+                                 for i in range(self.int_y12_values)]
 
         # add shift one word to the current position
         for ncnt_x in range(0, self.int_y12_values):
@@ -270,13 +272,12 @@ class CompMap (FileAccess):
             for ncnt_y in range(0, self.int_x_values):
 
                 if self.is_one_dim:
-                    self.arr_capacity[1 +
+                    self.arr_capacity[
                                       int(ncnt_x *
                                           self.int_x_values +
                                           ncnt_y)] = self.getNonZero()
                 else:
-                    self.arr_capacity[ncnt_x +
-                                      1][ncnt_y + 1] = self.getNonZero()
+                    self.arr_capacity[ncnt_x][ncnt_y] = self.getNonZero()
 
     # -----------------------------------------------------------
     def getNonZero(self):
@@ -309,14 +310,13 @@ class CompMap (FileAccess):
             return
 
         if self.is_one_dim:
-            self.arr_power = [
-                0.0] * (self.int_x_values * self.int_y12_values + 1)  # base is 1
+            # base is 0
+            self.arr_power = [0.0] * (self.int_x_values * self.int_y12_values)
         else:
-            self.arr_power = [[0.0] * (self.int_x_values + 1)
-                              for i in range(self.int_y12_values + 1)]
+            self.arr_power = [[0.0] * (self.int_x_values)
+                              for i in range(self.int_y12_values)]
 
         # add shift one word to the current position
-        #self.current_pos = self.current_pos + CompMap.SEG_POWER - CompMap.SEG_BLOCK
 
         for ncnt_x in range(0, self.int_y12_values):
             #self.current_pos = self.current_pos + CompMap.SEG_BLOCK
@@ -324,9 +324,10 @@ class CompMap (FileAccess):
 
                 if self.is_one_dim:
                     self.arr_power[int(
-                        ncnt_x * self.int_x_values + ncnt_y) + 1] = self.getNonZero()
+                        ncnt_x * self.int_x_values + ncnt_y)] = \
+                                                        self.getNonZero()
                 else:
-                    self.arr_power[ncnt_x + 1][ncnt_y + 1] = self.getNonZero()
+                    self.arr_power[ncnt_x][ncnt_y] = self.getNonZero()
 
     # -----------------------------------------------------------
     def readMapData(self):
@@ -375,15 +376,15 @@ class CompMap (FileAccess):
         if self.isError():
             return
         #	     capacity, temper, mass flow
-        # unit 1 - btu/hr,  deg f, lb/hr
-        # unit 2 - kcal/hr, deg c, kg/hr
+        # unit 1 - kcal/hr, deg c, kg/hr
+        # unit 2 - btu/hr,  deg f, lb/hr
         #
         # power data must be in watts
         #
         if self.arr_y1_values[1] <= 50:
-            return 1  # kcal/hr, deg c, kg/hr
+            return CompMap.UNIT_SI  # kcal/hr, deg c, kg/hr
         else:
-            return 2  # btu/hr,  deg f, lb/hr
+            return CompMap.UNIT_ENG  # btu/hr,  deg f, lb/hr
 
     # -----------------------------------------------------------
     def getType(self):

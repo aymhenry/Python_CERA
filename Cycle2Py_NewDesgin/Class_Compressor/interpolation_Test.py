@@ -14,9 +14,14 @@ data = [
   [292.9, 422.8, 581.4, 772.9, 1002.3, 1274.6],
   [272.1, 401.9, 560.3, 751.8,  980.9, 1253.0]
   ]
+  
+
+x_value =  -40
+y_value = 105
+    
 
 print ("\n............... Test 1 .........................................")
-interpolation (x_value=10, y_value=130,
+interpolation (x_value=x_value, y_value=y_value,
         x_series=x_series, y_series=y_series, data=data)
 
 print ("\n............... Test 2 .........................................")

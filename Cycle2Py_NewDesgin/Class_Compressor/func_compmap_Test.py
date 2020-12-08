@@ -31,7 +31,6 @@ lstRes = objComp_Map.compmap(PSUCT=PSUCT, PDISC=PDISC, TSUCT=TSUCT,
                             GAMA=GAMA, TAMB=TAMB, 
                             FRACT_SPEED=FRACT_SPEED, ICOMP=1)
 
-
 print("  TSP  : Temperature K ", lstRes[0])
 print("  WDOT : Capacity  kj/hr", lstRes[1])
 print("  MDOT : mass flow rate  kg/hr ", lstRes[2])

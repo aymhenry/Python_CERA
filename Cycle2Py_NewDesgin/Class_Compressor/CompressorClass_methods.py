@@ -88,9 +88,9 @@ class Comp_Map:
         # [HS, CVF, CPF, VSND] = self.hcvcps(1, TS, VGUESS, X)
         HS = Comp_Map.objCP.Property('H', T=TS, P=PDISC)  # j/kg
         # or HS = Comp_Map.objCP.Property('H', S=SSUC, P=PDISC)  # j/kg
-
+        
         # convert the saturation temperatures to corresspond to map data units
-        if (Comp_Map.IUNITS == 1):
+        if (Comp_Map.IUNITS == 2): # i.e temp in F
             TEVAP = TEVAPK * 1.8 - 459.67  # convert from Deg K to F
             TCOND = TCONDK * 1.8 - 459.67
         else:
@@ -282,7 +282,7 @@ class Comp_Map:
             POW = POW2 + (POW2 - POW1) * FRAC
         # ==============================================
         '''
-
+        
         CAP = interpolation (x_value=TEVAP, y_value=TCOND,
                              x_series=Comp_Map.TEDATA,
                              y_series=Comp_Map.TCDATA,
@@ -447,7 +447,7 @@ class Comp_Map:
         H2S = objCP.Property('H', S=SSUCT, P=PDISC)  # j/kg
 
         # calculate isentropic power requirement
-        WDOTS = MREF * (H2S - H1)/1000  # kj/hr = kg/hr * (j/kg)/1000
+        # moved by Dr-Omar WDOTS = MREF * (H2S - H1)/1000  # kj/hr = kg/hr * (j/kg)/1000
 
         # determine actual compressor performance [TSP, WDOT, MDOT, QSHELL]
         [TSUC, WDOT, MREF, QSHELL] =\
@@ -457,6 +457,9 @@ class Comp_Map:
                             GAMA=GAMA, TAMB=TAMB, \
                             FRACT_SPEED=FRACT_SPEED, ICOMP=ICOMP)
 
+        # calculate isentropic power requirement
+        WDOTS = MREF * (H2S - H1)/1000  # kj/hr = kg/hr * (j/kg)/1000
+        
         # calculate refrigerant exit enthalpy and temperature
         # fact = QSHELL / WDOT  # useless not used anywhere
 

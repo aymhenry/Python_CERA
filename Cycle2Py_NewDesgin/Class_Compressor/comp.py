@@ -102,7 +102,8 @@ def comp(objCP, H1, P1, P2, T1, T12, MEFF, QHILO, QCAN,
         # SSUC = self.entrop(TSUC, VSUC, X)  # Suction entropy
         # [T2S, XQ[2], XL, XV, VL2S, VV2S, SL2S, SV2S] = self.spin(SSUC, P2, X)
         # [H2S, DUM1, DUM2, DUM3] = self.hcvcps(1, T2S, VV2S, X)
-        H2S = objCP.Property('H', T=TSUC, V=VSUC)  # j/kg
+        SSUC = objCP.Property('s', T=TSUC, P=P1)  # J/kg K
+        H2S = objCP.Property('H', P=P2, S=SSUC)  # J/kg
 
         if(ICOMP == 2):
             ETAS = EFFC \

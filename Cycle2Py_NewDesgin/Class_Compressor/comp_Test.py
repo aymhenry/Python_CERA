@@ -6,8 +6,8 @@ from comp import *
 #================== Test Driver ========
 
 
-T1 = 296     # K suction temp.
-T12 = 249.5  # K discharge temp.
+T1 = 300 #296     # K Discharge temp.
+T12 = 280 #249.5  # K Suction temp.
 
 P1 = 123.05 * 1000  # Suction pressure Pa
 P2 = 928.18 * 1000  # Discharge pressire Pa

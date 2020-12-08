@@ -11,7 +11,7 @@ Compressor (Compressor.py) class solves the compressor module, compressor module
 All the three class inherits the base Abstract class Comp_Abstract.
 Another class Compressor class is exists to take Compressor type, and return the required class according to IMAP value.
 
-In Fortran there was function (comp) which is used in to server two types of compressors, IMAP=1, and 2. In the future this function will be divided to two separate parts, but now t will be tested once after approving faction logic.
+In Fortran there was function (comp) which is used in to server two types of compressors, IMAP=1, and 2. In the future this function will be divided to two separate parts, but now it will be tested once after approving faction logic.
 
 ### CompMap Class (Sub Class for Compressor Class)
 

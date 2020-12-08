@@ -34,6 +34,13 @@ def main ( str_file):
     print (" Volt = ",obj_comp_map.getVolt () )
 
     print (" ......................................." )
+    unit = obj_comp_map.getUnit ()
+    
+    if unit == obj_comp_map.UNIT_SI:
+        print (" Unit: kcal/hr, deg c, kg/hr")
+    else:
+        print (" Unit: btu/hr,  deg f, lb/hr")
+        
     print (" unit = ",obj_comp_map.getUnit ()  )
     print (" Type = ",obj_comp_map.getType ()  )
     print (" x = ",obj_comp_map.getX_count ())
