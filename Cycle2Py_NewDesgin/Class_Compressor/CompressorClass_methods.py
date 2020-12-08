@@ -306,7 +306,7 @@ class Comp_Map:
         POW = POW * REL_POW
 
         # convert the capacity to kj/hr
-        if (Comp_Map.IUNITS == 1):
+        if (Comp_Map.IUNITS == 2): # i.e temp in F
             CAP = CAP * 1.0548  # from but/hr to kj/hr
         else:
             CAP = CAP * 4.184   # from kcal/hr to kj/hr

@@ -1,8 +1,9 @@
 
+
 ==Test compcall only IMAP=0 ................
     #-- Inputs for Function Name: compcall
-        arg no 1 =  <CompressorClass_methods.Comp_Map object at 0x00837400>
-        arg no 2 =  <CoolPrp.CoolPrp object at 0x0077F628>
+        arg no 1 =  <CompressorClass_methods.Comp_Map object at 0x03487400>
+        arg no 2 =  <CoolPrp.CoolPrp object at 0x031DF628>
         PSUCT =  123050.0
         PDISC =  928180.0
         TSUCT =  296
@@ -13,7 +14,7 @@
         strFileName =  DG73C12RAU6.cmp
         ICOMP =  1
     #-- Inputs for Function Name: compmap
-        arg no 1 =  <CompressorClass_methods.Comp_Map object at 0x00837400>
+        arg no 1 =  <CompressorClass_methods.Comp_Map object at 0x03487400>
         PSUCT =  123050.0
         PDISC =  928180.0
         TSUCT =  296
@@ -51,22 +52,22 @@
 
 
     #-- Outputs for Function Name: compmap
-        Result = [337.2834872777778, 525.691179330167, 28.60386099044506, 390.8064373738928]
+        Result = [337.2834872777778, 525.691179330167, 7.211126331912393, 390.8064373738928]
 
 
     #-- Outputs for Function Name: compcall
-        Result = [374417.28947716806, 0.0, 0.7434144850439689, 0.1611942767347614, 0.019899465696307465, 337.2834872777778, 319.79515903767106, 1.1423062073090828, 1.1080370210898103, 2.393663668224732]
+        Result = [388406.76288616547, 0.0, 0.7434144850439689, 0.1611942767347614, 0.02191754267990197, 337.2834872777778, 339.12658919608685, 1.1423062073090828, 1.1080370210898103, 0.6034503913105754]
 
 
   ................. K
   TSUC     337.2834872777778
-  TDISC    319.79515903767106
-  HOUT  j/kg   374417.28947716806
+  TDISC    339.12658919608685
+  HOUT  j/kg   388406.76288616547
   QHILO =0     0.0
   ............. m3/kg
   VSUC     0.1611942767347614
-  VV2      0.019899465696307465
+  VV2      0.02191754267990197
   QCAN (#)     0.7434144850439689
   GAMA (%)  1.1423062073090828
   RN   (%)  1.1080370210898103
-  ETAS (%) less than 1  2.393663668224732
+  ETAS (%) less than 1  0.6034503913105754

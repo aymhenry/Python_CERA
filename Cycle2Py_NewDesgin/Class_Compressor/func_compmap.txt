@@ -1,7 +1,7 @@
 
 ==Test compcall only IMAP=0 ................
     #-- Inputs for Function Name: compmap
-        arg no 1 =  <CompressorClass_methods.Comp_Map object at 0x03247400>
+        arg no 1 =  <CompressorClass_methods.Comp_Map object at 0x03187400>
         PSUCT =  123050.0
         PDISC =  928180.0
         TSUCT =  296
@@ -39,10 +39,10 @@
 
 
     #-- Outputs for Function Name: compmap
-        Result = [337.2834872777778, 525.6477014392292, 28.601495275368524, 391.0739636171223]
+        Result = [337.2834872777778, 525.6477014392291, 7.210529927451893, 391.0739636171222]
 
 
   TSP  : Temperature K  337.2834872777778
-  WDOT : Capacity  kj/hr 525.6477014392292
-  MDOT : mass flow rate  kg/hr  28.601495275368524
-  QSHELL : Shell Heat kj/hr 391.0739636171223
+  WDOT : Capacity  kj/hr 525.6477014392291
+  MDOT : mass flow rate  kg/hr  7.210529927451893
+  QSHELL : Shell Heat kj/hr 391.0739636171222
