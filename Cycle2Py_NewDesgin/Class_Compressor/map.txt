@@ -1,0 +1,11 @@
+    #-- Inputs for Function Name: map
+        objCP =  <CoolPrp.CoolPrp object at 0x00C4F628>
+        ICOMP =  1
+        ICOOL =  1
+        EER =  5.28
+        SIZE =  1
+        DISPL =  5.7212885425902e-06
+        SPEEDN =  3450
+  ................. K
+  ETAC     0.7231465620087886
+  CE    0.7231465620087886
