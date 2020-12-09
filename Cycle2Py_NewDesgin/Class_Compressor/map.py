@@ -7,44 +7,22 @@ from decorators import *
 
 @show_input_output("IN")
 def map(objCP, ICOMP, ICOOL, EER, SIZE, DISPL, SPEEDN):
-    # [ P6 P7] = self.cnat (P1 to P5, P8 )
-    #	  SUBROUTINE MAP(ICOMP, ICOOL, EER, SIZE, DISPL, ETAC, CE, SPEEDN)
-    #     ******************************************************************
-    #     *    USE COMPRESSOR MAP DATA TO ESTIMATE COMPRESSOR BEHAVIOR     *
-    #     ******************************************************************
+    # INPUT PARAMETERS
+    #  ICOMP type of compressor:  1=reciprocating, 2=rotary
+    #  ICOOL type of compressor can cooling:  0=static, 1=fan forced
+    #  EER   EER at rating conditions
+    #  SIZE  capacity (btuh) at rating conditions
+    #  DISPL displacement (cu-in)
     #
-    #     INPUT PARAMETERS
-    #     ----------------
-    #        ICOMP                    TYPE OF COMPRESSOR:
-    #                                   1=RECIPROCATING, 2=ROTARY
-    #        ICOOL                    TYPE OF COMPRESSOR CAN COOLING:
-    #                                   0=STATIC, 1=FAN FORCED
-    #        EER                      EER AT RATING CONDITIONS
-    #        SIZE                     CAPACITY (BTUH) AT RATING CONDITIONS
-    #        DISPL                    DISPLACEMENT (CU-IN)
-    #
-    #     OUTPUT PARAMETERS
-    #     ----------------
-    #        ETAC                     COMPRESSOR ISENTROPIC EFFICIENCY,
-    #                                 INCLUDING MECHANICAL AND MOTOR LOSSES
-    #        CE                       CLEARANCE VOLUME (FRACTION)
-    #
-    #	  LOGICAL LCRIT, EXISTS
-    #	  REAL K, MASS, MOTOR
+    # OUTPUT PARAMETERS
+    #  ETAC  compressor isentropic efficiency,
+    #        including mechanical and motor losses
+    #  CE    clearance volume (fraction)
 
-    #	  DIMENSION X(5),  IR(5),  F(5,5), XL(5,5), XV(5,5)
-
-    #	  DIMENSION CAP(3,3), PWR(3,3), ETAS(3,3), ETAV(3,3), MASS(3,3),
-    #	 .          CEIJ(3,3)
-
-    # Note: 	first  index = cond temperature from 110 to 130 F
-    #		second index = evap temperature from -20 to   0 F
-
-    #IN = 1
     T90 = 305.3889			# 90F in Kelvin
     ETAP = 0.97 				# Get k from gamma
 
-    #          CONVERSION FUNCTIONS
+    #    CONVERSION FUNCTIONS
     def F_TO_K(T):
         return (T + 459.7) / 1.8
 
@@ -63,7 +41,7 @@ def map(objCP, ICOMP, ICOOL, EER, SIZE, DISPL, SPEEDN):
     XV = [[0.0] * (5 + 1) for i in range(5 + 1)]
     IR = [0.0] * (5 + 1)
 
-    #          NORMALIZE
+    #    NORMALIZE
     #
     ITAB = 0
     # X = [0.0] * (5 + 1)
@@ -78,7 +56,7 @@ def map(objCP, ICOMP, ICOOL, EER, SIZE, DISPL, SPEEDN):
     if(ITAB == 0):
         EXISTS = False  # Python comment allways  False
 
-    MOTOR = 3.413 * SIZE / EER 		# Motor power in Btuh
+    MOTOR = 3.413 * SIZE / EER 		# Motor power in Btu/hr
     CAP = [[1.0548 * SIZE] * (3 + 1) for i in range(3 + 1)]  # kJ/hr
     PWR = [[1.0548 * MOTOR] * (3 + 1) for i in range(3 + 1)]  # kJ/hr
 
@@ -90,7 +68,7 @@ def map(objCP, ICOMP, ICOOL, EER, SIZE, DISPL, SPEEDN):
 
         # [X, XV, P_COND, VL, VV, LCRIT] = self.bublt(T_COND, X, XV, True)
         P_COND = objCP.Property('P', X=1, T=T_COND)  # Pa             
-                       
+    
         # [AMIX, BMIX] = self.espar(0, T90, X)
         # VS = VL
         # [VS, LCRIT] = self.vit(T90, P_COND, AMIX, BMIX, VS, True)
@@ -111,10 +89,11 @@ def map(objCP, ICOMP, ICOOL, EER, SIZE, DISPL, SPEEDN):
             # [H_VAP, DUM1, DUM2, DUM3] = self.hcvcps(1, T90, VS, X)
             H_VAP = objCP.Property('H', T=T90, P=P_EVAP)  # j/kg
         
-            MASS[I][J] = CAP[I][J] / (H_VAP - H_LIQ)  # kg-mole/hr
+            # kg/hr    = (kj/hr)/ (kj/kg) 
+            MASS[I][J] = CAP[I][J] / (H_VAP - H_LIQ) * 1000  
             
             #
-            #          ESTIMATE THE SUCTION GAS TEMPERATURE AND THE EFFICIENCIES
+            #    ESTIMATE THE SUCTION GAS TEMPERATURE AND THE EFFICIENCIES
             #
             if(ICOOL == 0):
                 TSUC = 479.59 - 64.815 * EER
@@ -147,10 +126,12 @@ def map(objCP, ICOMP, ICOOL, EER, SIZE, DISPL, SPEEDN):
 
             #[H2S, DUM1, DUM2, DUM3] = self.hcvcps(1, T2S, VV2S, X)
             H2S = objCP.Property('H', T=T2S, P=P_COND)  # j/kg
-             
-            ETAS[I][J] = MASS[I][J] * (H2S - H_SUC) / PWR[I][J]
+            
+            #  None          kg/hr          * (kj/kg)             / (kJ/hr)
+            ETAS[I][J] = MASS[I][J] * (H2S - H_SUC) /1000/ PWR[I][J] # 
 
             # not the ETAV in common
+            #      kg/hr  * m3/kg  /rps / m3
             ETAV[I][J] = MASS[I][J] * VSUC /(60.0 * SPEEDN) / (DISPL / 61023.6)
                 
             # modification by Dr Omar    
@@ -162,17 +143,17 @@ def map(objCP, ICOMP, ICOOL, EER, SIZE, DISPL, SPEEDN):
 
             if(ICOMP == 1):
                 CEIJ[I][J] = ((0.92 - ETAV[I][J]) / 0.92) / \
-                    (PR**(1.0 / K) - 1.0)
+ (PR**(1.0 / K) - 1.0)
             else:
                 CEIJ[I][J] = ((1.00 - ETAV[I][J]) / 1.00) / \
-                    (PR**(1.0 / K) - 1.0)
+ (PR**(1.0 / K) - 1.0)
 
             #
             # estimate cyclinder temperature and can outlet temperature
             #
             TCYL = TSUC * (P_COND / P_EVAP) ** (1.0 - 1.0 / K)
 
-            COP = CAP[I][J] / PWR[I][J]
+            COP = CAP[I][J] / PWR[I][J]  # None =  (kJ/hr)  / (kJ/hr)
 
             if(ICOOL == 0):
                 RATIO = 0.68 - 0.05 * 3.413 * COP

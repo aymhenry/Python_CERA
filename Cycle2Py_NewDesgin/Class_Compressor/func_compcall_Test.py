@@ -1,6 +1,7 @@
 # Python Import ==================
 
 # User Import ======================
+from CoolPrp import *
 from CompressorClass_methods import *
 
 # Create basic object for coolProp
