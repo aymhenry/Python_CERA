@@ -14,7 +14,7 @@ def comp(objCP, H1, P1, P2, T1, T12, MEFF, QHILO, QCAN,
     
     R = 8.314
     TOLS = 0.1
-    ETA_ISEN = 0
+    ETA_ISEN = None
 
     # CONVERSION FUNCTIONS
     def F_TO_K(T):
@@ -257,7 +257,8 @@ def comp(objCP, H1, P1, P2, T1, T12, MEFF, QHILO, QCAN,
     else:
         ETAV = 1.00 * (1.0 - CE * (PR**RINV - 1.0))
 
-    DISP = MREF * VSUC / (60.0 * SPEED * ETAV)  # SPEED in rpm MREF kg/hr
+    # m3 = SPEED in rpm MREF kg/hr
+    DISP = MREF * VSUC / (60.0 * SPEED * ETAV)  
     
     HOUT = H2
     ETAS = ETA_ISEN

@@ -1,0 +1,69 @@
+Common Data for all tests ============
+ Clearance volume (fraction) output of map  CE =  0.022338000722326633
+ compressor displacement                    DISPLC= 6.57
+ compressor Effe.                           EFFC= 0.6058868684272488
+                                            EER= 5.28
+ isentropic efficiency                      SEFF= 0.9
+ ambitem Temp                               TAMB= 308.11
+ mechanical efficiency                      MEFF= 0.8
+ Fan cooling method 0 Static, 1 Fan-Forced  ICOOL= 1
+ Compressor Type 1-Reciprocating, 2-Rotary  ICOMP= 1
+ Speed rmp                                  SPEED= 3450
+ Compressor file                            strFileName= DG73C12RAU6.cmp
+                                            FRACT_SPEED= 1
+Test 1, IMAP=0 --------------------------------
+== Inputs===============
+    PSUCT Pa    =  123050.0
+    PDISC Pa    =  928180.0
+    TSUCT K     =  296
+    VSUCT kg/m3 =  0.1611942767347614
+    MREF kg/hr  =  5.8
+
+== Output===============
+Suction Temp K               TSUC =  337.2834872777778
+Dischare Temp K             TDISC =  339.12658919608685
+Dischare Enthalpy    j/kg    HOUT =  388406.76288616547
+normalized heat loss from dischange line inside j/kg QHILO =  0.0
+compressor shell loss normalized to power input j/kg QCAN  =  0.7434144850439689
+Suction sp.volume m3/kg      VSUC =  0.1611942767347614
+Dischare sp.volume m3/kg      VV2 =  0.02191754267990197
+Cp/Cv value                  GAMA =  1.1423062073090828
+Compressor Efficiency   %    ETAC =  0.6034503913105754
+Refrigerant Mas Flow Rate  kg/hr  MREF =  6.09
+Iso. outlet Temp (to be checked) K  not calculated T2 =  None
+compressor displacement  m3  DISP not calculated =  None
+
+
+Test 2, IMAP=1 --------------------------------
+Suction Temp K               TSUC =  304.67484413722235
+Dischare Temp K             TDISC =  411.12439050020015
+Dischare Enthalpy    j/kg    HOUT =  400805.03124602925
+normalized heat loss from dischange line inside j/kg QHILO =  0.5633834228680732
+compressor shell loss normalized to power input j/kg QCAN  =  -1.9356757595417604
+Suction sp.volume m3/kg      VSUC =  0.1659183822296477
+Dischare sp.volume m3/kg      VV2 =  0.02527842090395492
+Cp/Cv value                  GAMA =  1.1388924147264519
+Compressor Efficiency   %    ETAC =  0.6992580056863537
+Refrigerant Mas Flow Rate  kg/hr  MREF =  6.032
+Iso. outlet Temp (to be checked) K  T2 =  356.485557778894
+compressor displacement  m3  DISP =  1.8529761078071837e-05
+
+
+calulated only in case of IMAP = 1 and are system input for IMAP=2
+compressor isentropic efficiency ETAC =  0.7231465620087887
+clearance volume (fraction) CE =  0.13911057200476362
+
+
+Test 3, IMAP=2 --------------------------------
+Suction Temp K               TSUC =  248.06176364182318
+Dischare Temp K             TDISC =  280.41139342608574
+Dischare Enthalpy    j/kg    HOUT =  206976.61495716078
+normalized heat loss from dischange line inside j/kg QHILO =  0.0
+compressor shell loss normalized to power input j/kg QCAN  =  0.0
+Suction sp.volume m3/kg      VSUC =  0.02527842090395492
+Dischare sp.volume m3/kg      VV2 =  0.0007273342628314083
+Cp/Cv value                  GAMA =  1.606715909420568
+Compressor Efficiency   % (not calculated in this case)   ETAC =  None
+Refrigerant Mas Flow Rate  kg/hr  MREF =  6.032
+Iso. outlet Temp (to be checked) K  T2 =  280.41139342608574
+compressor displacement  m3  DISP =  1.221151848514165e-06

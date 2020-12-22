@@ -6,8 +6,8 @@ from comp import *
 #================== Test Driver ========
 
 
-T1 = 300 #296     # K Discharge temp.
-T12 = 280 #249.5  # K Suction temp.
+T1 = 300 #296     # K Suction temp. compressor inlet
+T12 = 280 #249.5  # K fresh food evap. dew point
 
 P1 = 123.05 * 1000  # Suction pressure Pa
 P2 = 928.18 * 1000  # Discharge pressire Pa
@@ -67,7 +67,7 @@ print ("  ................Other ")
 print ("  GAMA  ", lstRes[8])
 print ("  RN    ", lstRes[9])
 print ("  ETAS  ", lstRes[10])
-print ("  DISP  ", lstRes[11])
+print ("  DISP m3 ", lstRes[11])
 
 print ("\n\n==Test 2 =========================")
 IMAP = 2
@@ -94,7 +94,7 @@ print ("  VSUC  ", lstRes[4])
 print ("  ................Other ")
 print ("  GAMA  ", lstRes[8])
 print ("  RN    ", lstRes[9])
-print ("  ETAS  ", lstRes[10])
+print (" not calculated ETAS  ", lstRes[10])
 print ("  DISP  ", lstRes[11])
 
 print ("\n\n==Test 3 =========================")

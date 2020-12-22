@@ -42,8 +42,10 @@ print ("  ............. m3/kg")
 print ("  VSUC    ", lstRes[3])
 print ("  VV2     ", lstRes[4])
 
+print ("\n  MREF mass flow rate  kg/hr ", lstRes[10])
 
-print ("  QCAN (#)    ", lstRes[2])
+
+print ("\n  QCAN (#)    ", lstRes[2])
 print ("  GAMA (%) ", lstRes[7])
 print ("  RN   (%) ", lstRes[8])
 print ("  ETAS (%) less than 1 ", lstRes[9])

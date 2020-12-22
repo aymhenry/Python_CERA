@@ -166,9 +166,12 @@ Some function will be tested also using Python **unittest**. to use this :-
 | CompressorClass_methods.py |  method  |       func_compmap_Test.py        |   func_compmap.txt | interpolation.py, read_comp_file.py | Approved (by Omar)     |
 | CompressorClass_methods.py |  method  |       func_compcall_Test.py       |  func_compcall.txt |                      compmap method | Approved (by Omar)     |
 | map.py                     | function |            map_Test.py            |            map.txt |                                None | Draft                  |
+| ErrorException.py          |  Class   |      ErrorException_Test.py       | ErrorException.txt |                                None | Approved (by Ayman)    |
 
 ------
 
 ## Complete Class: Compressor
 
-**will be complied in one file, with separate test, after approving all class method.** 
+| File Name     | Type  |   Test function    |  Sample output | Dependency | Status(Approved/Draft) |
+| :------------ | :---: | :----------------: | -------------: | ---------: | ---------------------- |
+| Compressor.py | Class | Compressor_Test.py | Compressor.txt |  all above | Draft                  |

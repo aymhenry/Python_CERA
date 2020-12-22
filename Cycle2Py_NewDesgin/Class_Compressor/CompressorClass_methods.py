@@ -11,7 +11,7 @@ from interpolation import *
 
 
 class Comp_Map:
-    IREAD = 0  # indicator data is fetched from copressor file
+    #IREAD = 0  # indicator data is fetched from copressor file
 
     IUNITS = None
     TEDATA = None
@@ -22,7 +22,6 @@ class Comp_Map:
 
     def __init__(self, objCP):
         Comp_Map.objCP = objCP
-
 
     @show_input_output("ALL")
     def compmap(self, PSUCT, PDISC, ICOMP,
@@ -483,5 +482,6 @@ class Comp_Map:
         QHILO = 0.0 # use less feedback
         RN = 0.97 * GAMA
 
-        return [ HOUT, QHILO, QCAN, VSUC, VV2, TSUC, TDISC, GAMA, RN, ETAS]
+        return [ HOUT, QHILO, QCAN, VSUC, VV2, 
+                TSUC, TDISC, GAMA, RN, ETAS, MREF]
 

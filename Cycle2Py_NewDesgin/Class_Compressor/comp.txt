@@ -2,7 +2,7 @@
 
 ==Test 1 =========================
     #-- Inputs for Function Name: comp
-        arg no 1 =  <CoolPrp.CoolPrp object at 0x008BF628>
+        arg no 1 =  <CoolPrp.CoolPrp object at 0x015CF628>
         H1 =  196401.49183146743
         P1 =  123050.0
         P2 =  928180.0
@@ -37,12 +37,12 @@
   GAMA   1.1374407046311665
   RN     1.1033174834922315
   ETAS   0.7008529712799807
-  DISP   5.7212885425902e-06
+  DISP m3  5.7212885425902e-06
 
 
 ==Test 2 =========================
     #-- Inputs for Function Name: comp
-        arg no 1 =  <CoolPrp.CoolPrp object at 0x008BF628>
+        arg no 1 =  <CoolPrp.CoolPrp object at 0x015CF628>
         H1 =  196401.49183146743
         P1 =  123050.0
         P2 =  928180.0
@@ -76,7 +76,7 @@
   ................Other
   GAMA   1.6075280532110983
   RN     1.5593022116147652
-  ETAS   0
+ not calculated ETAS   None
   DISP   8.2954938226284e-07
 
 

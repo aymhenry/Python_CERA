@@ -1,9 +1,7 @@
-
-
 ==Test compcall only IMAP=0 ................
     #-- Inputs for Function Name: compcall
-        arg no 1 =  <CompressorClass_methods.Comp_Map object at 0x03487400>
-        arg no 2 =  <CoolPrp.CoolPrp object at 0x031DF628>
+        arg no 1 =  <CompressorClass_methods.Comp_Map object at 0x00FD7400>
+        arg no 2 =  <CoolPrp.CoolPrp object at 0x00F6F628>
         PSUCT =  123050.0
         PDISC =  928180.0
         TSUCT =  296
@@ -14,7 +12,7 @@
         strFileName =  DG73C12RAU6.cmp
         ICOMP =  1
     #-- Inputs for Function Name: compmap
-        arg no 1 =  <CompressorClass_methods.Comp_Map object at 0x03487400>
+        arg no 1 =  <CompressorClass_methods.Comp_Map object at 0x00FD7400>
         PSUCT =  123050.0
         PDISC =  928180.0
         TSUCT =  296
@@ -56,7 +54,7 @@
 
 
     #-- Outputs for Function Name: compcall
-        Result = [388406.76288616547, 0.0, 0.7434144850439689, 0.1611942767347614, 0.02191754267990197, 337.2834872777778, 339.12658919608685, 1.1423062073090828, 1.1080370210898103, 0.6034503913105754]
+        Result = [388406.76288616547, 0.0, 0.7434144850439689, 0.1611942767347614, 0.02191754267990197, 337.2834872777778, 339.12658919608685, 1.1423062073090828, 1.1080370210898103, 0.6034503913105754, 7.211126331912393]
 
 
   ................. K
@@ -67,6 +65,9 @@
   ............. m3/kg
   VSUC     0.1611942767347614
   VV2      0.02191754267990197
+
+  MREF mass flow rate  kg/hr  7.211126331912393
+
   QCAN (#)     0.7434144850439689
   GAMA (%)  1.1423062073090828
   RN   (%)  1.1080370210898103
