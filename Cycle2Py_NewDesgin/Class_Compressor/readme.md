@@ -2,16 +2,7 @@
 
 ## General information
 
-Compressor (Compressor.py) class solves the compressor module, compressor module is one of three type:-
-
-1. MAP - Tabular MAP based compressor model. IMAP = 0, with is calculated using class: Comp_MAP
-2. ERR - Efficiency Model. IMAP = 1, with is calculated using class: Comp_ERR
-3. EMOD - Theoretically based model. Compressor IMAP = 2, with is calculated using class: Comp_EMOD
-
-All the three class inherits the base Abstract class Comp_Abstract.
-Another class Compressor class is exists to take Compressor type, and return the required class according to IMAP value.
-
-In Fortran there was function (comp) which is used in to server two types of compressors, IMAP=1, and 2. In the future this function will be divided to two separate parts, but now it will be tested once after approving faction logic.
+Compressor (Compressor.py) class solves the compressor module, compressor module.
 
 ### CompMap Class (Sub Class for Compressor Class)
 
@@ -157,7 +148,6 @@ Some function will be tested also using Python **unittest**. to use this :-
 
 | File Name                  |   Type   |           Test function           |      Sample output |                          Dependency | Status(Approved/Draft) |
 | :------------------------- | :------: | :-------------------------------: | -----------------: | ----------------------------------: | ---------------------- |
-| comp.py                    | Function |           comp_Test.py            |           comp.txt |                                None | Approved (by Omar)     |
 | CompMap.py                 |  Class   |          CompMap_Test.py          |        CompMap.txt |                          FileAccess | Approved (by Ayman)    |
 | read_comp_file.py          | Function |      read_comp_file_Test.py       | read_comp_file.txt |                          CompMap.py | Approved (by Ayman)    |
 | CoolPrp.py                 |  Class   | CoolPrp_Test.py, CoolPrp_Test2.py |        CoolPrp.txt |                                None | Approved (by Ayman)    |
@@ -165,7 +155,6 @@ Some function will be tested also using Python **unittest**. to use this :-
 | interpolation.py           | Function |       interpolation_Test.py       |  interpolation.txt |                                None | Approved (by Ayman)    |
 | CompressorClass_methods.py |  method  |       func_compmap_Test.py        |   func_compmap.txt | interpolation.py, read_comp_file.py | Approved (by Omar)     |
 | CompressorClass_methods.py |  method  |       func_compcall_Test.py       |  func_compcall.txt |                      compmap method | Approved (by Omar)     |
-| map.py                     | function |            map_Test.py            |            map.txt |                                None | Draft                  |
 | ErrorException.py          |  Class   |      ErrorException_Test.py       | ErrorException.txt |                                None | Approved (by Ayman)    |
 
 ------
