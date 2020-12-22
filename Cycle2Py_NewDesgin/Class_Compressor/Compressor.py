@@ -38,7 +38,7 @@ class Compressor:
         OLDMAS = MREF
 
         lstRes = self.compcall(
-            PSUCT=PSUCT, PDISC=PDISC, TSUCT=TSUCT, VSUCT=VSUCT, MREF=MREF,
+            PSUCT=PSUCT, PDISC=PDISC, TSUCT=TSUCT, VSUCT=VSUCT,
             TAMB=self.TAMB,
             FRACT_SPEED=self.FRACT_SPEED,
             ICOMP=self.ICOMP
@@ -67,7 +67,7 @@ class Compressor:
         return dicRes
 
     def compcall( self, PSUCT, PDISC, TSUCT, VSUCT,
-                  TAMB, MREF, FRACT_SPEED, ICOMP):
+                  TAMB, FRACT_SPEED, ICOMP):
         # ************************************************************
         # true compressor map routine.  applies to refrigerant        *
         # subroutine compcall calculates isentropic compressor        *

@@ -8,8 +8,8 @@ Common Data===================
     PSUCT Pa    =  123050.0
     PDISC Pa    =  928180.0
     TSUCT K     =  296
-    VSUCT kg/m3 =  0.1611942767347614
     MREF kg/hr  =  5.8
+    VSUCT kg/m3 =  0.1611942767347614
 
 == Output===============
 Compressor exit Temp K        TSP =  337.2834872777778
