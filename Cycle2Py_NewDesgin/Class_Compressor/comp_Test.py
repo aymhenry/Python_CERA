@@ -13,7 +13,7 @@ P1 = 123.05 * 1000  # Suction pressure Pa
 P2 = 928.18 * 1000  # Discharge pressire Pa
 
 R12_TABLE_READING = 200.0 - 27.10795349661135 # 26.2257538946007 	# kj/kg   200-app result at 0C need to be 200, valid only for RF12
-H1 = 23726 *1000 /120.91 + R12_TABLE_READING # J/kg
+H1 = 1000*(23726 /120.91 + R12_TABLE_READING )# J/kg
 V1 = 19.490 / 120.91 # m3/kg
 
 TAMB = 308.11 # K

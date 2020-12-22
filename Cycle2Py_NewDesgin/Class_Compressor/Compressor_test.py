@@ -9,7 +9,7 @@ objCP = CoolPrp()
 objCP.setup('R12')
 
 
-#========================================================
+#==Happ/120.91 + R12_TABLE_READING=========================================
 T1 = 300 #296     # K Suction temp. compressor inlet
 T12 = 280 #249.5  # K fresh food evap. dew point
 
@@ -17,7 +17,7 @@ P1 = 123.05 * 1000  # Suction pressure Pa
 P2 = 928.18 * 1000  # Discharge pressire Pa
 
 R12_TABLE_READING = 200.0 - 27.10795349661135 # 26.2257538946007 	# kj/kg   200-app result at 0C need to be 200, valid only for RF12
-H1 = 23726 *1000 /120.91 + R12_TABLE_READING # J/kg
+H1 = 1000*(23726 /120.91 + R12_TABLE_READING) # J/kg
 V1 = 19.490 / 120.91 # m3/kg
 SIZE = 218 / 3.97  # capacity (btuh) at rating conditions (kcal/h = 3.97 btu/h)
 
@@ -55,8 +55,7 @@ strFileName = "DG73C12RAU6.cmp"  # File name
 
 DISPLC = 6.57	# cu-cm	DISPLC[1] compressor displacement
 
-R12_TABLE_READING = 200.0 - 27.10795349661135 # 26.2257538946007 	# kj/kg   200-app result at 0C need to be 200, valid only for RF12
-H1 = 23726 *1000 /120.91 + R12_TABLE_READING # J/kg
+H1 = 1000*(23726 /120.91 + R12_TABLE_READING) # J/kg
 
 #-=-=-=-=-=-=-=-==
 
