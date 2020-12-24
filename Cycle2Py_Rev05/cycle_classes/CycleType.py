@@ -309,8 +309,8 @@ class CycleType_Abstract (ABC, CycleUtil):
         print("aym --- self.obj_data.SPEED", self.obj_data.SPEED)
 
         if(self.obj_data.IMAP == 1):
-            self.obj_data.SPEED = self.obj_data.SPEEDN * \
-                self.obj_data.SPEEDI[lng_item]
+            self.obj_data.SPEED = self.obj_data.SPEEDN \
+                                  * self.obj_data.SPEEDI[lng_item]
         # from cm3 to cu-inch compressor displacement
         self.obj_data.DISPLC[lng_item] = self.obj_data.DISPLC[lng_item] / 16.3871
 

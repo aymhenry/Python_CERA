@@ -74,7 +74,7 @@ class Start:
 
         self.view_cycle_res(obj_param)  # View cycle calculation results
 
-        print("aym @ 63 self.view")
+        print("aym @ 77 self.view")
         self.view()  # View all data
 
     # -----------------------------------------------------------

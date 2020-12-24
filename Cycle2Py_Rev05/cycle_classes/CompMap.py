@@ -375,9 +375,9 @@ class CompMap (FileAccess):
         if self.isError():
             return
         #	     capacity, temper, mass flow
-        # unit 1 - btu/hr,  deg f, lb/hr
-        # unit 2 - kcal/hr, deg c, kg/hr
-        #
+        # unit 1 - kcal/hr, deg c, kg/hr
+        # unit 2 - btu/hr,  deg f, lb/hr
+        
         # power data must be in watts
         #
         if self.arr_y1_values[1] <= 50:

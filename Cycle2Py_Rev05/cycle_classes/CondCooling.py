@@ -57,6 +57,7 @@ class CondCool_Abstract (ABC, HeatExch, Data):
         #         INITIALIZE
         #
 
+                
         ICNT = 10  # any value but not 0,1,2, Python only to be checked
         #print (" in Python only, to check later, ICNT set in cond method ", ICNT)
         # MROLD = 0# Python only
@@ -108,16 +109,25 @@ class CondCool_Abstract (ABC, HeatExch, Data):
         ERRORT = abs(TCNEW - TC[JC])
         ERRORM = abs(Data.obj_cdata.MREF - Data.obj_cdata.MROLD) / \
             Data.obj_cdata.MREF
-
+            
+        # ==============this block modified by Ayman
+        # if(ERRORT < TOL_COND and ERRORM <= TOL_MASS):
+            # ICONC = 1 
+        
+        # this block modified by Ayman
         if(ERRORT < Data.obj_cdata.TOL_COND and ERRORM <= Data.obj_cdata.TOL_MASS):
+            ICONC = 0
+        else:
             ICONC = 1
-
+        # End of Ayman Modification
+            
         JC = 2
         ICNT = ICNT + 1  # useless
         TC[JC] = TCNEW
         # modification by Ayman - MROLD = Data.obj_cdata.MREF #useless
         Data.obj_cdata.MROLD = Data.obj_cdata.MREF
 
+        print("\n\n\n>>>> aym Err if 1      ICONC =", ICONC)
         return [TS2, TC, JC, ICONC]
 
 
@@ -137,6 +147,7 @@ class CondCool_CNat (CondCool_Abstract):  # Data.obj_cdata.ICOND= 0
 
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
     def cnat(self, TS1, TS3, TS5, T14, H14, T3, H3, T, TBUB, HBUB, CPRLIQ):
+
         # [ P12,P13,P14,P15, P16, P17 ] = self.cnat (P1 to P11 )
         #	input TS1, TS3, TS5, T14,H14,T3, H3,T,TBUB, HBUB,CPRLIQ
         # 	output QDSC, QTPC, QSCC, QTOTC, FSUP, FSUB
@@ -325,18 +336,11 @@ class CondCool_CCross (CondCool_Abstract):  # Data.obj_cdata.ICOND== 1
             Data.obj_cdata.N_COND)
 
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
-    def ccross(
-            self,
-            TS1,
-            T2,
-            H2,
-            TDEW_S,
-            HDEW_S,
-            TBUB_S,
-            HBUB_S,
+    def ccross(self,
+            TS1, T2, H2,
+            TDEW_S, HDEW_S, TBUB_S, HBUB_S,
             CPRLIQ,
-            PIN,
-            POUT,
+            PIN, POUT,
             X,
             NUM_ZONE):
         #   ******************************************************************
@@ -428,7 +432,6 @@ class CondCool_CCross (CondCool_Abstract):  # Data.obj_cdata.ICOND== 1
                     if(ICOUNT > 100):
                         LOOKING_FOR_AREA = False
                         continue
-                    # End if
 
                     CAIR = (ASCC / Data.obj_cdata.ATOTC) * Data.obj_cdata.CFMC
                     if(CAIR <= CRSC):
@@ -437,7 +440,6 @@ class CondCool_CCross (CondCool_Abstract):  # Data.obj_cdata.ICOND== 1
                     else:
                         CMINSC = CRSC
                         CMAXSC = CAIR
-                    # End if
 
                     QMAX = CMINSC * (TBUB - TAIR)
                     EFF_SUB = QSUB / QMAX
@@ -451,7 +453,6 @@ class CondCool_CCross (CondCool_Abstract):  # Data.obj_cdata.ICOND== 1
                     if(ERROR <= AREA_TOL):
                         LOOKING_FOR_AREA = False
                         continue
-                    # End if
 
                     QRAT = EFFSCC * QMAX / QSUB
                     QTOL = 1.0 - QRAT
@@ -467,19 +468,13 @@ class CondCool_CCross (CondCool_Abstract):  # Data.obj_cdata.ICOND== 1
                         DAREA = DAREA_MAX
 
                     ASCC = ASCC + DAREA
-                # End Do
-
-            # End if
 
             QSCC = EFFSCC * CMINSC * (TBUB - TAIR)
-        # End if
-        #
-        #        CONTINUE WITH TWO-PHASE AREA
-        #
+
+        #  CONTINUE WITH TWO-PHASE AREA
         ALEFT = Data.obj_cdata.ATOTC - ASCC
 
-        #N = 1
-        for N in range(1, NUM_ZONE + 1):  # DO WHILE (N  <=  NUM_ZONE)
+        for N in range(1, NUM_ZONE + 1):
             PDEW = PBUB + DELP
             HDEW = HBUB + DELH
             [TDEW, XQ, XL, XV, VL, VV, HL, HV] = self.hpin(HDEW, PDEW, X)
@@ -488,9 +483,8 @@ class CondCool_CCross (CondCool_Abstract):  # Data.obj_cdata.ICOND== 1
             if(HAVE_NOT_USED_FULL_AREA):
                 CPRTP = (HDEW - HBUB) / abs(TDEW - TBUB + 0.0001)
                 CRTP = Data.obj_cdata.MREF * CPRTP
-                #
+
                 #        DETERMINE CMIN AND CMAX IN THE TWO-PHASE REGION
-                #
                 CAIR = (ALEFT / Data.obj_cdata.ATOTC) * Data.obj_cdata.CFMC
                 if(CAIR <= CRTP):
                     CMINTP = CAIR
@@ -498,10 +492,8 @@ class CondCool_CCross (CondCool_Abstract):  # Data.obj_cdata.ICOND== 1
                 else:
                     CMINTP = CRTP
                     CMAXTP = CAIR
-                # End if
-                #
+
                 #        IS AREA BIG ENOUGH FOR CONDENSATION
-                #
                 QMAX = CMINTP * (TDEW - TAIR)
                 QDUM = Data.obj_cdata.MREF * (HDEW - HBUB)
 
@@ -514,12 +506,12 @@ class CondCool_CCross (CondCool_Abstract):  # Data.obj_cdata.ICOND== 1
                 if(EFFTPC <= EFF_TPC or ENTERS_WET):  # Need more area
                     ATPC = ATPC + ALEFT
                     HAVE_NOT_USED_FULL_AREA = False
-                    #
-                    #        BEGIN ITERATION PROCESS TO DETERMINE SOLUTION FOR THE
-                    #        TWO PHASE REGION
-                    #
-                    #        INITIALIZE VARIABLES
-                    #
+                    
+                    #  BEGIN ITERATION PROCESS TO DETERMINE SOLUTION FOR THE
+                    #   TWO PHASE REGION
+ 
+                    # INITIALIZE VARIABLES
+                    
                 else:
                     ADUM = 0.9 * ALEFT
                     LOOKING_FOR_AREA = True
@@ -531,8 +523,7 @@ class CondCool_CCross (CondCool_Abstract):  # Data.obj_cdata.ICOND== 1
                         if(ICOUNT > 100):
                             LOOKING_FOR_AREA = False
                             continue
-                        # End if
-
+                    
                         CAIR = (ADUM / Data.obj_cdata.ATOTC) * \
                             Data.obj_cdata.CFMC
                         if(CAIR <= CRTP):
@@ -541,8 +532,7 @@ class CondCool_CCross (CondCool_Abstract):  # Data.obj_cdata.ICOND== 1
                         else:
                             CMINTP = CRTP
                             CMAXTP = CAIR
-                        # End if
-
+                    
                         QMAX = CMINTP * (TDEW - TAIR)
                         EFF_TPC = QDUM / QMAX
 
@@ -555,8 +545,7 @@ class CondCool_CCross (CondCool_Abstract):  # Data.obj_cdata.ICOND== 1
                         if(ERROR <= AREA_TOL):
                             LOOKING_FOR_AREA = False
                             continue
-                        # End if
-
+                    
                         QRAT = EFFTPC * QMAX / QDUM
                         QTOL = 1.0 - QRAT
 
@@ -571,23 +560,18 @@ class CondCool_CCross (CondCool_Abstract):  # Data.obj_cdata.ICOND== 1
                             DAREA = DAREA_MAX
 
                         ADUM = ADUM + DAREA
-                    # End Do
+                    
                     ATPC = ATPC + ADUM
-                # End if
-
+                
                 QTPC = QTPC + EFFTPC * CMINTP * (TDEW - TAIR)
-            # End if
+            
 
             ALEFT = Data.obj_cdata.ATOTC - ASCC - ATPC
             HBUB = HBUB + DELH
             TBUB = TDEW
             PBUB = PBUB + DELP
-            #N = N + 1
-        # End Do
-
-        #
-        #        CONTINUE WITH DESUPERHEATING AREA
-        #
+            
+        #       CONTINUE WITH DESUPERHEATING AREA
         ALEFT = Data.obj_cdata.ATOTC - ASCC - ATPC
         if(ALEFT <= 0.0):
             HAVE_NOT_USED_FULL_AREA = False
@@ -598,9 +582,8 @@ class CondCool_CCross (CondCool_Abstract):  # Data.obj_cdata.ICOND== 1
         if(HAVE_NOT_USED_FULL_AREA):
             CPRVAP = (H2 - HDEW) / (T2 - TDEW)
             CRDS = Data.obj_cdata.MREF * CPRVAP
-            #
+            
             #        DETERMINE CMIN AND CMAX IN THE TWO-PHASE REGION
-            #
             CAIR = (ALEFT / Data.obj_cdata.ATOTC) * Data.obj_cdata.CFMC
 
             if(CAIR <= CRDS):
@@ -609,10 +592,8 @@ class CondCool_CCross (CondCool_Abstract):  # Data.obj_cdata.ICOND== 1
             else:
                 CMINDS = CRDS
                 CMAXDS = CAIR
-            # End if
-            #
+
             #        DETERMINE THE NET HEAT TRANSFER
-            #
             [EFFDSC, DEXDAR] = self.exf(
                 2, ALEFT, Data.obj_cdata.UDSC, CMINDS, CMAXDS)
             # CALL EXF(2,ALEFT,Data.obj_cdata.UDSC,CMINDS,CMAXDS,
@@ -620,17 +601,18 @@ class CondCool_CCross (CondCool_Abstract):  # Data.obj_cdata.ICOND== 1
             QDSC = CMINDS * EFFDSC * (T2 - TAIR)
 
             ADSC = ALEFT
-        # End if
-        #
+        
+        
         #      CALCULATE THE FRACTIONAL SUBCOOLING AND SUPERHEATING REGIONS
-        #
         FSUP = ADSC / Data.obj_cdata.ATOTC
         FSUB = ASCC / Data.obj_cdata.ATOTC
 
         QTOTC = QSCC + QTPC + QDSC
         Data.obj_cdata.UACOND = Data.obj_cdata.ATOTC * \
-            (FSUP * Data.obj_cdata.UDSC + FSUB * Data.obj_cdata.USCC + (1.0 - FSUP - FSUB) * Data.obj_cdata.UTPC)
-        return [CPRVAP, QDSC, QTPC, QSCC, QTOTC, FSUP, FSUB]
+            (FSUP * Data.obj_cdata.UDSC + FSUB * Data.obj_cdata.USCC 
+            + (1.0 - FSUP - FSUB) * Data.obj_cdata.UTPC)
+            
+        return [QDSC, QTPC, QSCC, QTOTC, FSUP, FSUB]
 
 
 class CondCool_CCount(CondCool_Abstract):  # Data.obj_cdata.ICOND== 2

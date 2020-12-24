@@ -18,6 +18,7 @@ from common_classes.FileAccess import FileAccess
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 class Comp_Abstract (ABC, Block2, Data):
     FLDER_COMPMAP_DAT = sys.path[0] + "\\" + "compmap"
+     
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
 
     def __init__(self, objdata, str_Comp_File=""):
@@ -66,29 +67,7 @@ class Comp_Abstract (ABC, Block2, Data):
         #	 COMMON/PARMS/ICOND,IFRSH,IFREZ,DISP,SPEED,CE,CREF,MREF,ETAV,SEFF
         #	 COMMON / MAPDAT / IMAP, ICOMP, ICOOL, EER, SIZE, DISPL, EFFC,
         #	                  SPEEDN, IREAD
-        
-        print ("\n aym ==============================")
-        print ("aym H=", H)
-        print ("aym P=", P)
-        print ("aym X=", X)
-        print ("aym T=", T)
-        print ("aym MEFF=", MEFF)
-        print ("aym QHILO=", QHILO)
-        print ("aym QCAN=", QCAN)
-        print ("aym V=", V)
-        print ("aym TAMB=", TAMB)
-        print ("aym IMAP=", Data.obj_cdata.IMAP)
-        print ("aym EER =", Data.obj_cdata.EER)
-        
-        print ("aym ICOOL = ", Data.obj_cdata.ICOOL)
-        print ("aym ICOMP = ", Data.obj_cdata.ICOMP)
-        print ("aym  EFFC = ", Data.obj_cdata.EFFC)
-        print ("aym  SEFF = ", Data.obj_cdata.SEFF)
-        print ("aym    CE = ", Data.obj_cdata.CE)
-        print ("aym SPEED = ", Data.obj_cdata.SPEED)
-        print ("aym  MREF = ", Data.obj_cdata.MREF)
-        print ("aym ==========================\n")
-        
+               
         R = 8.314
         TOLS = 0.1
 
@@ -214,7 +193,7 @@ class Comp_Abstract (ABC, Block2, Data):
 
             #[P5, P7] = self.vit (P1, P2, P3, P4, P5, P6)
             [VVD, LCRIT] = self.vit(TDISC, P[2], AMIX, BMIX, VVD, False)
-            print("aym    VVD =", VVD)
+
             # CALL VIT(TDISC, P[2], AMIX, BMIX, VVD, .FALSE., LCRIT)
 
             # CALL HCVCPS (1, TDISC, VVD, X, HDISC, CV, CP, DUM1)
@@ -222,7 +201,7 @@ class Comp_Abstract (ABC, Block2, Data):
 
             ETA_ISEN = (H2S - H_SUC) / (HDISC - H_SUC)
             #ETA_ISEN = 0.6
-            print("aym  chk=============================    ETA_ISEN", ETA_ISEN)
+
 
             if(Data.obj_cdata.ICOOL == 0):
                 RATIO = 0.68 - 0.05 * Data.obj_cdata.EER
@@ -347,6 +326,17 @@ class Comp_Abstract (ABC, Block2, Data):
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 class Comp_Map (Comp_Abstract):  # Data.obj_cdata.IMAP== 0
+    IREAD = None
+    IUNITS = None
+    TEDATA = None
+    TCDATA = None
+
+    NEVAP = None
+    NCOND = None
+
+    POWER = None
+    CAPAC = None
+    
     def comp_balance(self):
         OLDMAS = Data.obj_cdata.MREF
         lstRes = self.compcall(
@@ -392,7 +382,8 @@ class Comp_Map (Comp_Abstract):  # Data.obj_cdata.IMAP== 0
         # determine isentropic compressor performance
         XL = [0.0] * (5 + 1)  # modification in Python
         XV = [0.0] * (5 + 1)
-
+        XQ = [0.0] * (16 + 1)
+  
         TSUCT = T[1]
         PSUCT = P[1]
         VSUCT = V[1]
@@ -476,8 +467,8 @@ class Comp_Map (Comp_Abstract):  # Data.obj_cdata.IMAP== 0
         VSUC = V[1]
         QHILO = 0.0
         RN = 0.97 * GAMA
-
-        return [T, HOUT, QHILO, QCAN, VSUC, VV2, TSUC, TDISC, GAMA. RN, ETAS]
+    
+        return [T, HOUT, QHILO, QCAN, VSUC, VV2, TSUC, TDISC, GAMA, RN, ETAS]
 
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
     def compmap(self, PSUCT, PDISC, TSUCT, VSUCT, TAMB, X, GAMA, SPEED):
@@ -500,14 +491,14 @@ class Comp_Map (Comp_Abstract):  # Data.obj_cdata.IMAP== 0
 
         # INCOMP =15 not requirted in Python
         QLOSS = 1.00
-        Data.obj_cdata.TEDATA = [0.0] * (20 + 1)
-        Data.obj_cdata.TCDATA = [0.0] * (20 + 1)
+        # Comp_Map.TEDATA = [0.0] * (20 + 1)
+        # Comp_Map.TCDATA = [0.0] * (20 + 1)
         XX = [0.0] * (5 + 1)
 
         # array(Rows, Cols) = [[0] * Cols for i in range(Rows)]
-        Data.obj_cdata.CAPAC = [[0.0] * (20 + 1) for i in range(20 + 1)]
+        # Comp_Map.CAPAC = [[0.0] * (20 + 1) for i in range(20 + 1)]
         # array(Rows, Cols) = [[0] * Cols for i in range(Rows)]
-        Data.obj_cdata.POWER = [[0.0] * (20 + 1) for i in range(20 + 1)]
+        # Comp_Map.POWER = [[0.0] * (20 + 1) for i in range(20 + 1)]
 
         # ============Python commnet : data description and sample data
         '''
@@ -559,7 +550,9 @@ class Comp_Map (Comp_Abstract):  # Data.obj_cdata.IMAP== 0
 			130		77.3	98.1	118.7	139.0	158.6	177.0
 		'''
         # ==============================================================
-        if (Data.obj_cdata.IREAD == 0):
+        print ("aym Comp_Map.IREAD", Comp_Map.IREAD)
+        
+        if (Comp_Map.IREAD is None):
             obj_comp_map = CompMap(self.str_Comp_File, self.FLDER_COMPMAP_DAT)
 
             if obj_comp_map.isError():
@@ -575,8 +568,8 @@ class Comp_Map (Comp_Abstract):  # Data.obj_cdata.IMAP== 0
             # NEVAP : I3 number of data points along evaporating temperature axis
             # NCOND : I3 number of data points along condensing temperature
             # axis
-            NEVAP = obj_comp_map.getX_count()
-            NCOND = obj_comp_map.getY_count()
+            Comp_Map.NEVAP = obj_comp_map.getX_count()
+            Comp_Map.NCOND = obj_comp_map.getY_count()
 
             # this input is cancelled in Python, compressor type is defined in basic entry data.
             # changing type in middle of process is not acceptable
@@ -587,7 +580,7 @@ class Comp_Map (Comp_Abstract):  # Data.obj_cdata.IMAP== 0
             # IUNITS : I1 units for capacity, temperature data, and mass flow
             # (1 - btu/hr, deg f, lb/hr; 2 - kcal/hr, deg c, kg/hr) power data
             # must be in watts
-            Data.obj_cdata.IUNITS = obj_comp_map.getUnit()
+            Comp_Map.IUNITS = obj_comp_map.getUnit()
 
             # Python commnet : read EVAPORATING TEMPERATURE - x axis
             # for II in range (1, NEVAP+1 ):
@@ -607,16 +600,19 @@ class Comp_Map (Comp_Abstract):  # Data.obj_cdata.IMAP== 0
             #	for J in range (1, NEVAP+1 ):
             #		POWER[I][J] = inastk ( objCompMap, "float" )
 
-            Data.obj_cdata.TEDATA = obj_comp_map.getX_values()
-            Data.obj_cdata.TCDATA = obj_comp_map.getY1_values()
-
+            Comp_Map.TEDATA = obj_comp_map.getX_values()
+            Comp_Map.TCDATA = obj_comp_map.getY1_values()
+            
+            print ("get Comp_Map.TCDATA", Comp_Map.TCDATA)
+            print ("get Comp_Map.TEDATA", Comp_Map.TEDATA)
+            
             # READ COMPRESSOR CAPACITY DATA
-            Data.obj_cdata.CAPAC = obj_comp_map.getCapacity()
+            Comp_Map.CAPAC = obj_comp_map.getCapacity()
 
             # READ COMPRESSOR POWER DATA
-            Data.obj_cdata.POWER = obj_comp_map.getPower()
+            Comp_Map.POWER = obj_comp_map.getPower()
 
-            Data.obj_cdata.IREAD = 1
+            Comp_Map.IREAD = 1
             del(obj_comp_map) 	# close file
 
         # DETERMINE THE SATURATION TEMPERATURES CORRESPONDING TO PSUCT, PDISC
@@ -657,25 +653,32 @@ class Comp_Map (Comp_Abstract):  # Data.obj_cdata.IMAP== 0
         [HS, CVF, CPF, VSND] = self.hcvcps(1, TS, VGUESS, X)
 
         #  CONVERT THE SATURATION TEMPERATURES TO CORRESSPOND TO MAP DATA UNITS
-        if (Data.obj_cdata.IUNITS == 1):
-            TEVAP = TEVAPK * 1.8 - 459.67  # convert from Deg K to C
+        if (Comp_Map.IUNITS == 2):
+            TEVAP = TEVAPK * 1.8 - 459.67  # convert from Deg F to C
             TCOND = TCONDK * 1.8 - 459.67
         else:
             TEVAP = TEVAPK - 273.16  # convert from Deg K to C
             TCOND = TCONDK - 273.16
 
+        print ("TEVAP, TCOND", TEVAP, TCOND)
+        print ("Comp_Map.TCDATA", Comp_Map.TCDATA)
+        print ("Comp_Map.TEDATA", Comp_Map.TEDATA)
+        
+        
         #  CHECK IF TCOND AND/OR TEVAP IS OFF MAP DATA
         ICOND = 1
-        if (TCOND < Data.obj_cdata.TCDATA[1]):
+        if (TCOND < Comp_Map.TCDATA[1]):
             ICOND = 0
-        if (TCOND > Data.obj_cdata.TCDATA[NCOND]):
-            ICOND = NCOND
+            
+        if (TCOND > Comp_Map.TCDATA[Comp_Map.NCOND]):
+            ICOND = Comp_Map.NCOND
 
         IEVAP = 1
-        if (TEVAP < Data.obj_cdata.TEDATA[1]):
+        if (TEVAP < Comp_Map.TEDATA[1]):
             IEVAP = 0
-        if (TEVAP > Data.obj_cdata.TEDATA[NEVAP]):
-            IEVAP = NEVAP
+            
+        if (TEVAP > Comp_Map.TEDATA[Comp_Map.NEVAP]):
+            IEVAP = Comp_Map.NEVAP
 
         # THIS CODING WILL INTERPOLATE IF DATA IS WITHIN THE MAP OR
         #  EXTROPOLATE IF TCOND AND/OR TEVAP ARE/IS LESS THAN MAP DATA
@@ -684,7 +687,7 @@ class Comp_Map (Comp_Abstract):  # Data.obj_cdata.IMAP== 0
         if (ICOND <= 1 and IEVAP <= 1):
             if (ICOND == 1):
                 I = 1
-                while (TCOND > Data.obj_cdata.TCDATA[I]):
+                while (TCOND > Comp_Map.TCDATA[I]):
                     I = I + 1
 
                 ICOND = I - 1
@@ -694,7 +697,7 @@ class Comp_Map (Comp_Abstract):  # Data.obj_cdata.IMAP== 0
 
             I = 1
             if (IEVAP == 1):
-                while (TEVAP > Data.obj_cdata.TEDATA[I]):
+                while (TEVAP > Comp_Map.TEDATA[I]):
                     I = I + 1
 
                 IEVAP = I - 1
@@ -703,135 +706,153 @@ class Comp_Map (Comp_Abstract):  # Data.obj_cdata.IMAP== 0
                 IEVAP = 1
 
             # COMPRESSOR CAPACITY INTERPOLATION
-            DELTC = Data.obj_cdata.TCDATA[ICOND +
-                                          1] - Data.obj_cdata.TCDATA[ICOND]
-            DELTE = Data.obj_cdata.TEDATA[IEVAP +
-                                          1] - Data.obj_cdata.TEDATA[IEVAP]
+            DELTC = Comp_Map.TCDATA[ICOND +1] \
+                - Comp_Map.TCDATA[ICOND]
+                
+            DELTE = Comp_Map.TEDATA[IEVAP + 1] \
+                - Comp_Map.TEDATA[IEVAP]
 
-            FRAC = (TCOND - Data.obj_cdata.TCDATA[ICOND]) / DELTC
-            CAP1 = Data.obj_cdata.CAPAC[ICOND][IEVAP] + (
-                Data.obj_cdata.CAPAC[ICOND + 1][IEVAP] - Data.obj_cdata.CAPAC[ICOND][IEVAP]) * FRAC
+            FRAC = (TCOND - Comp_Map.TCDATA[ICOND]) / DELTC
+            CAP1 = Comp_Map.CAPAC[ICOND][IEVAP] + (
+                Comp_Map.CAPAC[ICOND + 1][IEVAP] 
+                - Comp_Map.CAPAC[ICOND][IEVAP]
+                ) * FRAC
 
-            CAP2 = Data.obj_cdata.CAPAC[ICOND][IEVAP + 1] + (
-                Data.obj_cdata.CAPAC[ICOND + 1][IEVAP + 1] - Data.obj_cdata.CAPAC[ICOND][IEVAP + 1]) * FRAC
+            CAP2 = Comp_Map.CAPAC[ICOND][IEVAP + 1] + (
+                Comp_Map.CAPAC[ICOND + 1][IEVAP + 1] \
+                - Comp_Map.CAPAC[ICOND][IEVAP + 1]
+                ) * FRAC
 
-            FRAC = (TEVAP - Data.obj_cdata.TEDATA[IEVAP]) / DELTE
+            FRAC = (TEVAP - Comp_Map.TEDATA[IEVAP]) / DELTE
             CAP = CAP1 + (CAP2 - CAP1) * FRAC
 
             # COMPRESSOR POWER INTERPOLATION
-            FRAC = (TCOND - Data.obj_cdata.TCDATA[ICOND]) / DELTC
-            POW1 = Data.obj_cdata.POWER[ICOND][IEVAP] + (
-                Data.obj_cdata.POWER[ICOND + 1][IEVAP] - Data.obj_cdata.POWER[ICOND][IEVAP]) * FRAC
-            POW2 = Data.obj_cdata.POWER[ICOND][IEVAP + 1] + (
-                Data.obj_cdata.POWER[ICOND + 1][IEVAP + 1] - Data.obj_cdata.POWER[ICOND][IEVAP + 1]) * FRAC
-            FRAC = (TEVAP - Data.obj_cdata.TEDATA[IEVAP]) / DELTE
+            FRAC = (TCOND - Comp_Map.TCDATA[ICOND]) / DELTC
+            
+            POW1 = Comp_Map.POWER[ICOND][IEVAP] + (
+                Comp_Map.POWER[ICOND + 1][IEVAP] 
+                - Comp_Map.POWER[ICOND][IEVAP]) * FRAC
+            
+            POW2 = Comp_Map.POWER[ICOND][IEVAP + 1] + (
+                Comp_Map.POWER[ICOND + 1][IEVAP + 1] 
+                - Comp_Map.POWER[ICOND][IEVAP + 1]) * FRAC
+            
+            FRAC = (TEVAP - Comp_Map.TEDATA[IEVAP]) / DELTE
             POW = POW1 + (POW2 - POW1) * FRAC
 
         # TCOND GREATER THAN OR EQUAL THE MAXIMUM CONDENSING TEMP DATA POINT
-        if (ICOND == NCOND):
+        if (ICOND == Comp_Map.NCOND):
             if (IEVAP <= 1):
                 I = 1
                 if (IEVAP == 1):
-                    while (TEVAP > Data.obj_cdata.TEDATA[I]):
+                    while (Comp_Map.TEVAP > Comp_Map.TEDATA[I]):
                         I = I + 1
                     IEVAP = I - 1
                 else:
                     IEVAP = 1
 
                 #  COMPRESSOR CAPACITY CALCULATION
-                DELTC = Data.obj_cdata.TCDATA[ICOND] - \
-                    Data.obj_cdata.TCDATA[ICOND - 1]
-                DELTE = Data.obj_cdata.TEDATA[IEVAP +
-                                              1] - Data.obj_cdata.TEDATA[IEVAP]
+                DELTC = Comp_Map.TCDATA[ICOND]  \
+                    - Comp_Map.TCDATA[ICOND - 1]
+                    
+                DELTE = Comp_Map.TEDATA[IEVAP + 1] \
+                    - Comp_Map.TEDATA[IEVAP]
 
-                FRAC = (TCOND - Data.obj_cdata.TCDATA[ICOND]) / DELTC
+                FRAC = (TCOND - Comp_Map.TCDATA[ICOND]) / DELTC
                 FRAC2 = FRAC
 
-                CAP1 = Data.obj_cdata.CAPAC[ICOND][IEVAP] + (
-                    CAPAC[ICOND][IEVAP] - Data.obj_cdata.CAPAC[ICOND - 1][IEVAP]) * FRAC
-                CAP2 = Data.obj_cdata.CAPAC[ICOND][IEVAP + 1] + (
-                    CAPAC[ICOND][IEVAP + 1] - Data.obj_cdata.CAPAC[ICOND - 1][IEVAP + 1]) * FRAC
+                CAP1 = Comp_Map.CAPAC[ICOND][IEVAP] + (
+                    CAPAC[ICOND][IEVAP] 
+                    - Comp_Map.CAPAC[ICOND - 1][IEVAP]) * FRAC
+                    
+                CAP2 = Comp_Map.CAPAC[ICOND][IEVAP + 1] + (
+                    CAPAC[ICOND][IEVAP + 1] 
+                    - Comp_Map.CAPAC[ICOND - 1][IEVAP + 1]) * FRAC
 
-                FRAC = (TEVAP - Data.obj_cdata.TEDATA[IEVAP]) / DELTE
+                FRAC = (Comp_Map.TEVAP - Comp_Map.TEDATA[IEVAP]) / DELTE
                 CAP = CAP1 + (CAP2 - CAP1) * FRAC
 
                 #  COMPRESSOR POWER CALCULATION
-                FRAC = (TCOND - Data.obj_cdata.TCDATA[ICOND]) / DELTC
+                FRAC = (TCOND - Comp_Map.TCDATA[ICOND]) / DELTC
 
-                POW1 = Data.obj_cdata.POWER[ICOND][IEVAP] + \
+                POW1 = Comp_Map.POWER[ICOND][IEVAP] + \
                     (POWER[ICOND][IEVAP] - POWER[ICOND - 1][IEVAP]) * FRAC
-                POW2 = Data.obj_cdata.POWER[ICOND][IEVAP + 1] + (
+                    
+                POW2 = Comp_Map.POWER[ICOND][IEVAP + 1] + (
                     POWER[ICOND][IEVAP + 1] - POWER[ICOND - 1][IEVAP + 1]) * FRAC
 
-                FRAC = (TEVAP - Data.obj_cdata.TEDATA[IEVAP]) / DELTE
+                FRAC = (Comp_Map.TEVAP - Comp_Map.TEDATA[IEVAP]) / DELTE
                 POW = POW1 + (POW2 - POW1) * FRAC
 
             else:
                 # COMPRESSOR CAPACITY CALCULATION
-                DELTC = Data.obj_cdata.TCDATA[ICOND] - \
-                    Data.obj_cdata.TCDATA[ICOND - 1]
-                DELTE = Data.obj_cdata.TEDATA(
-                    IEVAP) - Data.obj_cdata.TEDATA[IEVAP - 1]
-                FRAC = (TCOND - Data.obj_cdata.TCDATA[ICOND]) / DELTC
+                DELTC = Comp_Map.TCDATA[ICOND] - \
+                    Comp_Map.TCDATA[ICOND - 1]
+                DELTE = Comp_Map.TEDATA(
+                    IEVAP) - Comp_Map.TEDATA[IEVAP - 1]
+                FRAC = (TCOND - Comp_Map.TCDATA[ICOND]) / DELTC
 
-                CAP1 = Data.obj_cdata.CAPAC[ICOND][IEVAP - 1] + (
+                CAP1 = Comp_Map.CAPAC[ICOND][IEVAP - 1] + (
                     CAPAC[ICOND][IEVAP - 1] - CAPAC[ICOND - 1][IEVAP - 1]) * FRAC
-                CAP2 = Data.obj_cdata.CAPAC[ICOND][IEVAP] + \
+                    
+                CAP2 = Comp_Map.CAPAC[ICOND][IEVAP] + \
                     (CAPAC[ICOND][IEVAP] - CAPAC[ICOND - 1][IEVAP]) * FRAC
 
-                FRAC = (TEVAP - Data.obj_cdata.TEDATA[IEVAP]) / DELTE
+                FRAC = (Comp_Map.TEVAP - Comp_Map.TEDATA[IEVAP]) / DELTE
                 CAP = CAP2 + (CAP2 - CAP1) * FRAC
 
                 #          COMPRESSOR POWER CALCULATION
-                FRAC = (TCOND - Data.obj_cdata.TCDATA[ICOND]) / DELTC
-                POW1 = Data.obj_cdata.POWER[ICOND][IEVAP - 1] + (
-                    Data.obj_cdata.POWER[ICOND][IEVAP - 1] - Data.obj_cdata.POWER[ICOND - 1][IEVAP - 1]) * FRAC
+                FRAC = (TCOND - Comp_Map.TCDATA[ICOND]) / DELTC
+                
+                POW1 = Comp_Map.POWER[ICOND][IEVAP - 1] + (
+                    Comp_Map.POWER[ICOND][IEVAP - 1] - Comp_Map.POWER[ICOND - 1][IEVAP - 1]) * FRAC
 
-                POW2 = Data.obj_cdata.POWER[ICOND][IEVAP] + (
-                    Data.obj_cdata.POWER[ICOND][IEVAP] - Data.obj_cdata.POWER[ICOND - 1][IEVAP]) * FRAC
+                POW2 = Comp_Map.POWER[ICOND][IEVAP] + (
+                    Comp_Map.POWER[ICOND][IEVAP] - Comp_Map.POWER[ICOND - 1][IEVAP]) * FRAC
 
-                FRAC = (TEVAP - Data.obj_cdata.TEDATA[IEVAP]) / DELTE
+                FRAC = (Comp_Map.TEVAP - Comp_Map.TEDATA[IEVAP]) / DELTE
                 POW = POW2 + (POW2 - POW1) * FRAC
 
         # CONDENSING TEMPERATURE NOT GREATER THAN MAXIMUM OF MAP DATA
         #   EVAPORATING TEMPERATURE GREATER THAN MAXIMUM OF MAP DATA
-        #
-        if (IEVAP == NEVAP and ICOND < NCOND):
+        if (IEVAP == Comp_Map.NEVAP and ICOND < Comp_Map.NCOND):
             if (ICOND == 1):
                 I = 1
-                while (TCOND > Data.obj_cdata.TCDATA[I]):
+                while (TCOND > Comp_Map.TCDATA[I]):
                     I = I + 1
                 ICOND = I - 1
             else:
                 ICOND = 1
 
             #  COMPRESSOR CAPACITY CALCULATION
-            DELTC = Data.obj_cdata.TCDATA[ICOND +
-                                          1] - Data.obj_cdata.TCDATA[ICOND]
-            DELTE = Data.obj_cdata.TEDATA[IEVAP] - \
-                Data.obj_cdata.TEDATA[IEVAP - 1]
-            FRAC = (TCOND - Data.obj_cdata.TCDATA[ICOND]) / DELTC
+            DELTC = Comp_Map.TCDATA[ICOND + 1] - Comp_Map.TCDATA[ICOND]
+                
+            DELTE = Comp_Map.TEDATA[IEVAP] - Comp_Map.TEDATA[IEVAP - 1]
+            
+            FRAC = (TCOND - Comp_Map.TCDATA[ICOND]) / DELTC
 
-            CAP1 = Data.obj_cdata.CAPAC[ICOND][IEVAP - 1] + (
-                Data.obj_cdata.CAPAC[ICOND + 1][IEVAP - 1] - Data.obj_cdata.CAPAC[ICOND][IEVAP - 1]) * FRAC
+            CAP1 = Comp_Map.CAPAC[ICOND][IEVAP - 1] + (
+                Comp_Map.CAPAC[ICOND + 1][IEVAP - 1] - Comp_Map.CAPAC[ICOND][IEVAP - 1]) * FRAC
 
-            CAP2 = Data.obj_cdata.CAPAC[ICOND][IEVAP] + (
-                Data.obj_cdata.CAPAC[ICOND + 1][IEVAP] - Data.obj_cdata.CAPAC[ICOND][IEVAP]) * FRAC
+            CAP2 = Comp_Map.CAPAC[ICOND][IEVAP] + (
+                Comp_Map.CAPAC[ICOND + 1][IEVAP] - Comp_Map.CAPAC[ICOND][IEVAP]) * FRAC
 
-            FRAC = (Data.obj_cdata.TEVAP -
-                    Data.obj_cdata.TEDATA[IEVAP]) / DELTE
+            FRAC = (Comp_Map.TEVAP -
+                    Comp_Map.TEDATA[IEVAP]) / DELTE
             CAP = CAP2 + (CAP2 - CAP1) * FRAC
 
             #  COMPRESSOR POWER CALCULATION
-            FRAC = (TCOND - Data.obj_cdata.TCDATA[ICOND]) / DELTC
+            FRAC = (TCOND - Comp_Map.TCDATA[ICOND]) / DELTC
 
-            POW1 = Data.obj_cdata.POWER[ICOND][IEVAP - 1] + (
-                Data.obj_cdata.POWER[ICOND + 1][IEVAP - 1] - Data.obj_cdata.POWER[ICOND][IEVAP - 1]) * FRAC
+            POW1 = Comp_Map.POWER[ICOND][IEVAP - 1] + (
+                Comp_Map.POWER[ICOND + 1][IEVAP - 1] \
+                - Comp_Map.POWER[ICOND][IEVAP - 1]) * FRAC
 
-            POW2 = Data.obj_cdata.POWER[ICOND][IEVAP] + (
-                Data.obj_cdata.POWER[ICOND + 1][IEVAP] - Data.obj_cdata.POWER[ICOND][IEVAP]) * FRAC
+            POW2 = Comp_Map.POWER[ICOND][IEVAP] + (
+                Comp_Map.POWER[ICOND + 1][IEVAP] \
+                - Comp_Map.POWER[ICOND][IEVAP]) * FRAC
 
-            FRAC = (TEVAP - Data.obj_cdata.TEDATA[IEVAP]) / DELTE
+            FRAC = (Comp_Map.TEVAP - Comp_Map.TEDATA[IEVAP]) / DELTE
             POW = POW2 + (POW2 - POW1) * FRAC
 
         # handle off-speed operation (use Danfoss variable speed data)
@@ -844,12 +865,12 @@ class Comp_Map (Comp_Abstract):  # Data.obj_cdata.IMAP== 0
         POW = POW * REL_POW
 
         # CONVERT THE CAPACITY TO KJ/HR
-        if (Data.obj_cdata.IUNITS == 1):
+        if (Comp_Map.IUNITS == 2):
             CAP = CAP * 1.0548
         else:
             CAP = CAP * 4.184
 
-        if (Data.obj_cdata.IUNITS != 1 and Data.obj_cdata.IUNITS != 2):
+        if (Comp_Map.IUNITS != 1 and Comp_Map.IUNITS != 2):
             print("###CHECK COMPRESSOR MAP UNITS###")
 
         WDOT = POW

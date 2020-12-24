@@ -26,7 +26,9 @@ class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
 
         Cycle.obj_parameter = obj_parameter
         Data.obj_cdata = obj_cdata
-
+        
+        Data.obj_cdata.DISP = 0.0 # this calculated in comp method only
+        
         Cycle.obj_parameter.FSUBC = 0.0  # in Python only, it has no value in Fortant
         Cycle.obj_parameter.FSUPE = 0.0  # in python only
         Cycle.obj_parameter.FSUPC = 0.1
@@ -533,10 +535,6 @@ class Cycle (Adjlod, HeatExch, CycleUtil, Block2, Data):
 
             #	enter iteration for evaporator outlet temperature
             Data.obj_cdata.IE = 1
-
-            print(
-                "aym Cycle.obj_parameter.ITMAXE=",
-                Cycle.obj_parameter.ITMAXE)
 
             # DO WHILE (Data.obj_cdata.IE  <=  ITMAXE  and
             # Cycle.obj_parameter.LECON)
