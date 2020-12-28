@@ -1,0 +1,138 @@
+
+
+ Teat 1 ICOND = 0 ----------------------------------------------
+
+=== Parameters ======================
+Total Heat Transfer Surface Area               m2 ATOTC= 0.849
+Units to be checked  CFMC
+                    CFMC= 175.44
+
+
+  Unit sec-F/Btu(th)
+Desuperheating Heat Transfer Conductance, kj/hr/m2/C USCC= 55562.399999999994
+Subcooling Heat Transfer Conductance,     kj/hr/m2/C UTPC= 69217.2
+Two-Phase Heat Transfer Conductance,      kj/hr/m2/C UDSC= 54601.2
+A/R In Fresh Food Sec.(Or Cabinet Walls) UA_FF_CND= 0
+Cond: A/R In Freezer Section Walls       UA_FZ_CND= 0
+                (If Separate Section)
+Both: A/R In Fresh Food Section          UA_FF_HXS= 0
+                (Or Cabinet Walls)
+Both: A/R In Freezer Section Walls       UA_FZ_HXS= 0
+                (If Separate Section)
+Refrigerant Exit Subcooling, Deg C             DTSUBC= 0
+     used only for 1-CCOUNT and 2-ccross, (NOT useD IN 0-cnat)
+ N_COND 1       Two Door Topmount Refrigerator/Freezer.
+        2       Two Door Bottommount Befrigerator/Freezer.
+        3       Side Byside Refrigerator/Freezer.
+        4       Chest Freezer.
+        5       Upright Freezer.
+        6       Onedoor Refrigerator.
+        7       Onedoor Refrigerator/Freezer
+heat transfer fluid                            K TS1= 308.11
+  (htf) temperature entering condenser
+htf temperature entering fresh food evaporator K TS3= 261.776
+htf temperature entering freezer evaporator    K TS5= -300.0
+Refrigeration Type                           N_COND= 1
+     used only for 1-CCOUNT and 2-ccross, (NOT useD IN 0-cnat)
+=== Inputs ======================
+Conderser cooling type        Nat ICOND= 0
+Temperature INLET TO FRESH FOOD EVAPORATOR     K T5= 249.51
+Temperature INLET TO FREEZER EVAPORATOR        K T8= 249.51
+Temperature OUTLET FROM FREEZER EVAPORATOR     K T9= 249.51
+Temperature FRESH FOOD EVAPORATOR DEW POINT   K T12= 249.51
+Temperature CONDENSER INLET                    K T14= 360.44
+Enthalpy CONDENSER INLET                    j/kg H14= 402029.42141034425
+Temperature condenser dew point                 K T3= 311.7728
+Enthalpy condenser dew point                 j/kg H3= 367193.096871431
+Condenser bubble point Temp                   K TBUB= 311.59
+Condenser bubble point Enthalpy            j/kg HBUB= 237420.86959494435
+Condenser bubble point CP              j/kg/K CPRLIQ= 1017.1201720287818
+
+=== Output ==Not sure about unit====================
+Q desuperheating       rrr    QDSC =  986.9898216322188
+Q two phase            rrr    QTPC =  0.0
+Q subcooling           rrr    QSCC =  0.0
+Q total condenser       rrr  QTOTC =  986.9898216322188
+Fraction desuperheating   rrr FSUP =  1.0
+Fraction subcooling       rrr FSUB =  0.0
+
+
+ Teat 2 ICOND = 1 ----------------------------------------------
+Input --
+Conderser cooling type        Cross-Flow ICOND= 1
+Condenser Out pressure Pa   P4= 926000.0
+Condenser DEW pressure Pa PBUB= 828000
+
+=== Output ==Not sure about unit====================
+Q desuperheating       rrr    QDSC =  0.0
+Q two phase            rrr    QTPC =  -63.90594959676789
+Q subcooling           rrr    QSCC =  0.0
+Q total condenser       rrr  QTOTC =  -63.90594959676789
+Fraction desuperheating   rrr FSUP =  0.0
+Fraction subcooling       rrr FSUB =  0.0
+
+
+ Teat 3 ICOND = 2----------------------------------------------
+Input --
+Conderser cooling type        Counter-Flow ICOND= 2
+Condenser Out pressure Pa   P4= 926000.0
+Condenser DEW pressure Pa PBUB= 828000
+
+=== Output ==Not sure about unit====================
+Q desuperheating       rrr    QDSC =  9180.775199999996
+Q two phase            rrr    QTPC =  0.0
+Q subcooling           rrr    QSCC =  0.0
+Q total condenser       rrr  QTOTC =  9180.775199999996
+Fraction desuperheating   rrr FSUP =  1.0
+Fraction subcooling       rrr FSUB =  0.0
+
+
+
+ Testing cond method =======================
+==================input============
+ old Initial Guess For Refrigerant Mas Flow Rate kg/hr MROLD =  5.7
+ Initial Guess For Refrigerant Mas Flow Rate      kg/hr MREF =  5.8
+        ICOND = 1
+ heat transfer fluid (htf) temperature entering condenser  TS1 = 308.11
+ Condenser Temp                 TC = [0.0, 311.66, 316.66, 0.0]
+ Iteration count 1 or others    JC = 1
+ condenser outlet temperature   T4 = 316.66
+ condenser inlet Enthalpy      H14 = 412266.0436913798
+ condenser outlet Enthalpy      H4 = 242601.58252191485
+       watt QCONDS = 210.218
+       watt QCONDC = 75.156
+       watt QSCC = 0
+
+
+==================Output============
+           K TS2 = 309.73661878704974
+            K TC = [0.0, 311.66, 316.66, 0.0]
+              JC = 2
+           ICONC = 1
+
+=== Others outputs ======================
+if value is None, value is not calculated
+USCC, UTPC, UDSC are app inputs, and is recaluted here
+ Condenser Heat Fresh Food, sec-F/Btu(th) Q_CND_FF= None
+ Condenser Heat Freezer,    sec-F/Btu(th) Q_CND_FZ= None
+ Heat Exchanger Fresh Food  sec-F/Btu(th) Q_HXS_FF= None
+ Heat Exchanger Freezer     sec-F/Btu(th) Q_HXS_FZ= None
+ Condenser UA                    UACOND= 46356.4188
+ Desuperheating Heat Transfer Conductance, kj/hr/m2/C UDSC= 54601.2
+ Subcooling Heat Transfer Conductance, kj/hr/m2/C  USCC= 55562.399999999994
+ Two-Phase Heat Transfer Conductance,   kj/hr/m2/C UTPC= 69217.2
+Press any key to continue . . .
+
+
+
+
+
+
+
+
+
+
+
+
+
+
