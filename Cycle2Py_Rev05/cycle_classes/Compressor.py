@@ -550,8 +550,7 @@ class Comp_Map (Comp_Abstract):  # Data.obj_cdata.IMAP== 0
 			130		77.3	98.1	118.7	139.0	158.6	177.0
 		'''
         # ==============================================================
-        print ("aym Comp_Map.IREAD", Comp_Map.IREAD)
-        
+       
         if (Comp_Map.IREAD is None):
             obj_comp_map = CompMap(self.str_Comp_File, self.FLDER_COMPMAP_DAT)
 
@@ -602,9 +601,6 @@ class Comp_Map (Comp_Abstract):  # Data.obj_cdata.IMAP== 0
 
             Comp_Map.TEDATA = obj_comp_map.getX_values()
             Comp_Map.TCDATA = obj_comp_map.getY1_values()
-            
-            print ("get Comp_Map.TCDATA", Comp_Map.TCDATA)
-            print ("get Comp_Map.TEDATA", Comp_Map.TEDATA)
             
             # READ COMPRESSOR CAPACITY DATA
             Comp_Map.CAPAC = obj_comp_map.getCapacity()
@@ -659,11 +655,7 @@ class Comp_Map (Comp_Abstract):  # Data.obj_cdata.IMAP== 0
         else:
             TEVAP = TEVAPK - 273.16  # convert from Deg K to C
             TCOND = TCONDK - 273.16
-
-        print ("TEVAP, TCOND", TEVAP, TCOND)
-        print ("Comp_Map.TCDATA", Comp_Map.TCDATA)
-        print ("Comp_Map.TEDATA", Comp_Map.TEDATA)
-        
+       
         
         #  CHECK IF TCOND AND/OR TEVAP IS OFF MAP DATA
         ICOND = 1

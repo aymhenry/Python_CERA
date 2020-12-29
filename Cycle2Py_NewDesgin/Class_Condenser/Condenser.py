@@ -1,12 +1,7 @@
 # Python import
-import math
-import sys
-import datetime
 from abc import ABC, abstractmethod
 
 # User import
-# from .Data import Data
-# from .Block2 import Block2
 from HeatExch import HeatExch
 
 from ErrorException import ErrorException
@@ -52,7 +47,6 @@ class CondCool_Abstract (ABC, HeatExch):
                       USCC, UTPC, UDSC,
                       UA_FF_CND, UA_FZ_CND ,UA_FF_HXS  ,UA_FZ_HXS):
         # ATOTC m2 Total Heat Transfer Surface Area
-        # MREF  kg/hr Refrigerant Mas Flow Rate
         
         # UA_FF_CND sec-F/Btu(th) , Cond: A/R In Fresh Food Section 
         #    (Or Cabinet Walls)
@@ -62,7 +56,7 @@ class CondCool_Abstract (ABC, HeatExch):
         #    (Or Cabinet Walls)
         # UA_FZ_HXS sec-F/Btu(th) , Both: A/R In Freezer Section Walls
         #    (If Separate Section) 
-        # CFMC Air Flow Rate Across Coil (L/S)
+        # CFMC Air Flow Rate Across Coil (to be checked)
         # DTSUBC Refrigerant Exit Subcooling, Deg C 
         #  used only for 1-CCOUNT and 2-ccross, (NOT useD IN 0-cnat)
 
@@ -127,7 +121,7 @@ class CondCool_Abstract (ABC, HeatExch):
     
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
     def cond(self, T4, H4, H14, TC, JC, QCONDS, QCONDC, QSCC,
-             MROLD, MREF, ICOND):
+             MROLD, MREF):
         #     *****************************************************************
         #     *    CALCULATE CONDENSER EXIT TEMPERATURE                       *
         #     *****************************************************************
@@ -158,7 +152,7 @@ class CondCool_Abstract (ABC, HeatExch):
         TCOUT = TC[JC] + DELT
         TS2 = self.TS1 + (QCONDS + QCONDC + QSCC) / self.CFMC
 
-        if(ICOND == 0):
+        if(self.ICOND == 0):
             TS2 = 0.9 * T4 + 0.1 * self.TS1
             
         if(TCOUT < self.TS1):
@@ -187,9 +181,9 @@ class CondCool_Abstract (ABC, HeatExch):
         # if(ERRORT < TOL_COND and ERRORM <= TOL_MASS):
             # ICONC = 1    
         if(ERRORT < TOL_COND and ERRORM <= TOL_MASS):
-            ICONC = 0
-        else:
             ICONC = 1
+        else:
+            ICONC = 0
         # ======================End of Ayman Modification
 
         JC = 2

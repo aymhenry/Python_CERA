@@ -116,9 +116,9 @@ class CondCool_Abstract (ABC, HeatExch, Data):
         
         # this block modified by Ayman
         if(ERRORT < Data.obj_cdata.TOL_COND and ERRORM <= Data.obj_cdata.TOL_MASS):
-            ICONC = 0
-        else:
             ICONC = 1
+        else:
+            ICONC = 0
         # End of Ayman Modification
             
         JC = 2
@@ -127,7 +127,7 @@ class CondCool_Abstract (ABC, HeatExch, Data):
         # modification by Ayman - MROLD = Data.obj_cdata.MREF #useless
         Data.obj_cdata.MROLD = Data.obj_cdata.MREF
 
-        print("\n\n\n>>>> aym Err if 1      ICONC =", ICONC)
+        
         return [TS2, TC, JC, ICONC]
 
 

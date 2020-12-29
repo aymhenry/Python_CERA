@@ -85,8 +85,15 @@ class EvapCool_Abstract (ABC, HeatExch, Data):
             TENEW = TS3
 
         ERROR = abs(TENEW - TE[JE])
+
+        # ==============this block modified by Ayman
+        # if (ERROR < Data.obj_cdata.TOL_FRSH):
+            # ICONE = 1
         if (ERROR < Data.obj_cdata.TOL_FRSH):
             ICONE = 1
+        else:
+            ICONE = 0
+        # ======================End of Ayman Modification
 
         JEOLD = JE  # useless not used
         JE = 2
@@ -98,6 +105,7 @@ class EvapCool_Abstract (ABC, HeatExch, Data):
         if (Data.obj_cdata.IFRSH == 0):
             TS4 = 0.9 * TE[JE] + 0.1 * TS3
 
+        print("\n\n\n>>>> aym Err if 1      ICONE =", ICONE)
         return [TS4, TE, JE, ICONE]
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

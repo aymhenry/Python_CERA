@@ -286,8 +286,8 @@ print("       watt QSCC =", QSCC)
 lstRest = objCond.cond(T4=T4, H4=H4, H14=H14,
                TC=TC, JC=JC,
                QCONDS=QCONDS, QCONDC=QCONDC, QSCC=QSCC,
-               MROLD=MROLD, MREF=MREF,
-               ICOND=ICOND)
+               MROLD=MROLD, MREF=MREF
+               )
 
 print("\n\n==================Output============")
 print("           K TS2 =", lstRest[0])

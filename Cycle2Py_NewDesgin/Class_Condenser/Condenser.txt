@@ -108,7 +108,7 @@ Fraction subcooling       rrr FSUB =  0.0
            K TS2 = 309.73661878704974
             K TC = [0.0, 311.66, 316.66, 0.0]
               JC = 2
-           ICONC = 1
+           ICONC = 0
 
 === Others outputs ======================
 if value is None, value is not calculated
@@ -121,18 +121,3 @@ USCC, UTPC, UDSC are app inputs, and is recaluted here
  Desuperheating Heat Transfer Conductance, kj/hr/m2/C UDSC= 54601.2
  Subcooling Heat Transfer Conductance, kj/hr/m2/C  USCC= 55562.399999999994
  Two-Phase Heat Transfer Conductance,   kj/hr/m2/C UTPC= 69217.2
-Press any key to continue . . .
-
-
-
-
-
-
-
-
-
-
-
-
-
-

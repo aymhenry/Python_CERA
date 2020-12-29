@@ -471,10 +471,28 @@ class HeatExch ():
             EFFECT = 1.0
         return
 
-    # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
+    # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
     def exf(self, LOC, AREA, U, CMIN, CMAX):
-        # calculate counter flow efficiency parameters                
+        # [P6, P7] = self.exf (P1 ... P5)
+        #	  SUBROUTINE EXF(LOC, AREA, U, CMIN, CMAX, EFF, DEFFDA)
+        #     ******************************************************************
+        #     *    CALCULATE COUNTER FLOW EFFICIENCY PARAMETERS                *
+        #     ******************************************************************
+        #
+        #	  REAL NTU
 
+        #	  DIMENSION coff_A(4,6), EFF_CROSS(2)
+        #
+        #	DATA (coff_A(I,1),I=1,4)/2.394292,2.410798,2.399687,2.359642/
+        #	DATA (coff_A(I,2),I=1,4)/-1.19402,-2.23391,-2.96882,-3.37650/
+        #	DATA (coff_A(I,3),I=1,4)/-1.45067,0.825900,2.367080,3.04862/
+
+        #	DATA (coff_A(I,4),I=1,4)/1.938453,0.051006,-1.23009,-1.63421/
+        #	DATA (coff_A(I,5),I=1,4)/-0.81305,-0.11891,0.373338,0.468741/
+        #	DATA (coff_A(I,6),I=1,4)/0.118651,0.023360,-0.04886,-0.05492/
+        #
+        #          CALCULATE NTU AND CAPACITY RATIO
+        #
         EFF_CROSS = [0.0] * (2 + 1)
         coff_A = [
             [2.394292, -1.19402, -1.45067, 1.938453, -0.81305, 0.118651],
@@ -508,12 +526,12 @@ class HeatExch ():
             if (NTU <= 0.0):
                 NTU = 0.0
 
-            for L in range(1, 2 + 1):
+            for L in range(1, 2 + 1):  # DO L = 1, 2
                 BETA = math.log10(NTU + 1.0)
                 EFFA = 0.0
                 EFFB = 0.0
 
-                for J in range(1, 6 + 1): 
+                for J in range(1, 6 + 1):  # DO J = 1, 6
                     EX = 1.0 * J
                     if (int_row == 1):
                         EFFA = 1.0 - math.exp(-NTU)
