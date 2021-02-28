@@ -25,7 +25,7 @@ Condenser(Condenser.py) class solves the Condenser module.
 
 - In Condenser_Test.py, class is called three times, one for each type of cooling, and then cond method is called.
 - Some approved and tested classes is used from the other classes, example CoolPrp.py class. 
-- method exf, is found in external common class (HeatExch), not all methods in this class is  used in Condenser class, only method exf.
+- method exf, is found in external common class (exf4Cond_Evap), this class is used on both Condenser and Evaporator class.
 
 ## Available function for test
 

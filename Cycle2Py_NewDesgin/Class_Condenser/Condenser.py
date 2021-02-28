@@ -2,7 +2,7 @@
 from abc import ABC, abstractmethod
 
 # User import
-from HeatExch import HeatExch
+from exf4Cond_Evap import exf4Cond_Evap
 
 from ErrorException import ErrorException
 
@@ -36,7 +36,7 @@ class Condenser:
 #
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-class CondCool_Abstract (ABC, HeatExch):
+class CondCool_Abstract (ABC, exf4Cond_Evap):
     DATA_PARA = 0 # if set to 1 parameters was set
     
     def __init__(self, ICOND, objCP):
