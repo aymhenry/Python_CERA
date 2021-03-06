@@ -49,7 +49,7 @@ class EvapCool_Abstract (ABC, exf4Cond_Evap):
         # N_EVAP Number of Zones on Evaporator
 
         # USUPE Subcooling Heat Transfer Conductance, kj/hr/m2/C
-        # UTPE Two-Phase Heat Transfer Conductance, kj/hr/m2/C
+        # UTPE Two-Phase Heat Transfer Conductance, W/M2-C
         # TROOM room temp K
         # FZTEMP Freezer Temperature (K) 
         
@@ -60,13 +60,17 @@ class EvapCool_Abstract (ABC, exf4Cond_Evap):
         
         # NUM_ZONE   count no. of zones
         # IRFTYP Refrigeration Type (1 to 7)
-               
-        self.CFME = 1.8961 * (316.8/TS3 * CFME )/0.4720
-        self.UTPE =  UTPE * 3.600
-        self.USUPE = USUPE * 3.600
-        self.UA_FF = UA_FF * 1.8961
+        
+        # by Dr.Omar
+        # rho air = 1.354 kg/m3, CPair = 1.0058 kj/kg.K
+        #    j/sec  = L/sec .kg/m3 kj/kg.K
+        self.CFME = CFME * 1.354 * 1.0058 #  j/sec  #1.8961 * (316.8/TS3 *  )/0.4720
+                
+        self.UTPE =  UTPE   # * 3.600  # W/M2-C *3.600 = kj/hr/m2/c
+        self.USUPE = USUPE  # * 3.600  # W/M2-C *3.600 = kj/hr/m2/c
+        self.UA_FF = UA_FF  # * 1.8961
 
-        self.ATOTE = ATOTE
+        self.ATOTE = ATOTE # m2
         self.TS3 = TS3
         
         self.N_EVAP = N_EVAP       
@@ -178,10 +182,12 @@ class EvapCool_FFNat (EvapCool_Abstract):  # IFRSH== 0
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
     def evap_balance(self, MREF,
                        T5, H5, T7,
-                       TDEW, HDEW,
+                       TDEW, 
                        CPRVAP
                         ):
         # MREF  = MREF * 2.20462 # kg to pounds is not done
+        HDEW = self.objCP.Property('H', T=TDEW, X=1)  # j/kg
+        
         lstRes = self.ffnat(T5=T5, H5=H5, T7=T7,
                     TDEW=TDEW, HDEW=HDEW,
                     TS3=self.TS3,
@@ -205,18 +211,21 @@ class EvapCool_FFNat (EvapCool_Abstract):  # IFRSH== 0
         #  coefficient using small delta t approximation (black body)
         #  use the refrigerant dew point to evaluate h radiation
         SIGMA = 2.04326E-7
-        EPS = 0.8
+        EPS = 0.8 # emmissivity of heat excahnger
 
-        TENV = (self.TROOM + 459.6) / 1.8
-        TAVE = (T5 + T7) / 2.0
+        # TENV = (self.TROOM + 459.6) / 1.8 # R
+        # by Dr.Omar
+        TENV = self.TROOM  # K
+        
+        TAVE = (T5 + T7) / 2.0 # K
 
-        TAIR = TS3
-        FZTMPK = (self.FZTEMP + 459.6) / 1.8
+        TAIR = TS3 # K
+        FZTMPK = (self.FZTEMP + 459.6) / 1.8 # R
 
         HRAD = SIGMA * (TAVE + TAIR) * (TAVE**2 + TAIR**2) * EPS
 
         # get the net evaporator area
-        AEVAP = self.ATOTE
+        AEVAP = self.ATOTE # m2
         if (IRFTYP == 6):
             AEVAP = self.ATOTE + self.ATOTE
 
@@ -225,13 +234,17 @@ class EvapCool_FFNat (EvapCool_Abstract):  # IFRSH== 0
         if(DELTAT <= 0.0):
             DELTAT = 0.0001
 
-        DELTA = DELTAT * 1.8
+        # by Dr.Omar Cancel next line
+        # DELTA = DELTAT * 1.8 # DTemp F.
+        
 
         TBAR = 0.67 * TAVE + 0.33 * TAIR
         A_NAT = 0.239 + 3.34E-04 * (273.0 - TBAR)
 
-        HNAT = A_NAT * DELTA**0.33 * 20.44
-
+        # by Dr.Omar
+        # HNAT = A_NAT * DELTA**0.33 * 20.44
+        HNAT = A_NAT * DELTAT**0.33 * 20.44
+ 
         # Calculate combined air-side heat transfer coefficient
         UAIR = HRAD + HNAT
 
@@ -252,8 +265,10 @@ class EvapCool_FFNat (EvapCool_Abstract):  # IFRSH== 0
         if (ATPNEC < AEVAP):
             QTPE = QTPNEC # j/hr
             ASUPE = AEVAP - ATPNEC
-            QSUPMX = MREF * CPRVAP * (TAIR - TDEW)
-            QSUPE = UAIR * ASUPE * DELTAT + ASUPE * Q_IN_WALL
+            QSUPMX = MREF * CPRVAP * (TAIR - TDEW) # j/hr
+            QSUPE = UAIR * ASUPE * DELTAT + ASUPE * Q_IN_WALL # J/hr
+            
+            
             if (QSUPE > QSUPMX):
                 QSUPE = QSUPMX
             QTOTE = QTPE + QSUPE # j/hr
@@ -276,11 +291,13 @@ class EvapCool_FFCross (EvapCool_Abstract):  # IFRSH== 1
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
     def evap_balance(self, MREF,
                        T5, H5, 
-                       TDEW, HDEW,
+                       TDEW, 
                        CPRVAP, 
                        P5, P7
                         ):
         # MREF  = MREF * 2.20462 # kg to pounds is not done
+        HDEW = self.objCP.Property('H', T=TDEW, X=1)  # j/kg
+        
         lstRes = self.ffcross(T5_S=T5, H5_S=H5,
                     TDEW_S=TDEW, HDEW_S=HDEW,
                     TS3=self.TS3,
@@ -343,7 +360,7 @@ class EvapCool_FFCross (EvapCool_Abstract):  # IFRSH== 1
                 CPRTP = (HDEW - H5) / abs(TDEW - T5 + 0.0001)
                 CRTP = MREF * CPRTP
 
-                # determine cmin and cmax in the two-phase region
+                # determine CMIN and CMAX in the two-phase region
                 CAIR = (ALEFT / self.ATOTE) * self.CFME
                 if (CAIR <= CRTP):
                     CMINTP = CAIR
@@ -481,11 +498,13 @@ class EvapCool_FFCount (EvapCool_Abstract):  # IFRSH== 2
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
     def evap_balance(self, MREF,
                        T5, H5,
-                       TDEW, HDEW,
+                       TDEW, 
                        CPRVAP, 
                        P5, P7
                         ):
         # MREF  = MREF * 2.20462 # kg to pounds is not done
+        HDEW = self.objCP.Property('H', T=TDEW, X=1)  # j/kg
+        
         lstRes = self.ffcount(T5_S=T5, H5_S=H5,
                     TDEW_S=TDEW, HDEW_S=HDEW,
                     TS3=self.TS3,

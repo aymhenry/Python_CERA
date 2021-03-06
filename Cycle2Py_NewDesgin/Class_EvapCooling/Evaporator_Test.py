@@ -15,12 +15,12 @@ T5= 257.86  # K
 
 HDEW = 1000*(20824.4 /120.91 + R12_TABLE_READING) # j/kg
 TDEW= 256.77 # K
-CPRVAP= 69.72 # to be checked
+CPRVAP= 0.91 # Dr Omar Cp of Ref. Vap
 PIN= 180.1 *1000 # Pa
 POUT= 172.87 *1000 # Pa
 
 TS3= 260.86 # K
-N_EVAP = 1
+N_EVAP = 5
 USUPE = 5.633  # W/m2-c Superheat Region Conductance, W/M2-C
 UTPE = 13.787  # W/m2-c Two-Phase Heat Transfer Conductance, W/M2-C
 ATOTE = 2.338  # m2 Total Heat Transfer Surface Area, M2
@@ -47,14 +47,14 @@ T5 = 249.51 # 5 - INLET TO FRESH FOOD EVAPORATOR
 MREF = 5.8  # kg/hr Refrigerant Mas Flow Rate
 
 T8 = 249.51 # 8 - INLET TO FREEZER EVAPORATOR
-T9 = 249.51 # 9 - OUTLET FROM FREEZER EVAPORATOR
+T9 = 249.51+5 # 9 - OUTLET FROM FREEZER EVAPORATOR
 T12 = 249.51 # 12 - FRESH FOOD EVAPORATOR DEW POINT
 
-H5 = 1000*(23492.94 /120.91 + R12_TABLE_READING) # to be fixed
-T7 = 249.51 # to be fixed
+H5 = 211 * 1000 #1000*(23492.94 /120.91 + R12_TABLE_READING) # j/kg
+T7 = 249.51 + 5 # K
 
-P5 = 30000  # Pa INLET TO FRESH FOOD EVAPORATOR to be fixed
-P7 = 30000  # Pa OUTLET FROM FRESH FOOD EVAPORATOR to be fixed
+P5 = 130500  # Pa INLET TO FRESH FOOD EVAPORATOR  Pa
+P7 = 130500  # Pa OUTLET FROM FRESH FOOD EVAPORATOR Pa
 #========================================================
 IFRSH = 0
 objEvaporator = Evaporator()
@@ -77,11 +77,11 @@ objEvap.setParamters(ATOTE = ATOTE,
 
 dicRest = objEvap.evap_balance (MREF=MREF,
                        T5=T5, H5=H5, T7=T7,
-                       TDEW=TDEW, HDEW=HDEW,
+                       TDEW=TDEW,
                        CPRVAP=CPRVAP
                         )
 
-print ("\n\n Teat 1 IFRSH = 0 ---------------------------------------------- ")
+print ("\n\n\n Test 1 IFRSH = 0 ---------------------------------------------- ")
 print ("\n=== Parameters ======================")
 print ('Total Heat Transfer Surface Area               m2 ATOTE=', ATOTE)
 print ("Units to be checked  CFME")
@@ -102,45 +102,44 @@ print ('FF (OR CABINET) EVAPORATOR BEHIND LINER (0: NO, 1: YES) IWALL_FF=',
 print ('count no. of zones                         NUM_ZONE=', NUM_ZONE)
 print ('Refrigeration Type (1 to 7)                  IRFTYP=', IRFTYP)
 
-print ("=== Inputs ======================")
+print ("\n=== Inputs for IFRSH = 0 ======================")
 print ('Evaporator cooling type        Nat IFRSH=', IFRSH)
 print ('Temperature INLET TO FRESH FOOD EVAPORATOR      K T5=', T5)
 print ('Temperature OUTLET FROM FRESH FOOD EVAPORATOR   K T7=', T7)
 print ('Temperature htf entering fresh food evaporator K TS3=', TS3)
 print ('Temperature Evaporator Dew point              K TDEW=', TDEW)
 
-print ('Enthalpy Evaporator Dew point              j/kg HDEW=', HDEW )
+# print ('Enthalpy Evaporator Dew point              j/kg HDEW=', HDEW )
 print ('Enthalpy INLET TO FRESH FOOD EVAPORATOR Enthalpy j/kg H5=', H5 )
 
-print ('Evaporator  CP                             j/kg/K CPRVAP=', CPRVAP )
+print ('Evaporator  CP  Cp of Ref. Vap              j/kg/K CPRVAP=', CPRVAP )
 
 # ------------------------------------------
-print ("\n=== Output ====================")
+print ("\n\n\n=== Output for IFRSH = 0   ====================")
 print ('                      j/hr QFRSH = ',dicRest['QFRSH'])
 print ('                        W/C UAFF = ',dicRest['UAFF'])
 print ('Fraction subcooling,area Ration ASUPE / AEVAP FSUPE = ',dicRest['FSUPE'])
 
 #========================================================
-print ("\n\n Teat 2 IFRSH = 1 ---------------------------------------------- ")
+print ("\n\n Test 2 IFRSH = 1 ---------------------------------------------- ")
 IFRSH = 1
 objEvaporator = Evaporator()
 objEvap = objEvaporator.getObject(objCP=objCP, IFRSH=IFRSH)
 
-print ("=== Inputs ======================")
+print ("=== input for IFRSH = 1   ====================")
 print ('Evaporator cooling type        Nat IFRSH=', IFRSH)
 print ('Temperature INLET TO FRESH FOOD EVAPORATOR      K T5=', T5)
 
 print ('Temperature htf entering fresh food evaporator K TS3=', TS3)
 print ('Temperature Evaporator Dew point           K TDEW=', TDEW)
 
-print ('Enthalpy Evaporator Dew point               j/kg HDEW=', HDEW )
-print ('Enthalpy INLET TO FRESH FOOD EVAPORATOR Enthalpy j/kg H5=', H5 )
+# print ('Enthalpy Evaporator Dew point               j/kg HDEW=', HDEW )
+print ('Enthalpy INLET TO FRESH FOOD EVAPORATOR  j/kg H5=', H5 )
 
 print ('Evaporator  CP                             j/kg/K CPRVAP=', CPRVAP )
 
 print ('Pressure INLET TO FRESH FOOD EVAPORATOR    Pa P5=', P5)
 print ('Pressure OUTLET FROM FRESH FOOD EVAPORATOR Pa P7=', P7)
-
 
 objEvaporator = Evaporator()
 objEvap = objEvaporator.getObject(objCP=objCP, IFRSH=IFRSH)
@@ -161,31 +160,31 @@ objEvap.setParamters(ATOTE = ATOTE,
 
 dicRest = objEvap.evap_balance (MREF=MREF,
                        T5=T5, H5=H5, 
-                       TDEW=TDEW, HDEW=HDEW,
+                       TDEW=TDEW, 
                        CPRVAP=CPRVAP,
                        P5=P5, P7=P7
                         )
 
 # ------------------------------------------
-print ("\n=== Output ====================")
+print ("\n\n\n=== Output for IFRSH = 1   ====================")
 print ('                      j/hr QFRSH = ',dicRest['QFRSH'])
 print ('                        W/C UAFF = ',dicRest['UAFF'])
 print ('Fraction subcooling,area Ration ASUPE / AEVAP FSUPE = ',dicRest['FSUPE'])
 
 #========================================================
-print ("\n\n Teat 3 IFRSH = 2---------------------------------------------- ")
+print ("\n\n Test 3 IFRSH = 2---------------------------------------------- ")
 IFRSH = 2
 objEvaporator = Evaporator()
 objEvap = objEvaporator.getObject(objCP=objCP, IFRSH=IFRSH)
 
-print ("=== Inputs ======================")
+print ("=== input for IFRSH = 2   ====================")
 print ('Evaporator cooling type        Nat IFRSH=', IFRSH)
 print ('Temperature INLET TO FRESH FOOD EVAPORATOR      K T5=', T5)
 
 print ('Temperature htf entering fresh food evaporator K TS3=', TS3)
 print ('Temperature Evaporator Dew point           K TDEW=', TDEW)
 
-print ('Enthalpy Evaporator Dew point               j/kg HDEW=', HDEW )
+# print ('Enthalpy Evaporator Dew point               j/kg HDEW=', HDEW )
 print ('Enthalpy INLET TO FRESH FOOD EVAPORATOR Enthalpy j/kg H5=', H5 )
 
 print ('Evaporator  CP                             j/kg/K CPRVAP=', CPRVAP )
@@ -214,13 +213,13 @@ objEvap.setParamters(ATOTE = ATOTE,
 
 dicRest = objEvap.evap_balance (MREF=MREF,
                        T5=T5, H5=H5, 
-                       TDEW=TDEW, HDEW=HDEW,
+                       TDEW=TDEW, 
                        CPRVAP=CPRVAP,
                        P5=P5, P7=P7
                         )
 
 # -------------------------------------------------
-print ("\n=== Output ==Not sure about unit====================")
+print ("\n=== Output for IFRSH = 2   ====================")
 print ('Q                     j/hr QFRSH = ',dicRest['QFRSH'])
 print ('                        W/C UAFF = ',dicRest['UAFF'])
 print ('Fraction subcooling,area Ration ASUPE / AEVAP FSUPE = ',dicRest['FSUPE'])
@@ -244,11 +243,11 @@ H7 = 1000 * (21034.06 / 120.91 + R12_TABLE_READING) # J/kg
 # ALPHA = QFRSH/(MREF*(H(7) - H(5)))
 # QFRSH = MREF * Delat H = (kg/hr) * (j/kg)= j/hr.
 
-IFRSH = 1  # 0 Nat. cooling, 1 Cross, OR 2 Counter
-QFRSH = 160 #MREF * 10 * 1000    # j/hr. to be checked
+IFRSH = 0  # 0 Nat. cooling, 1 Cross, OR 2 Counter
+QFRSH = 450 #126354.802 #MREF * 10 * 1000    # j/hr. to be checked 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-print("==================input============")
+print ("\n\n\n Test 4 Input for frsh method  IFRSH = 0 =====================")
 
 print("        IFRSH =", IFRSH)
 print(" Entry Value to be checked j/hr                     QFRSH = ", QFRSH)
@@ -268,16 +267,15 @@ dicRest = objEvap.frsh(T5=T5, H5=H5, H7=H7, TS3=TS3,
                MREF=MREF
                )
 
-print("\n\n==================Output============")
+print ("\n output for frsh method  IFRSH = 0 =====================")
 print("           K TE =", dicRest['TE'])
 print("             JE =", dicRest['JE'])
 print("          K TS4 =", dicRest['TS4'])
 print(" 1=Free Error, 0=Error Found         ICONE =", dicRest['ICONE']) # 0=Free Error, 1=Error Found
 
 #------------------------------------
-print("\n==================input============")
-IFRSH = 0  # 0 Nat. cooling, 1 Cross, OR 2 Counter
-QFRSH = -126000 #MREF * 10 * 1000    # j/hr. to be checked
+print ("\n\n\n Test 5 input for frsh method  IFRSH = 1 =====================")
+IFRSH = 1  # 0 Nat. cooling, 1 Cross, OR 2 Counter
 
 print("        IFRSH =", IFRSH)
 print(" Entry Value to be checked j/hr                     QFRSH = ", QFRSH)
@@ -288,9 +286,29 @@ dicRest = objEvap.frsh(T5=T5, H5=H5, H7=H7, TS3=TS3,
                MREF=MREF
                )
 
-print("\n\n==================Output============")
+print ("\n output for frsh method  IFRSH = 1 =====================")
 print("           K TE =", dicRest['TE'])
 print("             JE =", dicRest['JE'])
 print("          K TS4 =", dicRest['TS4'])
 print(" 1=Free Error, 0=Error Found         ICONE =", dicRest['ICONE']) # 0=Free Error, 1=Error Found
+
+#------------------------------------
+print ("\n\n\n Test 6 b input for frsh method  IFRSH = 2 =====================")
+IFRSH = 2  # 0 Nat. cooling, 1 Cross, OR 2 Counter
+
+print("        IFRSH =", IFRSH)
+print(" Entry Value to be checked j/hr                     QFRSH = ", QFRSH)
+
+dicRest = objEvap.frsh(T5=T5, H5=H5, H7=H7, TS3=TS3,
+               TE=TE, JE=JE,
+               QFRSH=QFRSH,
+               MREF=MREF
+               )
+
+print ("\n output for frsh method  IFRSH = 2 =====================")
+print("           K TE =", dicRest['TE'])
+print("             JE =", dicRest['JE'])
+print("          K TS4 =", dicRest['TS4'])
+print(" 1=Free Error, 0=Error Found         ICONE =", dicRest['ICONE']) # 0=Free Error, 1=Error Found
+
 
