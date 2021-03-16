@@ -107,7 +107,7 @@ class CoolPrp:
                 if eval(prop + " !=None"):
                     int_count = int_count + 1
 
-                    if prop == 'V':  # CoolPrp use D for dencity
+                    if prop == 'V':  # CoolPrp use D for density
                         prob_code = "D"
                         prob_val = 1 / eval(prop)
                     else:

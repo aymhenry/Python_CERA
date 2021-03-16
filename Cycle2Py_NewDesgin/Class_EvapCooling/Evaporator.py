@@ -44,12 +44,12 @@ class EvapCool_Abstract (ABC, exf4Cond_Evap):
                       USUPE, UTPE, TROOM, FZTEMP, 
                       UA_FF, Q_HXS_FF, IWALL_FF, NUM_ZONE, IRFTYP):
         # ATOTE m2 Total Heat Transfer Surface Area
-        # CFME Air Flow Rate Across Coil (to be checked)
+        # CFME Air Flow Rate Across Coil (L/s) [OA]
         # TS3 htf temperature entering fresh food evaporator
         # N_EVAP Number of Zones on Evaporator
 
-        # USUPE Subcooling Heat Transfer Conductance, kj/hr/m2/C
-        # UTPE Two-Phase Heat Transfer Conductance, W/M2-C
+        # USUPE Subcooling Heat Transfer Conductance, W/m2-C [OA]
+        # UTPE Two-Phase Heat Transfer Conductance, W/m2-C [OA]
         # TROOM room temp K
         # FZTEMP Freezer Temperature (K) 
         
@@ -64,10 +64,10 @@ class EvapCool_Abstract (ABC, exf4Cond_Evap):
         # by Dr.Omar
         # rho air = 1.354 kg/m3, CPair = 1.0058 kj/kg.K
         #    j/sec  = L/sec .kg/m3 kj/kg.K
-        self.CFME = CFME * 1.354 * 1.0058 #  j/sec  #1.8961 * (316.8/TS3 *  )/0.4720
+        self.CFME = CFME #  l/sec  #1.8961 * (316.8/TS3 *  )/0.4720
                 
-        self.UTPE =  UTPE   # * 3.600  # W/M2-C *3.600 = kj/hr/m2/c
-        self.USUPE = USUPE  # * 3.600  # W/M2-C *3.600 = kj/hr/m2/c
+        self.UTPE =  UTPE   # * 3.600  # W/m2-C *3.600 = kj/hr/m2/c
+        self.USUPE = USUPE  # * 3.600  # W/m2-C *3.600 = kj/hr/m2/c
         self.UA_FF = UA_FF  # * 1.8961
 
         self.ATOTE = ATOTE # m2
@@ -100,8 +100,8 @@ class EvapCool_Abstract (ABC, exf4Cond_Evap):
 
         ICONE = 0
 
-        # Python: MREF:Initial Guess For Refrigerant Mas Flow Rate (kg/hr)
-        ALPHA = QFRSH / (MREF * (H7 - H5))  # = (j/hr)/(kg/hr * j/kg) = %Ration
+        # Python: MREF:Initial Guess For Refrigerant Mass Flow Rate (kg/s) [OA changed /hr to /s]
+        ALPHA = QFRSH / (MREF * (H7 - H5))  # = (W)/(kg/s * j/kg) = %Ration [OA changed /hr to /s]
 
         if (QFRSH == 0.0):
             ALPHA = 0.01
@@ -157,7 +157,8 @@ class EvapCool_Abstract (ABC, exf4Cond_Evap):
         # ======================End of Ayman Modification
 
         JEOLD = JE  # useless not used
-        JE = 2
+        TE[2]=TE[1] #[OA added this line to store the previous value!]
+        JE = 1 #[OA changed from 2 to 1; we need to compare the new value to the old value]
 
         TE[JE] = TENEW
 
@@ -211,7 +212,7 @@ class EvapCool_FFNat (EvapCool_Abstract):  # IFRSH== 0
         #  coefficient using small delta t approximation (black body)
         #  use the refrigerant dew point to evaluate h radiation
         SIGMA = 2.04326E-7
-        EPS = 0.8 # emmissivity of heat excahnger
+        EPS = 0.8 # emissivity of heat exchanger
 
         # TENV = (self.TROOM + 459.6) / 1.8 # R
         # by Dr.Omar
@@ -220,7 +221,8 @@ class EvapCool_FFNat (EvapCool_Abstract):  # IFRSH== 0
         TAVE = (T5 + T7) / 2.0 # K
 
         TAIR = TS3 # K
-        FZTMPK = (self.FZTEMP + 459.6) / 1.8 # R
+        #[OA] commented next line - not used elsewhere
+        # FZTMPK = (self.FZTEMP + 459.6) / 1.8 # R
 
         HRAD = SIGMA * (TAVE + TAIR) * (TAVE**2 + TAIR**2) * EPS
 
@@ -258,20 +260,20 @@ class EvapCool_FFNat (EvapCool_Abstract):  # IFRSH== 0
         #  resistance dominates
         #
         # Calculate the are necessary to evaporate the refrigerant
-        QTPNEC = MREF * (HDEW - H5) # j/hr
+        QTPNEC = MREF * (HDEW - H5) # j/s [OA changed /hr to /s]
         ATPNEC = QTPNEC / (UAIR * DELTAT + Q_IN_WALL)
 
         # Calculate the superheating area fraction
         if (ATPNEC < AEVAP):
-            QTPE = QTPNEC # j/hr
+            QTPE = QTPNEC # j/s [OA changed to /hr to /s]
             ASUPE = AEVAP - ATPNEC
-            QSUPMX = MREF * CPRVAP * (TAIR - TDEW) # j/hr
-            QSUPE = UAIR * ASUPE * DELTAT + ASUPE * Q_IN_WALL # J/hr
+            QSUPMX = MREF * CPRVAP * (TAIR - TDEW) # j/s [OA changed /hr to /s]
+            QSUPE = UAIR * ASUPE * DELTAT + ASUPE * Q_IN_WALL # J/s [OA changed /hr to /s]
             
             
             if (QSUPE > QSUPMX):
                 QSUPE = QSUPMX
-            QTOTE = QTPE + QSUPE # j/hr
+            QTOTE = QTPE + QSUPE # j/s [OA changed /hr to /s]
             FSUPE = ASUPE / AEVAP
         else:
             QTOTE = UAIR * AEVAP * DELTAT + AEVAP * Q_IN_WALL
@@ -343,7 +345,10 @@ class EvapCool_FFCross (EvapCool_Abstract):  # IFRSH== 1
         ATPC = 0
 
         TAIR = TS3
-        CAIR = self.CFME
+        # by Dr.Omar
+        # rho air = 1.354 kg/m3, CPair = 1.0058 kj/kg.K
+        #    j/sec  = L/sec .kg/m3 kj/kg.K
+        CAIR = self.CFME * 1.354 * 1.0058 #[OA]
         HAVE_NOT_USED_FULL_AREA = True
 
         # begin  with two-phase area
@@ -418,7 +423,7 @@ class EvapCool_FFCross (EvapCool_Abstract):  # IFRSH== 1
                         ERROR = abs(QTOL)
                         if(ERROR <= AREA_TOL):
                             LOOKING_FOR_AREA = False
-                            Cointinue
+                            #Continue [OA commented this line - no continue in python!]
 
                         QRAT = EFFTPC * QMAX / QDUM
                         QTOL = 1.0 - QRAT

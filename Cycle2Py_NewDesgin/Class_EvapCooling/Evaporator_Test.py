@@ -13,7 +13,8 @@ R12_TABLE_READING = 200.0 - 27.10795349661135
 #========================================================
 T5= 257.86  # K
 
-HDEW = 1000*(20824.4 /120.91 + R12_TABLE_READING) # j/kg
+#Omar Abdelaziz Commented
+# HDEW = 1000*(20824.4 /120.91 + R12_TABLE_READING) # j/kg
 TDEW= 256.77 # K
 CPRVAP= 0.91 # Dr Omar Cp of Ref. Vap
 PIN= 180.1 *1000 # Pa
@@ -21,9 +22,9 @@ POUT= 172.87 *1000 # Pa
 
 TS3= 260.86 # K
 N_EVAP = 5
-USUPE = 5.633  # W/m2-c Superheat Region Conductance, W/M2-C
-UTPE = 13.787  # W/m2-c Two-Phase Heat Transfer Conductance, W/M2-C
-ATOTE = 2.338  # m2 Total Heat Transfer Surface Area, M2
+USUPE = 5.633  # W/m2-c Superheat Region Conductance, W/m2-C
+UTPE = 13.787  # W/m2-c Two-Phase Heat Transfer Conductance, W/m2-C
+ATOTE = 2.338  # m2 Total Heat Transfer Surface Area, m2
 
 CFME = 23.6   # L/s Air Flow Rate Across Coil (L/S)
 # RHOCPE   = 316.8/TS3
@@ -39,12 +40,12 @@ Q_HXS_FF = 0 # Q_HXS_FF = 1.8 * Data.UA_FF_HXS*(TCND - TFF)*1.0548
              # In Fresh Food Section (Or Cabinet Walls)
 
 IWALL_FF = 0 # FF (OR CABINET) EVAPORATOR BEHIND LINER (0: NO, 1: YES)
-NUM_ZONE= 1
+NUM_ZONE= 5 #OA change from 1 to 5
 IRFTYP = 1  # Refrigeration Type (1 to 7)
 
 # ===========================================
 T5 = 249.51 # 5 - INLET TO FRESH FOOD EVAPORATOR
-MREF = 5.8  # kg/hr Refrigerant Mas Flow Rate
+MREF = 5.8/3600  #[OA] kg/s Refrigerant Mas Flow Rate --OA changed input to be in kg/s
 
 T8 = 249.51 # 8 - INLET TO FREEZER EVAPORATOR
 T9 = 249.51+5 # 9 - OUTLET FROM FREEZER EVAPORATOR
@@ -116,7 +117,7 @@ print ('Evaporator  CP  Cp of Ref. Vap              j/kg/K CPRVAP=', CPRVAP )
 
 # ------------------------------------------
 print ("\n\n\n=== Output for IFRSH = 0   ====================")
-print ('                      j/hr QFRSH = ',dicRest['QFRSH'])
+print ('                      W QFRSH = ',dicRest['QFRSH']) #[OA changed units]
 print ('                        W/C UAFF = ',dicRest['UAFF'])
 print ('Fraction subcooling,area Ration ASUPE / AEVAP FSUPE = ',dicRest['FSUPE'])
 
@@ -167,7 +168,7 @@ dicRest = objEvap.evap_balance (MREF=MREF,
 
 # ------------------------------------------
 print ("\n\n\n=== Output for IFRSH = 1   ====================")
-print ('                      j/hr QFRSH = ',dicRest['QFRSH'])
+print ('                      W QFRSH = ',dicRest['QFRSH'])#[OA changed units]
 print ('                        W/C UAFF = ',dicRest['UAFF'])
 print ('Fraction subcooling,area Ration ASUPE / AEVAP FSUPE = ',dicRest['FSUPE'])
 
@@ -220,7 +221,7 @@ dicRest = objEvap.evap_balance (MREF=MREF,
 
 # -------------------------------------------------
 print ("\n=== Output for IFRSH = 2   ====================")
-print ('Q                     j/hr QFRSH = ',dicRest['QFRSH'])
+print ('Q                     W QFRSH = ',dicRest['QFRSH'])#[OA changed units]
 print ('                        W/C UAFF = ',dicRest['UAFF'])
 print ('Fraction subcooling,area Ration ASUPE / AEVAP FSUPE = ',dicRest['FSUPE'])
 
@@ -230,8 +231,8 @@ print ("\n\n\n Testing frsh method  ======================")
 R12_TABLE_READING = 200.0 - 27.10795349661135
 TS3 = 261.776   # htf temperature entering fresh food evaporator
 
-TE = [0.0, 273.15 - 13.38, 00.0]  #  Evaporator Temp Traials
-JE = 1  # Current trailar 1 the first time 2 others
+TE = [0.0, 273.15 - 13.38, 00.0]  #  Evaporator Temp Trials
+JE = 1  # Current trial 1 the first time 2 others
 
 T5 = 273.15 - 13.38  # Temp K INLET TO FRESH FOOD EVAPORATOR # J/kg
 # Enthalpy INLET TO FRESH FOOD EVAPORATOR J/kg
@@ -241,16 +242,16 @@ H5 = 1000 * (4484.17 / 120.91 + R12_TABLE_READING) # J/kg
 H7 = 1000 * (21034.06 / 120.91 + R12_TABLE_READING) # J/kg
 
 # ALPHA = QFRSH/(MREF*(H(7) - H(5)))
-# QFRSH = MREF * Delat H = (kg/hr) * (j/kg)= j/hr.
+# QFRSH = MREF * Delat H = (kg/s) * (j/kg)= j/s = W. #[OA changed units]
 
 IFRSH = 0  # 0 Nat. cooling, 1 Cross, OR 2 Counter
-QFRSH = 450 #126354.802 #MREF * 10 * 1000    # j/hr. to be checked 
+QFRSH = 450 #126354.802 #MREF * 10 * 1000    # W #[OA changed units]
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 print ("\n\n\n Test 4 Input for frsh method  IFRSH = 0 =====================")
 
 print("        IFRSH =", IFRSH)
-print(" Entry Value to be checked j/hr                     QFRSH = ", QFRSH)
+print(" Entry Value to be checked W                     QFRSH = ", QFRSH)#[OA changed units]
 
 print(" Evaporator Temp                 TE =", TE)
 print(" Iteration count 1 or others     JE =", JE)
@@ -258,7 +259,7 @@ print(" Iteration count 1 or others     JE =", JE)
 print(" Temperature INLET TO FRESH FOOD EVAPORATOR  K  T5 =", T5)
 print(" Entry Value to be checked Enthalpy INLET TO FRESH FOOD EVAPORATOR   j/kg H5 =", H5)
 print(" Entry Value to be checked Enthalpy LIQUID LINE OUTLET FROM HIGH TEMP INTERCHANGER j/kg H7 =", H7)
-print(" Initial Guess For Refrigerant Mas Flow Rate   kg/hr MREF = ", MREF)
+print(" Initial Guess For Refrigerant Mas Flow Rate   kg/s MREF = ", MREF) #[OA changed units]
 
 
 dicRest = objEvap.frsh(T5=T5, H5=H5, H7=H7, TS3=TS3,
@@ -278,7 +279,7 @@ print ("\n\n\n Test 5 input for frsh method  IFRSH = 1 =====================")
 IFRSH = 1  # 0 Nat. cooling, 1 Cross, OR 2 Counter
 
 print("        IFRSH =", IFRSH)
-print(" Entry Value to be checked j/hr                     QFRSH = ", QFRSH)
+print(" Entry Value to be checked W                     QFRSH = ", QFRSH)#[OA changed units]
 
 dicRest = objEvap.frsh(T5=T5, H5=H5, H7=H7, TS3=TS3,
                TE=TE, JE=JE,
@@ -297,7 +298,7 @@ print ("\n\n\n Test 6 b input for frsh method  IFRSH = 2 =====================")
 IFRSH = 2  # 0 Nat. cooling, 1 Cross, OR 2 Counter
 
 print("        IFRSH =", IFRSH)
-print(" Entry Value to be checked j/hr                     QFRSH = ", QFRSH)
+print(" Entry Value to be checked W                     QFRSH = ", QFRSH) #[OA changed units]
 
 dicRest = objEvap.frsh(T5=T5, H5=H5, H7=H7, TS3=TS3,
                TE=TE, JE=JE,
