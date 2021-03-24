@@ -424,6 +424,7 @@ class EvapCool_FFCross (EvapCool_Abstract):  # IFRSH== 1
                         if(ERROR <= AREA_TOL):
                             LOOKING_FOR_AREA = False
                             #Continue [OA commented this line - no continue in python!]
+                            continue  # [Ayman commented fixed to lower case ok]
 
                         QRAT = EFFTPC * QMAX / QDUM
                         QTOL = 1.0 - QRAT
