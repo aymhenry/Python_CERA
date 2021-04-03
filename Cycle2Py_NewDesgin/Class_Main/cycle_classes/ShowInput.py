@@ -103,20 +103,21 @@ class ShowInput ():
         self.showdata ('SPEEDI[1]','rpm','Nominal Speed')
         self.showdata ('TSPECI[1]','DEG C'
             ,'Temp. At Comp., Inlet or -1 If Unspecified')
-        self.showdata ('DISPLC[1]','cu-cm','Compressor Displacement')
-        self.showdata ('SIZEN[1]','kcal/hr','Rated Capacity')
-        self.showdata ('SPDNOM[1]','#','Fractional Speed')
-        self.showdata ('EERN[1]','#','Rated EER')
-        self.showdata ('ICOOLN[1]','#','Fan cooling method')
-        self.showdata ('CEI[1]','cm3','Estimated clearance volume')
-        self.showdata ('SEFFI[1]','%','isentropic efficiency')
-        self.showdata ('MEFF[1]','%','Mechanical Efficiency')
-        self.showdata ('ELOSS[1]','#','Electrical LOSSES')
-        self.showdata ('QCAN[1]','watt'
-            ,'Compressor shell loss normalized to power input')
-        self.showdata ('QHILO[1]','watt'
-            ,'Normalized heat loss from dischange line inside the compressor'
-                + 'shell to suction gas')
+            
+        # self.showdata ('DISPLC[1]','cm3','Compressor Displacement')
+        # self.showdata ('SIZEN[1]','kcal/hr','Rated Capacity')
+        # self.showdata ('SPDNOM[1]','#','Fractional Speed')
+        # self.showdata ('EERN[1]','#','Rated EER')
+        # self.showdata ('ICOOLN[1]','#','Fan cooling method')
+        # self.showdata ('CEI[1]','cm3','Estimated clearance volume')
+        # self.showdata ('SEFFI[1]','%','isentropic efficiency')
+        # self.showdata ('MEFF[1]','%','Mechanical Efficiency')
+        # self.showdata ('ELOSS[1]','#','Electrical LOSSES')
+        # self.showdata ('QCAN[1]','watt'
+        #    ,'Compressor shell loss normalized to power input')
+        # self.showdata ('QHILO[1]','watt'
+        #    ,'Normalized heat loss from dischange line inside the compressor'
+        #        + 'shell to suction gas')
                 
         self.showdata ('SUPIHX[1]','DEG C','Interchanger exit superheat')
         self.showdata ('ETHX[1]','#','Effectiveness Of High Temp Interchanger')

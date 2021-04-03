@@ -135,15 +135,19 @@ class CycleType_Abstract (ABC):
     # Output		:
     # -----------------------------------------------------------
     def adjust_units_for_all_types(self):
-        # Python - Temperatue input (C) and is converted to K
+
         self.dt.FILE_NAME = self.dt.FILE_NAME + '.cmp'
         # TOL_FRSH 
         # TOL_FRZ 
         # TOL_COND
+                
+        # Python - Temperatue input (C) and is converted to K
         self.dt.TS1= [temp_c + 273.11 for temp_c in self.dt.TS1]
         self.dt.TS3= [temp_c + 273.11 for temp_c in self.dt.TS3]
         self.dt.DTSBCI= [temp_c + 273.11 for temp_c in self.dt.DTSBCI]
         self.dt.SUPIHX= [temp_c + 273.11 for temp_c in self.dt.SUPIHX]
+        
+        # -----------------------------------
         
         for item in range(0, len(self.dt.TSPECI)):
             if(self.dt.TSPECI[item] > 0.0):
@@ -153,14 +157,7 @@ class CycleType_Abstract (ABC):
         self.dt.TROOM = self.dt.TROOM + 273.11
         self.dt.FFTEMP = self.dt.FFTEMP + 273.11
         self.dt.FZTEMP = self.dt.FZTEMP + 273.11
-        
-        # precent
-        self.dt.CEI = [percet / 100.0 for percet in self.dt.CEI]
-        self.dt.SEFFI = [percet / 100.0 for percet in self.dt.SEFFI]
-        self.dt.MEFF = [percet / 100.0 for percet in self.dt.MEFF]
-        self.dt.QCAN = [percet / 100.0 for percet in self.dt.QCAN]
-        self.dt.QHILO = [percet / 100.0 for percet in self.dt.QHILO]
-        
+                
         # kpa to pa
         self.dt.DPC = [kpa * 1000 for kpa in self.dt.DPC]
         self.dt.DPE = [kpa * 1000 for kpa in self.dt.DPE]
@@ -230,31 +227,20 @@ class CycleType_Abstract (ABC):
         # self.dt.USUPE = self.dt.USUPEI[lng_item] # * 3.600
 
         # self.dt.SIZE = self.dt.SIZEN[lng_item] # / 0.252
-        # self.dt.MREF = self.dt.MREFI[lng_item] # * 2.20462
+        # self.dt.MREF = self.dt.MREFI[lng_item] # * 2.20462 kg/hr --> LBM/hr
         
         # # from cm3 to cu-inch compressor displacement
         # self.dt.DISPLC[lng_item] = self.dt.DISPLC[lng_item] # / 16.3871
 
+        
         print ("===============to be checked ============cycle type====")
-        RHOCPC = 316.8 / self.dt.TS1[lng_item]
-        RHOCPE = 316.8 / self.dt.TS3[lng_item]
-
-        self.dt.CFMC = 1.8961 * \
-            (RHOCPC * self.dt.CFMCI[lng_item]) / 0.4720
-            
-        self.dt.CFME = 1.8961 * \
-            (RHOCPE * self.dt.CFMEI[lng_item]) / 0.4720
-
         # if(self.dt.IMAP == 1):
             # self.dt.SPEED = self.dt.SPEEDN * self.dt.SPEEDI[lng_item]
-
         if(self.dt.IFREZI[lng_item] != 0):
             self.dt.UAF = 3.600 * self.dt.UAF
-
         # ============= end of data to be checked ==========
+
         
-        # Python change from L/s to cm3/s to be checked
-        self.dt.CFMEI[lng_item] = self.dt.CFMEI[lng_item] * 1000
 
 
     # -----------------------------------------------------------

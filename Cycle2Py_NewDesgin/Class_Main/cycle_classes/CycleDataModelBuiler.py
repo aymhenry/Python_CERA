@@ -16,7 +16,7 @@ from common_classes.DataModelBuiler import DataModelBuiler
 class CycleDataModelBuiler (DataModelBuiler):
     # Type 2 is not supported
     # required data for each configration
-    DataModelBuiler.lst_required_data = [108, 0, 105, 105]
+    DataModelBuiler.lst_required_data = [108-11, 0, 105, 105]
     # maximum data file lines to read, this need to be updated if there is any
     # data line more than this
     DataModelBuiler.MAX_DATA_FILE_TO_READ = 150
@@ -85,17 +85,17 @@ class CycleDataModelBuiler (DataModelBuiler):
             'MREFI[1]', 
             'SPEEDI[1]', 
             'TSPECI[1]', 
-            'DISPLC[1]', 
-            'SIZEN[1]', 
-            'SPDNOM[1]', 
-            'EERN[1]',
-            'ICOOLN[1]',
-            'CEI[1]', 
-            'SEFFI[1]', 
-            'MEFF[1]',
-            'ELOSS[1]',
-            'QCAN[1]', 
-            'QHILO[1]',
+            #'DISPLC[1]', 
+            #'SIZEN[1]', 
+            #'SPDNOM[1]', 
+            #'EERN[1]',
+            #'ICOOLN[1]',
+            #'CEI[1]', 
+            #'SEFFI[1]', 
+            #'MEFF[1]',
+            #'ELOSS[1]',
+            #'QCAN[1]', 
+            #'QHILO[1]',
             'SUPIHX[1]', 
             'ETHX[1]',
             'UA_FF', 
@@ -139,112 +139,10 @@ class CycleDataModelBuiler (DataModelBuiler):
             'QMUL']
 
         lst_config2 = ['TITLE', 'TITLE2', 'FILERA', 'ICYCL']
-        lst_config3 = [
+        lst_config3 = [ # later
             'TITLE',
-            'TITLE2',
-            'FILERA',
-            'ICYCL',
-            'IRFTYP',
-            'IDFRST',
-            'HRSOFF',
-            'TOL_FRSH',
-            'TOL_FRZ',
-            'TOL_COND',
-            'TOL_MASS',
-            'TOL_HX',
-            'N_EVAP',
-            'N_COND',
-            'ICOMP',
-            'IMAP',
-            'I_CYCLE',
-            'T_CYCLE',
-            'I_VALVE',
-            'IR[1][1]',
-            'IR[2][1]',
-            'IR[3][1]',
-            'NC[1]',
-            'F[1][2][1]',
-            'F[1][3][1]',
-            'F[2][3][1]',
-            'X[1][1]',
-            'X[2][1]',
-            'X[3][1]',
-            'ICONDI[1]',
-            'TS1[1]',
-            'CFMCI[1]',
-            'FNPWRC[1]',
-            'DPC[1]',
-            'UDSCI[1]',
-            'UTPCI[1]',
-            'USCCI[1]',
-            'ATOTCI[1]',
-            'DTSBCI[1]',
-            'CONDHT[1]',
-            'CONDVP[1]',
-            'ISPECI[1]',
-            'IFRSHI[1]',
-            'TS3[1]',
-            'CFMEI[1]',
-            'FNPWRE[1]',
-            'DPE[1]',
-            'UTPEI[1]',
-            'USUPEI[1]',
-            'ATOTEI[1]',
-            'DTSPEI[1]',
-            'MREFI[1]',
-            'SPEEDI[1]',
-            'TSPECI[1]',
-            'DISPLC[1]',
-            'SIZEN[1]',
-            'SPDNOM[1]',
-            'EERN[1]',
-            'ICOOLN[1]',
-            'CEI[1]',
-            'SEFFI[1]',
-            'MEFF[1]',
-            'ELOSS[1]',
-            'QCAN[1]',
-            'QHILO[1]',
-            'SUPIHX[1]',
-            'ETHX[1]',
-            'UA_FF',
-            'UA_FZ',
-            'UA_ML',
-            'UA_FF_CND',
-            'UA_FZ_CND',
-            'UA_FF_HXS',
-            'UA_FZ_HXS',
-            'FRACT_FF',
-            'FRACT_FZ',
-            'IWALL_FF',
-            'IWALL_FZ',
-            'DFSTCYC',
-            'FFCYC',
-            'FZCYC',
-            'OUTCYC',
-            'FFASH',
-            'FFAUX',
-            'FZASH',
-            'FZAUX',
-            'OTHERW',
-            'TROOM',
-            'FFTEMP',
-            'FZTEMP',
-            'FFQ',
-            'FZQOFF',
-            'FFSEN',
-            'FFLAT',
-            'FROSTF',
-            'FZSEN',
-            'FZLAT',
-            'FROSTZ',
-            'FFPENA',
-            'FZPENA',
-            'FFHTQ',
-            'FZHTQ',
-            'FFREFQ',
-            'FZREFQ',
-            'QMUL']
+            'TITLE2']
+            
         # lst_config4 same as 2
 
         lst_var_names = []
@@ -334,17 +232,17 @@ class CycleDataModelBuiler (DataModelBuiler):
         self.obj_qdata.MREFI = [0.0] * (2 + 1)
         self.obj_qdata.SPEEDI = [0.0] * (2 + 1)
         self.obj_qdata.TSPECI = [0.0] * (2 + 1)
-        self.obj_qdata.DISPLC = [0.0] * (2 + 1)
-        self.obj_qdata.SIZEN = [0.0] * (2 + 1)
-        self.obj_qdata.SPDNOM = [0.0] * (2 + 1)
-        self.obj_qdata.EERN = [0.0] * (2 + 1)
-        self.obj_qdata.ICOOLN = [0.0] * (2 + 1)
-        self.obj_qdata.CEI = [0.0] * (2 + 1)
-        self.obj_qdata.SEFFI = [0.0] * (2 + 1)
-        self.obj_qdata.MEFF = [0.0] * (2 + 1)
-        self.obj_qdata.ELOSS = [0.0] * (2 + 1)
-        self.obj_qdata.QCAN = [0.0] * (2 + 1)
-        self.obj_qdata.QHILO = [0.0] * (2 + 1)
+        # self.obj_qdata.DISPLC = [0.0] * (2 + 1)
+        # self.obj_qdata.SIZEN = [0.0] * (2 + 1)
+        # self.obj_qdata.SPDNOM = [0.0] * (2 + 1)
+        # self.obj_qdata.EERN = [0.0] * (2 + 1)
+        # self.obj_qdata.ICOOLN = [0.0] * (2 + 1)
+        # self.obj_qdata.CEI = [0.0] * (2 + 1)
+        # self.obj_qdata.SEFFI = [0.0] * (2 + 1)
+        # self.obj_qdata.MEFF = [0.0] * (2 + 1)
+        # self.obj_qdata.ELOSS = [0.0] * (2 + 1)
+        # self.obj_qdata.QCAN = [0.0] * (2 + 1)
+        # self.obj_qdata.QHILO = [0.0] * (2 + 1)
         self.obj_qdata.SUPIHX = [0.0] * (2 + 1)
         self.obj_qdata.ETHX = [0.0] * (2 + 1)
 
@@ -489,17 +387,6 @@ class CycleDataModelBuiler (DataModelBuiler):
         #  MREFI[1]		Initial Guess For Refrigerant Mas Flow Rate (kg/hr)
         #  SPEEDI[1]	Nominal Speed (rpm)
         #  TSPECI[1]	Temp. At Comp., Inlet (C) [-1 If Unspecified]
-        #  DISPLC[1]	Compressor Displacement, (cc-cm)
-        #  SIZEN[1]		Rated Capacity (kcal/hr)
-        #  SPDNOM[1]	Fractional Speed (-)
-        #  EERN[1]		Rated EER
-        #  ICOOLN[1]	Fan cooling method
-        #  CEI[1]		Estimated clearance volume
-        #  SEFFI[1]		isentropic efficiency
-        #  MEFF[1]		Mechanical Efficiency
-        #  ELOSS[1]		Electrical LOSSES
-        #  QCAN[1]		Compressor shell loss normalized to power input
-        # QHILO[1]                Normalized heat loss from dischange line
         # inside the compressor shell to suction gas
 
     # Interchanger data
