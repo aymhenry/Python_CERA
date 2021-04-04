@@ -755,20 +755,30 @@ class CycleSolver (CycleUtils):
                     and self.IFRSH != 0):
 
                     if (self.dt.IC == 1):
-                        TIN = 0.15 * TFF + 0.85 * TFZ
+                        TIN = 0.15 * self.TFF + 0.85 * self.TFZ
                         self.FF_FRACT = 0.0  # in Python only
 
                     else:
-                        self.dt.CAPE = self.QFRSH / 1.0548 - 3.413 * \
-                            self.dt.FANE - 3.413 * (self.dt.DFSTCYC + self.dt.FZCYC)
+                        # self.dt.FANE, self.dt.DFSTCYC, FZCYC all in watt
+                        # self.dt.CAPE = self.QFRSH / 1.0548 - 3.413 * \
+                            # self.dt.FANE 
+                            # - 3.413 * (self.dt.DFSTCYC + self.dt.FZCYC)
                             
-                        CFMA = self.CFME / (1.08 * 1.8961)
-                        QFM = QFF + 3.413 * self.dt.DUTYC * self.dt.FFCYC
+                        self.dt.CAPE = self.QFRSH - self.dt.FANE \
+                             - (self.dt.DFSTCYC + self.dt.FZCYC)
+                             
+                        # Ayamn
+                        # CFMA = self.CFME / (1.08 * 1.8961)
+                        CFMA = self.CFME 
+                        # QFM = QFF + 3.413 * self.dt.DUTYC * self.dt.FFCYC
+                        QFM = QFF + self.dt.DUTYC * self.dt.FFCYC
 
                         [TIN, self.FF_FRACT] = self.mixair(
-                            self.dt.CAPE, QFM, QFZ, TFF, TFZ, CFMA)
+                            self.dt.CAPE, QFM, QFZ, self.TFF, self.TFZ, CFMA)
 
-                    self.TS3 = (TIN + 459.6) / 1.8
+                    # Dr Omar to check
+                    # self.TS3 = (TIN + 459.6) / 1.8
+                    self.TS3 = TIN 
 
             #........Evaporator Class..................
             # add evaporator class here
@@ -799,7 +809,7 @@ class CycleSolver (CycleUtils):
             # ... Output ....
             self.QFRSH = dicRest['QFRSH']
             UAFF = dicRest['UAFF']
-            FSUPE = dicRest['FSUPE']
+            self.FSUPE = dicRest['FSUPE']
             #..........................................
 
             # Superheating fraction
@@ -837,14 +847,14 @@ class CycleSolver (CycleUtils):
             # Calculate the heat transfer if the air left at T[5]
             # CFME kg/hr see common in CycleType
             # Dr Omar to check 
-            # CFME# j/hr K -->
+            # CFME j/hr K -->
             QAMAX = self.CFME * (self.TS3 - self.T[5]) # j/hr
-            QMAXE = QAMAX 
+            QMAXE = QAMAX # j/hr
 
             if (QRMAX < QAMAX):
                 QMAXE = QRMAX
 
-            ETAE = self.QFRSH / QMAXE
+            ETAE = self.QFRSH / QMAXE # QMAXE=j/hr
 
             # if (ICONE == 1):
                 # LECON = False # Exit loop

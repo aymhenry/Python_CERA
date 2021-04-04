@@ -991,6 +991,6 @@ class CycleUtils ():
         X = - B / (2.0 * A) - math.sqrt(B**2 - 4.0 * A * C) / (2.0 * A)
         TIN = X * TFF + (1.0 - X) * TFZ
         
-        Data.obj_cdata.FF_AIR = X
+        # Ayman not used anywhere Data.obj_cdata.FF_AIR = X
         
         return [TIN, X]
