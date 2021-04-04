@@ -683,7 +683,7 @@ class CycleSolver (CycleUtils):
         IE = 1
         while ( (IE <= ITMAXE) and LECON):
             I_ERROR_INTER = 0
-
+            
             # ----------------------------- Step 02
             if (self.ISPEC == 1):  # Evap superheat:
                 self.TE[self.JE] = self.T[15] + self.DTSUPE
@@ -844,6 +844,15 @@ class CycleSolver (CycleUtils):
             # # --- end of useless code block
 
             # fresh food section evaporator
+
+            print ("    Input to frsh - main iteration function ...")
+            print ("        self.H[5]=",self.H[5])
+            print ("        self.H[7]=",self.H[7])
+            print ("        self.TE=",self.TE)
+            print ("        self.TS3=",self.TS3)
+            print ("        self.QFRSH=",self.QFRSH)
+            print ("        self.MREF=",self.MREF)
+            
             dicRest = self.objEvap.frsh(T5=self.T[5]
                             , H5=self.H[5]
                             , H7=self.H[7]
@@ -851,12 +860,16 @@ class CycleSolver (CycleUtils):
                             , TE=self.TE, JE=self.JE
                             , QFRSH=self.QFRSH
                             , MREF=self.MREF)
-
+            
             self.TE = dicRest['TE']
             self.JE = dicRest['JE']
             TS4 = dicRest['TS4']
             ICONE = dicRest['ICONE']
 
+            print ("    Output from frsh - main iteration function ...")
+            print ("        self.TE=",self.TE)
+            print ("      not used  TS4=",TS4)
+            print ("              ICONE=",ICONE)
             # ---------------------------ADDED NEW CODE (12/29/90)---------
             self.T[15] = self.T[15] + self.TE[2] - self.T[7]
 
@@ -882,6 +895,10 @@ class CycleSolver (CycleUtils):
             # if (self.TE[JE] <= self.TEMIN):
                 # LECON = False # Exit loop
 
+            print ("\n    Evaporator Iteration Number -----> IE=",IE)
+            print ("    ===========================================")
+            print ("    ICONE ",ICONE, self.TE[self.JE] <= self.TEMIN)
+            
             if (ICONE == 1) or (self.TE[self.JE] <= self.TEMIN):
                 LECON = False # Exit loop
 
@@ -899,7 +916,6 @@ class CycleSolver (CycleUtils):
     def  calc_lowevap (self):
         #--- Reptead block ----
         # ----------------------------- Step 03
-        print ("    calc_lowevap-self.T[7]",self.T[7])
         #	determine the enthalpy at [7]
         if (self.ISPEC == 1):  # Evap superheat:
             self.H[7] = self.objCP.Property('H', P=self.P[7], T=self.T[7])  # j/kg
@@ -915,7 +931,7 @@ class CycleSolver (CycleUtils):
                                , self.ETHX1)
       
             # [T[7],XQ[7],XL_Temp, XV_Temp,  VL[7],VV[7],HL7,HV7] = self.hpin ( H[7],P[7],X)
-            
+            print ("cxheck why re-calcuklate T[7]")
             self.T[7] = self.objCP.Property('T', H=self.H[7]
                                                      , P=self.P[7])  # K
             
@@ -924,7 +940,10 @@ class CycleSolver (CycleUtils):
             
         elif (self.ISPEC == 3):  # Evap exit quality
             # XQ[7] = Data.XEXITE
-            [ X,P[7],H[7] ] = self.enthal ( HBUB15,H[15],XQ[7] )	# CALL ENTHAL(HBUB15,H[15],XQ[7],X,P[7],H[7])
+            # CALL ENTHAL(HBUB15,H[15],XQ[7],X,P[7],H[7])
+            print (" line 927 CycleSolver -- check this function")
+            self.H[7] = self.enthal (self.objCP, HBUB15, H[15]
+                            , self.dt.XEXITE, self.P[7])
 
             self.T[7] = self.objCP.Property('T', H=self.H[7]
                                                      , P=self.P[7])  # K
