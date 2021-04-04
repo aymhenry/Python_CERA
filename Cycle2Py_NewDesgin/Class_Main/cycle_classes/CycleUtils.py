@@ -819,6 +819,57 @@ class CycleUtils ():
         return ETHX1 * min(H4 - H6STAR, H13STR - H7)
 
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
+    def inter2(self, PA, TAI, HAI, VAI, PB, HBO, TDEW, HDEW, VDEW, ETA):
+        # iterates to solve for interchanger heat transfer knowing    
+        # the inlet state of one stream and outlet state of the       
+        # other for a counterflow heat exchanger.                     
+        # equal mass flow rates of the same fluid                     
+
+        LCONV = False
+
+        # KNOWN: INLET STATE OF STREAM A
+        #        OUTLET STATE OF STREAM B
+
+        # GUESS THE INLET STATE FOR STREAM B
+        
+        HBI = HDEW - 5.0
+        ITER = 0
+        HTOL = 1000.0
+        
+        while (ITER <= 100 and HTOL > 0.001):
+            # [TBI, XQBI, XL, XV, VL, VV, HL, HV] = self.hpin(HBI, PB, X)
+            TBI = self.cy.objCP.Property('T', H=HBI, P=PB)  # K
+            
+            # DETERMINE EXIT STATE OF STREAM A if AT TBI
+            HAOSTR = self.cy.objCP.Property('H', X=0, T=TBI)  # j/kg
+            DHAMAX = HAI - HAOSTR
+
+            # DETERMINE EXIT STATE OF STREAM B if AT TAI
+            HBOSTR = self.cy.objCP.Property('H', X=0, T=TAI)  # j/kg
+            DHBMAX = HBI - HBOSTR
+
+            # DETERMINE THE HEAT TRANSFER FOR THE GUESSED INLET STATE HBI
+            QMAX = min(DHAMAX, DHBMAX)
+            QACT = ETA * QMAX
+            
+            # ADJUST THE STREAM B ENTHALPY GUESS
+            DELTA = QACT / (HBO - HBI)
+            HTOL = abs(1.0 - DELTA)
+            HBI2 = HBO - (HBO - HBI) * DELTA
+
+            if(HBI2 > 1.1 * HBI):
+                HBI2 = 1.1 * HBI
+                
+            if(HBI2 < 0.9 * HBI):
+                HBI2 = 0.9 * HBI
+                
+            HBI = HBI2
+
+            ITER = ITER + 1
+
+        return [TBI, HBI, QACT]
+    
+    # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
     def dutfnd(self, dt, ICAB
             ,IRFTYP, ICYCL, N
             ,QFRSH, QFREZ

@@ -10,7 +10,6 @@ from cycle_classes.CoolPrp import *
 from cycle_classes.Compressor import *
 from cycle_classes.Evaporator import *
 from cycle_classes.Condenser import *
-from cycle_classes.EvapXCH import *
 
 from cycle_classes.ErrorException import ErrorException
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -45,11 +44,6 @@ class CycleSolver (CycleUtils):
     def setupEvap(self, IFRSH, ISPEC): 
         self.IFRSH = IFRSH
         self.ISPEC = ISPEC
-
-        objEvaporatorXCHG = EvapXCH()
-        self.objEvapXCH = objEvaporatorXCHG.getObject(objCP=self.objCP
-                                                        , ISPEC=ISPEC
-                                                        , dt=self.dt)
 
         objEvaporator = Evaporator()
         self.objEvap = objEvaporator.getObject(objCP=self.objCP, IFRSH=IFRSH)
@@ -288,14 +282,44 @@ class CycleSolver (CycleUtils):
 
     # basic Solver
     def __solveCycle(self):
-        self.T[15] = self.TS3 - (self.DTSUPE + 2.0)
-        self.P[15] = self.objCP.Property('P', X=1, T=self.T[15])  # pas
+        # GUESS A DEW POINT TEMPERATURE AT THE EVAPORATOR EXIT
+        # ----------------------------- Step 01
+        if (self.ISPEC == 1):  # Evap superheat:
+            self.T[15] = self.TS3 - (self.DTSUPE + 2.0)
 
-        self.TE[1] = self.T[15] + self.DTSUPE
-        self.T[7] = self.TE[1] # 7 - OUTLET FROM FRESH FOOD EVAPORATOR
-        self.P[7] = self.P[15]
+            self.P[15] = self.objCP.Property('P', X=1, T=self.T[15])  # pas
+            
+            self.TE[1] = self.T[15] + self.DTSUPE
+            self.T[7] = self.TE[1] # 7 - OUTLET FROM FRESH FOOD EVAPORATOR
+            self.P[7] = self.P[15]
 
-        # Step 02 - condenser itaration loop
+        elif (self.ISPEC == 2):  # Interchanger superheat specified
+            self.T[15] = self.TS3 - 2.0
+            self.T[13] = self.T[15] + self.DTSUPI
+
+            if self.T[13] > self.TC[1]:
+                self.T[13] = self.TC[1] - 5.0
+                self.T[15] = self.T[13] - self.DTSUPI
+            
+            self.P[15] = self.objCP.Property('P', X=1, T=self.T[15])  # pas
+            
+            self.TE[1] = self.T[15]
+            self.T[7] = self.TE[1]
+            self.P[7] = self.P[15]
+
+        elif (self.ISPEC == 3):  # Evap exit quality
+            self.T[15] = self.TS3 - 2.0
+
+            self.P[15] = self.objCP.Property('P', X=1, T=self.T[15])  # pas
+            TBUB15 = self.objCP.Property('T', X=0, T=self.T[15])  # K
+            
+            self.TE[1] = self.T[15] - \
+                (self.T[15]- TBUB15 )*(1.0 - self.XEXITE)
+            self.T[7]  = self.TE[1]
+            self.P[7]  = self.P[15]
+        # ----------------------------- End Step 01
+
+        # Condenser itaration loop
         while (self.IC <= self.ITMAXC and self.LCCON):
             print ("\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
             print ("Condenser Iteration Number -----> self.IC=",self.IC)
@@ -322,9 +346,6 @@ class CycleSolver (CycleUtils):
             
             #	find condenser pressure for current guess of TC
             TBUB4 = self.TC[self.JC] + self.DTSUBC
-
-            # [X,XV_Temp,P[4],VBUB4,VV[4],LCRIT]
-            #   = self.bublt(TBUB4, X, XV_Temp, True)
             self.P[4] = self.objCP.Property('P', X=0, T=TBUB4)  # pas
 
             # determine the specific volume of the liquid
@@ -354,9 +375,6 @@ class CycleSolver (CycleUtils):
                 - self.dt.CONDHT[self.NCYC] / (self.MREF/3600) / self.DUTYR
                 
             self.P[16] = self.P[4]
-
-            # [T[16], XQ[16], XL_Temp, XV_Temp, VL[16], VV[16], HL16, HV16]
-            # = self.hpin(H[16], P[16], # X)
 
             # 16 - LIQUID LINE STATE AFTER HEAT LOSS TO CABINET AND MULLION
             self.T[16] = self.objCP.Property('T', P=self.P[16]
@@ -391,17 +409,9 @@ class CycleSolver (CycleUtils):
                 self.V[1] = self.objCP.Property('V', X=1, P=self.P[1])  # m3/kg
                 self.H[1] = self.objCP.Property('H', X=1, P=self.P[1])  # j/kg
             else:
-                self.V[1] = self.V[13] # bug if ISPEC<>2 and TSPEC <=0
+                self.V[1] = self.V[13]
                 self.T[1] = self.T[13]
                 self.H[1] = self.H[13]
-
-            # ----------------Dr Omar this block only in Python
-            # fix bug if ISPEC<>2 and TSPEC <=0
-            if self.ISPEC != 2 and self.TSPEC < 0.0:
-                self.V[1] = self.objCP.Property('V', T=self.T[1]
-                    , P=self.P[1])  # m3/kg
-
-            #---------------------End if block to fix bug------
             
             # S[1] = self.entrop(T[1],V[1],X)
             # self.S[1] = self.objCP.Property('S', V=self.V[1]
@@ -672,30 +682,43 @@ class CycleSolver (CycleUtils):
         #	enter iteration for evaporator outlet temperature
         IE = 1
         while ( (IE <= ITMAXE) and LECON):
-            # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-            # this block is common for all solvers (1,2, and 3)
             I_ERROR_INTER = 0
-            # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=End of common block
 
-            self.TE[self.JE] = self.T[15] + self.DTSUPE
+            # ----------------------------- Step 02
+            if (self.ISPEC == 1):  # Evap superheat:
+                self.TE[self.JE] = self.T[15] + self.DTSUPE
+                self.P[15] = self.objCP.Property('P', X=1, T=self.T[15])  # pas
+                
+                self.P[7] = self.P[15]
 
-            # [XL_Temp, X, P[15], VL[15], V[15], LCRIT]
-            #   = self.bublt(T[15],XL_Temp, X, False)
+            elif (self.ISPEC == 2):  # Interchanger superheat specified
+                self.P[15] = self.objCP.Property('P', X=1, T=self.T[15])  # pas
+                
+                self.P[13] = self.P[15]
+                self.T[13] = self.T[15] + self.DTSUPI
+                
+                self.H[13] = self.objCP.Property('H', X=1, T=self.T[13])  # j/kg
+                self.P[7] = self.P[15]
+                self.TE[self.JE] = self.T[7]
+                
+                if (self.T[13]  >=  self.T[16]) :
+                    LECON = False
+                    I_ERROR_INTER = 1
+                    continue
 
-            self.P[15] = self.objCP.Property('P', X=1, T=self.T[15]) # pas
-            self.P[7] = self.P[15]
+            elif (self.ISPEC == 3):  # Evap exit quality
+                self.P[15] = self.objCP.Property('P', X=1, T=self.T[15])  # pas
+                
+                self.P[7] = self.P[15]
+            # ----------------------------- End Step 02
 
-            # this block is common for all solvers (1,2, and 3)
-            #	determine the bubble point at the evap exit pressure
             TBUB15 = self.objCP.Property('T', X=0, P=self.P[15])  # K
             VBUB15 = self.objCP.Property('V', X=0, P=self.P[15])  # m3/kg
 
             #	determine the bubble and dew point enthalpies
             self.H[15] = self.objCP.Property('H', X=1, T=self.T[15]) # j/kg
-
             HBUB15 = self.objCP.Property('H', X=0, P=self.P[15])  # j/kg
-            # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=End of common block
-
+            
             #--- Reptead block ----
             self.calc_lowevap()
             # end of repeated block
@@ -706,7 +729,6 @@ class CycleSolver (CycleUtils):
             if (PDEWE > self.P[5]):
                 PDEWE = self.P[5]
 
-            # [XREF,X,TDEW,VLDEW,VDEW,LCRIT] = self.bublp(PDEWE,XREF,X,False)
             TDEW = self.objCP.Property('T', P=PDEWE, X=1)  # K
 
             # Python POLDE is not used !!!
@@ -717,7 +739,6 @@ class CycleSolver (CycleUtils):
             if (self.T[5] >= self.TS3):
                 self.T[5] = self.TS3 - 1.0
 
-            #[HDEW,CVRVAP,CPRVAP,VS] = self.hcvcps(3,TDEW,VDEW,X)
             HDEW = self.objCP.Property('H', X=1, P=PDEWE)  # j/kg
             CPRVAP = self.objCP.Property('CP', X=1, P=PDEWE)  # j/kg K
 
@@ -727,7 +748,6 @@ class CycleSolver (CycleUtils):
             self.T[12] = TDEW
             #self.V[12] = VDEW
             self.H[12] = HDEW
-            #XQ[12] = 1.0
 
             if self.IC !=1: # skip first trail to calc. some values later
                 [QFF, QFZ, DUTYR] = \
@@ -878,36 +898,64 @@ class CycleSolver (CycleUtils):
     # repeated block
     def  calc_lowevap (self):
         #--- Reptead block ----
+        # ----------------------------- Step 03
+        print ("    calc_lowevap-self.T[7]",self.T[7])
         #	determine the enthalpy at [7]
-        self.H[7] = self.objCP.Property('H', P=self.P[7]
-                                           , T=self.T[7])  # j/kg
-        self.T[7] = self.TE[self.JE]
+        if (self.ISPEC == 1):  # Evap superheat:
+            self.H[7] = self.objCP.Property('H', P=self.P[7], T=self.T[7])  # j/kg
+       
+            #VV[7] = V[7]
+            self.T[7] = self.TE[self.JE]
 
-        # this block is common for all solvers (1,and 3 only)
-        self.dt.QINT = self.inter1(self.objCP
-                                    , self.T[4], self.H[4]
-                                    , self.T[7], self.H[7]
-                                    , self.ETHX1)
+        elif (self.ISPEC == 2):  # Interchanger superheat specified
+            [self.T[7], self.H[7], self.QINT] =\
+                    self.inter2 (self.P[16], self.T[16], self.H[16]
+                               , self.V[16], self.P[13], self.H[13]
+                               , self.T[15], self.H[15], self.V[15]
+                               , self.ETHX1)
+      
+            # [T[7],XQ[7],XL_Temp, XV_Temp,  VL[7],VV[7],HL7,HV7] = self.hpin ( H[7],P[7],X)
+            
+            self.T[7] = self.objCP.Property('T', H=self.H[7]
+                                                     , P=self.P[7])  # K
+            
+            #V[7] = (1.0-XQ[7])*VL[7] + XQ[7]*VV[7]
+            self.TE[self.JE] = self.T[7]
+            
+        elif (self.ISPEC == 3):  # Evap exit quality
+            # XQ[7] = Data.XEXITE
+            [ X,P[7],H[7] ] = self.enthal ( HBUB15,H[15],XQ[7] )	# CALL ENTHAL(HBUB15,H[15],XQ[7],X,P[7],H[7])
 
-        self.H[13] = self.H[7] + self.dt.QINT
-        # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=End of common block 1,3
-
-        # this block is common for all solvers (1,2.3)
+            self.T[7] = self.objCP.Property('T', H=self.H[7]
+                                                     , P=self.P[7])  # K
+            
+            # V[7] = (1.0-XQ[7])*VL[7] + XQ[7]*VV[7]
+            self.T[7] = self.TE[self.JE]
+        
+        # ----------------------------- End Step 03
+        # ----------------------------- Step 04
+        if (self.ISPEC  !=  2) :
+            self.dt.QINT = self.inter1(self.objCP
+                                        , self.T[4], self.H[4]
+                                        , self.T[7], self.H[7]
+                                        , self.ETHX1)
+            self.H[13] = self.H[7] + self.dt.QINT
+        # ----------------------------- End Step 04
+        
         self.H[6] = self.H[16] + self.dt.QINT
         self.P[6] = self.P[4]
         self.P[13] = self.P[7]
         self.T[6] = self.objCP.Property('T', P=self.P[6]
                                            , H=self.H[6])  # K
-        # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=End of common
+        
+        # ----------------------------- Step 05
+        if (self.ISPEC  !=  2):
+            self.T[13] = self.objCP.Property('T', P=self.P[13]
+                                                , H=self.H[13])  # K
+       # ----------------------------- End Step 05
 
-        # this block is common for all solvers (1,2, and 3)
-        self.T[13] = self.objCP.Property('T', P=self.P[13]
-                                            , H=self.H[13])  # K
-        # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=End of common block
-
-        # this block is common for all solvers (1,2.3)
         self.P[5] = self.P[13] + self.DPE
-        #PAGE 13 LINE 851
+
         [self.H, self.P, self.T, self.TS6, self.QFREZ] =\
                 self.lowevp(self.dt, self.objCP, self.MREF, self.dt.ICYCL
                             , 0 # ICNTRL no value set in Fortran
@@ -927,8 +975,5 @@ class CycleSolver (CycleUtils):
         objSolution.S = self.S
 
         return objSolution
-
-
-
 
 
