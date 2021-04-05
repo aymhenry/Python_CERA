@@ -93,6 +93,9 @@ class EvapCool_Abstract (ABC, exf4Cond_Evap):
         # calculate fresh food section exit temperature
         # MREF  = MREF * 2.20462 # kg to pounds is not done
         
+        # Dr Omar
+        MREF  = MREF / 3600 # kg/sec
+        
         #   initialize
         TOL_FRSH = 0.1  # Tolerance 
         
@@ -101,7 +104,8 @@ class EvapCool_Abstract (ABC, exf4Cond_Evap):
         ICONE = 0
 
         # Python: MREF:Initial Guess For Refrigerant Mass Flow Rate (kg/s) [OA changed /hr to /s]
-        ALPHA = QFRSH / (MREF * (H7 - H5))  # = (W)/(kg/s * j/kg) = %Ration [OA changed /hr to /s]
+        # = (W)/(kg/s * j/kg) = %Ration [OA changed /hr to /s]
+        ALPHA = QFRSH / (MREF * (H7 - H5))  
 
         if (QFRSH == 0.0):
             ALPHA = 0.01
@@ -113,7 +117,7 @@ class EvapCool_Abstract (ABC, exf4Cond_Evap):
 
         TEOUT = TE[JE] + DELT
 
-        TS4 = TS3 - QFRSH / self.CFME
+        TS4 = TS3 - QFRSH / self.CFME   # K - [j/kg] [j/kg/K]
         if (TEOUT > TS3):
             TEOUT = TS3
 

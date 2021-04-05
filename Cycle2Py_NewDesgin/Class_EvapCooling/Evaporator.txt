@@ -1,6 +1,7 @@
-                                                                                     
 
- Teat 1 IFRSH = 0 ----------------------------------------------
+
+
+ Test 1 IFRSH = 0 ----------------------------------------------
 
 === Parameters ======================
 Total Heat Transfer Surface Area               m2 ATOTE= 2.338
@@ -8,7 +9,7 @@ Units to be checked  CFME
 L/s Air Flow Rate Across Coil (L/S)             CFME= 23.6
   (htf) temperature entering Evaporator
 htf temperature entering fresh food evaporator K TS3= 260.86
-Number of Zones on Evaporator                 N_EVAP= 1
+Number of Zones on Evaporator                 N_EVAP= 5
 Superheat Region Conductance, W/M2-C           USUPE= 5.633
 Two-Phase Heat Transfer Conductance            UTPE= 13.787
 room temp K                                   TROOM= 305.37
@@ -16,87 +17,104 @@ Freezer Temperature (K)                      FZTEMP= 258.15
 A/R In Fresh Food Section (Or Cabinet Walls)  UA_FF= 0
 Heat Fresh Food Section (Or Cabinet Walls) Q_HXS_FF= 0
 FF (OR CABINET) EVAPORATOR BEHIND LINER (0: NO, 1: YES) IWALL_FF= 0
-count no. of zones                         NUM_ZONE= 1
+count no. of zones                         NUM_ZONE= 5
 Refrigeration Type (1 to 7)                  IRFTYP= 1
-=== Inputs ======================
+
+=== Inputs for IFRSH = 0 ======================
 Evaporator cooling type        Nat IFRSH= 0
 Temperature INLET TO FRESH FOOD EVAPORATOR      K T5= 249.51
-Temperature OUTLET FROM FRESH FOOD EVAPORATOR   K T7= 249.51
+Temperature OUTLET FROM FRESH FOOD EVAPORATOR   K T7= 254.51
 Temperature htf entering fresh food evaporator K TS3= 260.86
 Temperature Evaporator Dew point              K TDEW= 256.77
-Enthalpy Evaporator Dew point              j/kg HDEW= 345122.6312358343
-Enthalpy INLET TO FRESH FOOD EVAPORATOR Enthalpy j/kg H5= 367193.096871431
-Evaporator  CP                             j/kg/K CPRVAP= 69.72
-
-=== Output ====================
-                      j/hr QFRSH =  -126354.80284646059
-                        W/C UAFF =  57.179309359412166
-Fraction subcooling,area Ration ASUPE / AEVAP FSUPE =  198.2444184147173
+Enthalpy INLET TO FRESH FOOD EVAPORATOR Enthalpy j/kg H5= 211000
+Evaporator  CP  Cp of Ref. Vap              j/kg/K CPRVAP= 0.91
 
 
- Teat 2 IFRSH = 1 ----------------------------------------------
-=== Inputs ======================
+
+=== Output for IFRSH = 0   ====================
+                      W QFRSH =  216.44503022777857
+                        W/C UAFF =  49.83185250415005
+Fraction subcooling,area Ration ASUPE / AEVAP FSUPE =  0.5092217773415156
+
+
+ Test 2 IFRSH = 1 ----------------------------------------------
+=== input for IFRSH = 1   ====================
 Evaporator cooling type        Nat IFRSH= 1
 Temperature INLET TO FRESH FOOD EVAPORATOR      K T5= 249.51
 Temperature htf entering fresh food evaporator K TS3= 260.86
 Temperature Evaporator Dew point           K TDEW= 256.77
-Enthalpy Evaporator Dew point               j/kg HDEW= 345122.6312358343
-Enthalpy INLET TO FRESH FOOD EVAPORATOR Enthalpy j/kg H5= 367193.096871431
-Evaporator  CP                             j/kg/K CPRVAP= 69.72
-Pressure INLET TO FRESH FOOD EVAPORATOR    Pa P5= 30000
-Pressure OUTLET FROM FRESH FOOD EVAPORATOR Pa P7= 30000
-
-=== Output ====================
-                      j/hr QFRSH =  153.46485213727024
-                        W/C UAFF =  47.411834400000004
-Fraction subcooling,area Ration ASUPE / AEVAP FSUPE =  1.0
+Enthalpy INLET TO FRESH FOOD EVAPORATOR  j/kg H5= 211000
+Evaporator  CP                             j/kg/K CPRVAP= 0.91
+Pressure INLET TO FRESH FOOD EVAPORATOR    Pa P5= 130500
+Pressure OUTLET FROM FRESH FOOD EVAPORATOR Pa P7= 130500
 
 
- Teat 3 IFRSH = 2----------------------------------------------
-=== Inputs ======================
+
+=== Output for IFRSH = 1   ====================
+                      W QFRSH =  173.15719196762134
+                        W/C UAFF =  29.71949307284489
+Fraction subcooling,area Ration ASUPE / AEVAP FSUPE =  0.13189813619660248
+
+
+ Test 3 IFRSH = 2----------------------------------------------
+=== input for IFRSH = 2   ====================
 Evaporator cooling type        Nat IFRSH= 2
 Temperature INLET TO FRESH FOOD EVAPORATOR      K T5= 249.51
 Temperature htf entering fresh food evaporator K TS3= 260.86
 Temperature Evaporator Dew point           K TDEW= 256.77
-Enthalpy Evaporator Dew point               j/kg HDEW= 345122.6312358343
-Enthalpy INLET TO FRESH FOOD EVAPORATOR Enthalpy j/kg H5= 367193.096871431
-Evaporator  CP                             j/kg/K CPRVAP= 69.72
-Pressure INLET TO FRESH FOOD EVAPORATOR    Pa P5= 30000
-Pressure OUTLET FROM FRESH FOOD EVAPORATOR Pa P7= 30000
+Enthalpy INLET TO FRESH FOOD EVAPORATOR Enthalpy j/kg H5= 211000
+Evaporator  CP                             j/kg/K CPRVAP= 0.91
+Pressure INLET TO FRESH FOOD EVAPORATOR    Pa P5= 130500
+Pressure OUTLET FROM FRESH FOOD EVAPORATOR Pa P7= 130500
 
-=== Output ==Not sure about unit====================
-Q                     j/hr QFRSH =  -69661.8244325835
-                        W/C UAFF =  109.17936288000001
-Fraction subcooling,area Ration ASUPE / AEVAP FSUPE =  0.1
+=== Output for IFRSH = 2   ====================
+Q                     W QFRSH =  216.2558678594957
+                        W/C UAFF =  26.95624747615797
+Fraction subcooling,area Ration ASUPE / AEVAP FSUPE =  0.27684348132506337
 
 
 
  Testing frsh method  ======================
-==================input============
-        IFRSH = 1
- Entry Value to be checked j/hr                     QFRSH =  160
+
+
+
+ Test 4 Input for frsh method  IFRSH = 0 =====================
+        IFRSH = 0
+ Entry Value to be checked W                     QFRSH =  450
  Evaporator Temp                 TE = [0.0, 259.77, 0.0]
  Iteration count 1 or others     JE = 1
  Temperature INLET TO FRESH FOOD EVAPORATOR  K  T5 = 259.77
  Entry Value to be checked Enthalpy INLET TO FRESH FOOD EVAPORATOR   j/kg H5 = 209978.88795570855
  Entry Value to be checked Enthalpy LIQUID LINE OUTLET FROM HIGH TEMP INTERCHANGER j/kg H7 = 346856.64827330015
- Initial Guess For Refrigerant Mas Flow Rate   kg/hr MREF =  5.8
+ Initial Guess For Refrigerant Mas Flow Rate   kg/s MREF =  0.0016111111111111111
 
-
-==================Output============
-           K TE = [0.0, 259.77, 246.78149999999997]
-             JE = 2
-          K TS4 = 260.38633199992114
+ output for frsh method  IFRSH = 0 =====================
+           K TE = [0.0, 260.7728634649035, 259.77]
+             JE = 1
+          K TS4 = 242.70820338983052
  1=Free Error, 0=Error Found         ICONE = 0
 
-==================input============
-        IFRSH = 0
- Entry Value to be checked j/hr                     QFRSH =  -126000
 
 
-==================Output============
-           K TE = [0.0, 259.77, 260.773]
-             JE = 2
-          K TS4 = 1356.1395500620893
+ Test 5 input for frsh method  IFRSH = 1 =====================
+        IFRSH = 1
+ Entry Value to be checked W                     QFRSH =  450
+
+ output for frsh method  IFRSH = 1 =====================
+           K TE = [0.0, 261.2744317324517, 260.7728634649035]
+             JE = 1
+          K TS4 = 242.70820338983052
+ 1=Free Error, 0=Error Found         ICONE = 0
+
+
+
+ Test 6 b input for frsh method  IFRSH = 2 =====================
+        IFRSH = 2
+ Entry Value to be checked W                     QFRSH =  450
+
+ output for frsh method  IFRSH = 2 =====================
+           K TE = [0.0, 261.52521586622584, 261.2744317324517]
+             JE = 1
+          K TS4 = 242.70820338983052
  1=Free Error, 0=Error Found         ICONE = 0
 Press any key to continue . . .
