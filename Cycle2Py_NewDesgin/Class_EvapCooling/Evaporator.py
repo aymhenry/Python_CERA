@@ -171,7 +171,7 @@ class EvapCool_Abstract (ABC, exf4Cond_Evap):
         dicRes = {'TS4':TS4,
                  'TE':TE, 
                  'JE':JE,
-                 'ICONE':ICONE  # 1=Free Error, 0=Error Found
+                 'ICONE':ICONE  # 0=Free Error, 1=Error Found
                  }
         return dicRes
 
@@ -246,16 +246,31 @@ class EvapCool_FFNat (EvapCool_Abstract):  # IFRSH== 0
 
         # by Dr.Omar
         # HNAT = A_NAT * DELTA**0.33 * 20.44
-        HNAT = A_NAT * DELTAT**0.33 * 20.44
+        
+        # By Ayman - Dr omar to approve, imprical equation
+        # HNAT = A_NAT * DELTAT**0.33 * 20.44
+        HNAT = A_NAT * (DELTAT*1.8)**0.33 * 20.44
  
         # Calculate combined air-side heat transfer coefficient
         UAIR = HRAD + HNAT
 
         if (self.IWALL_FF == 1):
             UAIR = 1.0 / (1.0 / UAIR + 0.1389 / 20.44)
+            # UAIR by ayman units is power/Temp/sq-lenght
+            # Btu/hr/Feh/(length * Length)
+            
+        # by Ayman ( not in Fortran)
+        # Dr Omar to check
+        UAIR = UAIR / 1.8961 # convert to W/C/sq-length
+        
+        # Dr Omar - this is not SI units
+        # UA_FF is  W/K,  BTU = 1.0548 J
+        # Q_IN_WALL = 1.0548 * 1.8 * self.UA_FF * \
+            # (TENV - TAVE) / AEVAP + self.Q_HXS_FF / AEVAP
 
-        Q_IN_WALL = 1.0548 * 1.8 * self.UA_FF * \
-            (TENV - TAVE) / AEVAP + self.Q_HXS_FF / AEVAP
+        # UA_FF W/C,  W/C = 1.8961 Btu/(h.Feh); 
+        Q_IN_WALL = self.UA_FF * (TENV - TAVE) / AEVAP \
+                    + self.Q_HXS_FF / AEVAP # watt/m2
 
         # Calculate the heat transfer assuming that the air side
         #  resistance dominates
@@ -280,7 +295,7 @@ class EvapCool_FFNat (EvapCool_Abstract):  # IFRSH== 0
             QTOTE = UAIR * AEVAP * DELTAT + AEVAP * Q_IN_WALL
             FSUPE = 0
 
-        UAFF = UAIR * AEVAP     #   * m2
+        UAFF = UAIR * AEVAP     #  Watt/K * m2
 
         return [QTOTE, FSUPE, UAFF]
 

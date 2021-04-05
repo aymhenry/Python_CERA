@@ -344,7 +344,7 @@ class CycleSolver (CycleUtils):
             # Dr. Omar to check adjlod
             #ICAB Flag to represent presence of cabinet loads in input, 0 =No
             if (self.dt.ICAB == 1):
-                [self.TS3, self.TS5] =  self.adjlod(self.dt, self.MREF
+                [self.TS3, self.TS5] =  self.adjlod(self.dt, self.MREF/3600
                                 # , self.dt.ATOTEI[self.lng_item]
                                 , self.dt.ICYCL
                                 , self.IC

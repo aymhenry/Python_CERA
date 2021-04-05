@@ -214,9 +214,12 @@ class CycleUtils ():
                 DELTS3 = (dt.FFQ - FFQ_S) / UFF
 
                 # check temp units--- dr. Omar
-                TS3 = TS3_S - DELTS3 / 1.8
-                dt.FFTEMP_A = 1.8 * TS3 - 459.6
+                # TS3 = TS3_S - DELTS3 / 1.8
+                # dt.FFTEMP_A = 1.8 * TS3 - 459.6
 
+                TS3 = TS3_S - DELTS3 
+                dt.FFTEMP_A = TS3 
+                
                 dt.FFSEN = UFF_SEN * (dt.TROOM - dt.FFTEMP_A)
                 dt.CONDF = UCND_F * (dt.TROOM - dt.FFTEMP_A) - dt.QMUL
 
@@ -430,7 +433,10 @@ class CycleUtils ():
                         DELTAT = 0.0001
 
                     # Dr. Omar Units
-                    DELTA = DELTAT * 1.8
+                    # DELTA = DELTAT * 1.8
+                    # DELTA in K
+                    DELTA = DELTAT 
+                    
                     TBAR = 0.67 * TAVE + 0.33 * TS5
                     A_NAT = 0.239 + 3.34E-04 * (273.0 - TBAR)
                     HNAT = A_NAT * (DELTA**0.33) * 20.44
@@ -449,11 +455,16 @@ class CycleUtils ():
                     dt.UAFZ = dt.UAF * UAIR
 
                     # Dr Omar Temp Unit
-                    TENV = (TROOM + 459.6) / 1.8
+                    # TENV = (TROOM + 459.6) / 1.8
+                    TENV = TROOM 
                     
                     # Dr Omar Heat Unit
-                    QFREZ = QFREZ + 1.8 * UA_FZ * (TENV - TAVE) * 1.0548 \
-                        + 1.8 * UA_ML * (TS3 - TAVE) * 1.0548 + Q_HXS_FZ
+                    # QFREZ = QFREZ + 1.8 * UA_FZ * (TENV - TAVE) * 1.0548 \
+                        # + 1.8 * UA_ML * (TS3 - TAVE) * 1.0548 + Q_HXS_FZ
+                    
+                    # UA_FZ Watt/K,  1.0548 btu to j (1 BTU = 1.0548 J)
+                    QFREZ = QFREZ + UA_FZ * (TENV - TAVE)  \
+                        + UA_ML * (TS3 - TAVE) + Q_HXS_FZ  # watt
 
                     if(QFREZ > QMAX):
                         QFREZ = QMAX
@@ -486,7 +497,7 @@ class CycleUtils ():
             #
             #          UPDATE ENTHALPY ACROSS EVAPORATOR
             #
-            H[9] = H[8] + QFREZ / MREF
+            H[9] = H[8] + QFREZ / MREF # MREF kg/s
 
                 #[P4, P5, P6, P7, P8, P9, P10, P11] = self.hpin ( P1,P2,P3 )
                 # [T[9], XQ[9], XL_Temp, XV_Temp, VL[9],
