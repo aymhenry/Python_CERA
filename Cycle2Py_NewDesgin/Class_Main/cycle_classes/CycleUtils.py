@@ -7,7 +7,46 @@ import datetime
 from cycle_classes.CoolPrp import *
 
 class CycleUtils ():
-    # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
+    # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
+    def enthal(self, objCP, HBUB, HDEW, XSPEC, X, P):
+        # ITERATES TO DETERMINE THE ENTHALPY.                 
+        #  THE PRESSURE AND QUALITY ARE INPUTS                      
+
+        # MAKE INITIAL GUESS ASSUMING A LINEAR VARIATION IN ENTHALPY
+        #   WITH THE EXIT QUALITY
+        #
+        HGUESS = HBUB + (HDEW - HBUB) * XSPEC
+        DELH = 0.0
+
+        ITERH = 0
+        XTOL = 1000.0
+
+        while (ITERH < 100 and XTOL >= 0.001):
+            HGUESS = HGUESS + DELH
+            if (HGUESS < HBUB):
+                HGUESS = HBUB * 1.01
+            if (HGUESS > HDEW):
+                HGUESS = HDEW * 0.99
+
+            # [T, XCALC, XL, XV, VL, V, HL, HV] = self.hpin(HGUESS, P, X)
+            T = self.objCP.Property('T', P=P, X=X)  # K
+
+            if (XCALC < 0.0):
+                XCALC = 0.001
+            if (XCALC > 1.0):
+                XCALC = 0.999
+            #
+            #        ADJUST ENTHALPY GUESS
+            #
+            ALPHAH = 1.0 - XCALC / XSPEC
+            XTOL = abs(ALPHAH)
+            DELH = (HDEW - HBUB) * ALPHAH
+            ITERH = ITERH + 1
+
+        H = HGUESS
+
+        return H
+    # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
     def adjlod(self, dt, MREF, ICYCL, IC, TS3, TS5, FROSTF, FROSTZ, IDFRST):
         # ADJUST THE CABINET LOADS AND SET POINT TEMPERATURES *
 
@@ -22,40 +61,6 @@ class CycleUtils ():
 
         # IDFRST : #, if 0 Manual Defrost, auto 1     
 
-
-
-
-        # [p3, p4] = self.adjlod (all)
-        #	SUBROUTINE ADJLOD(ICYCL,IC,TS3,TS5,FROSTF,FROSTZ,IDFRST)
-        #
-        
-        # COMMON BLOCKS
-        #
-        #	REAL MREF
-        #	no 		COMMON / PARMS / ICOND,IFRSH,IFREZ,DISP,SPEED,CE,CREF,MREF,ETAV,SEFF
-        #	no 		COMMON / PARMS2 / TSPEC,TDROPC
-        #	COMMON / HTEXS / CFMC,CFME,CFMF,self.dt.UAF,ETAC,ETAE,ETAF
-
-        #	COMMON / FEVAP / UTPE,USUPE,self.dt.ATOTE
-        #	no		COMMON / CONDEN / UDSC,UTPC,USCC,ATOTC,UACOND
-        #	no		COMMON / SPECS / DTSUPE,DTSUBC
-        #	no		COMMON  / SPECS2 /  ISPEC,XEXITE,DTSUPI
-        #	COMMON / CABLOD / FFASH,FFAUX,FZASH,FZAUX,self.dt.TROOM,self.dt.FFTEMP,OTHERW,
-        #	 .self.dt.FZTEMP,self.dt.FFQ,self.dt.FZQON,self.dt.FZQOFF,self.dt.FFLAT,FZLAT,self.dt.FFSEN,self.dt.FZSEN,
-        #	 .self.dt.FFHTQ,self.dt.FZHTQ,self.dt.CONDF,self.dt.CONDZ,self.dt.QMUL
-        #	COMMON / FANS / FANE,FANZ,FANC,DUTYC,W,COPR
-        #	COMMON / LORENZ / self.dt.DUTYE,self.dt.DUTYZ,PWRL,PWRE,self.dt.CAPE,self.dt.CAPZ,DUTYL,DUTYS,
-        #	 .FANEL,FANCL,FANES,FANCS
-        #	COMMON / FIGURE / IEVAP
-        #	COMMON  /  RESULT  /  QE, QZ, FLOW, QEN(2), FLOWN(2), COPRN(2)
-        #	COMMON  /  CHINA  /  self.dt.INCTRL
-        #	COMMON  /  BALNCE  /  self.dt.IBLNCE, BAFFLF, BAFFLZ, self.dt.AREAFZ, self.dt.ATOTE_S,
-        #	 .self.dt.AREAFZ_S, self.dt.ATOTE_A, self.dt.AREAFZ_A, self.dt.FFTEMP_A, self.dt.FZTEMP_A
-        #	COMMON  /  INWALL  /  self.dt.UA_FZ, self.dt.UA_FF, self.dt.UA_ML, Q_FZ_IN_WALL, Q_FF_IN_WALL,
-        #	 .Q_ML_IN_WALL, CAPE_IN_WALL, CAPM_IN_WALL,
-        #	 .CAPZ_IN_WALL, self.dt.Q_FZ_FF
-        #	COMMON  /  PENAT  /  self.dt.FFPENA, self.dt.FZPENA
-        #
         # BRANCH ON THE VALUE IC.AVE VARIABLES AND INITIALIZE ON THE
         # FIRST CALL AND : WAIT UNTIL THE 4TH CALL TO MAKE ADJUSTMENTS
         #
@@ -241,7 +246,7 @@ class CycleUtils ():
 
         return [TS3, TS5]
     
-    # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
+    # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
     def lowevp(self, dt, objCP, MREF, ICYCL, ICNTRL
             ,H, P, T
             # XQ, XL, XV, not used
@@ -250,67 +255,13 @@ class CycleUtils ():
             ,TS3, TS5
             ,DPF, ETHX2):
         # ICNTRL - CONTROL METHOD FOR EVAPORATOR LOAD
-        
-        # Input P5, P8
-        #           , T6, T9, 
-        #           ,TS5
-        #           ,H5,H6
-        #           VL6
-        #           MREF, CFMF, CREF, UAF, IWALL_FZ, IFREZ
-        
-        # Output P8, P8, P10
-        #           ,T5,T8,T9,T10
-        #           ,TS6
-        #           , H5,H8,H9,H10
-        #           VL10
-        #           CREF, UAFZ, ETAF
-        #           QFREZ
-        
-        
-        # Input    ICYCL,ICNTRL,H,  P,X,T,  XQ,XL,XV, TS5, DPF , ETHX2
-        # output   H, P,X,T,  XQ,XL,XV, VL,VV,HL,       HV,TS6 QFREZ
-        # [P2 to P12, P13 ,P16, P19] = self.lowevp (P1... P12, P14, P15, P17..P18)
-        # P20 is NA
-        #	 SUBROUTINE LOWEVP(ICYCL,ICNTRL,H,  P,X,T,  XQ,XL,XV,  VL,VV,HL, HV,TS3,TS5   #15
-        #	.     , TS6,DPF,ETHX2,   QFREZ,LQUIT)
-        #     *****************************************************************
-        #     *    FREEZER EVAPORATOR AND LOWER INTERCHANGER                  *
-        #     *****************************************************************
-        #
-        #	 CHARACTER KEY
-        #	 LOGICAL LCRIT,LQUIT
-        #	 REAL MREF
-        #
-        #	DIMENSION H(16),P(16),X[5],XQ(16),XL(5,16),XV(5,16),VL(16)
-        #	DIMENSION VV(16),T(16)
-        #	COMMON/PARMS/ICOND,IFRSH,IFREZ,DISP,SPEED,CE,CREF,MREF,ETAV,SEFF
-        #	COMMON/EVAPS/ITYPE, FRACT_FF, FRACT_FZ
-        #	COMMON /FEVAP / UTPE,USUPE,ATOTE, FF_AIR, UAFF, uafz
-        #	COMMON/HTEXS/CFMC,CFME,CFMF,UAF,ETAC,ETAE,ETAF
-        #	COMMON/RDATA4/R
-        #	COMMON / INWALL / UA_FZ, UA_FF, UA_ML, Q_FZ_IN_WALL, Q_FF_IN_WALL,
-        #	.                  Q_ML_IN_WALL, CAPE_IN_WALL, CAPM_IN_WALL,
-        #	.                  CAPZ_IN_WALL, Q_FZ_FF
-        #	COMMON /CABLOD/ FFASH,FAUXF,FZASH,FZAUX,TROOM,FFTEMP,OTHERW,
-        #	.                FZTEMP,FFQ,FZQON,FZQOFF,FFLAT,FZLAT,FFSEN,FZSEN,
-        #	.                FFHTQ,FZHTQ,CONDF,CONDZ,QMUL
-        #
-        #	COMMON/TLRNCE/TOL_COND, TOL_MASS, TOL_FRSH, TOL_FRZ, TOL_HX,
-        #	.              N_EVAP, N_COND
-        #
-        #	COMMON / CNDWAL / UA_FF_CND, UA_FZ_CND, UA_FF_HXS, UA_FZ_HXS,
-        #	.                  Q_CND_FF,  Q_CND_FZ,  Q_HXS_FF,  Q_HXS_FZ,
-        #	.                  CONDF_IN_WALL, CONDZ_IN_WALL
-
-        #	COMMON / PLSTIC / IWALL_FF, IWALL_FZ
-        #
+        #  FREEZER EVAPORATOR AND LOWER INTERCHANGER
 
         NCALL = 0
         SIGMA = 2.0432E-7
         EPS = 0.8
-        #
-        #          SET UP PRESSURES AND QUALITIES
-        #
+
+        # SET UP PRESSURES AND QUALITIES
         P[10] = P[6]
         P[9] = P[5]
         P[8] = P[9] + DPF
@@ -438,7 +389,9 @@ class CycleUtils ():
 
 
             # DETERMINE CMIN AND CMAX
-
+            # Dr Omar
+            # Ayman CFMF only on Type 2, in case of type 1 CFMF allways 0
+            
             if(dt.CFMF <= dt.CREF):
                 CMIN = dt.CFMF
                 CMAX = dt.CREF
@@ -675,7 +628,7 @@ class CycleUtils ():
         #return [H, P, X, T, XQ, XL, XV, VL, VV, HL, HV, TS6, QFREZ]
         return [H, P, T, TS6, QFREZ]
 
-    # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
+    # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
     def efcross(self, CRAT, NTU):
         # P3 = self.efcross (P1, P2)
         #	  SUBROUTINE EFCROSS(CRAT,NTU,EFFECT)
@@ -818,7 +771,7 @@ class CycleUtils ():
         
         return ETHX1 * min(H4 - H6STAR, H13STR - H7)
 
-    # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
+    # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
     def inter2(self, PA, TAI, HAI, VAI, PB, HBO, TDEW, HDEW, VDEW, ETA):
         # iterates to solve for interchanger heat transfer knowing    
         # the inlet state of one stream and outlet state of the       
@@ -869,7 +822,7 @@ class CycleUtils ():
 
         return [TBI, HBI, QACT]
     
-    # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
+    # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
     def dutfnd(self, dt, ICAB
             ,IRFTYP, ICYCL, N
             ,QFRSH, QFREZ
@@ -942,11 +895,25 @@ class CycleUtils ():
                     QFZ = QFZ + self.dt.FROSTF
 
                 # Dr. Omar Unit
-                self.dt.CAPE = QFRSH / 1.0548 - 3.413 * self.dt.FANE - 3.413 * self.dt.DFSTCYC	\
-                    - 3.413 * self.dt.FFCYC - 3.413 * self.dt.FZCYC	\
-                    - self.dt.CONDF_IN_WALL - self.dt.CONDZ_IN_WALL
+                # 1 Wh = 3.413 Btu    BTU = 1.0548 kj/hr
+                # self.dt.CAPE = QFRSH / 1.0548 \
+                    # - 3.413 * self.dt.FANE - 3.413 * self.dt.DFSTCYC	\
+                    # - 3.413 * self.dt.FFCYC - 3.413 * self.dt.FZCYC	\
+                    # - self.dt.CONDF_IN_WALL - self.dt.CONDZ_IN_WALL
 
+                # both self.dt.CONDF_IN_WALL - self.dt.CONDZ_IN_WALL
+                # are zero by defalut
+                
+                self.dt.CAPE = QFRSH \
+                    - self.dt.FANE \
+                    - self.dt.DFSTCYC	\
+                    - self.dt.FFCYC  \
+                    - self.dt.FZCYC	\
+                    - self.dt.CONDF_IN_WALL \
+                    - self.dt.CONDZ_IN_WALL
+                    
                 self.dt.DUTYC = (QFF + QFZ) / self.dt.CAPE
+                
                 if (self.dt.DUTYC > 1.0):
                     self.dt.DUTYC = 1.0
                 DUTYR = self.dt.DUTYC
@@ -957,11 +924,22 @@ class CycleUtils ():
                     QFZ = QFZ + self.dt.FROSTF
                 
                 # Dr. Omar Unit
-                self.dt.CAPZ = QFREZ / 1.0548 - 3.413 * self.dt.FANZ - 3.413 * self.dt.DFSTCYC	\
-                    + self.dt.Q_FZ_IN_WALL + self.dt.Q_ML_IN_WALL	\
-                    - self.dt.CAPZ_IN_WALL - self.dt.CAPM_IN_WALL	\
-                    - self.dt.CONDZ_IN_WALL - 3.413 * self.dt.FZCYC	\
-                    - self.dt.Q_HXS_FZ / 1.0548
+                # self.dt.CAPZ = QFREZ / 1.0548 - 3.413 * self.dt.FANZ - 3.413 * self.dt.DFSTCYC	\
+                    # + self.dt.Q_FZ_IN_WALL + self.dt.Q_ML_IN_WALL	\
+                    # - self.dt.CAPZ_IN_WALL - self.dt.CAPM_IN_WALL	\
+                    # - self.dt.CONDZ_IN_WALL - 3.413 * self.dt.FZCYC	\
+                    # - self.dt.Q_HXS_FZ / 1.0548
+                    
+                self.dt.CAPZ = QFREZ \
+                    - self.dt.FANZ \
+                    - self.dt.DFSTCYC \
+                    + self.dt.Q_FZ_IN_WALL \
+                    + self.dt.Q_ML_IN_WALL \
+                    - self.dt.CAPZ_IN_WALL \
+                    - self.dt.CAPM_IN_WALL \
+                    - self.dt.CONDZ_IN_WALL \
+                    - self.dt.FZCYC	\
+                    - self.dt.Q_HXS_FZ 
 
                 if (self.dt.CAPZ <= 0.0):
                     self.showError("Incorrect Solution, Check Mass Flow")
@@ -971,10 +949,19 @@ class CycleUtils ():
                 self.dt.DUTYZ = QFZ / self.dt.CAPZ
 
                 # Dr. Omar Unit
-                self.dt.CAPE = QFRSH / 1.0548 - 3.413 * self.dt.FANE - 3.413 * self.dt.FFCYC	\
-                    + self.dt.Q_FF_IN_WALL - self.dt.CAPE_IN_WALL	\
-                    - self.dt.CONDF_IN_WALL + self.dt.Q_FZ_FF	\
-                    - self.dt.Q_HXS_FF / 1.0548
+                # self.dt.CAPE = QFRSH / 1.0548 - 3.413 * self.dt.FANE - 3.413 * self.dt.FFCYC	\
+                    # + self.dt.Q_FF_IN_WALL - self.dt.CAPE_IN_WALL	\
+                    # - self.dt.CONDF_IN_WALL + self.dt.Q_FZ_FF	\
+                    # - self.dt.Q_HXS_FF / 1.0548
+
+                self.dt.CAPE = QFRSH \
+                    - self.dt.FANE \
+                    - self.dt.FFCYC \
+                    + self.dt.Q_FF_IN_WALL \
+                    - self.dt.CAPE_IN_WALL \
+                    - self.dt.CONDF_IN_WALL \
+                    + self.dt.Q_FZ_FF \
+                    - self.dt.Q_HXS_FF
 
                 self.dt.DUTYE = QFF / self.dt.CAPE
 
@@ -983,6 +970,7 @@ class CycleUtils ():
 
                 if (self.dt.DUTYC > 1.0):
                     self.dt.DUTYC = 1.0
+                    
                 DUTYR = max(self.dt.DUTYE, self.dt.DUTYZ)
 
                 if (DUTYR > 1.0):
@@ -992,17 +980,30 @@ class CycleUtils ():
                 if (N == 1):
                     if (self.dt.IDFRST == 0):
                         QFZ = QFZ + self.dt.FROSTF
+                    
+                    # Dr Omar approve
+                    # self.dt.CAPZ = QFRSH / 1.0548 - 3.413 * self.dt.FANE - \
+                        # 3.413 * (self.dt.DFSTCYC + self.dt.FZCYC)
 
-                    self.dt.CAPZ = QFRSH / 1.0548 - 3.413 * self.dt.FANE - \
-                        3.413 * (self.dt.DFSTCYC + self.dt.FZCYC)
+                    self.dt.CAPZ = QFRSH \
+                            - self.dt.FANE \
+                            - (self.dt.DFSTCYC + self.dt.FZCYC)
+                        
                     self.dt.DUTYZ = QFZ / self.dt.CAPZ
 
                     self.dt.DUTYC = min(self.dt.DUTYZ, 1.0)
                     self.dt.DUTYZ = self.dt.DUTYC
 
                 else:
-                    self.dt.CAPE = QFRSH / 1.0548 - 3.413 * \
-                        (self.dt.FANE + self.dt.FFCYC) + self.dt.Q_FF_IN_WALL - self.dt.CAPE_IN_WALL
+                    # Dr omar
+                    # self.dt.CAPE = QFRSH / 1.0548 - 3.413 * \
+                        # (self.dt.FANE + self.dt.FFCYC) 
+                        # + self.dt.Q_FF_IN_WALL - self.dt.CAPE_IN_WALL
+
+                    self.dt.CAPE = QFRSH \
+                        - (self.dt.FANE + self.dt.FFCYC) \
+                        + self.dt.Q_FF_IN_WALL - self.dt.CAPE_IN_WALL
+                        
                     QFF = QFF - self.dt.FROSTF
                     self.dt.DUTYE = QFF / self.dt.CAPE
                     self.dt.DUTYC = min(self.dt.DUTYE, 1.0)
@@ -1013,9 +1014,17 @@ class CycleUtils ():
             else:
                 if (self.dt.IDFRST == 0):
                     QFZ = QFZ + self.dt.FROSTF
-                self.dt.CAPE = QFRSH / 1.0548 - 3.413 * (self.dt.FANE + self.dt.DFSTCYC + self.dt.FZCYC)	\
-                    + self.dt.Q_FF_IN_WALL - self.dt.CAPE_IN_WALL						\
-                    - self.dt.CONDF_IN_WALL - self.dt.Q_HXS_FF / 1.0548
+                
+                # Dr Omar
+                # self.dt.CAPE = QFRSH / 1.0548 - 3.413 * (self.dt.FANE + self.dt.DFSTCYC + self.dt.FZCYC)	\
+                    # + self.dt.Q_FF_IN_WALL - self.dt.CAPE_IN_WALL						\
+                    # - self.dt.CONDF_IN_WALL - self.dt.Q_HXS_FF / 1.0548
+
+                self.dt.CAPE = QFRSH \
+                    - (self.dt.FANE + self.dt.DFSTCYC + self.dt.FZCYC) \
+                    + self.dt.Q_FF_IN_WALL - self.dt.CAPE_IN_WALL \
+                    - self.dt.CONDF_IN_WALL - self.dt.Q_HXS_FF 
+                                        
 
                 self.dt.DUTYE = QFZ / self.dt.CAPE
                 self.dt.DUTYC = min(self.dt.DUTYE, 1.0)

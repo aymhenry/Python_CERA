@@ -50,7 +50,7 @@ class CycleSolver (CycleUtils):
 
         #------- Setup paramters
         self.objEvap.setParamters(ATOTE=self.dt.ATOTEI[self.lng_item]
-                    , CFME=self.CFME
+                    , CFME=self.dt.CFME # watt/K
                     , TS3=self.TS3
                     , N_EVAP=self.dt.N_EVAP
                     , USUPE=self.USUPE
@@ -58,7 +58,7 @@ class CycleSolver (CycleUtils):
                     , TROOM=self.dt.TROOM
                     , FZTEMP=self.dt.FZTEMP
                     , UA_FF=self.dt.UA_FF
-                    , Q_HXS_FF=self.dt.Q_HXS_FF
+                    , Q_HXS_FF=self.dt.Q_HXS_FF # defalut =0 in Fortran
                     , IWALL_FF=self.dt.IWALL_FF
                     , NUM_ZONE=self.dt.N_EVAP
                     , IRFTYP=self.dt.IRFTYP
@@ -74,7 +74,7 @@ class CycleSolver (CycleUtils):
                     , UA_FZ_CND=self.dt.UA_FZ_CND
                     , UA_FF_HXS=self.dt.UA_FF_HXS
                     , UA_FZ_HXS=self.dt.UA_FZ_HXS
-                    , CFMC=self.CFMC
+                    , CFMC=self.dt.CFMC # watt/K
                     , DTSUBC=self.DTSUBC
                     , N_COND=self.dt.N_COND
                     , TS1=self.TS1
@@ -158,24 +158,38 @@ class CycleSolver (CycleUtils):
         # RHOCPE = 316.8 / self.dt.TS3[lng_item]
 
         # modification by Ayman
-        AirHeatCapacity = 700 # Air heat capacity 700 j/kg K 
+        #------------------------------------
+        AirHeatCapacity = 700 # Air heat capacity 700 j/kg/K 
         # https://www.gribble.org/cycling/air_density.html
         # self.CFMC = 1.8961 * (RHOCPC * self.dt.CFMCI[lng_item]) / 0.4720
-        #  convert L/sec --> m3/sec
-        self.CFMC = self.dt.CFMCI[self.lng_item] /1000 \
-                    * ((self.dt.TS1[self.lng_item]-273.11) /417.25 \
-                    + 1.2934) # kg/m3
-        # kg/hr* j/kg K
-        self.CFMC = self.CFMC * 3600 * AirHeatCapacity # j/hr K
         
-        #--------
+        # CFMCI L/sec = 1000 cm3/sec = 1000/100^3 m3/sec= 1/1000 m3/sec
+        # C-deg = K - 273.11
+        # Air dencity (kg/m3) = Temp_c_deg/417.25 + 1.2934
+        air_densityC = (self.dt.TS1[self.lng_item]-273.11) /417.25 + 1.2934
+
+        # [m3/sec] * [kg/m3] * [j/kg/K] =j/sec/K = watt/K
+        self.dt.CFMC = self.dt.CFMCI[self.lng_item] /1000 * air_densityC \
+            * AirHeatCapacity
+        
+        #------------------------------------
         # self.CFME = 1.8961 * (RHOCPE * self.dt.CFMEI[lng_item]) / 0.4720
-        # convert # L/sec --> m3/sec
-        self.CFME = self.dt.CFMEI[self.lng_item] /1000 \
-                    * ((self.dt.TS3[self.lng_item]-273.11) /417.25 \
-                    + 1.2934) # kg/m3
-        # kg/hr* j/kg K
-        self.CFME = self.CFME * 3600 * AirHeatCapacity # j/hr K
+       # C-deg = K - 273.11
+        # Air dencity (kg/m3) = Temp_c_deg/417.25 + 1.2934
+        air_densityE = (self.dt.TS3[self.lng_item]-273.11) /417.25 + 1.2934
+        
+        # [m3/sec] * [kg/m3] * [j/kg K] =j/sec K = watt/K
+        self.dt.CFME = self.dt.CFMEI[self.lng_item] /1000 * air_densityE \
+            * AirHeatCapacity
+
+        #------------------------------------
+        # C-deg = K - 273.11
+        # Air dencity (kg/m3) = Temp_c_deg/417.25 + 1.2934
+        air_densityF = (self.dt.TS5 - 273.11) /417.25 + 1.2934
+        
+        # [m3/sec] * [kg/m3] * [j/kg K] =j/sec K = watt/K
+        self.dt.CFMF = self.dt.CFMF /1000 * air_densityF \
+            * AirHeatCapacity
         # =================================
         
 
@@ -322,11 +336,9 @@ class CycleSolver (CycleUtils):
         # Condenser itaration loop
         while (self.IC <= self.ITMAXC and self.LCCON):
             print ("\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
-            print ("Condenser Iteration Number -----> self.IC=",self.IC)
+            print ("Condenser Iteration Number -----> self.IC=",self.IC, " Test=",self.ICONC)
             print ("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
 
-            # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-            # this block is common for all solvers (1,2, and 3)
             # ICAB - flag to represent presence of cabinet loads in input
 
             # Dr. Omar to check adjlod
@@ -408,14 +420,28 @@ class CycleSolver (CycleUtils):
                 # [H[1],CV,CP,VS] = self.hcvcps (1,T[1],V[1],X) # CALL HCVCPS
                 self.V[1] = self.objCP.Property('V', X=1, P=self.P[1])  # m3/kg
                 self.H[1] = self.objCP.Property('H', X=1, P=self.P[1])  # j/kg
+                
             else:
-                self.V[1] = self.V[13]
-                self.T[1] = self.T[13]
-                self.H[1] = self.H[13]
-            
-            # S[1] = self.entrop(T[1],V[1],X)
-            # self.S[1] = self.objCP.Property('S', V=self.V[1]
-                                               # , T=self.T[1])  # j/kg K
+                # By Ayman
+                # ----------------Dr Omar this block only in Python
+                # fix bug if ISPEC<>2 and TSPEC <=0
+                # V[13] is calculated only in case SPEC=2
+                if self.ISPEC != 2 and self.TSPEC < 0.0:
+                    # Dr Omar to approve, no starting value of T[1] in Fortran
+                    self.T[1] = self.TS1 + 5 # Ayman Proposal
+                    print ("    by Ayman self.T[1]", self.T[1])
+                    
+                    self.V[1] = self.objCP.Property('V', T=self.T[1]
+                        , P=self.P[1])  # m3/kg
+                    self.H[1] = self.objCP.Property('H', T=self.T[1]
+                        , P=self.P[1])  # j/kg
+                #- Ayman end of my block
+                
+                else: # the following as Fortran
+                    self.V[1] = self.V[13]
+                    self.T[1] = self.T[13]
+                    self.H[1] = self.H[13]
+                
 
             self.S[1] = self.objCP.Property('S', X=1
                                                , T=self.T[1])  # j/kg K
@@ -498,7 +524,7 @@ class CycleSolver (CycleUtils):
                 self.condenser_calc()
 
             self.IC = self.IC + 1 # do another trail
-
+            
             if self.dt.INCTRL in [0, 3]:
                 if (self.IC <= 4):
                     self.LCCON = True
@@ -591,10 +617,10 @@ class CycleSolver (CycleUtils):
                                         )
 
         #== Output of condenser class --------
-        QDSC = dicRest['QDSC']
-        QTPC = dicRest['QTPC']
-        QSCC = dicRest['QSCC']
-        QTOTC = dicRest['QTOTC']
+        QDSC = dicRest['QDSC'] # kj
+        QTPC = dicRest['QTPC'] # kj
+        QSCC = dicRest['QSCC'] # kj
+        QTOTC = dicRest['QTOTC'] # kj
 
         FSUP = dicRest['FSUP']
         FSUB = dicRest['FSUB']
@@ -614,11 +640,11 @@ class CycleSolver (CycleUtils):
 
         #- cond method
         lstRest = self.objCond.cond(T4=self.T[4]
-                       , H4=self.H[4]
-                       , H14=self.H[4]
-                       , TC=self.TC
-                       , JC=self.JC
-                       , QCONDS=QDSC
+                       , H4=self.H[4] # j/kg
+                       , H14=self.H[4] # j/kg
+                       , TC=self.TC # K
+                       , JC=self.JC # number unit less
+                       , QCONDS=QDSC 
                        , QCONDC=QTPC
                        , QSCC=QSCC
                        , MROLD=self.MROLD # to check Dr Omar
@@ -656,11 +682,11 @@ class CycleSolver (CycleUtils):
             VS1 = V[4]
 
         HS1 = self.objCP.Property('T', T=self.TS1, V=VS1)  # j/kg
-        QRMAX = self.MREF * (self.H[14] - HS1) # j/hr
+        QRMAX = self.MREF * (self.H[14] - HS1)/3600 # watt
 
         #	CALCULATE THE HEAT TRANSFER if THE AIR LEFT AT T[14]
 
-        QAMAX = self.CFMC * (self.T[14] - self.TS1) # j/hr K * K = j/hr
+        QAMAX = self.dt.CFMC * (self.T[14] - self.TS1) # watt/K * K = watt
         QMAXC = QAMAX
 
         if (QRMAX < QAMAX):
@@ -789,7 +815,7 @@ class CycleSolver (CycleUtils):
                              
                         # Ayamn
                         # CFMA = self.CFME / (1.08 * 1.8961)
-                        CFMA = self.CFME 
+                        CFMA = self.dt.CFME # watt/K
                         # QFM = QFF + 3.413 * self.dt.DUTYC * self.dt.FFCYC
                         QFM = QFF + self.dt.DUTYC * self.dt.FFCYC
 
@@ -875,19 +901,19 @@ class CycleSolver (CycleUtils):
 
             HS3 = self.objCP.Property('H', X=0, T=self.TS3)  # j/kg
 
-            QRMAX = self.MREF * (HS3 - self.H[5]) # kg/hr . j/kg = j/hr
+            QRMAX = self.MREF * (HS3 - self.H[5])/3600 # kg/hr/3600 j/kg = watt
 
             # Calculate the heat transfer if the air left at T[5]
-            # CFME kg/hr see common in CycleType
+            # CFME watt/K see common in CycleType
             # Dr Omar to check 
-            # CFME j/hr K -->
-            QAMAX = self.CFME * (self.TS3 - self.T[5]) # j/hr
-            QMAXE = QAMAX # j/hr
+            # CFME watt/K -->
+            QAMAX = self.dt.CFME * (self.TS3 - self.T[5]) # watt
+            QMAXE = QAMAX # watt
 
             if (QRMAX < QAMAX):
                 QMAXE = QRMAX
 
-            ETAE = self.QFRSH / QMAXE # QMAXE=j/hr
+            ETAE = self.QFRSH / QMAXE # QMAXE= watt
 
             # if (ICONE == 1):
                 # LECON = False # Exit loop
@@ -895,7 +921,8 @@ class CycleSolver (CycleUtils):
             # if (self.TE[JE] <= self.TEMIN):
                 # LECON = False # Exit loop
 
-            print ("\n    Evaporator Iteration Number -----> IE=",IE)
+            print ("\n  Cond iter.=",self.IC
+                , " Evaporator Iter. Number --> IE=",IE)
             print ("    ===========================================")
             print ("    ICONE ",ICONE, self.TE[self.JE] <= self.TEMIN)
             
@@ -966,7 +993,7 @@ class CycleSolver (CycleUtils):
         self.P[13] = self.P[7]
         self.T[6] = self.objCP.Property('T', P=self.P[6]
                                            , H=self.H[6])  # K
-        
+
         # ----------------------------- Step 05
         if (self.ISPEC  !=  2):
             self.T[13] = self.objCP.Property('T', P=self.P[13]

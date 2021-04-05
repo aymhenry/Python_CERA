@@ -89,9 +89,9 @@ print ('Total Heat Transfer Surface Area               m2 ATOTC=', ATOTC)
 print ("Units to be checked  CFMC")
 # sec.Kel/kj = 1.8961 sec.F/Btu(th)
 # RHOCPC   = 316.8/TS1(N) deg-C
-# CFMC     = 1.8961 ((RHOCPC*CFMCI(N) Liter/min )/0.4720
+# CFMC     = 1.8961 watt/K
 
-print ('                    CFMC=', CFMC)
+print ('      watt/K      CFMC=', CFMC)
 print ("\n\n  Unit sec-F/Btu(th) ")
 print ('Desuperheating Heat Transfer Conductance, kj/hr/m2/C USCC=', USCC)
 print ('Subcooling Heat Transfer Conductance,     kj/hr/m2/C UTPC=', UTPC)
@@ -141,13 +141,13 @@ print ('Condenser bubble point Enthalpy            j/kg HBUB=', HBUB )
 print ('Condenser bubble point CP              j/kg/K CPRLIQ=', CPRLIQ )
 
 print ("\n=== Output ==Not sure about unit====================")
-print ('Q desuperheating       rrr    QDSC = ',dicRest['QDSC'])
-print ('Q two phase            rrr    QTPC = ',dicRest['QTPC'])
-print ('Q subcooling           rrr    QSCC = ',dicRest['QSCC'])
-print ('Q total condenser       rrr  QTOTC = ',dicRest['QTOTC'])
+print ('Q desuperheating       watt    QDSC = ',dicRest['QDSC'])
+print ('Q two phase            watt    QTPC = ',dicRest['QTPC'])
+print ('Q subcooling           watt    QSCC = ',dicRest['QSCC'])
+print ('Q total condenser       watt  QTOTC = ',dicRest['QTOTC'])
 
-print ('Fraction desuperheating   rrr FSUP = ',dicRest['FSUP'])
-print ('Fraction subcooling       rrr FSUB = ',dicRest['FSUB'])
+print ('Fraction desuperheating   ratio% FSUP = ',dicRest['FSUP'])
+print ('Fraction subcooling       ratio% FSUB = ',dicRest['FSUB'])
 
 
 print ("\n\n Teat 2 ICOND = 1 ---------------------------------------------- ")
@@ -188,13 +188,13 @@ dicRest = objCond.cond_balance(T14=T14,
                             )
 
 print ("\n=== Output ==Not sure about unit====================")
-print ('Q desuperheating       rrr    QDSC = ',dicRest['QDSC'])
-print ('Q two phase            rrr    QTPC = ',dicRest['QTPC'])
-print ('Q subcooling           rrr    QSCC = ',dicRest['QSCC'])
-print ('Q total condenser       rrr  QTOTC = ',dicRest['QTOTC'])
+print ('Q desuperheating       watt    QDSC = ',dicRest['QDSC'])
+print ('Q two phase            watt    QTPC = ',dicRest['QTPC'])
+print ('Q subcooling           watt    QSCC = ',dicRest['QSCC'])
+print ('Q total condenser       watt  QTOTC = ',dicRest['QTOTC'])
 
-print ('Fraction desuperheating   rrr FSUP = ',dicRest['FSUP'])
-print ('Fraction subcooling       rrr FSUB = ',dicRest['FSUB'])
+print ('Fraction desuperheating   ration%  FSUP = ',dicRest['FSUP'])
+print ('Fraction subcooling       ration% FSUB = ',dicRest['FSUB'])
 #========================================================
 print ("\n\n Teat 3 ICOND = 2---------------------------------------------- ")
 ICOND = 2
@@ -255,11 +255,6 @@ H14 = 1000*(28942.71  /120.91 + R12_TABLE_READING) # Enthalpy condenser inlet J/
 
 ICOND = 1  # 0 Nat. cooling, 1 Cross, OR 2 Counter
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-# 42.476	L/s	CFMCI[1]	Air Flow Rate Across Coil(L/S)
-# RHOCPC   = 316.8/TS1(N)
-# CFMC     = 1.8961*(RHOCPC*CFMCI(N))/0.4720   # unknow
-# CFMC     = 1.8961*(16.8/TS1(N)*CFMCI(N))/0.4720   # unknow
-# QSCC = UAIR*ANET*DELTAT + ANET*Q_IN_WALL
 
 QCONDS = 210.218  # check the units unknow, need to be in watt
 QCONDC = 75.156  # check the units unknow, need to be in watt

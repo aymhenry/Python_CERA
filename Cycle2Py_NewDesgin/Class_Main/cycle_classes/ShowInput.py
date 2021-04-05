@@ -121,19 +121,19 @@ class ShowInput ():
                 
         self.showdata ('SUPIHX[1]','DEG C','Interchanger exit superheat')
         self.showdata ('ETHX[1]','#','Effectiveness Of High Temp Interchanger')
-        self.showdata ('UA_FF','watt'
+        self.showdata ('UA_FF','W/K'
             ,'Evap: A/R In Fresh Food Section (Or Cabinet Walls)')
-        self.showdata ('UA_FZ','watt'
+        self.showdata ('UA_FZ','W/K'
             ,'Evap: A/R In Freezer Section Walls (If Separate Section)')
-        self.showdata ('UA_ML','watt'
+        self.showdata ('UA_ML','W/K'
             ,'Evap: A/R In Mullion Section (If Present)')
-        self.showdata ('UA_FF_CND','watt'
+        self.showdata ('UA_FF_CND','W/K'
             ,'Cond: A/R In Fresh Food Section (Or Cabinet Walls)')
-        self.showdata ('UA_FZ_CND','watt'
+        self.showdata ('UA_FZ_CND','W/K'
             ,'Cond: A/R In Freezer Section Walls (If Separate Section)')
-        self.showdata ('UA_FF_HXS','watt'
+        self.showdata ('UA_FF_HXS','W/k'
             ,'Both: A/R In Fresh Food Section (Or Cabinet Walls)')
-        self.showdata ('UA_FZ_HXS','watt'
+        self.showdata ('UA_FZ_HXS','W/K'
             ,'Both: A/R In Freezer Section Walls (If Separate Section)')
         self.showdata ('FRACT_FF','watt'
             ,'Fraction Of Fresh Food Section (Or Cabinet Walls)')

@@ -176,8 +176,6 @@ class CycleType_Abstract (ABC):
         self.dt.CONDZ = self.dt.FZQ - self.dt.FZSEN - self.dt.FZLAT - \
             self.dt.FZHTQ - self.dt.FROSTZ - self.dt.FZREFQ - self.dt.FZPENA
 
-        RHOCPF = 316.8 / self.dt.TS5
-        self.dt.CFMF = 1.8961 * (RHOCPF * self.dt.CFMF) / 0.4720
         
     # -----------------------------------------------------------
     # Job 			: add extra var for all types
@@ -205,7 +203,7 @@ class CycleType_Abstract (ABC):
         self.dt.IFREZI = [1, 1, 1]
 
         self.dt.TS5 = 300  # set non zero value, prevent calculation error
-        self.dt.CFMF = 300  # set non zero value, prevent calculation error
+        # self.dt.CFMF = 300  # set non zero value, prevent calculation error
         self.dt.AREAFZ = 300  # set non zero value, prevent calculation error
         self.dt.UAF = 300  # set non zero value, prevent calculation error
         self.dt.DPF = 3  # set non zero value, prevent calculation error
@@ -234,8 +232,7 @@ class CycleType_Abstract (ABC):
 
         
         print ("===============to be checked ============cycle type====")
-        # if(self.dt.IMAP == 1):
-            # self.dt.SPEED = self.dt.SPEEDN * self.dt.SPEEDI[lng_item]
+        # only for type 2
         if(self.dt.IFREZI[lng_item] != 0):
             self.dt.UAF = 3.600 * self.dt.UAF
         # ============= end of data to be checked ==========
@@ -345,6 +342,7 @@ class Type_1Standard (CycleType_Abstract):
         
         self.dt.TS5 = -300.0 # 256
         self.dt.DPF = 0.0
+        self.dt.CFMF = 0 # by pass required value.
         
         # self.dt.XEXITE = self.dt.QUALTY[1]
         

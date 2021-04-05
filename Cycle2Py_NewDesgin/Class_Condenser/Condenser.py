@@ -48,15 +48,25 @@ class CondCool_Abstract (ABC, exf4Cond_Evap):
                       UA_FF_CND, UA_FZ_CND ,UA_FF_HXS  ,UA_FZ_HXS):
         # ATOTC m2 Total Heat Transfer Surface Area
         
-        # UA_FF_CND sec-F/Btu(th) , Cond: A/R In Fresh Food Section 
-        #    (Or Cabinet Walls)
-        # UA_FZ_CND sec-F/Btu(th) , Cond: A/R In Freezer Section Walls
-        #    (If Separate Section)
-        # UA_FF_HXS sec-F/Btu(th) , Both: A/R In Fresh Food Section 
-        #    (Or Cabinet Walls)
-        # UA_FZ_HXS sec-F/Btu(th) , Both: A/R In Freezer Section Walls
-        #    (If Separate Section) 
-        # CFMC Air Flow Rate Across Coil (to be checked)
+        # UA_FF_CND W/K or j/sec-K , Cond: A/R In Fresh Food Section 
+        #    (Or Cabinet Walls) old unit sec-F/Btu(th)
+        
+        # UA_FZ_CND W/K or j/sec-K, Cond: A/R In Freezer Section Walls
+        #    (If Separate Section) old unit sec-F/Btu(th)
+        
+        # UA_FF_HXS W/K or j/sec-K, Both: A/R In Fresh Food Section 
+        #    (Or Cabinet Walls) old unit sec-F/Btu(th)
+        
+        # UA_FZ_HXS W/K or j/sec-K , Both: A/R In Freezer Section Walls
+        #    (If Separate Section)  old unit sec-F/Btu(th)
+        
+        # CFMC  unit Watt/K
+        # by Ayman, Dr Omar to approve
+        # Air given data L/secthen * 700 j/kg K (Air heat capacity)
+        # and using PV=RT to get air dencity a\@ given temperature
+        # see details in CycleSolver.py
+        # j/kg/sec Air load
+        
         # DTSUBC Refrigerant Exit Subcooling, Deg C 
         #  used only for 1-CCOUNT and 2-ccross, (NOT useD IN 0-cnat)
 
@@ -73,15 +83,15 @@ class CondCool_Abstract (ABC, exf4Cond_Evap):
         # TS3 htf temperature entering fresh food evaporator
         # TS5 htf temperature entering freezer evaporator
 
-        # UDSC Desuperheating Heat Transfer Conductance, kj/hr/m2/C
-        # USCC Subcooling Heat Transfer Conductance, kj/hr/m2/C  
-        # UTPC Two-Phase Heat Transfer Conductance, kj/hr/m2/C
+        # UDSC Desuperheating Heat Transfer Conductance, watt/m2/C
+        # USCC Subcooling Heat Transfer Conductance, watt/m2/C  
+        # UTPC Two-Phase Heat Transfer Conductance, watt/m2/C
 
         self.ATOTC = ATOTC
-        self.UA_FF_CND = UA_FF_CND
-        self.UA_FZ_CND = UA_FZ_CND
-        self.UA_FF_HXS = UA_FF_HXS
-        self.UA_FZ_HXS = UA_FZ_HXS
+        self.UA_FF_CND = UA_FF_CND # W/K
+        self.UA_FZ_CND = UA_FZ_CND # W/K
+        self.UA_FF_HXS = UA_FF_HXS # W/K
+        self.UA_FZ_HXS = UA_FZ_HXS # W/K
         self.CFMC = CFMC
         self.DTSUBC = DTSUBC  
         self.N_COND = N_COND  
@@ -104,14 +114,14 @@ class CondCool_Abstract (ABC, exf4Cond_Evap):
         CondCool_Abstract.DATA_PARA = 1
 
     def getExtarOutputs (self):
-        # Q_CND_FF Condenser Heat Fresh Food, sec-F/Btu(th) 
-        # Q_CND_FZ Condenser Heat Freezer,    sec-F/Btu(th) 
-        # Q_HXS_FF Heat Exchanger Fresh Food  sec-F/Btu(th) 
-        # Q_HXS_FZ Heat Exchanger Freezer     sec-F/Btu(th) 
+        # Q_CND_FF Condenser Heat Fresh Food, 
+        # Q_CND_FZ Condenser Heat Freezer,    
+        # Q_HXS_FF Heat Exchanger Fresh Food  
+        # Q_HXS_FZ Heat Exchanger Freezer     
         # UACOND Condenser UA                    
-        # UDSC Desuperheating Heat Transfer Conductance, kj/hr/m2/C 
-        # USCC Subcooling Heat Transfer Conductance, kj/hr/m2/C  
-        # UTPC Two-Phase Heat Transfer Conductance, W/M2-C
+        # UDSC Desuperheating Heat Transfer Conductance, watt/m2/C 
+        # USCC Subcooling Heat Transfer Conductance, watt/m2/C  
+        # UTPC Two-Phase Heat Transfer Conductance, Watt/M2-C
         
         return [self.Q_CND_FF, self.Q_CND_FZ,
                 self.Q_HXS_FF, self.Q_HXS_FZ,
@@ -138,8 +148,8 @@ class CondCool_Abstract (ABC, exf4Cond_Evap):
             
         # Estimate new value for exit temperature
 
-        QREF = MREF * (H14 - H4)
-        QCOND = QCONDS + QCONDC + QSCC
+        QREF = MREF * (H14 - H4) # kg/hr * j/kg = j/hr
+        QCOND = QCONDS + QCONDC + QSCC # j/hr
         EPS = QREF - QCOND
         DELT = EPS / self.UACOND
 
@@ -288,7 +298,12 @@ class CondCool_CNat (CondCool_Abstract):  # Natural Convection= 0
 
         #  calculate combined air-side heat transfer coefficient
         UAIR = HRAD + HNAT
-        U1 = UAIR * 0.04892
+        
+        # Dr Omar to approve
+        # Ayman UAIR was kW/m2 K
+        # by Ayman  kW/m2 K = 0.04892 Btu/ (s ft2 F)
+        # U1 = UAIR * 0.04892 
+        U1 = UAIR * 1000 # W/m2 K
 
         # calculate the heat transfer assuming that the air side
         #  resistance dominates
@@ -296,35 +311,49 @@ class CondCool_CNat (CondCool_Abstract):  # Natural Convection= 0
 
         TCND = 0.2 * T14 + 0.4 * TDEW + 0.4 * TBUB
         
-        # Python: 1.8 C-to-F, then 1.0548 btu to kj
-        # Q_CND_FF & Q_CND_FZ Unit is kj
-        self.Q_CND_FF = 1.8 * self.UA_FF_CND * (TCND - TS3) * 1.0548
-        self.Q_CND_FZ = 1.8 * self.UA_FZ_CND * (TCND - TS5) * 1.0548
+        # Python: 1.8 C-to-F, then 1.0548 btu to j (1 BTU = 1.0548 J)
+        # UA_FF_CND, UA_FZ_CND Unit is W/K or j/sec-K
+        # Dr Omar to approve no need to convet 
+        # self.Q_CND_FF = 1.8 * self.UA_FF_CND * (TCND - TS3) * 1.0548
+        # self.Q_CND_FZ = 1.8 * self.UA_FZ_CND * (TCND - TS5) * 1.0548
+
+        self.Q_CND_FF = self.UA_FF_CND * (TCND - TS3) # watt
+        self.Q_CND_FZ = self.UA_FZ_CND * (TCND - TS5) # watt
 
         TFZ = 0.5 * (T8 + T9)
         TFF = 0.5 * (T5 + T12)
 
-        # Python: 1.8 C-to-F, then 1.0548 btu to kj
-        # Q_HXS_FF & Q_HXS_FZ Unit is kj
-        self.Q_HXS_FF = 1.8 * self.UA_FF_HXS * (TCND - TFF) * 1.0548
-        self.Q_HXS_FZ = 1.8 * self.UA_FZ_HXS * (TCND - TFZ) * 1.0548
+        # Python: 1.8 C-to-F, then 1.0548 btu to j
+        # UA_FF_HXS, UA_FZ_HXS Unit is W/K or j/sec-K
+        # Dr Omar to approve no need to convet 
+        
+        # self.Q_HXS_FF = 1.8 * self.UA_FF_HXS * (TCND - TFF) * 1.0548
+        # self.Q_HXS_FZ = 1.8 * self.UA_FZ_HXS * (TCND - TFZ) * 1.0548
 
-        if (TS5 < -290.0):
-            self.Q_CND_FZ = 0
+        self.Q_HXS_FF = self.UA_FF_HXS * (TCND - TFF) # watt
+        self.Q_HXS_FZ = self.UA_FZ_HXS * (TCND - TFZ) # watt
 
-        if (TS5 < -290.0):
+        # Dr Omar to approve
+        # if (TS5 < -290.0): # -290K = 94.2611 K
+        if (TS5 < 94.2611): # not sure 290 F to K
+            self.Q_CND_FZ = 0 # watt
+
+        # Dr Omar to approve
+        # if (TS5 < -290.0):
+        if (TS5 < 94.2611): # not sure 290 F to K
             self.Q_HXS_FZ = 0
 
         Q_IN_WALL = (self.Q_CND_FF + self.Q_CND_FZ) / self.ATOTC \
-            + (self.Q_HXS_FF + self.Q_HXS_FZ) / self.ATOTC
+             + (self.Q_HXS_FF + self.Q_HXS_FZ) / self.ATOTC # W/m2
 
-        QDSNEC = MREF * (H14 - HDEW)
-        ADSNEC = QDSNEC / (UAIR * DELTAT + Q_IN_WALL)
+        QDSNEC = MREF * (H14 - HDEW) # kg/hr . j/kg = j/hr
+        # UAIR W/m2 K
+        ADSNEC = QDSNEC / (UAIR * DELTAT + Q_IN_WALL) # unit less
 
         if (ADSNEC > self.ATOTC):
             ADSNEC = self.ATOTC
 
-        QDSC = UAIR * ADSNEC * DELTAT + ADSNEC * Q_IN_WALL
+        QDSC = UAIR * ADSNEC * DELTAT + ADSNEC * Q_IN_WALL # watt
         FSUP = ADSNEC / self.ATOTC
 
         QTPC = 0.0
@@ -333,7 +362,7 @@ class CondCool_CNat (CondCool_Abstract):  # Natural Convection= 0
         QTOTC = QDSC + QTPC + QSCC
 
         FSUB = 0.0
-        self.UDSC = UAIR
+        self.UDSC = UAIR # W/m2 K
         self.UACOND = self.ATOTC * self.UDSC
 
         if (FSUP == 1.0):
@@ -358,8 +387,13 @@ class CondCool_CNat (CondCool_Abstract):  # Natural Convection= 0
 
         # calculate combined air-side heat transfer coefficient
         UAIR = HRAD + HNAT
-        U2 = UAIR * 0.04892
 
+        # Dr Omar to approve
+        # Ayman UAIR was kW/m2 K
+        # by Ayman  kW/m2 K = 0.04892 Btu/ (s ft2 F)
+        # U2 = UAIR * 0.04892 
+        U2 = UAIR * 1000 # W/m2 K
+        
         # calculate the heat transfer necessary to condense the refrigerant
         QTPNEC = MREF * (HDEW - HBUB)
 
@@ -367,19 +401,21 @@ class CondCool_CNat (CondCool_Abstract):  # Natural Convection= 0
         ANET = self.ATOTC - ADSNEC
 
         # calculate the actual heat transfer in the two-phase region
-        QTPC = UAIR * ANET * DELTAT + ANET * Q_IN_WALL
+        #      # (W/m2.K)m2 K  + m2 * # W/m2
+        QTPC = UAIR * ANET * DELTAT + ANET * Q_IN_WALL # watt
 
         if (QTPC > QTPNEC):
             QTPC = QTPNEC
 
         # calculate the area in the two-phase region
-        ATPC = QTPC / (UAIR * DELTAT + Q_IN_WALL)
+        #       watt / ( (W/m2 K)  K +  W/m2)
+        ATPC = QTPC / (UAIR * DELTAT + Q_IN_WALL) # m2
         QSCC = 0.0
 
         QTOTC = QDSC + QTPC + QSCC
         FSUB = 0.0
 
-        self.UTPC = UAIR
+        self.UTPC = UAIR # W/m2 K
         self.UACOND = self.ATOTC * \
             (FSUP * self.UDSC + (1.0 - FSUP) * self.UTPC)
 
@@ -393,18 +429,19 @@ class CondCool_CNat (CondCool_Abstract):  # Natural Convection= 0
         QSCMAX = MREF * CPRLIQ * (TBUB - TS1)
 
         # calculate the subcooling heat transfer
-        QSCC = UAIR * ANET * DELTAT + ANET * Q_IN_WALL
+        #        W/m2 K * m2
+        QSCC = UAIR * ANET * DELTAT + ANET * Q_IN_WALL # watt
 
         if (QSCC > QSCMAX):
             QSCC = QSCMAX
 
-        QTOTC = QDSC + QTPC + QSCC
-        FSUB = ANET / self.ATOTC
+        QTOTC = QDSC + QTPC + QSCC # watt
+        FSUB = ANET / self.ATOTC # unit less
 
-        self.USCC = UAIR
+        self.USCC = UAIR # W/m2 K
         self.UACOND = self.ATOTC * \
             (FSUP * self.UDSC + FSUB * self.USCC \
-            + (1.0 - FSUP - FSUB) * self.UTPC)
+                + (1.0 - FSUP - FSUB) * self.UTPC)
 
         return [QDSC, QTPC, QSCC, QTOTC, FSUP, FSUB]
 
