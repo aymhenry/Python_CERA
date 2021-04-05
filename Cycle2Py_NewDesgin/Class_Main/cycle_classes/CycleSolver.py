@@ -830,10 +830,10 @@ class CycleSolver (CycleUtils):
             # add evaporator class here
 
             if self.IFRSH == 0:
-                dicRest = self.objEvap.evap_balance (MREF=self.MREF
-                                       ,T5=self.T[5], H5=self.H[5], T7=self.T[7]
-                                       ,TDEW=TDEW
-                                       ,CPRVAP=CPRVAP
+                dicRest = self.objEvap.evap_balance (MREF=self.MREF/3600
+                                   ,T5=self.T[5], H5=self.H[5], T7=self.T[7]
+                                   ,TDEW=TDEW
+                                   ,CPRVAP=CPRVAP
                                         )
 
             elif self.IFRSH == 1:

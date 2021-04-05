@@ -92,10 +92,7 @@ class EvapCool_Abstract (ABC, exf4Cond_Evap):
 
         # calculate fresh food section exit temperature
         # MREF  = MREF * 2.20462 # kg to pounds is not done
-        
-        # Dr Omar
-        MREF  = MREF / 3600 # kg/sec
-        
+               
         #   initialize
         TOL_FRSH = 0.1  # Tolerance 
         

@@ -92,10 +92,7 @@ class EvapCool_Abstract (ABC, exf4Cond_Evap):
 
         # calculate fresh food section exit temperature
         # MREF  = MREF * 2.20462 # kg to pounds is not done
-        
-        # Dr Omar
-        MREF  = MREF / 3600 # kg/sec
-        
+               
         #   initialize
         TOL_FRSH = 0.1  # Tolerance 
         
@@ -174,7 +171,7 @@ class EvapCool_Abstract (ABC, exf4Cond_Evap):
         dicRes = {'TS4':TS4,
                  'TE':TE, 
                  'JE':JE,
-                 'ICONE':ICONE  # 0=Free Error, 1=Error Found
+                 'ICONE':ICONE  # 1=Free Error, 0=Error Found
                  }
         return dicRes
 
