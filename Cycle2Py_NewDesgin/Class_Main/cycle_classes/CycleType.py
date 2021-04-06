@@ -144,8 +144,10 @@ class CycleType_Abstract (ABC):
         # Python - Temperatue input (C) and is converted to K
         self.dt.TS1= [temp_c + 273.11 for temp_c in self.dt.TS1]
         self.dt.TS3= [temp_c + 273.11 for temp_c in self.dt.TS3]
-        self.dt.DTSBCI= [temp_c + 273.11 for temp_c in self.dt.DTSBCI]
-        self.dt.SUPIHX= [temp_c + 273.11 for temp_c in self.dt.SUPIHX]
+        
+        # - delta -t not required
+        #       self.dt.DTSBCI= [temp_c + 273.11 for temp_c in self.dt.DTSBCI]
+        #       self.dt.SUPIHX= [temp_c + 273.11 for temp_c in self.dt.SUPIHX]
         
         # -----------------------------------
         
@@ -343,11 +345,6 @@ class Type_1Standard (CycleType_Abstract):
         self.dt.TS5 = -300.0 # 256
         self.dt.DPF = 0.0
         self.dt.CFMF = 0 # by pass required value.
-        
-        # self.dt.XEXITE = self.dt.QUALTY[1]
-        
-        # not used var self.dt.DTSUPI = self.dt.SUPIHX[1]
-        # not used var - self.dt.ISPEC = self.dt.ISPECI[1]
         
         # show all data from input file
         self.obj_show.show(self.dt.ITYPE)

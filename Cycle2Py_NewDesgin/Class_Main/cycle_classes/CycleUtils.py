@@ -332,6 +332,7 @@ class CycleUtils ():
         # begin iteration for temperature at point 10
 
         ITER = 1
+        VL10 = self.objCP.Property('V', P=P[6], H=H[6])  # m3/kg
         # 10 CONTINUE
         while (True):
             ITER = ITER + 1
@@ -349,11 +350,11 @@ class CycleUtils ():
                     # "LIQUID LINE OUTLET FROM LOW TEMP INTERCHANGER - point 10 ",
                     # T[10] - 273.11)
  
-                #[P5, P6, P7, P8] = self.hcvcps (P1, P2, P3, P4)
                 # CALL HCVCPS(1,T[10],VL[10],X,H[10],CV,CP,VS)
             #[H[10], CV, CP, VS] = self.hcvcps(1, T[10], VL[10], X)
 
-            H[10] = objCP.Property('H', T=T[10], P=P[10])  # j/kg
+            H[10] = objCP.Property('H', T=T[10], V=VL10)  # j/kg
+            # H[10] = objCP.Property('H', T=T[10], V=V[10])  # j/kg
             
                 #[P4, P5, P6, P7, P8, P9, P10, P11] = self.hpin ( P1,P2,P3 )
                 # CALL HPIN(H[10],P[10],X,  T10,XQ[10],XL(1,10),XV(1,10),
@@ -802,14 +803,14 @@ class CycleUtils ():
         
         while (ITER <= 100 and HTOL > 0.001):
             # [TBI, XQBI, XL, XV, VL, VV, HL, HV] = self.hpin(HBI, PB, X)
-            TBI = self.cy.objCP.Property('T', H=HBI, P=PB)  # K
+            TBI = self.objCP.Property('T', H=HBI, P=PB)  # K
             
             # DETERMINE EXIT STATE OF STREAM A if AT TBI
-            HAOSTR = self.cy.objCP.Property('H', X=0, T=TBI)  # j/kg
+            HAOSTR = self.objCP.Property('H', X=0, T=TBI)  # j/kg
             DHAMAX = HAI - HAOSTR
 
             # DETERMINE EXIT STATE OF STREAM B if AT TAI
-            HBOSTR = self.cy.objCP.Property('H', X=0, T=TAI)  # j/kg
+            HBOSTR = self.objCP.Property('H', X=0, T=TAI)  # j/kg
             DHBMAX = HBI - HBOSTR
 
             # DETERMINE THE HEAT TRANSFER FOR THE GUESSED INLET STATE HBI

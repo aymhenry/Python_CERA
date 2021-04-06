@@ -709,10 +709,11 @@ class CycleSolver (CycleUtils):
         IE = 1
         while ( (IE <= ITMAXE) and LECON):
             I_ERROR_INTER = 0
-            
+           
             # ----------------------------- Step 02
             if (self.ISPEC == 1):  # Evap superheat:
                 self.TE[self.JE] = self.T[15] + self.DTSUPE
+                
                 self.P[15] = self.objCP.Property('P', X=1, T=self.T[15])  # pas
                 
                 self.P[7] = self.P[15]
@@ -981,19 +982,18 @@ class CycleSolver (CycleUtils):
         # ----------------------------- End Step 03
         # ----------------------------- Step 04
         if (self.ISPEC  !=  2) :
-            self.dt.QINT = self.inter1(self.objCP
+            self.QINT = self.inter1(self.objCP
                                         , self.T[4], self.H[4]
                                         , self.T[7], self.H[7]
                                         , self.ETHX1)
-            self.H[13] = self.H[7] + self.dt.QINT
+            self.H[13] = self.H[7] + self.QINT
         # ----------------------------- End Step 04
         
-        self.H[6] = self.H[16] + self.dt.QINT
+        self.H[6] = self.H[16] + self.QINT
         self.P[6] = self.P[4]
         self.P[13] = self.P[7]
         self.T[6] = self.objCP.Property('T', P=self.P[6]
                                            , H=self.H[6])  # K
-
         # ----------------------------- Step 05
         if (self.ISPEC  !=  2):
             self.T[13] = self.objCP.Property('T', P=self.P[13]
