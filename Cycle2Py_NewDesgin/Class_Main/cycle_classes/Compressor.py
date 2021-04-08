@@ -73,7 +73,7 @@ class Compressor:
         # subroutine compcall calculates isentropic compressor        *
         # performance and calls subroutine compmap                    *
         # *************************************************************
-
+        
         H1 = self.objCP.Property('H', T=TSUCT, V=VSUCT)  # j/kg
 
         CP = self.objCP.Property('CP', T=TSUCT, V=VSUCT)  # j/kg/K
@@ -88,6 +88,7 @@ class Compressor:
         # moved by Dr-Omar WDOTS = MREF * (H2S - H1)/1000  # kj/hr = kg/hr * (j/kg)/1000
 
         # determine actual compressor performance [TSP, WDOT, MDOT, QSHELL]
+        # K, kj/hr, kg/hr, kj/hr
         [TSP, WDOT, MREF, QSHELL] =\
         self.compmap(PSUCT=PSUCT, PDISC=PDISC, TSUCT=TSUCT,
                     VSUCT=VSUCT,
@@ -138,6 +139,8 @@ class Compressor:
 
             if x_value > max(x_series) or y_value > max(y_series)\
                     or x_value < min(x_series) or y_value < min(y_series):
+                print ("\n\n Temp x_series", x_series, " x_value=", x_value)
+                print ("\n Pressure y_series", y_series, "y_value=", y_value)
                 raise ErrorException('Reading value out of range', 'Comp1002')
                 return None
 
@@ -306,7 +309,7 @@ class Compressor:
              ] = read_comp_file(self.strFileName, strFolder)
 
         # Determine the saturation temperatures corresponding to PSUCT, PDISC
-        TEVAPK = self.objCP.Property('T', P=PSUCT, X=0) # K
+        TEVAPK = self.objCP.Property('T', P=PSUCT, X=1) # K
         TCONDK = self.objCP.Property('T', P=PDISC, X=0) # K
 
         # Determine the enthalpies at each pressure for the following:
@@ -333,6 +336,7 @@ class Compressor:
             TEVAP = TEVAPK - 273.16  # convert from Deg K to C
             TCOND = TCONDK - 273.16
 
+        print ("\n aym TCON, TEVAP", TCOND, TEVAP)
         CAP = interpolation (x_value=TEVAP, y_value=TCOND,
                              x_series=Compressor.TEDATA,
                              y_series=Compressor.TCDATA,
@@ -387,14 +391,16 @@ class Compressor:
         # none =(kg/hr) * (j/kg)     /(kj/hr) /1000
         EFFS = MDOT90 * (HS - HIN) / WDOT90 /1000
 
-        HSUCT = self.objCP.Property('H', T=TSUCT, P=PSUCT)  # j/kg
-        SSUC = self.objCP.Property('S', T=TSUCT, P=PSUCT)  # j/kg/K
+        HSUCT = self.objCP.Property('H', T=TSUCT, V=VSUCT)  # j/kg
+        SSUC = self.objCP.Property('S', T=TSUCT, V=VSUCT)  # j/kg/K
         TS = self.objCP.Property('T', S=SSUC, P=PDISC)  # K
-        HS = self.objCP.Property('H', T=TS, P=PDISC)  # j/kg
+        
+        VSUCT = self.objCP.Property('V', T=TS, X=1)  # m3/kg
+        HS = self.objCP.Property('H', T=TS, V=VSUCT)  # j/kg
 
         # kj/hr = kg/hr * J/kg /1000
         WDOT = MDOT * (HS - HSUCT) / EFFS / 1000
-
+  
         # estimate shell heat loss including effect of different ambient
         if (ICOMP == 1):  # Reciprocating compressor
             DELTIN = 67.0

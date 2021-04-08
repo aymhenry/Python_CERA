@@ -131,7 +131,7 @@ class CondCool_Abstract (ABC, exf4Cond_Evap):
     
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
     def cond(self, T4, H4, H14, TC, JC, QCONDS, QCONDC, QSCC,
-             MROLD, MREF):
+             MROLD, MREF, UACOND):
         #     *****************************************************************
         #     *    CALCULATE CONDENSER EXIT TEMPERATURE                       *
         #     *****************************************************************
@@ -151,7 +151,7 @@ class CondCool_Abstract (ABC, exf4Cond_Evap):
         QREF = MREF * (H14 - H4) # kg/hr * j/kg = j/hr
         QCOND = QCONDS + QCONDC + QSCC # j/hr
         EPS = QREF - QCOND
-        DELT = EPS / self.UACOND
+        DELT = EPS / UACOND
 
         if(DELT > 5.0):
             DELT = 5.0
@@ -171,9 +171,13 @@ class CondCool_Abstract (ABC, exf4Cond_Evap):
         # modification by Ayman if(ICNT <= 2) :
         if(JC < 2):
             TCNEW = TCOUT
-        else:
+        else: # Dr Omar
+            # if((TCOUT > TC[1] and TC[1] > TC[2])
+                    # or (TCOUT < TC[1] and TC[1] < TC[2])):
+
             if((TCOUT > TC[1] and TC[1] > TC[2])
-                    or (TCOUT < TC[1] and TC[1] < TC[2])):
+                    or (TCOUT < TC[2] and TC[1] > TC[2]) ):
+                    
                 TCNEW = 0.5 * (TC[1] + TC[2])
             else:
                 TCNEW = TCOUT
@@ -181,10 +185,11 @@ class CondCool_Abstract (ABC, exf4Cond_Evap):
             if(TCNEW < self.TS1):
                 TCNEW = (self.TS1 + TC[JC]) / 2.0
 
-            TC[1] = TC[2]
+            # ayman TC[1] = TC[2]
 
         # Check convergence
-        ERRORT = abs(TCNEW - TC[JC])
+        # ERRORT = abs(TCNEW - TC[JC])
+        ERRORT = abs(TCNEW - TC[1])
         ERRORM = abs(MREF - MROLD) / MREF
 
         # ==============this block modified by Ayman
@@ -198,7 +203,9 @@ class CondCool_Abstract (ABC, exf4Cond_Evap):
 
         JC = 2
         # ICNT = ICNT + 1  # useless
-        TC[JC] = TCNEW
+        # TC[JC] = TCNEW
+        TC[2] = TC[1]
+        TC[1] = TCNEW
         # modification by Ayman - MROLD = MREF to be moved out of class
         # MROLD = MREF
 

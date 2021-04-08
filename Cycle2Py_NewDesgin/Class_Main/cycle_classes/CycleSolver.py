@@ -104,9 +104,12 @@ class CycleSolver (CycleUtils):
         self.IFRSH = self.dt.IFRSHI[self.lng_item]
         self.ICOND = self.dt.ICONDI[self.lng_item]
         
-        # Refrigerant Exit Superheat (C) Or Quality (0-1)
+        # Refrigerant Exit Superheat (C) 
         self.DTSUPE=self.dt.DTSPEI[self.lng_item]
-
+        
+        # Quality (0-1)) 
+        self.XEXITE=self.dt.QUALITY[self.lng_item]
+        
         # 'Interchanger exit superheat C
         self.DTSUPI=self.dt.SUPIHX[self.lng_item]
 
@@ -213,7 +216,7 @@ class CycleSolver (CycleUtils):
         # ETHX2 - EFFECTIVENESS OF LOW  TEMP INTERCHANGER
         self.ETHX1=self.dt.ETHX[self.lng_item] # both same value
         self.ETHX2=self.dt.ETHX[self.lng_item]
-
+ 
         #-- setup basic variables
         #----------------------------------------------
         # 1 - COMPRESSOR INLET (SATURATED VAPOR)
@@ -426,10 +429,11 @@ class CycleSolver (CycleUtils):
                 # ----------------Dr Omar this block only in Python
                 # fix bug if ISPEC<>2 and TSPEC <=0
                 # V[13] is calculated only in case SPEC=2
-                if self.ISPEC != 2 and self.TSPEC < 0.0:
+                if self.ISPEC != 2:
                     # Dr Omar to approve, no starting value of T[1] in Fortran
-                    self.T[1] = self.TS1 + 5 # Ayman Proposal
-                    print ("    by Ayman self.T[1]", self.T[1])
+                    self.T[1] = self.T[15] # Ayman Proposal
+                    self.P[1] = self.P[15] # Ayman Proposal
+                    print ("aym-- self.T[1]", self.T[1])
                     
                     self.V[1] = self.objCP.Property('V', T=self.T[1]
                         , P=self.P[1])  # m3/kg
@@ -597,7 +601,7 @@ class CycleSolver (CycleUtils):
                                         H3=self.H[3],
                                         TBUB=TBUB,
                                         HBUB=HBUB,
-                                        MREF=MREF,
+                                        MREF=self.MREF,
                                         CPRLIQ=CPRLIQ,
                                         PBUB=PBUB,
                                         P4=self.P[4]
@@ -625,9 +629,9 @@ class CycleSolver (CycleUtils):
         FSUP = dicRest['FSUP']
         FSUB = dicRest['FSUB']
         
-        # [Q_CND_FF, Q_CND_FZ, Q_HXS_FF
-            # ,Q_HXS_FZ, UACOND, UDSC, USCC, UTPC] = \
-                # self.objCond.getExtarOutputs()
+        [Q_CND_FF, Q_CND_FZ, Q_HXS_FF
+            ,Q_HXS_FZ, self.UACOND, UDSC, USCC, UTPC] = \
+                self.objCond.getExtarOutputs()
 
         # Condenser Heat Fresh Food,  Q_CND_FF
         # Condenser Heat Freezer,     Q_CND_FZ
@@ -648,7 +652,8 @@ class CycleSolver (CycleUtils):
                        , QCONDC=QTPC
                        , QSCC=QSCC
                        , MROLD=self.MROLD # to check Dr Omar
-                       , MREF=self.MREF
+                       , MREF=self.MREF  # kg/hr
+                       , UACOND=self.UACOND *3600 # kj/hr
                        )
 
         # output of cond method
@@ -724,6 +729,7 @@ class CycleSolver (CycleUtils):
                 self.P[13] = self.P[15]
                 self.T[13] = self.T[15] + self.DTSUPI
                 
+                self.V[13] = self.objCP.Property('V', X=1, T=self.T[13])  # m3/kg
                 self.H[13] = self.objCP.Property('H', X=1, T=self.T[13])  # j/kg
                 self.P[7] = self.P[15]
                 self.TE[self.JE] = self.T[7]
@@ -744,7 +750,7 @@ class CycleSolver (CycleUtils):
 
             #	determine the bubble and dew point enthalpies
             self.H[15] = self.objCP.Property('H', X=1, T=self.T[15]) # j/kg
-            HBUB15 = self.objCP.Property('H', X=0, P=self.P[15])  # j/kg
+            self.HBUB15 = self.objCP.Property('H', X=0, P=self.P[15])  # j/kg
             
             #--- Reptead block ----
             self.calc_lowevap()
@@ -838,7 +844,7 @@ class CycleSolver (CycleUtils):
                                         )
 
             elif self.IFRSH == 1:
-                dicRest = self.objEvap.evap_balance (MREF=self.MREF
+                dicRest = self.objEvap.evap_balance (MREF=self.MREF/3600
                                        ,T5=self.T[5], H5=self.H[5]
                                        ,TDEW=TDEW
                                        ,CPRVAP=CPRVAP
@@ -846,7 +852,7 @@ class CycleSolver (CycleUtils):
                                         )
 
             elif self.IFRSH == 2:
-                dicRest = self.objEvap.evap_balance (MREF=self.MREF
+                dicRest = self.objEvap.evap_balance (MREF=self.MREF/3600
                                        ,T5=self.T[5], H5=self.H[5]
                                        ,TDEW=TDEW
                                        ,CPRVAP=CPRVAP
@@ -855,7 +861,7 @@ class CycleSolver (CycleUtils):
 
             # ... Output ....
             self.QFRSH = dicRest['QFRSH']
-            UAFF = dicRest['UAFF']
+            self.UAFF = dicRest['UAFF']
             self.FSUPE = dicRest['FSUPE']
             #..........................................
 
@@ -886,7 +892,9 @@ class CycleSolver (CycleUtils):
                             , TS3=self.TS3
                             , TE=self.TE, JE=self.JE
                             , QFRSH=self.QFRSH
-                            , MREF=self.MREF)
+                            , MREF=self.MREF/3600
+                            , UAFF=self.UAFF
+                            )
             
             self.TE = dicRest['TE']
             self.JE = dicRest['JE']
@@ -969,12 +977,12 @@ class CycleSolver (CycleUtils):
         elif (self.ISPEC == 3):  # Evap exit quality
             # XQ[7] = Data.XEXITE
             # CALL ENTHAL(HBUB15,H[15],XQ[7],X,P[7],H[7])
-            print (" line 927 CycleSolver -- check this function")
-            self.H[7] = self.enthal (self.objCP, HBUB15, H[15]
-                            , self.dt.XEXITE, self.P[7])
+     
+            self.H[7] = self.enthal (self.objCP, self.HBUB15, self.H[15]
+                            , self.XEXITE, self.P[7])
 
             self.T[7] = self.objCP.Property('T', H=self.H[7]
-                                                     , P=self.P[7])  # K
+                                               , P=self.P[7])  # K
             
             # V[7] = (1.0-XQ[7])*VL[7] + XQ[7]*VV[7]
             self.T[7] = self.TE[self.JE]
@@ -982,6 +990,7 @@ class CycleSolver (CycleUtils):
         # ----------------------------- End Step 03
         # ----------------------------- Step 04
         if (self.ISPEC  !=  2) :
+            print ("\n\n\naym  self.T[7]",self.T[7] )
             self.QINT = self.inter1(self.objCP
                                         , self.T[4], self.H[4]
                                         , self.T[7], self.H[7]
@@ -998,6 +1007,9 @@ class CycleSolver (CycleUtils):
         if (self.ISPEC  !=  2):
             self.T[13] = self.objCP.Property('T', P=self.P[13]
                                                 , H=self.H[13])  # K
+            
+            self.V[13] = self.objCP.Property('V', P=self.P[13]
+                                                , H=self.H[13])  # m3/kg
        # ----------------------------- End Step 05
 
         self.P[5] = self.P[13] + self.DPE

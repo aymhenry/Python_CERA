@@ -16,7 +16,7 @@ from common_classes.DataModelBuiler import DataModelBuiler
 class CycleDataModelBuiler (DataModelBuiler):
     # Type 2 is not supported
     # required data for each configration
-    DataModelBuiler.lst_required_data = [108-11, 0, 105, 105]
+    DataModelBuiler.lst_required_data = [98, 0, 105, 105]
     # maximum data file lines to read, this need to be updated if there is any
     # data line more than this
     DataModelBuiler.MAX_DATA_FILE_TO_READ = 150
@@ -82,6 +82,7 @@ class CycleDataModelBuiler (DataModelBuiler):
             'USUPEI[1]',
             'ATOTEI[1]', 
             'DTSPEI[1]', 
+            'QUALITY[1]', 
             'MREFI[1]', 
             'SPEEDI[1]', 
             'TSPECI[1]', 
@@ -229,6 +230,7 @@ class CycleDataModelBuiler (DataModelBuiler):
         self.obj_qdata.USUPEI = [0.0] * (2 + 1)
         self.obj_qdata.ATOTEI = [0.0] * (2 + 1)
         self.obj_qdata.DTSPEI = [0.0] * (2 + 1)
+        self.obj_qdata.QUALITY = [0.0] * (2 + 1)
         self.obj_qdata.MREFI = [0.0] * (2 + 1)
         self.obj_qdata.SPEEDI = [0.0] * (2 + 1)
         self.obj_qdata.TSPECI = [0.0] * (2 + 1)
@@ -381,7 +383,8 @@ class CycleDataModelBuiler (DataModelBuiler):
         #  UTPEI[1]		Two-Phase Heat Transfer Conductance, W/M2-C
         #  USUPEI[1]	Superheat Region Conductance, W/M2-C
         #  ATOTEI[1]	Total Heat Transfer Surface Area, M2
-        #  DTSPEI[1]	Refrigerant Exit Superheat (C) Or Quality (0-1)
+        #  DTSPEI[1]	Refrigerant Exit Superheat (C)
+        #  QUALITY[1]	Quality (0-1)
 
     # Compressor data
         #  MREFI[1]		Initial Guess For Refrigerant Mas Flow Rate (kg/hr)

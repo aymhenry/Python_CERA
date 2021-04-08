@@ -96,8 +96,8 @@ class ShowInput ():
         self.showdata ('UTPEI[1]','W/m2-c','Two-Phase Heat Transfer Conductance')
         self.showdata ('USUPEI[1]','W/m2-c','Superheat Region Conductance')
         self.showdata ('ATOTEI[1]','m2','Total Heat Transfer Surface Area')
-        self.showdata ('DTSPEI[1]','#'
-            ,'Refrigerant Exit Superheat (C) Or Quality (0-1)')
+        self.showdata ('DTSPEI[1]','#', 'Refrigerant Exit Superheat (C)')
+        self.showdata ('QUALITY[1]','#', 'Quality (0-1)')
         self.showdata ('MREFI[1]','kg/hr'
             ,'Initial Guess For Refrigerant Mas Flow Rate')
         self.showdata ('SPEEDI[1]','rpm','Nominal Speed')

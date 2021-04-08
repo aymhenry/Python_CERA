@@ -86,15 +86,15 @@ class EvapCool_Abstract (ABC, exf4Cond_Evap):
 
     def getExtarOutputs (self):
         pass
-    
+
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
-    def frsh(self, H5, H7, T5, TS3, TE, JE, QFRSH, MREF):
+    def frsh(self, H5, H7, T5, TS3, TE, JE, QFRSH, MREF, UAFF=0):
 
         # calculate fresh food section exit temperature
         # MREF  = MREF * 2.20462 # kg to pounds is not done
                
         #   initialize
-        TOL_FRSH = 0.1  # Tolerance 
+        TOL_FRSH = 0.1   # Tolerance 
         
         FTE = [0.0, 0.0, 0.0]  # in Python only, to review no old data for this
 
@@ -159,12 +159,13 @@ class EvapCool_Abstract (ABC, exf4Cond_Evap):
 
         JEOLD = JE  # useless not used
         TE[2]=TE[1] #[OA added this line to store the previous value!]
-        JE = 1 #[OA changed from 2 to 1; we need to compare the new value to the old value]
+        #JE = 1 #[OA changed from 2 to 1; we need to compare the new value to the old value]
 
-        TE[JE] = TENEW
+        # TE[JE] = TENEW
+        TE[1] = TENEW
 
         #  adjust exit air temp to 90% approach if natural convection
-
+        JE = 2 # by Ayman to chk Dr omar
         if (self.IFRSH == 0):
             TS4 = 0.9 * TE[JE] + 0.1 * TS3
 

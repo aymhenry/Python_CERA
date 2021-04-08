@@ -99,7 +99,8 @@ class CycleType_Abstract (ABC):
             # self.dt.F[3][2][int_ref] = self.dt.F[2][3][int_ref]
 
         # Delat Temp Refrigerant Exit Superheat (C) Or Quality (0-1)
-        self.dt.QUALTY = self.dt.DTSPEI[:]
+        # add a new entry for Quality in Python only
+        # self.dt.QUALTY = self.dt.DTSPEI[:]
 
         # if IDFRST(Manual Defrost) =1  (i.e Autoamtic ) DFSTCYC :Closed-Door
         # Automatic Defrost (W)

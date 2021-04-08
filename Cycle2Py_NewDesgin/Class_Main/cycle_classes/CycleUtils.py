@@ -8,7 +8,7 @@ from cycle_classes.CoolPrp import *
 
 class CycleUtils ():
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
-    def enthal(self, objCP, HBUB, HDEW, XSPEC, X, P):
+    def enthal(self, objCP, HBUB, HDEW, XSPEC, P):
         # ITERATES TO DETERMINE THE ENTHALPY.                 
         #  THE PRESSURE AND QUALITY ARE INPUTS                      
 
@@ -29,8 +29,12 @@ class CycleUtils ():
                 HGUESS = HDEW * 0.99
 
             # [T, XCALC, XL, XV, VL, V, HL, HV] = self.hpin(HGUESS, P, X)
-            T = self.objCP.Property('T', P=P, X=X)  # K
-
+            T = self.objCP.Property('T', P=P, H=HGUESS)  # K
+            # Python only
+            H_water = self.objCP.Property('H', P=P, X=0)  # j/kg
+            H_gas = self.objCP.Property('H', P=P, X=1)  # j/kg
+            XCALC = (H_gas - H_water) / H_gas
+            # End of Python addition
             if (XCALC < 0.0):
                 XCALC = 0.001
             if (XCALC > 1.0):
@@ -271,45 +275,18 @@ class CycleUtils ():
         #XQ[10] = 0
         ETHX = ETHX2
         TSAV = T[9]
-
-        # XL_Temp = [0.0] * len(XL)  # in python only
-        # XV_Temp = [0.0] * len(XV)  # in python only
-
-        # Find bubble and dew point enthalpies at freezer pressure
-            # [P2, P3, P4, P5, P6, P8] = self.bublp ( P1, P2, P3,    P7)
-            # CALL BUBLP(P[8],X,XV(1,8),TBUB,VL[8],VV[8],True,LCRIT)
-            
-        # [X, XV_Temp, TBUB, VL[8], VV[8], LCRIT] = self.bublp(
-            # P[8], X, XV_Temp, True)
-        # self.setArr2dCol(XV, 8, XV_Temp)
         
         TBUB = objCP.Property('T', P=P[8], X=0)  # K
-        
-            #[P5, P6, P7, P8] = self.hcvcps (P1, P2, P3, P4)
-            # CALL HCVCPS(1,TBUB,VL[8],X,HBUB,CV,CP,VS)
-        #[HBUB, CV, CP, VS] = self.hcvcps(1, TBUB, VL[8], X)
-        
-        HBUB = self.objCP.Property('H', P=P[8], X=0)  # K
+        HBUB = self.objCP.Property('H', P=P[8], X=0)  # j/kg
 
         if(NCALL == 0): # Python all times NCALL = 0 !!!
-                # [P2, P3, P4, P5, P6, P8] = self.bublp ( P1, P2, P3,    P7)
-                # CALL BUBLP(P[9],XL(1,9),X,TDEW,VL[9],VV[9],.FALSE.,LCRIT)
-            # [XL_Temp, X, TDEW, VL[9], VV[9], LCRIT] = self.bublp(
-                # P[9], XL_Temp, X, False)
-            # self.setArr2dCol(XL, 9, XL_Temp)
-            
             TDEW = objCP.Property('T', P=P[9], X=1)  # K
-            
-                #[P5, P6, P7, P8] = self.hcvcps (P1, P2, P3, P4)
-                # CALL HCVCPS(1,TDEW,VV[9],X,   HDEW,CV,CP,VS)
-            #[HDEW, CV, CP, VS] = self.hcvcps(1, TDEW, VV[9], X)
-            
             HDEW = objCP.Property('H', P=P[9], X=1)  # j/kg
             
-            dt.CREF = MREF * (HDEW - HBUB) / (TDEW - TBUB + 0.001)
+            # dt.CREF watt.K
+            dt.CREF = MREF * (HDEW - HBUB) / (TDEW - TBUB + 0.001)/3600
             if(dt.CREF <= 0.1):
                 dt.CREF = 1000000.0  # 5/9/94
-            # END if
 
             T[10] = TS5
             NCALL = 1
@@ -332,83 +309,37 @@ class CycleUtils ():
         # begin iteration for temperature at point 10
 
         ITER = 1
+        # the next statment by Ayman
         VL10 = self.objCP.Property('V', P=P[6], H=H[6])  # m3/kg
         # 10 CONTINUE
+        
         while (True):
             ITER = ITER + 1
 
-            # wait a key to exit app
-            # CALL INCHR(0,J,KEY)
-            # if(J  ==  1): sys.exit(100)#  CALL FINISH
-            #if(J  ==  68): LQUIT = True
-
-            #TSHOW = T[10] - 273.11
-            # if(ICYCL == 2):
-                # # CALL GOTOXY(2,21)
-                # # CALL PRINT(TSHOW,5,1)
-                # self.showMsg(
-                    # "LIQUID LINE OUTLET FROM LOW TEMP INTERCHANGER - point 10 ",
-                    # T[10] - 273.11)
- 
-                # CALL HCVCPS(1,T[10],VL[10],X,H[10],CV,CP,VS)
-            #[H[10], CV, CP, VS] = self.hcvcps(1, T[10], VL[10], X)
-
             H[10] = objCP.Property('H', T=T[10], V=VL10)  # j/kg
-            # H[10] = objCP.Property('H', T=T[10], V=V[10])  # j/kg
             
-                #[P4, P5, P6, P7, P8, P9, P10, P11] = self.hpin ( P1,P2,P3 )
-                # CALL HPIN(H[10],P[10],X,  T10,XQ[10],XL(1,10),XV(1,10),
-                # VL[10],VV[10],HL,HV)
-                
-            # [T10, XQ[10], XL_Temp, XV_Temp, VL[10], VV[10],
-                # HL, HV] = self.hpin(H[10], P[10], X)
-            # self.setArr2dCol(XL, 10, XL_Temp)
-            # self.setArr2dCol(XV, 10, XV_Temp)
-
             # I think it is T[10]
             T[10] = objCP.Property('T', P=P[10], H=H[10])  # K
             
             H[8] = H[10]
-
-                # CALL HPIN(H[8],P[8],X,  T[8],XQ[8],XL(1,8),XV(1,8),
-                # VL[8],VV[8],HL,HV)
-            # [T[8], XQ[8], XL_Temp, XV_Temp, VL[8],
-                # VV[8], HL, HV] = self.hpin(H[8], P[8], X)
-            # self.setArr2dCol(XL, 8, XL_Temp)
-            # self.setArr2dCol(XV, 8, XV_Temp)
-
             T[8] = objCP.Property('T', P=P[8], H=H[8])  # K
-            
-            #TSHOW = T[8] - 273.11
-            # if(ICYCL  ==  2) :
-            #	CALL GOTOXY(14,21)
-            # else:
-            #	CALL GOTOXY(14,15)
-            # END if
-
-            # CALL PRINT(TSHOW,5,1)
-            # self.showMsg(
-                # "INLET TO FREEZER EVAPORATOR - point 8",
-                # T[8] - 273.11)
-
 
             # DETERMINE CMIN AND CMAX
             # Dr Omar
             # Ayman CFMF only on Type 2, in case of type 1 CFMF allways 0
             
-            if(dt.CFMF <= dt.CREF):
+            if(dt.CFMF <= dt.CREF): # both watt. K
                 CMIN = dt.CFMF
                 CMAX = dt.CREF
             else:
                 CMIN = dt.CREF
                 CMAX = dt.CFMF
-            # END if
 
             CAPRAT = CMIN / CMAX
             if(CMIN <= 0.0):
                 CMIN = 0.001
 
-            FNTU = dt.UAF / CMIN
+            FNTU = dt.UAF / CMIN # UAF Ayman check input list
             if(FNTU < 0.0):
                 FNTU = 0.0
 
@@ -417,8 +348,6 @@ class CycleUtils ():
             dt.UAFZ = dt.UAF
             if(IFREZ2 == 1):
                 if dt.IFREZ == 0:
-                    # SELECT CASE (IFREZ)
-                    #CASE (0)
                     TAVE = (T[8] + T[9]) / 2.0
 
                     if(T[9] < -1000.0):
@@ -426,7 +355,7 @@ class CycleUtils ():
                     if(TAVE > TS5):
                         TAVE = TS5 - 1.0
 
-                    QMAX = 0.90 * MREF * (H(7) - H[6])  # 5/9/94
+                    QMAX = 0.90 * MREF * (H(7) - H[6]) /3600 # 5/9/94
                     HRAD = SIGMA * (TAVE + TS5) * (TAVE**2 + TS5**2) * EPS
                     DELTAT = TS5 - TAVE
 
@@ -447,10 +376,11 @@ class CycleUtils ():
                     #
                     #  HRAD = (1.0 - FRACT_FZ)*HRAD
                     #  HNAT = 0.5*HNAT
+                    
+                    # Dr. Omar
                     UAIR = HRAD + HNAT
                     if(dt.IWALL_FZ == 1):
                         UAIR = 1.0 / (1.0 / UAIR + 0.1389 / 20.44)
-                    # END if
 
                     QFREZ = dt.UAF * UAIR * DELTAT
                     dt.UAFZ = dt.UAF * UAIR
@@ -471,21 +401,18 @@ class CycleUtils ():
                         QFREZ = QMAX
 
                 elif dt.IFREZ == 1:
-                    #CASE (1)
-                    # CALL EFCROSS(CAPRAT,FNTU,EXFR)
                     EXFR = self.efcross(CAPRAT, FNTU)
 
                     QFREZ = EXFR * CMIN * (TS5 - T[8])
                     dt.ETAF = EXFR
 
                 elif dt.IFREZ == 2:
-                    #CASE (2)
                     XX = 1.0 - CAPRAT
                     XXX = EXP(-FNTU * XX)
                     EXFR = (1.0 - XXX) / (1.0 - CAPRAT * XXX)
                     QFREZ = EXFR * CMIN * (TS5 - T[8])
                     dt.ETAF = EXFR
-                # END SELECT
+
                 TS6 = TS5 - QFREZ / dt.CFMF
 
                 if(IFREZ == 0):
@@ -493,79 +420,31 @@ class CycleUtils ():
             else:
                 QFREZ = 0.0
                 TS6 = TS5
-            # END if
 
+        
+            #  UPDATE ENTHALPY ACROSS EVAPORATOR
             #
-            #          UPDATE ENTHALPY ACROSS EVAPORATOR
-            #
-            H[9] = H[8] + QFREZ / MREF # MREF kg/s
-
-                #[P4, P5, P6, P7, P8, P9, P10, P11] = self.hpin ( P1,P2,P3 )
-                # [T[9], XQ[9], XL_Temp, XV_Temp, VL[9],
-                # VV[9], HL, HV] = self.hpin(H[9], P[9], X)
-
-            # CALL HPIN(H[9],P[9],X,  T[9],XQ[9],XL(1,9),XV(1,9),
-            # VL[9],VV[9],HL,HV)
-            # self.setArr2dCol(XL, 9, XL_Temp)
-            # self.setArr2dCol(XV, 9, XV_Temp)
-            
+            H[9] = H[8] + QFREZ / MREF /3600 # MREF kg/hr *3600
             T[9] = objCP.Property('T', P=P[9], H=H[9])  # K
             
-            #TSHOW = T[9] - 273.11
-            # if(ICYCL == 2):
-                # # CALL GOTOXY(52,21)
-                # # CALL PRINT(TSHOW,5,1)
-                # self.showMsg("OUTLET FROM FREEZER EVAPORATOR - point 9", TSHOW)
-            # # END if
-
             if(IFREZ2 == 0):
                 break  # GO TO 20
-            #
+  
             #          GET NEW GUESS FOR TEMPERATURE AT POINT 10
-            #
+     
             TOLD = T[10]
             if(ICYCL != 2 .OR. ICNTRL != 2):
                 TNEW = T[6] - ETHX * (T[6] - T[9])
             else:
-                    # [P2, P3, P4, P5, P6, P8] = self.bublp ( P1, P2, P3,    P7)
-                    # CALL BUBLP(P[9],XLD,X,TD,VLD,VVD,.FALSE.,LCRIT)
-                #[XLD, X, TD, VLD, VVD, LCRIT] = self.bublp(P[9], XLD, X, False)
                 TD = self.objCP.Property('T', X=1, P=P[9])  # K
                 if(TD > T[6]):
                     TNEW = T[6] - ETHX * (T[6] - T[9])
                 else:
-                        #[P5, P6, P7, P8] = self.hcvcps (P1, P2, P3, P4)
-                        # CALL HCVCPS(1,T[9],VL[10],X,HHIGH,CV,CP,VS)
-                    #[HHIGH, CV, CP, VS] = self.hcvcps(1, T[9], VL[10], X)
                     HHIGH = self.objCP.Property('H', V=VL[10], T=T[9])  # j/kg
-                
-                        # [P4, P5] = self.espar [P1, P2, P3]
-                        # CALL ESPAR(0,T[6],X,A1,B1)
-                    #[A1, B1] = self.espar[0, T[6], X]
-
-                        #VGUESS = R*T[6]/P[9]
-                    #VGUESS = R * T[6] / P[9] / 1000  # must be in Pa
-
-                        #[P5, P7] = self.vit (P1, P2, P3, P4, P5, P6)
-                        # CALL VIT(T[6],P[9],A1,V1,VGUESS,.FALSE.,LCRIT)
-                    #[VGUESS, LCRIT] = self.vit(T[6], P[9], A1, V1, VGUESS, False)
-
-                        #[P5, P6, P7, P8] = self.hcvcps (P1, P2, P3, P4)
-                        # CALL HCVCPS(1,T[6],VGUESS,X,HLOW,CV,CP,VS)
-                    #[HLOW, CV, CP, VS] = self.hcvcps(1, T[6], VGUESS, X)
-
                     HLOW = self.objCP.Property('H', X=0, T=T[6])  # j/kg
                     
                     DH = min((HLOW - H[9]), (H[6] - HHIGH))
-                    H[10] = H[6] - DH
-
-                        #[P4, P5, P6, P7, P8, P9, P10, P11] = self.hpin ( P1,P2,P3 )
-                        # CALL HPIN(H[10],P[10],X, T[10],XQ[10],XL(1,10), XV(1,10),VL[10],VV[10],HL,HV)
-                    # [T[10], XQ[10], XL_Temp, XV_Temp, VL[10],
-                        # VV[10], HL, HV] = self.hpin(H[10], P[10], X)
-                    # self.setArr2dCol(XL, 10, XL_Temp)
-                    # self.setArr2dCol(XV, 10, XV_Temp)
-                    
+                    H[10] = H[6] - DH                    
                     T[10] = objCP.Property('T', P=P[10], H=H[10])  # K
             
             # correct guess if necessary and calculate error
@@ -573,17 +452,18 @@ class CycleUtils ():
             if(T[9] > T[6]):
                 TNEW = T[10] - 0.9 * ERROR
                 T[10] = TNEW
-            # END if
-
+            
             T[10] = TNEW
             ERROR = TSAV - T[9]
             TSAV = T[9]
 
             if(abs(ERROR) < TOL_FRZ):
                 break  # GO TO 20
-
-            dt.CREF = MREF * abs((H[9] - H[8]) / (T[9] - T[8] + 0.0001))
-                
+            
+            # j/hr K      = kg/hr . # watt. K
+            dt.CREF = MREF /3600 * abs((H[9] - H[8]) / (T[9] - T[8] + 0.0001))
+            # Dr omar units
+ 
             if(dt.CREF <= 0.1):
                 dt.CREF = 1000000.0  # /5/9/94
 
@@ -602,54 +482,27 @@ class CycleUtils ():
                 break  # GO TO 20
         # GO TO 10
 
-        #
+        
         # END OF ITERATION.  CALCULATE NEEDED PARAMETERS
-        #
+    
         # 20 CONTINUE
 
-        H[5] = H[9] + (H[6] - H[10])
-            #[P4, P5, P6, P7, P8, P9, P10, P11] = self.hpin ( P1,P2,P3 )
-
-        # [T[5], XQ[5], XL_Temp, XV_Temp, VL[5],
-            # VV[5], HL, HV] = self.hpin(H[5], P[5], X)
-        # self.setArr2dCol(XL, 5, XL_Temp)
-        # self.setArr2dCol(XV, 5, XV_Temp)
-        
+        H[5] = H[9] + (H[6] - H[10])        
         T[5] = objCP.Property('T', P=P[5], H=H[5])  # K
-
-        # [T[10], XQ[10], XL_Temp, XV_Temp, VL[10],
-            # VV[10], HL, HV] = self.hpin(H[10], P[10], X)
-        # self.setArr2dCol(XL, 10, XL_Temp)
-        # self.setArr2dCol(XV, 10, XV_Temp)
         
         T[10] = objCP.Property('T', P=P[10], H=H[10])  # K
-
-        # CALL HPIN(H[5],P[5],X, T[5],XQ[5],XL(1,5),XV(1,5),VL[5],VV[5],   HL,HV)
-        # CALL HPIN(H[10],P[10],X, T[10],XQ[10],XL(1,10),XV(1,10),VL[10],
-        # VV[10],HL,HV)
-
-        #TSHOW = T[5] - 273.11
-        # if(ICYCL  ==  2) :
-        #	CALL GOTOXY(52,11)
-        #	CALL PRINT(TSHOW,5,1)
-        # END if
-        # self.showMsg(
-            # "INLET TO FRESH FOOD EVAPORATOR  - point 5 ",
-            # T[5] - 273.11)
 
         #return [H, P, X, T, XQ, XL, XV, VL, VV, HL, HV, TS6, QFREZ]
         return [H, P, T, TS6, QFREZ]
 
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
     def efcross(self, CRAT, NTU):
-        # P3 = self.efcross (P1, P2)
         #	  SUBROUTINE EFCROSS(CRAT,NTU,EFFECT)
         #     ******************************************************************
         #     *     CALCULATES THE HEAT TRANSFER EFFECTIVENESS FOR A CROSS     *
         #     *     FLOW HEAT EXCHANGER WITH BOTH FLUIDS UNMIXED               *
         #     ******************************************************************
 
-        # DIMENSION A(4,6)
 
         A = [	[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
               [0.0, 2.394292, -1.19402, -1.45067, 1.938453, -0.81305, 0.118651],
@@ -668,15 +521,19 @@ class CycleUtils ():
         #
         #          FIND POSITION IN ARRAY BASED ON THE CAPACITY RATIO
         #          OF THE TWO STREAMS
-        #
+        
         if(CRAT >= 0.00 and CRAT <= 0.25):
             I = 1
+        
         if(CRAT > 0.25 and CRAT <= 0.50):
             I = 2
+        
         if(CRAT > 0.50 and CRAT <= 0.75):
             I = 3
+        
         if(CRAT > 0.75 and CRAT <= 1.00):
             I = 4
+        
         if(NTU <= 0.0):
             NTU = 0.0
 
@@ -690,13 +547,14 @@ class CycleUtils ():
                 EFFA = 1.0 - EXP(-NTU)
             else:
                 EFFA = EFFA + A[I - 1][J] * BETA**EX
-            # END if
+            
             EFFB = EFFB + A[I][J] * BETA**EX
             #J = J + 1
-        # END DO
+       
 
         FRAC = (CRAT - (I - 1) * 0.25) / (I * 0.25 - (I - 1) * 0.25)
         EFFECT = EFFA + FRAC * (EFFB - EFFA)
+        
         if (EFFECT > 1.0):
             EFFECT = 1.0
         return
@@ -713,9 +571,6 @@ class CycleUtils ():
         # 4 - condenser outlet
         # 7 - outlet from fresh food evaporator
         
-    #def inter1(self, objCP, X, P4, T4, H4, V4, P7, T7, H7, V7, ETHX1):
-        #  P11 = self.inter1 ( P1, ... to .. P10)
-        #	  SUBROUTINE INTER1(X,P4,T4,H4,V4,P7,T7,H7,V7,ETHX1,QACT)
         #     ******************************************************************
         #     *    INTERCHANGER FOR SUBCOOLING CONDENSER LIQUID                *
         #     *    USED WHEN THE INLET STATES OF BOTH STREAMS SPECIFIED        *
@@ -726,51 +581,9 @@ class CycleUtils ():
         #                   7 = OUTLET FROM FRESH FOOD EVAPORATOR
         #                  13 = LOW PRESSURE SIDE OUTLET FROM INTERCHANGER
 
-        # LCONV = False
 
-        # determine state 6 for case of refrigerant exit TEMP=T[7]
-
-        #P6STAR = P4
-        # T6STAR = T7
-        #VGUESS = V4
-        
-            # [P4, P5] = self.espar [P1, P2, P3]
-            # CALL ESPAR(0,T6STAR,X,A6STAR,B6STAR)
-        #[A6STAR, B6STAR] = self.espar(0, T6STAR, X)
-
-            #[P5, P7] = self.vit (P1, P2, P3, P4, P5, P6)
-            # CALL VIT(T6STAR,P6STAR,A6STAR,B6STAR,VGUESS,True,LCONV)
-        # [VGUESS, LCONV] = self.vit(T6STAR, P6STAR, A6STAR, B6STAR, VGUESS, True)
-
-        # V6STAR = VGUESS
-        
-            #[P5, P6, P7, P8] = self.hcvcps (P1, P2, P3, P4)
-            # CALL HCVCPS(1,T6STAR,V6STAR,X,  H6STAR,CV,CP,VS)
-        # [H6STAR, CV, CP, VS] = self.hcvcps(1, T6STAR, V6STAR, X)
-
-        H6STAR = objCP.Property('H', X=1, T=T7)  # j/kg
-        
-        # determine state 13 if refrigerant exit TEMP=T(4)
-        # for the case of evaporator exit superheat specified
-        
-        #P13STR = P7
-        # T13STR = T4
-        #VGUESS = V7 * T13STR / T7
-
-            # [P4, P5] = self.espar [P1, P2, P3]
-            # CALL ESPAR(0,T13STR,X,A13STR,B13STR)
-        #[A13STR, B13STR] = self.espar(0, T13STR, X)
-
-            #[P5, P7] = self.vit (P1, P2, P3, P4, P5, P6)
-            # CALL VIT(T13STR,P13STR,A13STR,B13STR,VGUESS,.FALSE.,LCONV)
-        #[VGUESS, LCONV] = self.vit(T13STR, P13STR, A13STR, B13STR, VGUESS, False)
-        #V13STR = VGUESS
-
-            #[P5, P6, P7, P8] = self.hcvcps (P1, P2, P3, P4)
-            # CALL HCVCPS(1,T13STR,V13STR,X,   H13STR,CV,CP,VS)
-        # [H13STR, CV, CP, VS] = self.hcvcps(1, T13STR, V13STR, X)
-        
-        H13STR = objCP.Property('H', X=0, T=T4)  # j/kg
+        H6STAR = objCP.Property('H', X=0, T=T7)  # j/kg        
+        H13STR = objCP.Property('H', X=1, T=T4)  # j/kg
         
         #
         #          FIND THE MAXIMUM AND ACTUAL HEAT TRANSFER
@@ -1045,15 +858,9 @@ class CycleUtils ():
         return [QFF, QFZ, DUTYR]
 
     def mixair(self, CAP, QFF, QFZ, TFF, TFZ, CFME):
-        # [P7, P8] = self.mixair (P1 to P6)
-        #	  SUBROUTINE MIXAIR(CAP,QFF,QFZ,TFF,TFZ,CFME   ,TIN,X)
-        #     ******************************************************************
-        #     *     CALCULATE INLET TEMPERATURE TO THE EVAPORATOR              *
-        #     ******************************************************************
-
+        #     *     CALCULATE INLET TEMPERATURE TO THE EVAPORATOR            
         #          SET UP THE QUADRATIC EQUATION COEFFICIENTS
         #
-        #	  COMMON /FEVAP / UTPE,USUPE,ATOTE, FF_AIR, UAFF, uafz
 
         A = 1.08 * CFME * (TFF - TFZ) / CAP
         B = - (A + 1.0)
