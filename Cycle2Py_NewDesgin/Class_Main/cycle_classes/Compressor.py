@@ -336,7 +336,6 @@ class Compressor:
             TEVAP = TEVAPK - 273.16  # convert from Deg K to C
             TCOND = TCONDK - 273.16
 
-        print ("\n aym TCON, TEVAP", TCOND, TEVAP)
         CAP = interpolation (x_value=TEVAP, y_value=TCOND,
                              x_series=Compressor.TEDATA,
                              y_series=Compressor.TCDATA,

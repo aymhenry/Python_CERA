@@ -195,7 +195,6 @@ class CycleSolver (CycleUtils):
             * AirHeatCapacity
         # =================================
         
-
         # Temp. At Comp., Inlet or -1 If Unspecified
         # converted before from C to K
         self.TSPEC=self.dt.TSPECI[self.lng_item]
@@ -278,7 +277,6 @@ class CycleSolver (CycleUtils):
         self.JC = 1
         self.LCCON = True
         self.LQUIT = False
-        self.TEMIN = 210.0 # K
 
         #	SET UP TEMPERATURES AND CABINET LOADS FOR INLET TEMPERATURE
         #	CALCULATION FOR EVAPORATOR OF A STANDARD DESIGN (TYPE 1)
@@ -291,8 +289,8 @@ class CycleSolver (CycleUtils):
 
         self.DUTYR = 0.5
 
-        self.FSUPC = 0.1 # unit (%)
-        self.FSUPE = 0 # in python only
+        self.FSUPC = 0.1 # unit (%) in python only
+        self.FSUPE = 0 # unit (%) in python only
         # -----------------------
 
         self.__solveCycle()
@@ -300,11 +298,11 @@ class CycleSolver (CycleUtils):
     # basic Solver
     def __solveCycle(self):
         # GUESS A DEW POINT TEMPERATURE AT THE EVAPORATOR EXIT
-        # ----------------------------- Step 01
+        # ----------------------------- 
         if (self.ISPEC == 1):  # Evap superheat:
             self.T[15] = self.TS3 - (self.DTSUPE + 2.0)
-
             self.P[15] = self.objCP.Property('P', X=1, T=self.T[15])  # pas
+            self.V[15] = self.objCP.Property('V', X=1, T=self.T[15])  # m3/kg
             
             self.TE[1] = self.T[15] + self.DTSUPE
             self.T[7] = self.TE[1] # 7 - OUTLET FROM FRESH FOOD EVAPORATOR
@@ -312,6 +310,8 @@ class CycleSolver (CycleUtils):
 
         elif (self.ISPEC == 2):  # Interchanger superheat specified
             self.T[15] = self.TS3 - 2.0
+            self.V[15] = self.objCP.Property('V', X=1, T=self.T[15])  # m3/kg
+            
             self.T[13] = self.T[15] + self.DTSUPI
 
             if self.T[13] > self.TC[1]:
@@ -326,15 +326,21 @@ class CycleSolver (CycleUtils):
 
         elif (self.ISPEC == 3):  # Evap exit quality
             self.T[15] = self.TS3 - 2.0
-
+            self.V[15] = self.objCP.Property('V', X=1, T=self.T[15])  # m3/kg
             self.P[15] = self.objCP.Property('P', X=1, T=self.T[15])  # pas
-            TBUB15 = self.objCP.Property('T', X=0, T=self.T[15])  # K
             
-            self.TE[1] = self.T[15] - \
-                (self.T[15]- TBUB15 )*(1.0 - self.XEXITE)
+            # Dr omar
+            # not logic, TBUB15 will be the same as T[15]
+            # TBUB15 = self.objCP.Property('T', X=0, P=self.P[15])  # K
+            
+            # XEXITE is quality !!!
+            # self.TE[1] = self.T[15] - \
+                # (self.T[15]- TBUB15 )*(1.0 - self.XEXITE)
+            self.TE[1] = self.T[15] # add by Ayman same as prev. statment
+            
             self.T[7]  = self.TE[1]
             self.P[7]  = self.P[15]
-        # ----------------------------- End Step 01
+        # -----------------------------
 
         # Condenser itaration loop
         while (self.IC <= self.ITMAXC and self.LCCON):
@@ -365,13 +371,13 @@ class CycleSolver (CycleUtils):
 
             # determine the specific volume of the liquid
             if self.DTSUBC > 0:
-                self.V[4] = self.objCP.Property('V', X=0
+                self.V[4] = self.objCP.Property('V', P=self.P[4]
                                                , T=self.TC[self.JC])  # m3/kg
             else:
                 self.V[4] = self.objCP.Property('V', X=0, T=TBUB4)  # m3/kg
 
             # condenser dew point
-            self.P[3] = self.P[4] + (1 - self.FSUPC) * self.DPC
+            self.P[3] = self.P[4] + (1 - self.FSUPC) * self.DPC # DPC in Pascal
             
             # check if CRITICAL TEMPERATURE EXCEEDED IN CONDENSER
             # and display error in this case
@@ -399,16 +405,24 @@ class CycleSolver (CycleUtils):
             # V[16] = VL[16]
 
             self.V[16] = self.objCP.Property('V', P=self.P[16]
-                                                , H=self.H[16])  # K
-            if (self.V[16] == 0.0):
-                self.V[16] = self.V[4]
-            # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=End of common block
-
+                                                , H=self.H[16])  # m3/kg
+            # if (self.V[16] == 0.0):
+                # self.V[16] = self.V[4]
+                
+            # Evaporator iteration
             self.evapIteration()
-
-            #--- Reptead block ----
-            self.calc_lowevap()
-            # end of repeated block
+            
+            self.enthalp_p7()
+            
+            #---------
+            self.T[6] = self.objCP.Property('T', P=self.P[6]
+                                               , H=self.H[6])  # K            
+            if (self.ISPEC  !=  2):
+                self.T[13] = self.objCP.Property('T', P=self.P[13]
+                                                    , H=self.H[13])  # K
+                self.V[13] = self.objCP.Property('V', P=self.P[13]
+                                                    , H=self.H[13])  # m3/kg
+            # TE[1]=TE[JE] DONE ABOVE
 
             #--------------------------END OF NEW CODE (12/29/90)-------------
             #
@@ -425,26 +439,9 @@ class CycleSolver (CycleUtils):
                 self.H[1] = self.objCP.Property('H', X=1, P=self.P[1])  # j/kg
                 
             else:
-                # By Ayman
-                # ----------------Dr Omar this block only in Python
-                # fix bug if ISPEC<>2 and TSPEC <=0
-                # V[13] is calculated only in case SPEC=2
-                if self.ISPEC != 2:
-                    # Dr Omar to approve, no starting value of T[1] in Fortran
-                    self.T[1] = self.T[15] # Ayman Proposal
-                    self.P[1] = self.P[15] # Ayman Proposal
-                    print ("aym-- self.T[1]", self.T[1])
-                    
-                    self.V[1] = self.objCP.Property('V', T=self.T[1]
-                        , P=self.P[1])  # m3/kg
-                    self.H[1] = self.objCP.Property('H', T=self.T[1]
-                        , P=self.P[1])  # j/kg
-                #- Ayman end of my block
-                
-                else: # the following as Fortran
-                    self.V[1] = self.V[13]
-                    self.T[1] = self.T[13]
-                    self.H[1] = self.H[13]
+                self.V[1] = self.V[13]
+                self.T[1] = self.T[13]
+                self.H[1] = self.H[13]
                 
 
             self.S[1] = self.objCP.Property('S', X=1
@@ -708,14 +705,16 @@ class CycleSolver (CycleUtils):
         self.JE = 1
         LECON = True
         ITMAXE =  40
-
-        # Step 03 - Evap itaration loop
-        #	enter iteration for evaporator outlet temperature
+        
+        TEMIN = 210.0 # K
+                
+        #  Evap itaration loop
+        #  enter iteration for evaporator outlet temperature
         IE = 1
         while ( (IE <= ITMAXE) and LECON):
             I_ERROR_INTER = 0
            
-            # ----------------------------- Step 02
+            # ----------------------------- 
             if (self.ISPEC == 1):  # Evap superheat:
                 self.TE[self.JE] = self.T[15] + self.DTSUPE
                 
@@ -743,44 +742,24 @@ class CycleSolver (CycleUtils):
                 self.P[15] = self.objCP.Property('P', X=1, T=self.T[15])  # pas
                 
                 self.P[7] = self.P[15]
-            # ----------------------------- End Step 02
+            # ----------------------------- 
 
-            TBUB15 = self.objCP.Property('T', X=0, P=self.P[15])  # K
-            VBUB15 = self.objCP.Property('V', X=0, P=self.P[15])  # m3/kg
+            # TBUB15 = self.objCP.Property('T', X=0, P=self.P[15])  # K
+            # VBUB15 = self.objCP.Property('V', X=0, P=self.P[15])  # m3/kg
 
             #	determine the bubble and dew point enthalpies
-            self.H[15] = self.objCP.Property('H', X=1, T=self.T[15]) # j/kg
+            # self.H[15] = self.objCP.Property('H', P=self.P[15]
+                                                # , V=self.V[15]) # j/kg
+            self.H[15] = self.objCP.Property('H', P=self.P[15]
+                                                , X=1) # j/kg                                                
             self.HBUB15 = self.objCP.Property('H', X=0, P=self.P[15])  # j/kg
-            
-            #--- Reptead block ----
+                      
+          
+            self.enthalp_p7()
             self.calc_lowevap()
-            # end of repeated block
 
             # Calculate fresh food section heat exchange
-            PDEWE = self.P[5] - (1.0 - self.FSUPE) * self.DPE
-
-            if (PDEWE > self.P[5]):
-                PDEWE = self.P[5]
-
-            TDEW = self.objCP.Property('T', P=PDEWE, X=1)  # K
-
-            # Python POLDE is not used !!!
-            POLDE = PDEWE
-            if (TDEW >= self.TS3):
-                TDEW = self.TS3 - 1.0
-
-            if (self.T[5] >= self.TS3):
-                self.T[5] = self.TS3 - 1.0
-
-            HDEW = self.objCP.Property('H', X=1, P=PDEWE)  # j/kg
-            CPRVAP = self.objCP.Property('CP', X=1, P=PDEWE)  # j/kg K
-
-            # STATE 12 IS THE POINT AT WHICH THE DEW POINT IS REACHED IN
-            # THE EVAPORATOR
-            self.P[12] = PDEWE
-            self.T[12] = TDEW
-            #self.V[12] = VDEW
-            self.H[12] = HDEW
+            self.calc_ff_exchanger()
 
             if self.IC !=1: # skip first trail to calc. some values later
                 [QFF, QFZ, DUTYR] = \
@@ -839,23 +818,23 @@ class CycleSolver (CycleUtils):
             if self.IFRSH == 0:
                 dicRest = self.objEvap.evap_balance (MREF=self.MREF/3600
                                    ,T5=self.T[5], H5=self.H[5], T7=self.T[7]
-                                   ,TDEW=TDEW
-                                   ,CPRVAP=CPRVAP
+                                   ,TDEW=self.TDEW
+                                   ,CPRVAP=self.CPRVAP
                                         )
 
             elif self.IFRSH == 1:
                 dicRest = self.objEvap.evap_balance (MREF=self.MREF/3600
                                        ,T5=self.T[5], H5=self.H[5]
-                                       ,TDEW=TDEW
-                                       ,CPRVAP=CPRVAP
+                                       ,TDEW=self.TDEW
+                                       ,CPRVAP=self.CPRVAP
                                        ,P5=self.P[5], P7=self.P[7]
                                         )
 
             elif self.IFRSH == 2:
                 dicRest = self.objEvap.evap_balance (MREF=self.MREF/3600
                                        ,T5=self.T[5], H5=self.H[5]
-                                       ,TDEW=TDEW
-                                       ,CPRVAP=CPRVAP
+                                       ,TDEW=self.TDEW
+                                       ,CPRVAP=self.CPRVAP
                                        ,P5=self.P[5], P7=self.P[7]
                                         )
 
@@ -933,9 +912,9 @@ class CycleSolver (CycleUtils):
             print ("\n  Cond iter.=",self.IC
                 , " Evaporator Iter. Number --> IE=",IE)
             print ("    ===========================================")
-            print ("    ICONE ",ICONE, self.TE[self.JE] <= self.TEMIN)
+            print ("    ICONE ",ICONE, self.TE[self.JE] <= TEMIN)
             
-            if (ICONE == 1) or (self.TE[self.JE] <= self.TEMIN):
+            if (ICONE == 1) or (self.TE[self.JE] <= TEMIN):
                 LECON = False # Exit loop
 
             IE = IE + 1
@@ -947,11 +926,34 @@ class CycleSolver (CycleUtils):
         self.T[7] = self.TE[self.JE]
         self.TE[1] = self.TE[self.JE]
 
+    def calc_ff_exchanger(self):
+        # Calculate fresh food section heat exchange
+        PDEWE = self.P[5] - (1.0 - self.FSUPE) * self.DPE
 
-    # repeated block
-    def  calc_lowevap (self):
-        #--- Reptead block ----
-        # ----------------------------- Step 03
+        if (PDEWE > self.P[5]):
+            PDEWE = self.P[5]
+
+        self.TDEW = self.objCP.Property('T', P=PDEWE, X=1)  # K
+
+        # Python POLDE is not used !!!
+        POLDE = PDEWE
+        if (self.TDEW >= self.TS3):
+            self.TDEW = self.TS3 - 1.0
+
+        if (self.T[5] >= self.TS3):
+            self.T[5] = self.TS3 - 1.0
+
+        HDEW = self.objCP.Property('H', X=1, P=PDEWE)  # j/kg
+        self.CPRVAP = self.objCP.Property('CP', X=1, P=PDEWE)  # j/kg K
+
+        # STATE 12 IS THE POINT AT WHICH THE DEW POINT IS REACHED IN
+        # THE EVAPORATOR
+        self.P[12] = PDEWE
+        self.T[12] = self.TDEW
+        #self.V[12] = VDEW
+        self.H[12] = HDEW
+    
+    def enthalp_p7(self):
         #	determine the enthalpy at [7]
         if (self.ISPEC == 1):  # Evap superheat:
             self.H[7] = self.objCP.Property('H', P=self.P[7], T=self.T[7])  # j/kg
@@ -965,9 +967,8 @@ class CycleSolver (CycleUtils):
                                , self.V[16], self.P[13], self.H[13]
                                , self.T[15], self.H[15], self.V[15]
                                , self.ETHX1)
-      
-            # [T[7],XQ[7],XL_Temp, XV_Temp,  VL[7],VV[7],HL7,HV7] = self.hpin ( H[7],P[7],X)
-            print ("cxheck why re-calcuklate T[7]")
+
+            print (".......? >>>>>check why re-calcuklate T[7]")
             self.T[7] = self.objCP.Property('T', H=self.H[7]
                                                      , P=self.P[7])  # K
             
@@ -987,31 +988,34 @@ class CycleSolver (CycleUtils):
             # V[7] = (1.0-XQ[7])*VL[7] + XQ[7]*VV[7]
             self.T[7] = self.TE[self.JE]
         
-        # ----------------------------- End Step 03
-        # ----------------------------- Step 04
         if (self.ISPEC  !=  2) :
-            print ("\n\n\naym  self.T[7]",self.T[7] )
             self.QINT = self.inter1(self.objCP
-                                        , self.T[4], self.H[4]
-                                        , self.T[7], self.H[7]
+                                        , self.T[16], self.P[16], self.H[16]
+                                        , self.T[7], self.P[7], self.H[7]
                                         , self.ETHX1)
-            self.H[13] = self.H[7] + self.QINT
-        # ----------------------------- End Step 04
+            self.H[13] = self.H[7] + self.QINT         
         
+        
+    def  calc_lowevap (self):
+
         self.H[6] = self.H[16] + self.QINT
         self.P[6] = self.P[4]
+
         self.P[13] = self.P[7]
+        
         self.T[6] = self.objCP.Property('T', P=self.P[6]
                                            , H=self.H[6])  # K
-        # ----------------------------- Step 05
+        
+        # ----------------------------- 
         if (self.ISPEC  !=  2):
             self.T[13] = self.objCP.Property('T', P=self.P[13]
                                                 , H=self.H[13])  # K
             
             self.V[13] = self.objCP.Property('V', P=self.P[13]
                                                 , H=self.H[13])  # m3/kg
-       # ----------------------------- End Step 05
+        # ----------------------------- 
 
+        # find conditions at evaporator inlet assuming isenthalpic expansion         
         self.P[5] = self.P[13] + self.DPE
 
         [self.H, self.P, self.T, self.TS6, self.QFREZ] =\
@@ -1022,8 +1026,8 @@ class CycleSolver (CycleUtils):
                             # ,HL not clear its use
                             , self.TS3, self.dt.TS5, self.dt.DPF
                             , self.ETHX2)
-        # end of repeated block
-
+                                  
+                                  
     def getSolution(self):
         objSolution = QData()
 

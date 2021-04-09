@@ -563,7 +563,7 @@ class CycleUtils ():
     # job interchanger for subcooling condenser liquid
     #     used when the inlet states of both streams specified
     # -----------------------------------------------------------
-    def inter1(self, objCP, T4, H4, T7, H7, ETHX1):
+    def inter1(self, objCP, T4, P4, H4, T7, P7, H7, ETHX1):
         # objCP cool prob object
         # ETHX1 - effectiveness of high temp interchanger
         # T temp in KEY
@@ -582,8 +582,8 @@ class CycleUtils ():
         #                  13 = LOW PRESSURE SIDE OUTLET FROM INTERCHANGER
 
 
-        H6STAR = objCP.Property('H', X=0, T=T7)  # j/kg        
-        H13STR = objCP.Property('H', X=1, T=T4)  # j/kg
+        H6STAR = objCP.Property('H', P=P7, T=T7)  # j/kg        
+        H13STR = objCP.Property('H', P=P4, T=T4)  # j/kg
         
         #
         #          FIND THE MAXIMUM AND ACTUAL HEAT TRANSFER
