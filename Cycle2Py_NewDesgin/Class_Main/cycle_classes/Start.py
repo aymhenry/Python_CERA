@@ -12,9 +12,9 @@ from .CycleDataModelBuiler import CycleDataModelBuiler
 #from ..common_class.QData import QData
 
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-# Job 			: Start Cycle app
+# Job             : Start Cycle app
 #
-# Editor		: aymhenry@gmail.com
+# Editor        : aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
 
@@ -24,7 +24,7 @@ class Start:
     FILE_CYC_OUTPUT = "Cycle_out.csv"  # output file for cabinit module
 
     def __init__(self):
-        self.obj_data = None  # object to save data
+        self.dt = None  # object to save data
         self.obj_control = None  # object to control data
 
         self.str_FILE_CYC_INPUT = Start.FILE_CYC_INPUT
@@ -49,92 +49,99 @@ class Start:
             self.str_FILE_CYCLE_OUTPUT = str_file_cyc_out
 
     # -----------------------------------------------------------
-    # Job 			: Main app start up, driver for all others
-    # Input 		:
+    # Job             : Main app start up, driver for all others
+    # Input         :
     #
-    # Output		:
+    # Output        :
     # -----------------------------------------------------------
     def main(self):
-        self.data_prepare()  # assign value to obj_data
+        self.data_prepare()  # assign value to dt
         
-        obj_param = self.calculte()		# calculate heat rate
+        # it will return objSolution object (has cycle solution)
+        objSolution = self.calculte()  # calculate heat rate
         
         '''
-		try:
-			obj_param = self.calculte ()		# calculate heat rate
+        try:
+            obj_param = self.calculte ()        # calculate heat rate
 
-		except ValueError as err_description: # OSError
-			print ("Fatal program error ... system terminated")
-			print (str(err_description) + "\n\n")
-			print ("=======================================")
-			print ("Expected reasone, none propoer input data")
-			print ("=======================================\n\n")
-			print ("						  sys.exit('3100')	# terminat application")
-			print ("=======================================\n\n")
-		'''
+        except ValueError as err_description: # OSError
+            print ("Fatal program error ... system terminated")
+            print (str(err_description) + "\n\n")
+            print ("=======================================")
+            print ("Expected reasone, none propoer input data")
+            print ("=======================================\n\n")
+            print ("               sys.exit('3100')  # terminat application")
+            print ("=======================================\n\n")
+        '''
 
-        print (" aym self.view_cycle_res(obj_param)")  # View cycle calculation results
-
+ 
+        
+        self.view_cycle_res(objSolution)
         print("aym @ 77 self.view === later .....")
         self.view()  # View all data
 
     # -----------------------------------------------------------
-    # Job 			: output results of cycle calculations
-    # Input 		:
+    # Job             : output results of cycle calculations
+    # Input         :
     #
-    # Output		:
+    # Output        :
     # -----------------------------------------------------------
-    def view_cycle_res(self, obj_param):
+    def view_cycle_res(self, objSolution):
+    
         obj_view_cycle = ViewCycle(
-            self.obj_data,
-            obj_param,
-            self.str_FILE_CYCLE_OUTPUT,
-            self.str_path_cyc_out)
+            self.dt
+            , objSolution # will be named ds for short
+            , self.str_FILE_CYCLE_OUTPUT
+            , self.str_path_cyc_out
+            )
             
         obj_view_cycle.show_rep()
 
     # -----------------------------------------------------------
-    # Job 			: output results a reported form
-    # Input 		:
+    # Job             : output results a reported form
+    # Input         :
     #
-    # Output		:
+    # Output        :
     # -----------------------------------------------------------
 
     def view(self):
         obj_view = View(
-            self.obj_data,
+            self.dt,
             self.str_FILE_CYCLE_OUTPUT,
             self.str_path_cyc_out)
         obj_view.show_rep()
 
     # -----------------------------------------------------------
-    # Job 			: Calaculte heat balance, the main app target.
-    # Input 		:
+    # Job             : Calaculte heat balance, the main app target.
+    # Input         :
     #
-    # Output		:
+    # Output        :
     # -----------------------------------------------------------
     def calculte(self):
+        # run object in CycleType.py according to cycle type given
+        # it will return objSolution object (has cycle solution)
         return self.obj_control.calculte()
 
     # -----------------------------------------------------------
-    # Job 			: Preprae the main data object & control object
-    # Input 		:
+    # Job             : Preprae the main data object & control object
+    # Input         :
     #
-    # Output		:
+    # Output        :
     # -----------------------------------------------------------
     def data_prepare(self):
         # Set main data file name
         obj_datamodel = CycleDataModelBuiler()
 
+        # save file name in data object
         obj_datamodel.set_init_data(
             self.str_FILE_CYC_INPUT,
-            self.str_path_cyc_in) 	# Input data file name
+            self.str_path_cyc_in)     # Input data file name
 
         # check if error, if so exit application
         if obj_datamodel.isError():
             print("Error Opening file")
             print(obj_datamodel.err_description())  # print error description
-            obj_datamodel = "" 	# clean object and close file
+            obj_datamodel = ""     # clean object and close file
             sys.exit('3000')  # terminat application
             # --------------
 
@@ -144,48 +151,50 @@ class Start:
         # Is data is good, or exit application
         if obj_datamodel.isError():
             print(obj_datamodel.err_description())  # print error description
-            sys.exit('3001')							# terminate
+            sys.exit('3001')                            # terminate
 
         # Create related data object as the given configration
-        self.obj_data = obj_datamodel.get_data_object()
+        self.dt = obj_datamodel.get_data_object()
 
         # Create related object as the given configration
         self.obj_control = ""
 
         # 1: Standard
-        if self.obj_data.ICYCL == 1:
-            self.obj_control = Type_1Standard(self.obj_data)
+        if self.dt.ICYCL == 1:
+            self.obj_control = Type_1Standard(self.dt)
 
         # 2: Lorenz
-        elif self.obj_data.ICYCL == 2:
+        elif self.dt.ICYCL == 2:
             print("Type 2 is not supported.")  # print error description
-            sys.exit('9001')							# terminate
+            sys.exit('9001')                            # terminate
 
-            # INCTRL: 	0 = none,
-            #			1 = adjust evaporator areas,
-            #			2 = adjust fresh food section tempeature,
-            #			3 = adjust freezer    section tempeature,
-            # 			4 = switching valve (only one section is cooled  at a time)
-            #			5 = solenoid valve or fan control provides evaporator capacity to only one cabinet
-            #				during part of the cycle
-            if self.obj_data.INCTRL == 4:
-                self.obj_control = Type_2Lorenz_4swtchVLV(self.obj_data)
+            # INCTRL: 0 = none
+            #         1 = adjust evaporator areas,
+            #         2 = adjust fresh food section tempeature
+            #         3 = adjust freezer    section tempeature
+            #         4 = switching valve(only one section is cooled at a time)
+            #         5 = solenoid valve 
+            #               or fan control provides evaporator capacity 
+            #               to only one cabinet during part of the cycle
+            
+            if self.dt.INCTRL == 4:
+                self.obj_control = Type_2Lorenz_4swtchVLV(self.dt)
 
-            elif self.obj_data.INCTRL == 5:
-                self.obj_control = Type_2Lorenz_5solindVLV(self.obj_data)
+            elif self.dt.INCTRL == 5:
+                self.obj_control = Type_2Lorenz_5solindVLV(self.dt)
 
             else:
-                self.obj_control = Type_2Lorenz_ctrlOthers(self.obj_data)
+                self.obj_control = Type_2Lorenz_ctrlOthers(self.dt)
 
         # 3: Dual Loop
-        elif self.obj_data.ICYCL == 3:
-            self.obj_control = Type_3DualLoop(self.obj_data)
+        elif self.dt.ICYCL == 3:
+            self.obj_control = Type_3DualLoop(self.dt)
 
         # 4: Dual Evap
-        elif self.obj_data.ICYCL == 4:
-            self.obj_control = Type_4DualEvap(self.obj_data)
+        elif self.dt.ICYCL == 4:
+            self.obj_control = Type_4DualEvap(self.dt)
 
-        # add extra vars to obj_data
+        # add extra vars to dt
         # moved to class: self.obj_control.setup_vars_extra()
 
         # adjust default vars, according to basic input values
