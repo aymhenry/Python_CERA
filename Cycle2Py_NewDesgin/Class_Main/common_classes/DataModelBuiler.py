@@ -2,8 +2,8 @@
 
 
 # User Import
-from .FileAccess import FileAccess
-from .QData import QData
+from FileAccess import FileAccess
+from QData import QData
 
 # -----------------------------------------------------------
 # Job 			: Creates object with data from file for Q class
