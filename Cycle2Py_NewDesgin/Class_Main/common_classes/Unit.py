@@ -23,16 +23,16 @@ class Unit:
     TEMP_F_COF2 = 1.8
 
     # 1 watt = 3.41442595 Btu (th)/hour
-    POWR_W_BTUH = 3.41442595  # 3.413
+    POWR_W_BTUH = 3.41214 #omar change 3.41442595  # 3.413
 
-    VOLU_FT_LITER = 28.317
+    VOLU_FT_LITER = 28.31685 # omar change 28.317
 
     # 1 watt/m K = 0.048174 Btu(th) /hr.inch Deg-F
-    COND_WattM_BtuThHrInchF = 0.048174
+    COND_WattM_BtuThHrInchF = 0.0481817 #omar change 0.048174
 
     # 1 cm watt/square meter/K = 0.06938111789 Btu (th) inch/hour/square
     # foot/DEG_F
-    COND_WATTCM_BTU_INCH = 0.069380
+    COND_WATTCM_BTU_INCH = 0.069335 #omar change 0.069380
 
     # 1 Btu (th) foot/hour/square foot/DEG_F = 1.729577206 watt/meter/K	Conductivity
     # 1 watt/meter/K = 1/1.729577206 Btu (th) foot/hour/square foot/DEG_F

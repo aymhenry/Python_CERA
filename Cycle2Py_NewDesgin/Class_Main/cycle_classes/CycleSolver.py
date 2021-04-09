@@ -13,7 +13,7 @@ from cycle_classes.Condenser import *
 
 from cycle_classes.ErrorException import ErrorException
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-# Job             : Create Class object cycle paramters
+# Job             : Create Class object cycle parameters
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 class CycleSolver (CycleUtils):
@@ -162,34 +162,41 @@ class CycleSolver (CycleUtils):
 
         # modification by Ayman
         #------------------------------------
-        AirHeatCapacity = 700 # Air heat capacity 700 j/kg/K 
+        #https://www.ohio.edu/mechanical/thermo/property_tables/air/air_Cp_Cv.html#:~:text=The%20nominal%20values%20used%20for,v%20%3D%200.718%20kJ%2Fkg.
+        AirHeatCapacityC = 0.0003 * (self.dt.TS1[self.lng_item]) ^ 2 - 0.129 * self.dt.TS1[self.lng_item] + 1016.55
+
+        #AirHeatCapacity = 1003 #omar change we use cp not cv! 700 # Air heat capacity 700 j/kg/K
         # https://www.gribble.org/cycling/air_density.html
         # self.CFMC = 1.8961 * (RHOCPC * self.dt.CFMCI[lng_item]) / 0.4720
         
         # CFMCI L/sec = 1000 cm3/sec = 1000/100^3 m3/sec= 1/1000 m3/sec
         # C-deg = K - 273.11
         # Air dencity (kg/m3) = Temp_c_deg/417.25 + 1.2934
-        air_densityC = (self.dt.TS1[self.lng_item]-273.11) /417.25 + 1.2934
+        #air_densityC = (self.dt.TS1[self.lng_item]-273.11) /417.25 + 1.2934
+        # equation change to account for correct pressure 101.325 kPa, and interpolate between rho at 0 C and rho at 10 C
+        air_densityC = 1.2873 + (self.dt.TS1[self.lng_item] - 273.11)/10*(1.2418-1.2873)
 
         # [m3/sec] * [kg/m3] * [j/kg/K] =j/sec/K = watt/K
         self.dt.CFMC = self.dt.CFMCI[self.lng_item] /1000 * air_densityC \
-            * AirHeatCapacity
+            * AirHeatCapacityC
         
         #------------------------------------
         # self.CFME = 1.8961 * (RHOCPE * self.dt.CFMEI[lng_item]) / 0.4720
        # C-deg = K - 273.11
+        AirHeatCapacityE = 0.0003 * (self.dt.TS3[self.lng_item]) ^ 2 - 0.129 * self.dt.TS3[self.lng_item] + 1016.55
         # Air dencity (kg/m3) = Temp_c_deg/417.25 + 1.2934
-        air_densityE = (self.dt.TS3[self.lng_item]-273.11) /417.25 + 1.2934
-        
+        #air_densityE = (self.dt.TS3[self.lng_item]-273.11) /417.25 + 1.2934
+        air_densityE = 1.2873 + (self.dt.TS3[self.lng_item] - 273.11) / 10 * (1.2418 - 1.2873)
         # [m3/sec] * [kg/m3] * [j/kg K] =j/sec K = watt/K
         self.dt.CFME = self.dt.CFMEI[self.lng_item] /1000 * air_densityE \
-            * AirHeatCapacity
+            * AirHeatCapacityE
 
         #------------------------------------
         # C-deg = K - 273.11
+        AirHeatCapacityF = 0.0003 * (self.dt.TS5[self.lng_item]) ^ 2 - 0.129 * self.dt.TS5[self.lng_item] + 1016.55
         # Air dencity (kg/m3) = Temp_c_deg/417.25 + 1.2934
-        air_densityF = (self.dt.TS5 - 273.11) /417.25 + 1.2934
-        
+        #air_densityF = (self.dt.TS5 - 273.11) /417.25 + 1.2934
+        air_densityF = 1.2873 + (self.dt.TS3[self.lng_item] - 273.11) / 10 * (1.2418 - 1.2873)
         # [m3/sec] * [kg/m3] * [j/kg K] =j/sec K = watt/K
         self.dt.CFMF = self.dt.CFMF /1000 * air_densityF \
             * AirHeatCapacity
@@ -245,12 +252,12 @@ class CycleSolver (CycleUtils):
         # V - VOLUME
         # X - COMPOSITION
 
-        self.T = [0.0] * (16+1) # Temp in Key
+        self.T = [0.0] * (16+1) # Temp in K
         self.P = [0.0] * (16+1) # Pressure in pascal
         self.V = [0.0] * (16+1) # Volume in m3/kg
 
-        self.H = [0.0] * (16+1) # Enthalpy in j/kg
-        self.S = [0.0] * (16+1) # Entorpy in j/kg K
+        self.H = [0.0] * (16+1) # Enthalpy in J/kg
+        self.S = [0.0] * (16+1) # Entorpy in J/kg K
 
         self.TE = [0, 0, 0]
         self.TC = [0, 0, 0]
@@ -284,7 +291,7 @@ class CycleSolver (CycleUtils):
         self.TFZ = self.dt.FZTEMP # Freezer Temperature
 
         self.ICONC = 0 # Condenser Flag, =1 if iteration result is good
-        self.IC = 1  # Condenser itemation counter
+        self.IC = 1  # Condenser iteration counter
         self.ITMAXC = 100 # Condenser max. number of iterations
 
         self.DUTYR = 0.5
@@ -301,7 +308,7 @@ class CycleSolver (CycleUtils):
         # ----------------------------- 
         if (self.ISPEC == 1):  # Evap superheat:
             self.T[15] = self.TS3 - (self.DTSUPE + 2.0)
-            self.P[15] = self.objCP.Property('P', X=1, T=self.T[15])  # pas
+            self.P[15] = self.objCP.Property('P', X=1, T=self.T[15])  # Pa
             self.V[15] = self.objCP.Property('V', X=1, T=self.T[15])  # m3/kg
             
             self.TE[1] = self.T[15] + self.DTSUPE
@@ -318,7 +325,7 @@ class CycleSolver (CycleUtils):
                 self.T[13] = self.TC[1] - 5.0
                 self.T[15] = self.T[13] - self.DTSUPI
             
-            self.P[15] = self.objCP.Property('P', X=1, T=self.T[15])  # pas
+            self.P[15] = self.objCP.Property('P', X=1, T=self.T[15])  # Pa
             
             self.TE[1] = self.T[15]
             self.T[7] = self.TE[1]
@@ -326,20 +333,20 @@ class CycleSolver (CycleUtils):
 
         elif (self.ISPEC == 3):  # Evap exit quality
             self.T[15] = self.TS3 - 2.0
-            self.V[15] = self.objCP.Property('V', X=1, T=self.T[15])  # m3/kg
-            self.P[15] = self.objCP.Property('P', X=1, T=self.T[15])  # pas
+            self.V[15] = self.objCP.Property('V', X=self.XEXITE, T=self.T[15])  # m3/kg
+            self.P[15] = self.objCP.Property('P', X=self.XEXITE, T=self.T[15])  # Pa
             
             # Dr omar
             # not logic, TBUB15 will be the same as T[15]
             # TBUB15 = self.objCP.Property('T', X=0, P=self.P[15])  # K
-            
+            #==> see correction above
             # XEXITE is quality !!!
             # self.TE[1] = self.T[15] - \
                 # (self.T[15]- TBUB15 )*(1.0 - self.XEXITE)
             self.TE[1] = self.T[15] # add by Ayman same as prev. statment
             
-            self.T[7]  = self.TE[1]
-            self.P[7]  = self.P[15]
+            self.T[7] = self.TE[1]
+            self.P[7] = self.P[15]
         # -----------------------------
 
         # Condenser itaration loop
@@ -367,7 +374,7 @@ class CycleSolver (CycleUtils):
             
             #	find condenser pressure for current guess of TC
             TBUB4 = self.TC[self.JC] + self.DTSUBC
-            self.P[4] = self.objCP.Property('P', X=0, T=TBUB4)  # pas
+            self.P[4] = self.objCP.Property('P', X=0, T=TBUB4)  # Pa
 
             # determine the specific volume of the liquid
             if self.DTSUBC > 0:
@@ -377,7 +384,7 @@ class CycleSolver (CycleUtils):
                 self.V[4] = self.objCP.Property('V', X=0, T=TBUB4)  # m3/kg
 
             # condenser dew point
-            self.P[3] = self.P[4] + (1 - self.FSUPC) * self.DPC # DPC in Pascal
+            self.P[3] = self.P[4] + (1 - self.FSUPC) * self.DPC # DPC in Pa
             
             # check if CRITICAL TEMPERATURE EXCEEDED IN CONDENSER
             # and display error in this case
@@ -385,7 +392,7 @@ class CycleSolver (CycleUtils):
             # ENTHALPY AT STATE 4 (CONDENSER OUTLET)
             # [H[4], CV, CP,VSND] = self.hcvcps(1, TC[JC],V[4], X)
             self.H[4] = self.objCP.Property('H', V=self.V[4]
-                                               , T=self.TC[self.JC])  # j/kg
+                                               , T=self.TC[self.JC])  # J/kg
 
             # ACCOUNT FOR HEAT LOSS FROM LIQUID LINE
             # CONDHT watt /self.MREF kg/hr /3600  = j/kg, DUTYR unit less
@@ -482,10 +489,10 @@ class CycleSolver (CycleUtils):
             # Dischare Temp K
             self.T[2] = dicRest['TDISC']
 
-            # Dischare Enthalpy    j/kg
+            # Dischare Enthalpy    J/kg
             self.H[2] = dicRest['HOUT']
 
-            # compressor shell loss normalized to power input j/kg
+            # compressor shell loss normalized to power input J/kg
             QCAN  = dicRest['QCAN']
 
             # Suction sp.volume m3/kg
@@ -503,7 +510,7 @@ class CycleSolver (CycleUtils):
             # add by Ayman Dr Omar to check, MROLD used later
             self.MROLD = self.MREF
             
-            # Refrigerant Mas Flow Rate  kg/hr
+            # Refrigerant Mass Flow Rate  kg/hr
             self.MREF = dicRest['MREF']
             #........End Compreesor Class
 
@@ -512,7 +519,7 @@ class CycleSolver (CycleUtils):
             # Python why calculate T[2] ??? Dr Omar
             # CONDITIONS OF GAS LEAVING COMPRESSOR SHELL
 
-            self.H[2] = self.objCP.Property('H', P=self.P[2], V=VV2)  # j/kg
+            self.H[2] = self.objCP.Property('H', P=self.P[2], V=VV2)  # J/kg
             self.T[2] = self.objCP.Property('T', P=self.P[2], V=VV2)  # K
             self.V[2] = self.objCP.Property('V', P=self.P[2], H=self.H[2])  # j/kg
 
