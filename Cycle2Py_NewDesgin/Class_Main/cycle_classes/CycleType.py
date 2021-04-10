@@ -4,7 +4,6 @@ from abc import ABC, abstractmethod
 
 # User Import ======================
 from common_classes.QData import QData
-from common_classes.Unit import Unit
 from cycle_classes.CycleSolver import *
 from cycle_classes.CoolPrp import *
 
@@ -21,9 +20,6 @@ class CycleType_Abstract (ABC):
     def __init__(self, objdata):
     
         self.dt = objdata
-        
-        # show row data input
-        self.obj_show = ShowInput(objdata)
         
         # Create basic object for coolProp
         # set be will be made later self.objCP.setup('R12')
