@@ -12,8 +12,8 @@ import math
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 class ShowInput ():
         
-    def __init__(self, objData):
-        self.dt = objData
+    def __init__(self, dt):
+        self.dt = dt
 
     def showdata (self, str_var_name, str_var_unit, str_var_desc):        
         print (str_var_name 
@@ -21,7 +21,8 @@ class ShowInput ():
                 , "\t" , str_var_unit
                 , "\t" , str_var_desc)
 
-    def show (self, int_type):
+    def show (self):
+        int_type = self.dt.ICYCL
         if int_type ==1:
             self.show_type1()
         

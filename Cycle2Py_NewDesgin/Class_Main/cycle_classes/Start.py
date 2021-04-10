@@ -156,6 +156,10 @@ class Start:
         # Create related data object as the given configration
         self.dt = obj_datamodel.get_data_object()
 
+        # show row data input
+        self.obj_show = ShowInput(self.dt)
+        self.obj_show.show()
+        
         # Create related object as the given configration
         self.obj_control = ""
 
@@ -193,9 +197,6 @@ class Start:
         # 4: Dual Evap
         elif self.dt.ICYCL == 4:
             self.obj_control = Type_4DualEvap(self.dt)
-
-        # add extra vars to dt
-        # moved to class: self.obj_control.setup_vars_extra()
 
         # adjust default vars, according to basic input values
         self.obj_control.adjust_input()

@@ -19,16 +19,19 @@ from cycle_classes.ErrorException import ErrorException
 class CycleType_Abstract (ABC):
 
     def __init__(self, objdata):
+    
         self.dt = objdata
-
+        
+        # show row data input
+        self.obj_show = ShowInput(objdata)
+        
+        # Create basic object for coolProp
+        # set be will be made later self.objCP.setup('R12')
+        self.objCP = CoolPrp()
+        
         self.setup_vars_for_all_types()
         self.setup_vars_extra()
 
-        #======= Create basic object for coolProp
-        self.objCP = CoolPrp()
-        # set be will be made later self.objCP.setup('R12')
-
-        self.obj_show = ShowInput(objdata)
 
     # Abstract methods
     # -----------------------------------------------------------
@@ -346,9 +349,6 @@ class Type_1Standard (CycleType_Abstract):
         self.dt.TS5 = -300.0 # 256
         self.dt.DPF = 0.0
         self.dt.CFMF = 0 # by pass required value.
-        
-        # show all data from input file
-        self.obj_show.show(self.dt.ITYPE)
 
         return self.call_cycle(self.dt.ITYPE)
 

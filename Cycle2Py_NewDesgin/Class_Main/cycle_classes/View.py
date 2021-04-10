@@ -300,7 +300,7 @@ class ViewCycle:
                                       J,
                                       self.dt.HSTATE[K],
                                       'N/A',
-                                      self.ds.T[J] - 237.11,
+                                      self.ds.T[J] - 273.11,
                                       self.ds.P[J] / 1000,
                                       self.ds.H[J] / 1000,
                                       self.ds.V[J],
