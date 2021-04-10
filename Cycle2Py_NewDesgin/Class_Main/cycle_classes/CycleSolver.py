@@ -10,13 +10,14 @@ from cycle_classes.CoolPrp import *
 from cycle_classes.Compressor import *
 from cycle_classes.Evaporator import *
 from cycle_classes.Condenser import *
+from cycle_classes.CoolPrpUtil import *
 
 from cycle_classes.ErrorException import ErrorException
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # Job             : Create Class object cycle parameters
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-class CycleSolver (CycleUtils):
+class CycleSolver (CycleUtils, CoolPrpUtil):
     K_C_DEG = 273.11
     def __init__(self, objCP, objData, lng_item, NCYC=1):
         self.objCP = objCP
@@ -331,11 +332,11 @@ class CycleSolver (CycleUtils):
             self.T[15] = self.TS3 - 2.0
             self.V[15] = self.objCP.Property('V', X=1, T=self.T[15])  # m3/kg
 
-            self.T[13] = self.T[15] + self.DTSUPI
+            self.T[13] = self.T[15] + self.DTSUPI  # Interchanger DT
 
             if self.T[13] > self.TC[1]:
                 self.T[13] = self.TC[1] - 5.0
-                self.T[15] = self.T[13] - self.DTSUPI
+                self.T[15] = self.T[13] - self.DTSUPI  # Interchanger DT
 
             self.P[15] = self.objCP.Property('P', X=1, T=self.T[15])  # Pa
 
@@ -393,8 +394,17 @@ class CycleSolver (CycleUtils):
 
             # determine the specific volume of the liquid
             if self.DTSUBC > 0:
-                self.V[4] = self.objCP.Property('V', P=self.P[4]
-                                               , T=self.TC[self.JC])  # m3/kg
+                # Dr. Omar to approve
+                # Ayman modification, in case DTSUPI = 0
+                # the given point came to wet area.
+                # check if in wet area, return sat. liquid or sat. vap.
+                # self.V[4] = self.objCP.Property('V', T=self.TC[self.JC]
+                                                   # , P=self.P[4])  # m3/kg
+                                                   
+                self.V[4] = self.getProp(prp='V', T=self.TC[self.JC]
+                                                , P=self.P[4], X=0)  # m3/kg
+            
+
             else:
                 self.V[4] = self.objCP.Property('V', X=0, T=TBUB4)  # m3/kg
 
@@ -456,10 +466,20 @@ class CycleSolver (CycleUtils):
 
             if (self.TSPEC >  0.0):
                 self.T[1] = self.TSPEC
-                # [H[1],CV,CP,VS] = self.hcvcps (1,T[1],V[1],X) # CALL HCVCPS
-                self.V[1] = self.objCP.Property('V', X=1, P=self.P[1])  # m3/kg
-                self.H[1] = self.objCP.Property('H', X=1, P=self.P[1])  # j/kg
-
+                # Dr. Omar to approve
+                # Ayman modification, in case DTSUPI = 0
+                # the given point came to wet area.
+                # check if in wet area, return sat. liquid or sat. vap.
+                # self.V[1] = self.objCP.Property('V', T=self.T[1]
+                                                   # , P=self.P[1])  # m3/kg 
+                # self.H[1] = self.objCP.Property('H', T=self.T[1]
+                                                   # , P=self.P[1])  # m3/kg
+                                                   
+                self.V[1] = self.getProp(prp='V', P=self.P[1]
+                                                , T=self.T[1], X=1)  # m3/kg
+                                                
+                self.H[1] = self.getProp(prp='H', P=self.P[1]
+                                                , T=self.T[1], X=1)  # j/kg
             else:
                 self.V[1] = self.V[13]
                 self.T[1] = self.T[13]
@@ -707,8 +727,14 @@ class CycleSolver (CycleUtils):
         # determine the specific volume of the liquid
         #
         if (self.TS1 < self.T[4]):
-            VS1 = self.objCP.Property('V', T=self.TS1
-                                         , P=self.P[4])  # m3/kg
+            # Dr. Omar to approve
+            # Ayman modification, in case DTSUPI = 0
+            # the given point came to wet area.
+            # check if in wet area, return sat. liquid or sat. vap.
+            # VS1 = self.objCP.Property('V', T=self.TS1
+                                         # , P=self.P[4])  # m3/kg
+            VS1 = self.getProp(prp='V', P=self.P[4]
+                                      , T=self.TS1, X=0)  # m3/kg
         else:
             VS1 = V[4]
 
@@ -752,15 +778,28 @@ class CycleSolver (CycleUtils):
                 self.P[7] = self.P[15]
 
             elif (self.ISPEC == 2):  # Interchanger superheat specified
+                print ("\n aymself.DTSUPI", self.DTSUPI)
+                                
                 self.P[15] = self.objCP.Property('P', X=1, T=self.T[15])  # pa
 
                 self.P[13] = self.P[15]
                 self.T[13] = self.T[15] + self.DTSUPI
-
-                self.V[13] = self.objCP.Property('V', X=1
-                                                    , T=self.T[13])  # m3/kg
-                self.H[13] = self.objCP.Property('H', X=1
-                                                    , T=self.T[13])  # j/kg
+                # Dr. Omar to approve
+                # Ayman modification, in case DTSUPI = 0
+                # the given point came to wet area.
+                # check if in wet area, return sat. liquid or sat. vap.
+                
+                # self.V[13] = self.objCP.Property('V', P=self.P[13]
+                                                    # , T=self.T[13])  # m3/kg
+                # self.H[13] = self.objCP.Property('H', P=self.P[13]
+                                                    # , T=self.T[13])  # j/kg
+                                                    
+                self.V[13] = self.getProp(prp='V', P=self.P[13]
+                                                 , T=self.T[13], X=1)  # m3/kg
+                
+                self.H[13] = self.getProp(prp='H', P=self.P[13]
+                                                 , T=self.T[13], X=1)  # j/kg
+                
                 self.P[7] = self.P[15]
                 self.TE[self.JE] = self.T[7]
 
@@ -918,7 +957,18 @@ class CycleSolver (CycleUtils):
             # ---------------------------ADDED NEW CODE (12/29/90)---------
             self.T[15] = self.T[15] + self.TE[2] - self.T[7]
 
-            HS3 = self.objCP.Property('H', X=0, T=self.TS3)  # j/kg
+            # calculate the average effectiveness of the ff evaporator
+            # calculate the heat transfer if the refrigerant left at TS3
+
+            # Dr. Omar to approve
+            # Ayman modification, in case DTSUPI = 0
+            # the given point came to wet area.
+            # check if in wet area, return sat. liquid or sat. vap.
+            
+            # HS3 = self.objCP.Property('H', P=self.P[7], T=self.TS3)  # j/kg            
+                                                
+            HS3 = self.getProp(prp='H', P=self.P[7]
+                                      , T=self.TS3, X=1)  # m3/kg
 
             QRMAX = self.MREF * (HS3 - self.H[5])/3600 # kg/hr/3600 j/kg = watt
 
@@ -987,8 +1037,15 @@ class CycleSolver (CycleUtils):
     def enthalp_p7(self):
         #	determine the enthalpy at [7]
         if (self.ISPEC == 1):  # Evap superheat:
-            self.H[7] = self.objCP.Property('H', P=self.P[7]
-                                               , T=self.T[7])  # j/kg
+            # Dr. Omar to approve
+            # Ayman modification, in case DTSUPI = 0
+            # the given point came to wet area.
+            # check if in wet area, return sat. liquid or sat. vap.
+            # self.H[7] = self.objCP.Property('H', P=self.P[7]
+                   # , T=self.T[7])  # j/kg 
+                   
+            self.H[7] = self.getProp(prp='H', P=self.P[7]
+                                            , T=self.T[7], X=1)  # j/kg 
 
             #VV[7] = V[7]
             self.T[7] = self.TE[self.JE]
@@ -1228,39 +1285,5 @@ class CycleSolver (CycleUtils):
 
             self.CORR_COP = cyclos(self.dt.I_VALVE, self.dt.T_CYCLE)
 
-    def get_coolQuality (self, Enthalpy, press, Temperature):
-        # as, liquid, twophase,  supercritical_gas
-        ERR_MARGIN = 0.001
-        P_sat = self.objCP.Property('P', T=Temperature, X=0)  # Pa
-
-        if abs(P_sat - press) > ERR_MARGIN:
-            sta_phas = False
-
-        else:
-            sta_phas = True
-
-        # status = self.objCP.phase_byPressTemp(press, Temperature)
-
-        if sta_phas:
-            # get Quality
-            H_liq = self.objCP.Property('H', T=Temperature, X=0)  # j/kg
-            H_vap = self.objCP.Property('H', T=Temperature, X=1)  # j/kg
-            quality = round((Enthalpy - H_liq) / (H_vap - H_liq), 4)
-            
-            if quality < 0 or quality > 1:
-                raise ErrorException(
-                    'Error in Entry data for quality ' \
-                        + "\ngive: " + str(Enthalpy)
-                        + "\n max: " + str(H_vap)
-                        + "\n min: " + str(H_liq)
-                        + "\n quality: " + str(quality)
-                    , 'CycleSolver1001')
-                return None
-
-        else:
-            # not in sat.
-            quality = -1
-
-        return quality
 
 

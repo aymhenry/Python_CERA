@@ -6,6 +6,7 @@ import sys
 # from .Data import Data
 from cycle_classes.CompMap import CompMap
 from cycle_classes.ErrorException import ErrorException
+from cycle_classes.CoolPrpUtil import *
 
 from common_classes.FileAccess import FileAccess
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -17,7 +18,7 @@ from common_classes.FileAccess import FileAccess
 #                 strFileName = "SomName.cmp"  # File name
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-class Compressor:
+class Compressor (CoolPrpUtil):
     IUNITS = None
     TEDATA = None
     TCDATA = None
@@ -317,15 +318,35 @@ class Compressor:
         # 	LIQUID - 90F or 32.2222C or 305.372K
 
         T90F_in_K = 305.372  # K
-        HIN = self.objCP.Property('H', T=T90F_in_K, P=PSUCT)  # j/kg
+
+        # Dr. Omar to approve
+        # Ayman modification, in case DTSUPI = 0
+        # the given point came to wet area.
+        # check if in wet area, return sat. liquid or sat. vap.
+        # HIN = self.objCP.Property('H', T=T90F_in_K, P=PSUCT)  # j/kg
+
+        HIN = self.getProp(prp='H', P=PSUCT
+                                  , T=T90F_in_K , X=1)  # j/kg        
 
         # liquid leaving condenser
-        HOUT = self.objCP.Property('H', T=T90F_in_K, P=PDISC)  # j/kg
+        # Dr. Omar to approve
+        # HOUT = self.objCP.Property('H', T=T90F_in_K, P=PDISC)  # j/kg
+        HOUT = self.getProp(prp='H', P=PDISC
+                                   , T=T90F_in_K , X=0)  # j/kg 
 
         # determine isentropic compression enthalpy (HS)
         SSUC = self.objCP.Property('S', T=T90F_in_K, P=PSUCT)  # j/kg/K
         TS = self.objCP.Property('T', S=SSUC, P=PDISC)  # K
-        HS = self.objCP.Property('H', T=TS, P=PDISC)  # j/kg
+
+        # Dr. Omar to approve
+        # Ayman modification, in case DTSUPI = 0
+        # the given point came to wet area.
+        # check if in wet area, return sat. liquid or sat. vap.
+        # HS = self.objCP.Property('H', T=TS, P=PDISC)  # j/kg
+
+        HS = self.getProp(prp='H', P=PDISC
+                                 , T=TS, X=1)  # j/kg 
+                                   
         # or HS = self.objCP.Property('H', S=SSUC, P=PDISC)  # j/kg
 
         # convert the saturation temperatures to corresspond to map data units

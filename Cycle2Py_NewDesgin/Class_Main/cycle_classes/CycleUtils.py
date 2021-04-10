@@ -440,9 +440,21 @@ class CycleUtils ():
                 if(TD > T[6]):
                     TNEW = T[6] - ETHX * (T[6] - T[9])
                 else:
-                    HHIGH = self.objCP.Property('H', V=VL[10], T=T[9])  # j/kg
-                    HLOW = self.objCP.Property('H', X=0, T=T[6])  # j/kg
-                    
+                    # to be checked later no VL[10]
+
+                    # Dr. Omar to approve
+                    # Ayman modification, in case DTSUPI = 0
+                    # the given point came to wet area.
+                    # check if in wet area, return sat. liquid or sat. vap.
+                    # HHIGH = self.objCP.Property('H', V=VL[10], T=T[9])  # j/kg
+                    # HLOW = self.objCP.Property('H', X=0, T=T[6])  # j/kg
+
+                    HHIGH = self.getProp(prp='H', V=self.VL[10]
+                                                , T=self.T[9], X=0)  # j/kg
+
+                    HLOW = self.getProp(prp='H', P=self.P[1]
+                                               , T=self.T[6], X=1)  # j/kg
+                                                
                     DH = min((HLOW - H[9]), (H[6] - HHIGH))
                     H[10] = H[6] - DH                    
                     T[10] = objCP.Property('T', P=P[10], H=H[10])  # K
@@ -581,10 +593,17 @@ class CycleUtils ():
         #                   7 = OUTLET FROM FRESH FOOD EVAPORATOR
         #                  13 = LOW PRESSURE SIDE OUTLET FROM INTERCHANGER
 
+        # Dr. Omar to approve
+        # Ayman modification, in case DTSUPI = 0
+        # the given point came to wet area.
+        # check if in wet area, return sat. liquid or sat. vap.
 
-        H6STAR = objCP.Property('H', P=P7, T=T7)  # j/kg        
-        H13STR = objCP.Property('H', P=P4, T=T4)  # j/kg
-        
+        # H6STAR = objCP.Property('H', P=P7, T=T7)  # j/kg
+        # H13STR = objCP.Property('H', P=P4, T=T4)  # j/kg
+        H6STAR = self.getProp(prp='H', P=P7
+                                     , T=T7, X=0)  # j/kg
+        H13STR = self.getProp(prp='H', P=P4
+                                     , T=T4, X=1)  # j/kg
         #
         #          FIND THE MAXIMUM AND ACTUAL HEAT TRANSFER
         #
@@ -619,11 +638,27 @@ class CycleUtils ():
             TBI = self.objCP.Property('T', H=HBI, P=PB)  # K
             
             # DETERMINE EXIT STATE OF STREAM A if AT TBI
-            HAOSTR = self.objCP.Property('H', X=0, T=TBI)  # j/kg
+            
+            # Dr. Omar to approve
+            # Ayman modification, in case DTSUPI = 0
+            # the given point came to wet area.
+            # check if in wet area, return sat. liquid or sat. vap.
+            # HAOSTR = self.objCP.Property('H', X=0, T=TBI)  # j/kg
+            
+            HAOSTR = self.getProp(prp='H', P=PA
+                                         , T=TBI, X=0)  # j/kg
             DHAMAX = HAI - HAOSTR
 
             # DETERMINE EXIT STATE OF STREAM B if AT TAI
-            HBOSTR = self.objCP.Property('H', X=0, T=TAI)  # j/kg
+            # Dr. Omar to approve
+            # Ayman modification, in case DTSUPI = 0
+            # the given point came to wet area.
+            # check if in wet area, return sat. liquid or sat. vap.
+            
+            # HBOSTR = self.objCP.Property('H', X=0, T=TAI)  # j/kg
+            HBOSTR = self.getProp(prp='H', P=PA
+                                         , T=TAI, X=0)  # j/kg
+                                         
             DHBMAX = HBI - HBOSTR
 
             # DETERMINE THE HEAT TRANSFER FOR THE GUESSED INLET STATE HBI
