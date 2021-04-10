@@ -8,7 +8,11 @@ class ErrorException(Exception):
         # to use the same Message header as the parent class
         super().__init__(message)
         self.errors = errors
+        
         # Display the errors
         print ("\n=-=-=-=-=-=-=-=-=-=-=-=-=-=-")
-        print('Printing Errors:')
+        print ('       Error in app Data Entry:')
+        print (message)
+        print ("-------------------------------\n")
+        print ("Error Details\n")
         print(errors)

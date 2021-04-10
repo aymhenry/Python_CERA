@@ -175,18 +175,14 @@ class CycleSolver (CycleUtils):
         # :text=The%20nominal%20values%20used%20for,v%20%3D%200.718%20kJ%2Fkg
 
         # kj/kg K
-        AirHeatCapacityC = 0.0003 * (self.TS1**2) - 0.129 * self.TS1 + 1016.55
-
-        # AirHeatCapacity = 1003 #omar change we use cp not cv! 700
-        # Air heat capacity 700 j/kg/K
+        AirHeatCapacityC = 0.0003 * (self.TS1**2) \
+                           - 0.129 * self.TS1 + 1016.55
 
         # https://www.gribble.org/cycling/air_density.html
         # self.CFMC = 1.8961 * (RHOCPC * self.dt.CFMCI[lng_item]) / 0.4720
 
         # CFMCI L/sec = 1000 cm3/sec = 1000/100^3 m3/sec= 1/1000 m3/sec
-        # C-deg = K - 273.11
-        # Air dencity (kg/m3) = Temp_c_deg/417.25 + 1.2934
-        #air_densityC = (self.dt.TS1[self.lng_item]-273.11) /417.25 + 1.2934
+    
         # equation change to account for correct pressure 101.325 kPa,
         #       and interpolate between rho at 0 C and rho at 10 C
 
@@ -199,13 +195,11 @@ class CycleSolver (CycleUtils):
 
         #------------------------------------
         # self.CFME = 1.8961 * (RHOCPE * self.dt.CFMEI[lng_item]) / 0.4720
-        # C-deg = K - 273.11
         
         # kj/kg K
-        AirHeatCapacityE = 0.0003 * (self.TS3**2) - 0.129 * self.TS3 + 1016.55
+        AirHeatCapacityE = 0.0003 * (self.TS3**2) \
+                           - 0.129 * self.TS3 + 1016.55
 
-        # Air dencity (kg/m3) = Temp_c_deg/417.25 + 1.2934
-        #air_densityE = (self.dt.TS3[self.lng_item]-273.11) /417.25 + 1.2934
         air_densityE = 1.2873 + (self.dt.TS3[self.lng_item] \
                 - CycleSolver.K_C_DEG) / 10 * (1.2418 - 1.2873)
 
@@ -214,15 +208,12 @@ class CycleSolver (CycleUtils):
             * AirHeatCapacityE * 1000
 
         #------------------------------------
-        # C-deg = K - 273.11
         # kj/kg K
         AirHeatCapacityF = 0.0003 * (self.TS5) ** 2 \
-                    - 0.129 * self.TS5 + 1016.55
+                           - 0.129 * self.TS5 + 1016.55
 
-        # Air dencity (kg/m3) = Temp_c_deg/417.25 + 1.2934
-        #air_densityF = (self.dt.TS5 - 273.11) /417.25 + 1.2934
         air_densityF = 1.2873 \
-                + (self.TS3 - CycleSolver.K_C_DEG) \
+                + (self.TS5 - CycleSolver.K_C_DEG) \
                 / 10 * (1.2418 - 1.2873)
 
         # [m3/sec] * [kg/m3] * [kj/kg K]*1000 =j/sec K = watt/K
@@ -1170,16 +1161,10 @@ class CycleSolver (CycleUtils):
                                                    , P=self.P[J])  # m3/kg
 
             else:
-                S_liq = self.objCP.Property('S', T=self.T[J], X=0)
-                S_vap = self.objCP.Property('S', T=self.T[J], X=1)
-                self.S[J] = (S_vap - S_liq) * quality
-
-                V_liq = self.objCP.Property('V', T=self.T[J], X=0)
-                V_vap = self.objCP.Property('V', T=self.T[J], X=1)
-                self.V[J] = (V_vap - V_liq) * quality
-
-
-            # self.S[J] = self.objCP.Property('S', T=self.T[J], V=V)  # m3/kg K
+                # j/kg K
+                self.S[J] = self.objCP.Property('S', T=self.T[J], X=quality)
+                # m3/kg
+                self.V[J] = self.objCP.Property('V', T=self.T[J], X=quality)
 
         # SL5 = self.entrop(
             # self.T[5],
@@ -1260,7 +1245,17 @@ class CycleSolver (CycleUtils):
             # get Quality
             H_liq = self.objCP.Property('H', T=Temperature, X=0)  # j/kg
             H_vap = self.objCP.Property('H', T=Temperature, X=1)  # j/kg
-            quality = Enthalpy / (H_vap - H_liq)
+            quality = round((Enthalpy - H_liq) / (H_vap - H_liq), 4)
+            
+            if quality < 0 or quality > 1:
+                raise ErrorException(
+                    'Error in Entry data for quality ' \
+                        + "\ngive: " + str(Enthalpy)
+                        + "\n max: " + str(H_vap)
+                        + "\n min: " + str(H_liq)
+                        + "\n quality: " + str(quality)
+                    , 'CycleSolver1001')
+                return None
 
         else:
             # not in sat.
