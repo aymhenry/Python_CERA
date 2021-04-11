@@ -24,6 +24,7 @@ class ShowInput ():
     def show (self):
         int_type = self.dt.ICYCL
         if int_type ==1:
+            self.show_sigle_cycle()
             self.show_type1()
         
         elif int_type ==2:
@@ -183,4 +184,27 @@ class ShowInput ():
 
     def show_type4 (self):
         pass
-        
+    
+    def show_sigle_cycle(self):
+        print ("    Line Diagram for single cycle")
+        print ("      ")
+        print ("         11-buble   3-dew                                    ")
+        print ("    4    +-----------+         14                            ")
+        print ("    +----| Condenser +----------+------<---+                 ")
+        print ("    |    +-----------+                     | 2               ")
+        print ("    |                                    +-+--+              ")
+        print ("    |+---------+------------>--+         |    |              ")
+        print ("    ||         6,13            |         |Comp|              ")
+        print ("  +-||-+                       |         +-+--+              ")
+        print ("  | || |                       |           | 1               ")
+        print ("  | || |interchanger           |           |                 ")
+        print ("  | || |                       |           |                 ")
+        print ("  +-||-+                       +---->------+                 ")
+        print ("  10||                                    ")
+        print ("    ||                                    ")
+        print ("    |+------<------------+                ")
+        print ("    |                    |                ")
+        print ("   (X)   +----------+    |                ")
+        print ("    +->--|Evaparator|-->-+                ")
+        print ("    5,8  +----------+    7,9              ")
+        print ("         12dew           \n\n\n")

@@ -11,6 +11,7 @@ from cycle_classes.Compressor import *
 from cycle_classes.Evaporator import *
 from cycle_classes.Condenser import *
 from cycle_classes.CoolPrpUtil import *
+from cycle_classes.Trace import *
 
 from cycle_classes.ErrorException import ErrorException
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -24,6 +25,9 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
         self.dt = objData
         self.lng_item = lng_item
 
+        # Trace Data
+        self.trace = Trace(self.dt, self)
+        
         # lng_item group number of data.
         # NCYC number of calls to cycle (1=Single or 2= Dual cycle)
         self.NCYC = NCYC
@@ -277,7 +281,6 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
 
     #-- Soving actions
     def solveCycle(self):
-
         print ("\n\n== Starting processing ===")
         #	INITIAL GUESSES FOR TC AND TE
         #	ASSUME TEMP RISE OF COND IS 0.5 F PER LBM
@@ -293,11 +296,13 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
         # stepts was simplifed, all vars equal to self.MREF
         self.FLOW = self.FLOW2 = self.FLWREF = self.MREFSV = self.MREF
 
-        # set outer loop data
+        # set outer loop data       
         self.JC = 1
         self.LCCON = True
         self.LQUIT = False
 
+        self.trace.randam (Self_JC=self.JC)
+        
         #	SET UP TEMPERATURES AND CABINET LOADS FOR INLET TEMPERATURE
         #	CALCULATION FOR EVAPORATOR OF A STANDARD DESIGN (TYPE 1)
         self.TFF = self.dt.FFTEMP # Fresh Food Temperature
@@ -311,6 +316,7 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
 
         self.FSUPC = 0.1 # unit (%) in python only
         self.FSUPE = 0 # unit (%) in python only
+        self.FSUBC = 0 # unit (%) in python only
         # -----------------------
 
         self.__solveCycle()
@@ -366,10 +372,7 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
 
         # Condenser itaration loop
         while (self.IC <= self.ITMAXC and self.LCCON):
-            print ("\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
-            print ("Condenser Iteration Number -----> self.IC=",self.IC
-                                , " Test=",self.ICONC)
-            print ("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
+            self.trace.cond_ic() #  self.IC
 
             # ICAB - flag to represent presence of cabinet loads in input
 
@@ -492,65 +495,46 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
             self.P[2] = self.P[3] + self.FSUPC * self.DPC
 
             #........Compreesor Class..................
-            print ("\n\nInput to compressor -------------------")
-            print ("\tPSUCT = self.P[1] = ", self.P[1])
-            print ("\tTSUCT = self.T[1] = ", self.T[1])
-            print ("\tVSUCT = self.V[1] = ", self.V[1])
-
-            print ("\tPDISC = self.P[2] = ", self.P[2])
-            print ("\tMREF = self.MREF = ", self.MREF)
-            print ("\n\n")
+            self.trace.comp_ins() #  compress_inputs
 
             # only one type
-            dicRest = self.objComp.comp_balance(PSUCT=self.P[1],
+            self.dicRest = self.objComp.comp_balance(PSUCT=self.P[1],
                                    PDISC=self.P[2],
                                    TSUCT=self.T[1],
                                    MREF=self.MREF,
                                    VSUCT=self.V[1])
-            print ("Compressor output")
-            print ('\tCompressor exit Temp K        TSP = ',dicRest['TSP'])
-            print ('\tDischare Temp K             TDISC = ',dicRest['TDISC'])
-            print ('\tDischare Enthalpy    j/kg    HOUT = ',dicRest['HOUT'])
-            print ("""\tcompressor shell loss
-                   normalized to power input j/kg QCAN  = """
-                ,dicRest['QCAN'])
-
-            print ('\tSuction sp.volume m3/kg      VSUC = ',dicRest['VSUC'])
-            print ('\tDischare sp.volume m3/kg      VV2 = ',dicRest['VV2'])
-            print ('\tCp/Cv value                  GAMA = ',dicRest['GAMA'])
-            print ('\tCompressor Efficiency   %    ETAC = ',dicRest['ETAC'])
-            print ('\tRefrigerant Mas Flow Rate  kg/hr  MREF = '
-                            ,dicRest['MREF'])
+                                   
+            self.trace.comp_out()
 
             # Compressor exit Temp K Dr Omar
             # self.T[1] = dicRest['TSP']
 
             # Dischare Temp K
-            self.T[2] = dicRest['TDISC']
+            self.T[2] = self.dicRest['TDISC']
 
             # Dischare Enthalpy    j/kg
-            self.H[2] = self.HOUT = dicRest['HOUT']
+            self.H[2] = self.HOUT = self.dicRest['HOUT']
 
             # compressor shell loss normalized to power input j/kg
-            self.QCAN  = dicRest['QCAN']
+            self.QCAN  = self.dicRest['QCAN']
 
             # Suction sp.volume m3/kg
-            VSUC = dicRest['VSUC']
+            VSUC = self.dicRest['VSUC']
 
             # Dischare sp.volume m3/kg
-            VV2 = dicRest['VV2']
+            VV2 = self.dicRest['VV2']
 
             # Cp/Cv value
-            GAMA = dicRest['GAMA']
+            GAMA = self.dicRest['GAMA']
 
             # Compressor Efficiency   %
-            ETAS = dicRest['ETAC']
+            ETAS = self.dicRest['ETAC']
 
             # add by Ayman Dr Omar to check, MROLD used later
             self.MROLD = self.MREF
 
             # Refrigerant Mass Flow Rate  kg/hr
-            self.MREF = dicRest['MREF']
+            self.MREF = self.dicRest['MREF']
             #........End Compreesor Class
 
             self.FLOW2 = self.FLWREF * self.MREF / self.MREFSV
@@ -583,15 +567,7 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
                     self.LCCON = True
                     self.ICONC = 0
 
-        print ("\n----------------------------")
-        n = 0
-        print ("#\t\tT C\tP kPa\tH kj/kg")
-        for n in range (1,17):
-            print (n, "\t%9.2f\t%9.2f\t%9.2f"
-                % (self.T[n]-CycleSolver.K_C_DEG
-                , self.P[n]/1000, self.H[n]/1000) )
-
-        print ("----------------------\n\n\n")
+        self.trace.cycle_out()
 
         return
 
@@ -605,9 +581,7 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
         #	DETERMINE BUBBLE POINT CONDITIONS
         #	ASSUME A LINEAR PRESSURE DROP THROUGHOUT THE CONDENSER
 
-        # Dr Omar change FSUBC to FSUPC
-        # self.P[11] = PBUB = self.P[4] + self.DPC * self.FSUBC
-        self.P[11] = PBUB = self.P[4] + self.DPC * self.FSUPC
+        self.P[11] = PBUB = self.P[4] + self.DPC * self.FSUBC
 
         self.T[11] = TBUB = self.objCP.Property('T', P=PBUB, X=0)  # K
         self.H[11] = HBUB = self.objCP.Property('H', P=PBUB, X=0)  # j/kg
@@ -777,9 +751,7 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
 
                 self.P[7] = self.P[15]
 
-            elif (self.ISPEC == 2):  # Interchanger superheat specified
-                print ("\n aymself.DTSUPI", self.DTSUPI)
-                                
+            elif (self.ISPEC == 2):  # Interchanger superheat specified   
                 self.P[15] = self.objCP.Property('P', X=1, T=self.T[15])  # pa
 
                 self.P[13] = self.P[15]
@@ -804,7 +776,7 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
                 self.TE[self.JE] = self.T[7]
 
                 if (self.T[13]  >=  self.T[16]) :
-                    LECON = False
+                    self.LECON = False
                     self.I_ERROR_INTER = 1
                     continue
 
@@ -926,14 +898,7 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
             # # --- end of useless code block
 
             # fresh food section evaporator
-
-            print ("    Input to frsh - main iteration function ...")
-            print ("        self.H[5]=",self.H[5])
-            print ("        self.H[7]=",self.H[7])
-            print ("        self.TE=",self.TE)
-            print ("        self.TS3=",self.TS3)
-            print ("        self.QFRSH=",self.QFRSH)
-            print ("        self.MREF=",self.MREF)
+            self.trace.frsh_ins()
 
             dicRest = self.objEvap.frsh(T5=self.T[5]
                             , H5=self.H[5]
@@ -950,10 +915,7 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
             self.TS4 = dicRest['TS4']
             ICONE = dicRest['ICONE']
 
-            print ("    Output from frsh - main iteration function ...")
-            print ("        self.TE=",self.TE)
-            print ("      not used  TS4=",self.TS4)
-            print ("              ICONE=",ICONE)
+            self.trace.frsh_out(ICONE)
             # ---------------------------ADDED NEW CODE (12/29/90)---------
             self.T[15] = self.T[15] + self.TE[2] - self.T[7]
 
@@ -990,10 +952,7 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
             # if (self.TE[JE] <= self.TEMIN):
                 # LECON = False # Exit loop
 
-            print ("\n  Cond iter.=",self.IC
-                , " Evaporator Iter. Number --> IE=",self.IE)
-            print ("    ===========================================")
-            print ("    ICONE ",ICONE, self.TE[self.JE] <= TEMIN)
+            self.trace.evap_ie(ICONE)
 
             if (ICONE == 1) or (self.TE[self.JE] <= TEMIN):
                 self.LECON = False # Exit loop

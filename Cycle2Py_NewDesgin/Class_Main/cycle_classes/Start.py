@@ -73,43 +73,15 @@ class Start:
             print ("               sys.exit('3100')  # terminat application")
             print ("=======================================\n\n")
         '''
-
- 
-        
-        self.view_cycle_res(objSolution)
-        print("aym @ 77 self.view === later .....")
-        self.view()  # View all data
-
-    # -----------------------------------------------------------
-    # Job             : output results of cycle calculations
-    # Input         :
-    #
-    # Output        :
-    # -----------------------------------------------------------
-    def view_cycle_res(self, objSolution):
-    
-        obj_view_cycle = ViewCycle(
+        obj_view = View(
             self.dt
             , objSolution # will be named ds for short
             , self.str_FILE_CYCLE_OUTPUT
             , self.str_path_cyc_out
             )
             
-        obj_view_cycle.show_rep()
-
-    # -----------------------------------------------------------
-    # Job             : output results a reported form
-    # Input         :
-    #
-    # Output        :
-    # -----------------------------------------------------------
-
-    def view(self):
-        obj_view = View(
-            self.dt,
-            self.str_FILE_CYCLE_OUTPUT,
-            self.str_path_cyc_out)
-        obj_view.show_rep()
+        obj_view.show_overall()
+        obj_view.show_rep()        
 
     # -----------------------------------------------------------
     # Job             : Calaculte heat balance, the main app target.
