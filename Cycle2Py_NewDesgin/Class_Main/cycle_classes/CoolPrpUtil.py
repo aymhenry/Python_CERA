@@ -1,8 +1,8 @@
 # Python Import ==================
 
 # User Import ======================
+from cycle_classes.ErrorException import ErrorException
 
-from cycle_classes.CoolPrp import *
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 # Job             : Check point stats Cycle app
 #                   check if given point in wet region
@@ -13,15 +13,17 @@ from cycle_classes.CoolPrp import *
 
 class CoolPrpUtil:
     ERR_MARGIN = 0.001
+    def __init__(self, objCP):
+        self.objCP = objCP
     
-    def getProp (self, P, T, prp="H", X=1):
+    def getProp (self, P, T, prp="H", X=1 ):
 
         P_sat = self.objCP.Property('P', T=T, X=0)  # Pa
         
         # check if in wet area
         if abs(P_sat - P) > CoolPrpUtil.ERR_MARGIN:
             # if so, get liquid or vap. value
-            prop = self.objCP.Property(prp, T=T, P=P) 
+            prop = self.objCP.Property(prp, T=T, P=P)
             
         else:
             prop = self.objCP.Property(prp, T=T, X=X)
@@ -46,7 +48,7 @@ class CoolPrpUtil:
             
             if quality < 0 or quality > 1:
                 raise ErrorException(
-                    'Error in Entry data for quality ' \
+                    'Error in Entry data for quality '
                         + "\ngive: " + str(Enthalpy)
                         + "\n max: " + str(H_vap)
                         + "\n min: " + str(H_liq)

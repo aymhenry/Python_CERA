@@ -153,7 +153,7 @@ class View:
         #
         if (self.ds.LQUIT):
             self.prn.write_or_terminate(
-                "Convergence forced after, iterations ", self.dt.IC)
+                "Convergence forced after, iterations, %3.0f," %(self.dt.IC))
 
         #
         #    PRINT ERROR MESSAGES if NON-CONVERGENCE
@@ -168,7 +168,8 @@ class View:
                 self.prn.write_or_terminate(
                     'EVAPORATOR ITERATION DID NOT CONVERGE,  %9.2f, %9.2f ' %
                     (self.ds.TE[1] - 273.11, self.ds.TE[2] - 273.11))
-                self.showError("EVAPORATOR ITERATION DID NOT CONVERGE", "")
+
+                # self.showError("EVAPORATOR ITERATION DID NOT CONVERGE", "")
 
             if (self.ds.LCCON):
                 self.prn.write_or_terminate(
@@ -312,7 +313,7 @@ class View:
                 # if (self.ds.XQ[J] < 0.0):
                     # self.ds.XQ[J] = 0.0
 
-                if (M >= 9 and M <= 11):
+                if 9 <= M <= 11:
                     continue
                 K = K + 1
                 if (self.ds.AIRTMP[M]):
@@ -570,21 +571,21 @@ class View:
         if (self.dt.IRFTYP <= 3 and self.dt.ICYCL == 1 and self.dt.ICAB != 0
                     and  self.ds.IFRSH != 0):
             self.prn.write_or_terminate ('''FRACTION AIR TO FRESH FOOD,
-                %9.3f, (SINGLE EVAPORATOR CYCLE)''' %( FF_FRACT) )
+                %9.3f, (SINGLE EVAPORATOR CYCLE)''' %(self.dt.FF_FRACT))
 
         self.prn.write_or_terminate (" ")
 
         if (self.dt.IMAP  ==  1) :
             self.prn.write_or_terminate  ('''ESTIMATED COMPRESSION EFFICIENCY,
-                %9.3f, (COMPRESSOR EER MODEL)''' %( ETAS) )
+                %9.3f, (COMPRESSOR EER MODEL)''' %( self.dt.ETAS) )
             self.prn.write_or_terminate  ('''ESTIMATED MOTOR-PUMP EFFICIENCY,
-                %9.3f, (COMPRESSOR EER MODEL)''' %( self.dt.EFFC/ETAS) )
+                %9.3f, (COMPRESSOR EER MODEL)''' %( self.dt.EFFC/ self.dt.ETAS))
             self.prn.write_or_terminate  ('''ESTIMATED CLEARANCE VOLUME,
                 %9.3f, (COMPRESSOR EER MODEL)''' %( self.dt.CE) )
             self.prn.write_or_terminate  ('''ESTIMATED SHELL LOSS,
-                %9.3f, (COMPRESSOR EER MODEL)''' %( QCAN) )
+                %9.3f, (COMPRESSOR EER MODEL)''' %( self.ds.QCAN) )
             self.prn.write_or_terminate  ('''ESTIMATED DISC TUBE HEAT LOSS,
-                %9.3f, (COMPRESSOR EER MODEL)''' %( QHILO) )
+                %9.3f, (COMPRESSOR EER MODEL)''' %( self.dt.QHILO))
 
         self.prn.write_or_terminate ("HEAT EXCHANGER PERFORMANCE SUMMARY")
         self.prn.write_or_terminate ('''EXCHANGER, EFFECTIVENESS,
@@ -636,10 +637,10 @@ class View:
 
         if (self.dt.IMAP != 0) :
             self.prn.write_or_terminate ('''SUCTION PORT TEMPERATURE (C),
-                %9.3f''' %( TSUC ) )
+                %9.3f''' %( self.ds.TSUC ) )
 
             self.prn.write_or_terminate ('''DISCHARGE PORT TEMPERATURE (C),
-                %9.3f''' %( TDISC ) )
+                %9.3f''' %( self.ds.TDISC ) )
             self.prn.write_or_terminate ('''DISCHARGE SUPERHEAT (C),
                 %9.3f''' %( TSUPC ) )
 

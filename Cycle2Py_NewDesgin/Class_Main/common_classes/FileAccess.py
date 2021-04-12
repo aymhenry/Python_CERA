@@ -86,7 +86,7 @@ class FileAccess:
     def write(self, strText):
         # check if there ia an error
         if self.m_access == "r":
-            terminate("Access open - Read Only")
+            self.terminate("Access open - Read Only")
             return
 
         b_current_err = self.isError()
@@ -183,7 +183,7 @@ class FileAccess:
 
         elif self.m_error == FileAccess.ERR_BLANK_LINE:
             return "Err " + str(FileAccess.ERR_BLANK_LINE) + \
-                "Blank line in data file row:".self.m_lineNo
+                "Blank line in data file row:" + str(self.m_lineNo)
 
         elif self.m_error != FileAccess.ERR_NOT_FOUND:
             return "Err, can cannot continue"

@@ -1,12 +1,10 @@
 # Python import
 import sys
-# Python import
-import sys
 
 # User import
-from CoolPrp import *
-from decorators import *
-from CompMap import *
+from .CoolPrp import *
+from .decorators import *
+from .CompMap import *
 
 # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
 

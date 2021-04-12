@@ -18,7 +18,7 @@ from common_classes.FileAccess import FileAccess
 #                 strFileName = "SomName.cmp"  # File name
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-class Compressor (CoolPrpUtil):
+class Compressor ():
     IUNITS = None
     TEDATA = None
     TCDATA = None
@@ -33,6 +33,7 @@ class Compressor (CoolPrpUtil):
         
         self.FRACT_SPEED = FRACT_SPEED
         self.strFileName = strFileName
+        self.coolutil = CoolPrpUtil(objCP)
         self.trace = Trace()
 
     def comp_balance(self, PSUCT, PDISC, TSUCT, VSUCT, MREF):
@@ -129,11 +130,11 @@ class Compressor (CoolPrpUtil):
                 items_x = [itm for itm in lst if flt_value >= itm]
                 return len(items_x)
 
-            def interplate (x_value, x1, x2, y1, y2):
+            def interplate (x_val, x1, x2, y1, y2):
                 if x1 == x2:
                     return y2
                 else:
-                    return y1 + (x_value - x1) * (y2 - y1) / (x2 - x1)
+                    return y1 + (x_val - x1) * (y2 - y1) / (x2 - x1)
 
             if len(x_series) != len(data[0]) or len(y_series) != len(data):
                 raise ErrorException('Reading value out of range', 'Comp1001')
@@ -326,14 +327,14 @@ class Compressor (CoolPrpUtil):
         # check if in wet area, return sat. liquid or sat. vap.
         # HIN = self.objCP.Property('H', T=T90F_in_K, P=PSUCT)  # j/kg
 
-        HIN = self.getProp(prp='H', P=PSUCT
+        HIN = self.coolutil.getProp(prp='H', P=PSUCT
                                   , T=T90F_in_K , X=1)  # j/kg        
 
         # liquid leaving condenser
         self.trace.dr_omar("Wet region issue")  # Dr. Omar to approve
         # HOUT = self.objCP.Property('H', T=T90F_in_K, P=PDISC)  # j/kg
-        HOUT = self.getProp(prp='H', P=PDISC
-                                   , T=T90F_in_K , X=0)  # j/kg 
+        HOUT = self.coolutil.getProp(prp='H', P=PDISC
+                                            , T=T90F_in_K , X=0)  # j/kg 
 
         # determine isentropic compression enthalpy (HS)
         SSUC = self.objCP.Property('S', T=T90F_in_K, P=PSUCT)  # j/kg/K
@@ -345,7 +346,7 @@ class Compressor (CoolPrpUtil):
         # check if in wet area, return sat. liquid or sat. vap.
         # HS = self.objCP.Property('H', T=TS, P=PDISC)  # j/kg
 
-        HS = self.getProp(prp='H', P=PDISC
+        HS = self.coolutil.getProp(prp='H', P=PDISC
                                  , T=TS, X=1)  # j/kg 
                                    
         # or HS = self.objCP.Property('H', S=SSUC, P=PDISC)  # j/kg

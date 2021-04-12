@@ -2,8 +2,7 @@
 from abc import ABC, abstractmethod
 
 # User import
-from .HeatExch import HeatExch
-from .CycleUtil import *
+from .Condenser import *
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # Job 			: Create Condenser object based on ISPEC
@@ -35,7 +34,7 @@ class EvapType:
 #
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-class Evap_Abstract (ABC, HeatExch, CycleUtil):
+class Evap_Abstract (ABC):
     def __init__(self, objdata):
         self.objData = objdata
     # Abstract methods

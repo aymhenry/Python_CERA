@@ -29,13 +29,13 @@ class exf4Cond_Evap ():
         int_row = 0
         
         if LOC == 2:  # Cross-flow
-            if (CRAT >= 0.00 and CRAT <= 0.25):
+            if 0.00 <= CRAT <= 0.25:
                 int_row = 1
-            if (CRAT > 0.25 and CRAT <= 0.50):
+            if 0.25 < CRAT <= 0.50:
                 int_row = 2
-            if (CRAT > 0.50 and CRAT <= 0.75):
+            if 0.50 < CRAT <= 0.75:
                 int_row = 3
-            if (CRAT > 0.75 and CRAT <= 1.00):
+            if 0.75 < CRAT <= 1.00:
                 int_row = 4
 
             if (NTU <= 0.0):

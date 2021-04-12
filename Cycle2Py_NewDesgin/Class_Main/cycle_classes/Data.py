@@ -3,7 +3,7 @@
 
 # User Import
 
-class Data (BData):
+class Data ():
 
     # =======================================================
     # obj_cdata will have the refe. to Common Data inputs & output

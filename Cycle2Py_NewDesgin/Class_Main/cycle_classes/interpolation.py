@@ -1,6 +1,6 @@
-from decorators import *
+from .decorators import *
 
-@show_input_output("ALL")
+# @show_input_output("ALL")
 def interpolation (x_value, y_value, x_series, y_series, data):
 
     def find_nerest_index (flt_value, lst):
@@ -8,11 +8,11 @@ def interpolation (x_value, y_value, x_series, y_series, data):
         print (items_x)
         return len(items_x)
 
-    def interplate (x_value, x1, x2, y1, y2):
+    def interplate (x_val, x1, x2, y1, y2):
         if x1 == x2:
             return y2
         else:
-            return y1 + (x_value - x1) * (y2 - y1) / (x2 - x1)
+            return y1 + (x_val - x1) * (y2 - y1) / (x2 - x1)
 
     if len(x_series) != len(data[0]) or len(y_series) != len(data):
         raise ValueError ("Reading value out of range, 1")

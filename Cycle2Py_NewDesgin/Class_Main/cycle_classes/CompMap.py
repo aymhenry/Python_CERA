@@ -1,20 +1,22 @@
 # Python Import ==================
 import sys
 
-
 # User Import
 from common_classes.FileAccess import FileAccess
+
 
 # ==============================
 
 
-class CompMap (FileAccess):
+class CompMap(FileAccess):
     TRY_COUNT = 120
     UNIT_SI = 1
     UNIT_ENG = 2
-    
+
     def __init__(self, strFileName, strPath="", is_one_dim=False):
         # member varbiable for compressor
+        super().__init__(strFileName, strPath)
+
         self.arr_x_values = None
 
         self.arr_y1_values = None
@@ -43,9 +45,9 @@ class CompMap (FileAccess):
         self.m_error = FileAccess.ERR_NOT_FOUND  # Current error
         self.m_error_desc = ""
 
-        self.m_text = ""		# last line that was read from file.
+        self.m_text = ""  # last line that was read from file.
         self.m_access = ""  # Access type r,w,a,x as list
-        self.m_name = ""		# Path & file name to access
+        self.m_name = ""  # Path & file name to access
         self.m_lineNo = 0  # Line number, last read
         self.m_handler = ""
 
@@ -99,7 +101,7 @@ class CompMap (FileAccess):
         # check if there is an error
         b_current_err = self.isError()
         if self.isError():
-            return not b_current_err 	# if error do nothing, return false
+            return not b_current_err  # if error do nothing, return false
 
         if int_pos != -1:
             self.current_pos = int_pos
@@ -139,7 +141,7 @@ class CompMap (FileAccess):
         # check if there is an error
         b_current_err = self.isError()
         if self.isError():
-            return not b_current_err 	# if error do nothing, return false
+            return not b_current_err  # if error do nothing, return false
 
         if int_pos != -1:
             self.current_pos = int_pos
@@ -222,7 +224,7 @@ class CompMap (FileAccess):
         if self.isError():
             return
 
-        self.arr_x_values = [0.0] * (self.int_x_values )  # base value is 0
+        self.arr_x_values = [0.0] * self.int_x_values  # base value is 0
 
         for ncnt in range(0, self.int_x_values):
 
@@ -241,8 +243,8 @@ class CompMap (FileAccess):
         if self.isError():
             return
 
-        self.arr_y1_values = [0.0] * (self.int_y12_values)  # base is 0
-        self.arr_y2_values = [0.0] * (self.int_y12_values)
+        self.arr_y1_values = [0.0] * self.int_y12_values  # base is 0
+        self.arr_y2_values = [0.0] * self.int_y12_values
 
         for ncnt in range(0, self.int_y12_values):
             if not self.readrecord():
@@ -261,21 +263,21 @@ class CompMap (FileAccess):
 
         if self.is_one_dim:
             self.arr_capacity = [0.0] * \
-                (self.int_x_values * self.int_y12_values)
+                                (self.int_x_values * self.int_y12_values)
         else:
-            self.arr_capacity = [[0.0] * (self.int_x_values)
+            self.arr_capacity = [[0.0] * self.int_x_values
                                  for i in range(self.int_y12_values)]
 
         # add shift one word to the current position
         for ncnt_x in range(0, self.int_y12_values):
-            #self.current_pos = self.current_pos + CompMap.SEG_BLOCK
+            # self.current_pos = self.current_pos + CompMap.SEG_BLOCK
             for ncnt_y in range(0, self.int_x_values):
 
                 if self.is_one_dim:
                     self.arr_capacity[
-                                      int(ncnt_x *
-                                          self.int_x_values +
-                                          ncnt_y)] = self.getNonZero()
+                        int(ncnt_x *
+                            self.int_x_values +
+                            ncnt_y)] = self.getNonZero()
                 else:
                     self.arr_capacity[ncnt_x][ncnt_y] = self.getNonZero()
 
@@ -295,7 +297,7 @@ class CompMap (FileAccess):
                 str_last_err = self.m_error
                 self.m_error = FileAccess.ERR_NOT_FOUND
                 Value = 0
-                #print ("Test nTry=",nTry, self.bytes.decode("utf-8") )
+                # print ("Test nTry=",nTry, self.bytes.decode("utf-8") )
                 continue
 
         # if exit without reading
@@ -313,19 +315,19 @@ class CompMap (FileAccess):
             # base is 0
             self.arr_power = [0.0] * (self.int_x_values * self.int_y12_values)
         else:
-            self.arr_power = [[0.0] * (self.int_x_values)
+            self.arr_power = [[0.0] * self.int_x_values
                               for i in range(self.int_y12_values)]
 
         # add shift one word to the current position
 
         for ncnt_x in range(0, self.int_y12_values):
-            #self.current_pos = self.current_pos + CompMap.SEG_BLOCK
+            # self.current_pos = self.current_pos + CompMap.SEG_BLOCK
             for ncnt_y in range(0, self.int_x_values):
 
                 if self.is_one_dim:
                     self.arr_power[int(
                         ncnt_x * self.int_x_values + ncnt_y)] = \
-                                                        self.getNonZero()
+                        self.getNonZero()
                 else:
                     self.arr_power[ncnt_x][ncnt_y] = self.getNonZero()
 
@@ -342,22 +344,27 @@ class CompMap (FileAccess):
 
     def getManif(self):
         return self.str_manf
+
     # -----------------------------------------------------------
 
     def getModel(self):
         return self.str_model
+
     # -----------------------------------------------------------
 
     def getKcal(self):
         return self.str_kcal_hr
+
     # -----------------------------------------------------------
 
     def getEer(self):
         return self.str_eer
+
     # -----------------------------------------------------------
 
     def getRpm(self):
         return self.str_rpm
+
     # -----------------------------------------------------------
 
     def getVolt(self):
@@ -389,6 +396,7 @@ class CompMap (FileAccess):
     # -----------------------------------------------------------
     def getType(self):
         return self.int_comp_type
+
     # -----------------------------------------------------------
 
     def getCapacity(self):

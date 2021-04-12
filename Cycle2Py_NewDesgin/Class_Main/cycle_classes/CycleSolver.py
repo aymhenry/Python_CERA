@@ -5,7 +5,7 @@
 from common_classes.QData import QData
 
 from cycle_classes.CycleUtils import CycleUtils
-from cycle_classes.CoolPrp import *
+# from cycle_classes.CoolPrp import *
 
 from cycle_classes.Compressor import *
 from cycle_classes.Evaporator import *
@@ -13,12 +13,12 @@ from cycle_classes.Condenser import *
 from cycle_classes.CoolPrpUtil import *
 from cycle_classes.Trace import *
 
-from cycle_classes.ErrorException import ErrorException
+# from cycle_classes.ErrorException import ErrorException
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # Job             : Create Class object cycle parameters
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-class CycleSolver (CycleUtils, CoolPrpUtil):
+class CycleSolver (CycleUtils):
     K_C_DEG = 273.11
     def __init__(self, objCP, objData, lng_item, NCYC=1):
         self.objCP = objCP
@@ -27,6 +27,7 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
 
         # Trace Data
         self.trace = Trace(self.dt, self)
+        self.coolutil = CoolPrpUtil(objCP)
         
         # lng_item group number of data.
         # NCYC number of calls to cycle (1=Single or 2= Dual cycle)
@@ -386,9 +387,9 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
                                 , self.IC
                                 , self.TS3
                                 , self.TS5
-                                , self.FROSTF
-                                , self.FROSTF
-                                , self.IDFRST)
+                                , self.dt.FROSTF
+                                , self.dt.FROSTF
+                                , self.dt.IDFRST)
 
             self.T[4] = self.TC[self.JC] # 4 - CONDENSER OUTLET
 
@@ -405,7 +406,7 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
                 # self.V[4] = self.objCP.Property('V', T=self.TC[self.JC]
                                                    # , P=self.P[4])  # m3/kg
                                                    
-                self.V[4] = self.getProp(prp='V', T=self.TC[self.JC]
+                self.V[4] = self.coolutil.getProp(prp='V', T=self.TC[self.JC]
                                                 , P=self.P[4], X=0)  # m3/kg
             
 
@@ -479,10 +480,10 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
                 # self.H[1] = self.objCP.Property('H', T=self.T[1]
                                                    # , P=self.P[1])  # m3/kg
                                                    
-                self.V[1] = self.getProp(prp='V', P=self.P[1]
+                self.V[1] = self.coolutil.getProp(prp='V', P=self.P[1]
                                                 , T=self.T[1], X=1)  # m3/kg
                                                 
-                self.H[1] = self.getProp(prp='H', P=self.P[1]
+                self.H[1] = self.coolutil.getProp(prp='H', P=self.P[1]
                                                 , T=self.T[1], X=1)  # j/kg
             else:
                 self.V[1] = self.V[13]
@@ -566,7 +567,7 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
                     self.ICONC = 0
 
             if self.dt.INCTRL in [1, 2, 4]:
-                if (sel.IC <= 10):
+                if (self.IC <= 10):
                     self.LCCON = True
                     self.ICONC = 0
 
@@ -712,10 +713,10 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
             # check if in wet area, return sat. liquid or sat. vap.
             # VS1 = self.objCP.Property('V', T=self.TS1
                                          # , P=self.P[4])  # m3/kg
-            VS1 = self.getProp(prp='V', P=self.P[4]
+            VS1 = self.coolutil.getProp(prp='V', P=self.P[4]
                                       , T=self.TS1, X=0)  # m3/kg
         else:
-            VS1 = V[4]
+            VS1 = self.V[4]
 
         HS1 = self.objCP.Property('T', T=self.TS1, V=VS1)  # j/kg
         QRMAX = self.MREF * (self.H[14] - HS1)/3600 # watt
@@ -771,10 +772,10 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
                 # self.H[13] = self.objCP.Property('H', P=self.P[13]
                                                     # , T=self.T[13])  # j/kg
                                                     
-                self.V[13] = self.getProp(prp='V', P=self.P[13]
+                self.V[13] = self.coolutil.getProp(prp='V', P=self.P[13]
                                                  , T=self.T[13], X=1)  # m3/kg
                 
-                self.H[13] = self.getProp(prp='H', P=self.P[13]
+                self.H[13] = self.coolutil.getProp(prp='H', P=self.P[13]
                                                  , T=self.T[13], X=1)  # j/kg
                 
                 self.P[7] = self.P[15]
@@ -934,7 +935,7 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
             
             # HS3 = self.objCP.Property('H', P=self.P[7], T=self.TS3)  # j/kg            
             
-            HS3 = self.getProp(prp='H', P=self.P[7]
+            HS3 = self.coolutil.getProp(prp='H', P=self.P[7]
                                       , T=self.TS3, X=1)  # m3/kg
 
             QRMAX = self.MREF * (HS3 - self.H[5])/3600 # kg/hr/3600 j/kg = watt
@@ -1009,7 +1010,7 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
             # self.H[7] = self.objCP.Property('H', P=self.P[7]
             # , T=self.T[7])  # j/kg 
             
-            self.H[7] = self.getProp(prp='H', P=self.P[7]
+            self.H[7] = self.coolutil.getProp(prp='H', P=self.P[7]
                                             , T=self.T[7], X=1)  # j/kg 
 
             #VV[7] = V[7]
@@ -1017,7 +1018,8 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
 
         elif (self.ISPEC == 2):  # Interchanger superheat specified
             [self.T[7], self.H[7], self.QINT] =\
-                    self.inter2 (self.P[16], self.T[16], self.H[16]
+                    self.inter2 (self.objCP
+                               , self.P[16], self.T[16], self.H[16]
                                , self.V[16], self.P[13], self.H[13]
                                , self.T[15], self.H[15], self.V[15]
                                , self.ETHX1)
@@ -1173,9 +1175,9 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
         for J in range(1, 16 + 1):
             #if (J != 5):
                 # self.S[J] = self.entrop(self.T[J], self.V[J], self.X)
-            quality = self.get_coolQuality (self.H[J]
-                                          , self.P[J]
-                                          , self.T[J])
+            quality = self.coolutil.get_coolQuality (self.H[J]
+                                                , self.P[J]
+                                                , self.T[J])
             if quality == -1:
                 self.S[J] = self.objCP.Property('S', T=self.T[J]
                                                    , P=self.P[J])  # j/kg K

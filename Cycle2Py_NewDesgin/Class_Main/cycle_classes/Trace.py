@@ -35,7 +35,7 @@ class Trace:
         self.ds = obj_cycletype  # CycleSolver object
 
     def file_line(self):
-        '''Returns the current file name & line number in our program'''
+        # Returns the current file name & line number in our program
         str_file = inspect.getfile(inspect.currentframe().f_back.f_back)
         lng_line = inspect.currentframe().f_back.f_back.f_lineno
         return "\tFile: " + str_file + "\n\tLine: " + str(lng_line)

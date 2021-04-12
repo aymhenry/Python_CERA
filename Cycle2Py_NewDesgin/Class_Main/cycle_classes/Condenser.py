@@ -177,8 +177,8 @@ class CondCool_Abstract (ABC, exf4Cond_Evap):
             # if((TCOUT > TC[1] and TC[1] > TC[2])
                     # or (TCOUT < TC[1] and TC[1] < TC[2])):
 
-            if((TCOUT > TC[1] and TC[1] > TC[2])
-                    or (TCOUT < TC[2] and TC[1] > TC[2]) ):
+            if((TCOUT > TC[1] > TC[2])
+                    or (TCOUT < TC[2] < TC[1])):
                     
                 TCNEW = 0.5 * (TC[1] + TC[2])
             else:

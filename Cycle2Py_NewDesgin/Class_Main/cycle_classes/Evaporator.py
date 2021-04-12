@@ -1,5 +1,4 @@
 # Python import
-from abc import ABC, abstractmethod
 
 # User import
 from cycle_classes.exf4Cond_Evap import exf4Cond_Evap
@@ -36,7 +35,7 @@ class Evaporator:
 #                   method (Natural, Cross, Counter-flow
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-class EvapCool_Abstract (ABC, exf4Cond_Evap):
+class EvapCool_Abstract (exf4Cond_Evap):
     def __init__(self, IFRSH, objCP):
         self.IFRSH = IFRSH
         self.objCP = objCP
@@ -586,8 +585,10 @@ class EvapCool_FFCount (EvapCool_Abstract):  # IFRSH== 2
             TAIR_GUESS = TAIR
             NCALL = 1
         else:
-            TAIR = TAIR_GUESS
-        # End if
+            # by Ayman
+            # TAIR = TAIR_GUESS
+            TAIR_GUESS = TS3
+
 
         CAIR = self.CFME
         HAVE_NOT_USED_FULL_AREA = True

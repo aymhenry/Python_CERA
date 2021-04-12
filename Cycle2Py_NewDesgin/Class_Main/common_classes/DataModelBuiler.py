@@ -29,7 +29,9 @@ class DataModelBuiler (FileAccess):
     ERR_FOUND_MAXLIE = 105		   	# lines in file more than expected
     ERR_FOUND_DATA_TYPE2 = 106   	# more than one decimal point, or (-) sign
 
-    def __init__(self):
+    def __init__(self, strFileName):
+        super().__init__(strFileName)
+
         self.lst_data = []
         self.obj_qdata = QData()
         self.int_parameter_count = None 	# number of parameter for the selected configration
@@ -73,7 +75,7 @@ class DataModelBuiler (FileAccess):
             return False
 
         # close file all  data is ok
-        super().__del__
+        # super().__del__
 
         # assign vars in data object
         self.assign_vars()

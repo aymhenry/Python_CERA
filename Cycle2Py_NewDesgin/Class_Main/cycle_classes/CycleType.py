@@ -1,9 +1,6 @@
 # Python Import ====================
-import math
-from abc import ABC, abstractmethod
 
 # User Import ======================
-from common_classes.QData import QData
 from cycle_classes.CycleSolver import *
 from cycle_classes.CoolPrp import *
 
@@ -166,8 +163,8 @@ class CycleType_Abstract (ABC):
         # others
         self.dt.FZQON = self.dt.FZQOFF
         self.dt.FZQ = self.dt.FZQOFF
-        self.dt.FROSTFS = self.dt.FROSTF
-        self.dt.FROSTZS = self.dt.FROSTZ
+        # self.dt.FROSTFS = self.dt.FROSTF
+        # self.dt.FROSTZS = self.dt.FROSTZ
 
         # error ===CONVERT UNITS need adjust may be move to other class
         print ("=== to be checked in Cycle.type =======")
@@ -313,24 +310,7 @@ class CycleType_Abstract (ABC):
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 class Type_1Standard (CycleType_Abstract):
-    '''
-    def view (self, str_file_cycle, str_path_cycle = ""):
-            # SET UP PARAMETERS FOR SUMMARY OUTPUT
-            #
-            if(self.dt.IFAN != 2)  :
-                    self.dt.DUTYN[N] = self.dt.DUTYC
-                    self.dt.WCOMP[N] = self.dt.W / self.dt.CORR_COP / 1.0548
-
-            #if(ICYCL != 2)  :
-            self.dt.QE_NET = self.dt.QE - self.dt.Q_HXS_FF
-            self.dt.QEL[N] = self.dt.QE_NET
-            self.dt.FLOWN[N]  = self.dt.FLOW
-            self.dt.COPRN[N]  = self.dt.COPR
-            self.dt.COPCYC[N] = self.dt.CORR_COP
-
-            obj_view = ViewCycle(self.dt, str_file_cycle, str_path_cycle)
-            obj_view.show_rep()
-    '''
+    pass
 
     def calculte(self):
         self.dt.ITYPE = 1
@@ -379,7 +359,8 @@ class Type_2Lorenz (CycleType_Abstract):
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 class Type_2Lorenz_4swtchVLV (Type_2Lorenz):
     def adjust_input(self):
-        super.adjust_input()
+        # super.adjust_input()
+        pass
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # Job 			: Analisis Cycle Type 2 - Lorenz
@@ -391,7 +372,7 @@ class Type_2Lorenz_5solindVLV (Type_2Lorenz):
         #	if INCTRL == 5 i.e solenoid valve or fan control
         #	set IDFRST =1 Manual Defrost to Yes
         self.dt.IDFRST = 1
-        super.adjust_input()
+        # super.adjust_input()
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # Job 			: Analisis Cycle Type 2 - Lorenz
@@ -400,7 +381,8 @@ class Type_2Lorenz_5solindVLV (Type_2Lorenz):
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 class Type_2Lorenz_ctrlOthers (Type_2Lorenz):
     def adjust_input(self):
-        super.adjust_input()
+        # super.adjust_input()
+        pass
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # Job 			: Analisis Cycle Type 3 - Dual Loop

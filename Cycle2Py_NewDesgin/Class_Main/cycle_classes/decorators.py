@@ -8,12 +8,12 @@ def show_input_output (show= None):
     SHOW_OUT = "OUT"
     SHOW_ALL = "ALL"
 
-    if show == None or show not in[SHOW_INS, SHOW_OUT, SHOW_ALL]:
+    if show is None or show not in[SHOW_INS, SHOW_OUT, SHOW_ALL]:
         show = SHOW_ALL
 
     def warper_fun_name (func_name):
         def wraper_args(*args, **kargs):
-            ''' actual func_name logic here '''
+            # actual func_name logic here
 
             if show in [SHOW_INS, SHOW_ALL]:
                 print ("    #-- Inputs for Function Name: "  + func_name.__name__ )
