@@ -1,9 +1,9 @@
 # Python Import ====================
-import math
+import inspect
 
 
 # User Import ======================
-
+from cycle_classes.ShowInput import *
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # Job 			: Show data in some selected points
@@ -15,6 +15,8 @@ class Trace:
     # must be true to print anythins
     DATA_ALL = True 
     
+    DR_OMAR = True
+    
     COMP_INS = False # for comp_ins
     COMP_OUT = False # for comp_out
     COND_IC = False # for cond_ic
@@ -22,18 +24,72 @@ class Trace:
     FRSH_INS = False # for frsh_ins
     FRSH_OUT = False # for frsh_out
     CYCLE_OUT = False # for cycle_out
+    APP_INS = True # for app ins
+    CYC_PID = True # for cycle pid
+    PNT_LST = True # for list of points name
+    
     RANDAM = True # for randam
     
-    def __init__(self, dt, obj_cycletype):
+    def __init__(self, dt=None, obj_cycletype=None):
         self.dt = dt  # app data
         self.ds = obj_cycletype  # CycleSolver object
 
+    def file_line(self):
+        '''Returns the current file name & line number in our program'''
+        str_file = inspect.getfile(inspect.currentframe().f_back.f_back)
+        lng_line = inspect.currentframe().f_back.f_back.f_lineno
+        return "\tFile: " + str_file + "\n\tLine: " + str(lng_line)
+        
     def is_canc_print (self, b_Flag):
         if not (b_Flag and Trace.DATA_ALL):
             return True
         else:
             return False
+
+    def dr_omar (self, str_msg=''): # inspection to be done by Dr Omar.
+        if self.is_canc_print (Trace.DR_OMAR):
+            return
+            
+        print ( "Description: Dr Omar Inspection Required" + " - " + str_msg )
         
+        print (self.file_line(), "\n")
+        # print ("\n")
+        
+    def pnt_lst (self):
+        if self.is_canc_print (Trace.PNT_LST):
+            return
+            
+        print ('1 - Compressor inlet (saturated vapor)')
+        print ('2 - Compressor discharge')
+        print ('3 - Condenser dew point')
+        print ('4 - Condenser outlet')
+        print ('5 - Inlet to fresh food evaporator')
+        print ('6 - Iiquid line outlet from high temp interchanger')
+        print ('7 - Outlet from fresh food evaporator')
+        print ('8 - Inlet to freezer evaporator')
+        print ('9 - Outlet from freezer evaporator')
+        print ('10 - Liquid line outlet from low temp interchanger')
+        print ('11 - Condenser bubble point')
+        print ('12 - Fresh food evaporator dew point')
+        print ('13 - Superheated gas leaving the high temp interchanger')
+        print ('14 - Condenser inlet')
+        print ('15 - Internal variable (not shown) for evap dew point')
+        print ('16 - Liquid line state after heat loss to cabinet and mullion')
+
+    def cyc_pid (self):
+        if self.is_canc_print (Trace.CYC_PID):
+            return
+            
+        obj_show = ShowInput(self.dt)
+        obj_show.graph()
+        
+    def app_ins (self):
+        if self.is_canc_print (Trace.APP_INS):
+            return
+            
+        obj_show = ShowInput(self.dt)
+        obj_show.show()
+    
     def randam (self, *args, **kargs):
         # how to call
         # self.trace.randam ("Some Data", T=5)

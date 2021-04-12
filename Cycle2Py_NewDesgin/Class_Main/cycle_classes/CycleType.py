@@ -7,7 +7,6 @@ from common_classes.QData import QData
 from cycle_classes.CycleSolver import *
 from cycle_classes.CoolPrp import *
 
-from cycle_classes.ShowInput import *
 from cycle_classes.ErrorException import ErrorException
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -232,15 +231,10 @@ class CycleType_Abstract (ABC):
         # # from cm3 to cu-inch compressor displacement
         # self.dt.DISPLC[lng_item] = self.dt.DISPLC[lng_item] # / 16.3871
 
-        
-        print ("===============to be checked ============cycle type====")
         # only for type 2
         if(self.dt.IFREZI[lng_item] != 0):
             self.dt.UAF = 3.600 * self.dt.UAF
         # ============= end of data to be checked ==========
-
-        
-
 
     # -----------------------------------------------------------
     # Job 			: prepare calling parameter for fror Cycle analysis

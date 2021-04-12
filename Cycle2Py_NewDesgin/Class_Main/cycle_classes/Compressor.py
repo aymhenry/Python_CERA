@@ -1,5 +1,4 @@
 # Python import
-import math
 import sys
 
 # User import
@@ -7,6 +6,7 @@ import sys
 from cycle_classes.CompMap import CompMap
 from cycle_classes.ErrorException import ErrorException
 from cycle_classes.CoolPrpUtil import *
+from cycle_classes.Trace import *
 
 from common_classes.FileAccess import FileAccess
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -33,6 +33,7 @@ class Compressor (CoolPrpUtil):
         
         self.FRACT_SPEED = FRACT_SPEED
         self.strFileName = strFileName
+        self.trace = Trace()
 
     def comp_balance(self, PSUCT, PDISC, TSUCT, VSUCT, MREF):
             
@@ -319,7 +320,7 @@ class Compressor (CoolPrpUtil):
 
         T90F_in_K = 305.372  # K
 
-        # Dr. Omar to approve
+        self.trace.dr_omar("Wet region issue")  # Dr. Omar to approve
         # Ayman modification, in case DTSUPI = 0
         # the given point came to wet area.
         # check if in wet area, return sat. liquid or sat. vap.
@@ -329,7 +330,7 @@ class Compressor (CoolPrpUtil):
                                   , T=T90F_in_K , X=1)  # j/kg        
 
         # liquid leaving condenser
-        # Dr. Omar to approve
+        self.trace.dr_omar("Wet region issue")  # Dr. Omar to approve
         # HOUT = self.objCP.Property('H', T=T90F_in_K, P=PDISC)  # j/kg
         HOUT = self.getProp(prp='H', P=PDISC
                                    , T=T90F_in_K , X=0)  # j/kg 
@@ -338,7 +339,7 @@ class Compressor (CoolPrpUtil):
         SSUC = self.objCP.Property('S', T=T90F_in_K, P=PSUCT)  # j/kg/K
         TS = self.objCP.Property('T', S=SSUC, P=PDISC)  # K
 
-        # Dr. Omar to approve
+        self.trace.dr_omar("Wet region issue")  # Dr. Omar to approve
         # Ayman modification, in case DTSUPI = 0
         # the given point came to wet area.
         # check if in wet area, return sat. liquid or sat. vap.

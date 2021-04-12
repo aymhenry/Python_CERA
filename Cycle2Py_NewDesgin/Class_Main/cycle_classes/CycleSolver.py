@@ -164,9 +164,10 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
         # self.CFMC Air Flow Rate Across Coil (L/S)
 
         # ===================        Air mass flow rate -----
+        self.trace.dr_omar("Approved")  # Dr Omar
         # RHOCPF   = 316.8/TS5
         # CFMF     = 1.8961*(RHOCPF*CFMF)/0.4720
-        # Dr Omar
+        
         # CFMCI, CFMEI L/sec --> CFMC,CFME kg/sec
         # Roh air kg/m3 = Temp_C_Deg/417.25 + 1.2934
 
@@ -282,15 +283,16 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
     #-- Soving actions
     def solveCycle(self):
         print ("\n\n== Starting processing ===")
+        print ("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
         #	INITIAL GUESSES FOR TC AND TE
         #	ASSUME TEMP RISE OF COND IS 0.5 F PER LBM
 
-        # DR omar TC and TS1 in K to fix equation
         # MREF kg/hr = MREF/2.20462 LBM /hr
         # N.B (5/9) *(1/2) = (1/3.6)
         #self.TC[1] = self.TS1 + self.dt.MREF / 3.6
+        self.trace.dr_omar("MREF kg/hr = MREF/2.20462 LBM /hr")
         self.TC[1] = self.TS1 + 0.5 * 5/9 * (self.MREF / 2.20462)
-
+        
         # -----------------------
         # steps for change MREF from kg/hr to kmole/hr was ignored
         # stepts was simplifed, all vars equal to self.MREF
@@ -300,8 +302,6 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
         self.JC = 1
         self.LCCON = True
         self.LQUIT = False
-
-        self.trace.randam (Self_JC=self.JC)
         
         #	SET UP TEMPERATURES AND CABINET LOADS FOR INLET TEMPERATURE
         #	CALCULATION FOR EVAPORATOR OF A STANDARD DESIGN (TYPE 1)
@@ -357,6 +357,7 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
             self.P[15] = self.objCP.Property('P', X=self.XEXITE
                                                 , T=self.T[15])  # Pa
 
+            self.trace.dr_omar("Ayman to chk source code")
             # Dr omar
             # not logic, TBUB15 will be the same as T[15]
             # TBUB15 = self.objCP.Property('T', X=0, P=self.P[15])  # K
@@ -376,7 +377,7 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
 
             # ICAB - flag to represent presence of cabinet loads in input
 
-            # Dr. Omar to check adjlod
+            self.trace.dr_omar("adjlod is not tested nor used")  # Dr. Omar
             #ICAB Flag to represent presence of cabinet loads in input, 0 =No
             if (self.dt.ICAB == 1):
                 [self.TS3, self.TS5] =  self.adjlod(self.dt, self.MREF/3600
@@ -469,7 +470,7 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
 
             if (self.TSPEC >  0.0):
                 self.T[1] = self.TSPEC
-                # Dr. Omar to approve
+                self.trace.dr_omar("Wet region issue")  # Dr. Omar to approve
                 # Ayman modification, in case DTSUPI = 0
                 # the given point came to wet area.
                 # check if in wet area, return sat. liquid or sat. vap.
@@ -506,7 +507,7 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
                                    
             self.trace.comp_out()
 
-            # Compressor exit Temp K Dr Omar
+            self.trace.dr_omar("Is it Iso. T for exit")  # Dr Omar
             # self.T[1] = dicRest['TSP']
 
             # Dischare Temp K
@@ -530,7 +531,8 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
             # Compressor Efficiency   %
             ETAS = self.dicRest['ETAC']
 
-            # add by Ayman Dr Omar to check, MROLD used later
+            # add by Ayman 
+            self.trace.dr_omar("Saved MRLOD to be used later")
             self.MROLD = self.MREF
 
             # Refrigerant Mass Flow Rate  kg/hr
@@ -539,9 +541,10 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
 
             self.FLOW2 = self.FLWREF * self.MREF / self.MREFSV
 
-            # Python why calculate T[2] ??? Dr Omar
+            self.trace.dr_omar("Python why calculate T[2]")  # Dr Omar
             # CONDITIONS OF GAS LEAVING COMPRESSOR SHELL
-
+            
+            
             self.H[2] = self.objCP.Property('H', P=self.P[2], V=VV2)  # j/kg
             self.T[2] = self.objCP.Property('T', P=self.P[2], V=VV2)  # K
             self.V[2] = self.objCP.Property('V', P=self.P[2]
@@ -588,8 +591,9 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
         CPRLIQ = self.objCP.Property('CP', P=PBUB, X=0)  # j/kg K
 
         #	DETERMINE CONDITIONS ENTERING THE CONDENSER
-        # Dr Omar
+        self.trace.dr_omar("unit for MREF")  # Dr Omar
         # HDROP = self.dt.CONDVP[self.NCYC] / self.MREF / self.dt.DUTYC
+        
         HDROP = self.dt.CONDVP[self.NCYC] / (self.MREF/3600) / self.dt.DUTYC
 
         self.P[14] = self.P[2]
@@ -663,6 +667,7 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
         # Two-Phase Heat Transfer Conductance,   kj/hr/m2/C    UTPC
 
         #- cond method
+        self.trace.dr_omar("Use of MROLD")
         lstRest = self.objCond.cond(T4=self.T[4]
                        , H4=self.H[4] # j/kg
                        , H14=self.H[4] # j/kg
@@ -671,7 +676,7 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
                        , QCONDS=QDSC
                        , QCONDC=QTPC
                        , QSCC=QSCC
-                       , MROLD=self.MROLD # to check Dr Omar
+                       , MROLD=self.MROLD
                        , MREF=self.MREF  # kg/hr
                        , UACOND=self.UACOND *3600 # kj/hr
                        )
@@ -701,7 +706,7 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
         # determine the specific volume of the liquid
         #
         if (self.TS1 < self.T[4]):
-            # Dr. Omar to approve
+            self.trace.dr_omar("Wet region issue")   # Dr. Omar to approve
             # Ayman modification, in case DTSUPI = 0
             # the given point came to wet area.
             # check if in wet area, return sat. liquid or sat. vap.
@@ -756,7 +761,7 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
 
                 self.P[13] = self.P[15]
                 self.T[13] = self.T[15] + self.DTSUPI
-                # Dr. Omar to approve
+                self.trace.dr_omar("Wet region issue")  # Dr. Omar to approve
                 # Ayman modification, in case DTSUPI = 0
                 # the given point came to wet area.
                 # check if in wet area, return sat. liquid or sat. vap.
@@ -821,7 +826,7 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
             #	CALCULATE FRESH FOOD EVAPORATOR HEAT TRANSFER.
             #	TEST FOR STANDARD DESIGN.
 
-            # Dr Omar to check the following
+            self.trace.dr_omar("General review for this point")
             if (self.dt.IRFTYP <= 3):
 
                 if (self.dt.ICYCL == 1
@@ -850,7 +855,7 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
                         [TIN, self.FF_FRACT] = self.mixair(
                             self.dt.CAPE, QFM, QFZ, self.TFF, self.TFZ, CFMA)
 
-                    # Dr Omar to check
+                    self.trace.dr_omar("Cancelled convert to F")  # Dr Omar to check
                     # self.TS3 = (TIN + 459.6) / 1.8
                     self.TS3 = TIN
 
@@ -922,13 +927,13 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
             # calculate the average effectiveness of the ff evaporator
             # calculate the heat transfer if the refrigerant left at TS3
 
-            # Dr. Omar to approve
+            self.trace.dr_omar("Wet region issue")  # Dr. Omar to approve
             # Ayman modification, in case DTSUPI = 0
             # the given point came to wet area.
             # check if in wet area, return sat. liquid or sat. vap.
             
             # HS3 = self.objCP.Property('H', P=self.P[7], T=self.TS3)  # j/kg            
-                                                
+            
             HS3 = self.getProp(prp='H', P=self.P[7]
                                       , T=self.TS3, X=1)  # m3/kg
 
@@ -936,8 +941,9 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
 
             # Calculate the heat transfer if the air left at T[5]
             # CFME watt/K see common in CycleType
-            # Dr Omar to check
+            self.trace.dr_omar("Approved")  # Dr Omar to check
             # CFME watt/K -->
+            
             QAMAX = self.dt.CFME * (self.TS3 - self.T[5]) # watt
             QMAXE = QAMAX # watt
 
@@ -996,13 +1002,13 @@ class CycleSolver (CycleUtils, CoolPrpUtil):
     def enthalp_p7(self):
         #	determine the enthalpy at [7]
         if (self.ISPEC == 1):  # Evap superheat:
-            # Dr. Omar to approve
+            self.trace.dr_omar("Wet region issue") # Dr. Omar to approve
             # Ayman modification, in case DTSUPI = 0
             # the given point came to wet area.
             # check if in wet area, return sat. liquid or sat. vap.
             # self.H[7] = self.objCP.Property('H', P=self.P[7]
-                   # , T=self.T[7])  # j/kg 
-                   
+            # , T=self.T[7])  # j/kg 
+            
             self.H[7] = self.getProp(prp='H', P=self.P[7]
                                             , T=self.T[7], X=1)  # j/kg 
 

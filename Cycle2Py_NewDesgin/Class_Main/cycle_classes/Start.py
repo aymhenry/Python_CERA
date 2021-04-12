@@ -1,15 +1,12 @@
 # Python Import ==================
-import math
 import sys
-import datetime
 
 # User Import ======================
 
 from .View import *
 from .CycleType import *
-
 from .CycleDataModelBuiler import CycleDataModelBuiler
-#from ..common_class.QData import QData
+from cycle_classes.Trace import *
 
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 # Job             : Start Cycle app
@@ -129,8 +126,10 @@ class Start:
         self.dt = obj_datamodel.get_data_object()
 
         # show row data input
-        self.obj_show = ShowInput(self.dt)
-        self.obj_show.show()
+        trace = Trace (self.dt, None)
+        trace.app_ins()     # show list of app inputs
+        trace.cyc_pid()     # show cycle graph
+        trace.pnt_lst()     # show cycle graph
         
         # Create related object as the given configration
         self.obj_control = ""

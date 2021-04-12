@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 from .exf4Cond_Evap import exf4Cond_Evap
 
 from .ErrorException import ErrorException
+from cycle_classes.Trace import *
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # Job 			: Create Condenser object based on ICOND
@@ -42,6 +43,7 @@ class CondCool_Abstract (ABC, exf4Cond_Evap):
     def __init__(self, ICOND, objCP):
         self.ICOND = ICOND
         self.objCP = objCP
+        self.trace = Trace()
 
     def setParamters (self, ATOTC, CFMC, TS1, TS3, TS5, DTSUBC, N_COND,
                       USCC, UTPC, UDSC,
@@ -61,8 +63,8 @@ class CondCool_Abstract (ABC, exf4Cond_Evap):
         #    (If Separate Section)  old unit sec-F/Btu(th)
         
         # CFMC  unit Watt/K
-        # by Ayman, Dr Omar to approve
-        # Air given data L/secthen * 700 j/kg K (Air heat capacity)
+        # by Ayman, Dr Omar approved
+        # see comments in CycleSolved 
         # and using PV=RT to get air dencity a\@ given temperature
         # see details in CycleSolver.py
         # j/kg/sec Air load
@@ -306,7 +308,7 @@ class CondCool_CNat (CondCool_Abstract):  # Natural Convection= 0
         #  calculate combined air-side heat transfer coefficient
         UAIR = HRAD + HNAT
         
-        # Dr Omar to approve
+        self.trace.dr_omar("Unit Adjusted")  # Dr Omar to approve
         # Ayman UAIR was kW/m2 K
         # by Ayman  kW/m2 K = 0.04892 Btu/ (s ft2 F)
         # U1 = UAIR * 0.04892 
@@ -320,7 +322,7 @@ class CondCool_CNat (CondCool_Abstract):  # Natural Convection= 0
         
         # Python: 1.8 C-to-F, then 1.0548 btu to j (1 BTU = 1.0548 J)
         # UA_FF_CND, UA_FZ_CND Unit is W/K or j/sec-K
-        # Dr Omar to approve no need to convet 
+ 
         # self.Q_CND_FF = 1.8 * self.UA_FF_CND * (TCND - TS3) * 1.0548
         # self.Q_CND_FZ = 1.8 * self.UA_FZ_CND * (TCND - TS5) * 1.0548
 
@@ -332,8 +334,7 @@ class CondCool_CNat (CondCool_Abstract):  # Natural Convection= 0
 
         # Python: 1.8 C-to-F, then 1.0548 btu to j
         # UA_FF_HXS, UA_FZ_HXS Unit is W/K or j/sec-K
-        # Dr Omar to approve no need to convet 
-        
+                
         # self.Q_HXS_FF = 1.8 * self.UA_FF_HXS * (TCND - TFF) * 1.0548
         # self.Q_HXS_FZ = 1.8 * self.UA_FZ_HXS * (TCND - TFZ) * 1.0548
 
@@ -345,7 +346,7 @@ class CondCool_CNat (CondCool_Abstract):  # Natural Convection= 0
         if (TS5 < 94.2611): # not sure 290 F to K
             self.Q_CND_FZ = 0 # watt
 
-        # Dr Omar to approve
+        self.trace.dr_omar("Wet region issue")  # Dr Omar to approve
         # if (TS5 < -290.0):
         if (TS5 < 94.2611): # not sure 290 F to K
             self.Q_HXS_FZ = 0
@@ -395,7 +396,7 @@ class CondCool_CNat (CondCool_Abstract):  # Natural Convection= 0
         # calculate combined air-side heat transfer coefficient
         UAIR = HRAD + HNAT
 
-        # Dr Omar to approve
+        self.trace.dr_omar("Wet region issue")  # Dr Omar to approve
         # Ayman UAIR was kW/m2 K
         # by Ayman  kW/m2 K = 0.04892 Btu/ (s ft2 F)
         # U2 = UAIR * 0.04892 

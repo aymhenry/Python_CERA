@@ -1,5 +1,4 @@
 # Python Import ====================
-import math
 
 
 # User Import ======================
@@ -21,10 +20,23 @@ class ShowInput ():
                 , "\t" , str_var_unit
                 , "\t" , str_var_desc)
 
-    def show (self):
+    def graph (self):
         int_type = self.dt.ICYCL
         if int_type ==1:
             self.show_sigle_cycle()
+        
+        elif int_type ==2:
+            self.show_double_cycle() # to be checked later
+            
+        elif int_type ==3:
+            self.show_double_cycle()
+            
+        elif int_type ==4:
+            self.show_double_cycle()
+            
+    def show (self):
+        int_type = self.dt.ICYCL
+        if int_type ==1:
             self.show_type1()
         
         elif int_type ==2:
@@ -186,25 +198,30 @@ class ShowInput ():
         pass
     
     def show_sigle_cycle(self):
-        print ("    Line Diagram for single cycle")
-        print ("      ")
-        print ("         11-buble   3-dew                                    ")
-        print ("    4    +-----------+         14                            ")
-        print ("    +----| Condenser +----------+------<---+                 ")
-        print ("    |    +-----------+                     | 2               ")
-        print ("    |                                    +-+--+              ")
-        print ("    |+---------+------------>--+         |    |              ")
-        print ("    ||         6,13            |         |Comp|              ")
-        print ("  +-||-+                       |         +-+--+              ")
-        print ("  | || |                       |           | 1               ")
-        print ("  | || |interchanger           |           |                 ")
-        print ("  | || |                       |           |                 ")
-        print ("  +-||-+                       +---->------+                 ")
-        print ("  10||                                    ")
-        print ("    ||                                    ")
-        print ("    |+------<------------+                ")
-        print ("    |                    |                ")
-        print ("   (X)   +----------+    |                ")
-        print ("    +->--|Evaparator|-->-+                ")
-        print ("    5,8  +----------+    7,9              ")
-        print ("         12dew           \n\n\n")
+        print ("\n\n      Line Diagram for single cycle")
+        print ("                           ")
+        print ("              COND BUB    COND-DEW                           ")
+        print (" COND OUT     11          3         COND IN                  ")
+        print ("         4    +-----------+         14                       ")
+        print ("         +----| Condenser +----------+------<---+            ")
+        print ("         |    +-----------+                     | 2  COMP DIS")
+        print ("         |                                    +-+--+         ")
+        print ("         |+---------+------------>--+         |    |         ")
+        print ("         ||         13              |         |Comp|         ")
+        print ("       +-||-+     HX OUT            |         +-+--+         ")
+        print ("       | || |                       |           | 1  COMP IN ")
+        print ("       | || |interchanger           |           |            ")
+        print ("       | || |                       |           |            ")
+        print ("       +-||-+                       +---->------+            ")
+        print ("       6 ||                                      ")
+        print ("SUBCOOL  ||                                      ")
+        print ("         |+------<------------------------------+")
+        print ("         |  EVAP DEW                            |")
+        print ("         |    12                                |")
+        print ("        (X)   +----------+                      |")
+        print ("         +->--|Evaparator|-->-------------------+")
+        print ("         5    +----------+    7                ")
+        print ("       EVAP IN              EVAP OUT     \n\n\n")
+        
+    def show_double_cycle (self):
+        pass

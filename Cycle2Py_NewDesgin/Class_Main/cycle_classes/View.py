@@ -83,8 +83,6 @@ class View:
     def show_rep(self):
         self.setBasicData()
 
-        print("Show cycle result in View Class ... later ...")
-
         #    SET UP LOGICAL VECTOR ON AIR TEMPERATURES
         if (self.dt.ICYCL == 2):
             self.ds.AIRTMP[10] = True
@@ -521,9 +519,9 @@ class View:
         #
         #    OUTPUT A FIGURE OF THE RESULTS
         #
-        #self.showError (" Check cycle fig number ...")
-        print("\nLEAVING CYCLE WITH IC:" + str(self.ds.IC) )
-        print("LEAVING CYCLE WITH IE:" + str(self.ds.IE) )
+
+        print ("\n\t\tLeaving cycle with IC:" + str(self.ds.IC) )
+        print ("\t\tLeaving cycle with IE:" + str(self.ds.IE) )
 
     def show_overall(self):
         # HOUT = HOUT/WMAVG

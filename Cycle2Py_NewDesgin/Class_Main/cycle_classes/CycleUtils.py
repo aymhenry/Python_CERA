@@ -5,7 +5,7 @@ import datetime
 
 # User import
 from cycle_classes.CoolPrp import *
-
+from cycle_classes.Trace import *
 class CycleUtils ():
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
     def enthal(self, objCP, HBUB, HDEW, XSPEC, P):
@@ -688,207 +688,209 @@ class CycleUtils ():
             ,QFRSH, QFREZ
             ,FROSTF ,FROSTZ
             ,TS3, TS5, T, IDFRST):
-        # Dr. Omar Unit
+        
         # [P9, P10, P15] = self.dutfnd (P1 ... P8, P11 to P15 )
         #	SUBROUTINE DUTFND(ICAB,IRFTYP,ICYCL,N,   QFRSH,QFREZ,FROSTF,FROSTZ,
-        #	QFF,QFZ,self.dt.TS3,TS5,   T,IDFRST, DUTYR)
+        #	QFF,QFZ,dt.TS3,TS5,   T,IDFRST, DUTYR)
         # output    QFF,QFZ,DUTYR
         #	*  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *
         #	* 	CALCULATE DUTY CYCLE AND THE AVERAGE CABINET LOADS			*
         #	*  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *
 
+        self.trace.dr_omar("Ayman Changed Convert") 
+        
         if (ICAB == 0):
             return [0,0,0]
         #
         #	CALCULATE IN-WALL HEAT LOADS
         #
-        TENV = (self.dt.TROOM + 459.6) / 1.8
+        # TENV = (dt.TROOM + 459.6) / 1.8
+        TENV = dt.TROOM 
         TCND = 0.2 * T[14] + 0.4 * T[3] + 0.4 * T[11]
 
         if (TS5 > -300.0):  # Freezer evaporator
             TRFZ = (T[8] + T[9]) / 2.0
-            self.dt.Q_FZ_IN_WALL = 1.8 * \
-                self.dt.UA_FZ * (TENV - TS5)
-            self.dt.Q_ML_IN_WALL = 1.8 * \
-                self.dt.UA_ML * (self.dt.TS3 - TS5)
-
-            self.dt.CAPZ_IN_WALL = 1.8 * \
-                self.dt.UA_FZ * (TENV - TRFZ)
-            self.dt.CAPM_IN_WALL = 1.8 * \
-                self.dt.UA_ML * (self.dt.TS3 - TRFZ)
-
-            self.dt.Q_FZ_FF = 1.8 * self.dt.UA_ML * (TS5 - TRFZ)
+            
+            # dt.Q_FZ_IN_WALL = 1.8 * dt.UA_FZ * (TENV - TS5)
+            # dt.Q_ML_IN_WALL = 1.8 * dt.UA_ML * (dt.TS3 - TS5)
+            # dt.CAPZ_IN_WALL = 1.8 * dt.UA_FZ * (TENV - TRFZ)
+            # dt.CAPM_IN_WALL = 1.8 * dt.UA_ML * (dt.TS3 - TRFZ)
+            # dt.Q_FZ_FF = 1.8 * dt.UA_ML * (TS5 - TRFZ)
+            
+            dt.Q_FZ_IN_WALL = dt.UA_FZ * (TENV - TS5)
+            dt.Q_ML_IN_WALL = dt.UA_ML * (dt.TS3 - TS5)
+            dt.CAPZ_IN_WALL = dt.UA_FZ * (TENV - TRFZ)
+            dt.CAPM_IN_WALL = dt.UA_ML * (dt.TS3 - TRFZ)
+            dt.Q_FZ_FF = dt.UA_ML * (TS5 - TRFZ)
+            
         else:
-            self.dt.Q_FZ_IN_WALL = 0
-            self.dt.Q_ML_IN_WALL = 0
+            dt.Q_FZ_IN_WALL = 0
+            dt.Q_ML_IN_WALL = 0
 
-            self.dt.CAPZ_IN_WALL = 0
-            self.dt.CAPM_IN_WALL = 0
+            dt.CAPZ_IN_WALL = 0
+            dt.CAPM_IN_WALL = 0
 
-            self.dt.Q_FZ_FF = 0
+            dt.Q_FZ_FF = 0
         # End if
 
-        # Dr. Omar units
         TRFF = (T[5] + T[7]) / 2.0
-        self.dt.Q_FF_IN_WALL = 1.8 * \
-            self.dt.UA_FF * (TENV - self.dt.TS3)
-            
-        self.dt.CAPE_IN_WALL = 1.8 * \
-            self.dt.UA_FF * (TENV - TRFF)
-            
-        self.dt.CONDF_IN_WALL = 1.8 * \
-            self.dt.UA_FF_CND * (TCND - TENV)
-            
-        self.dt.CONDZ_IN_WALL = 1.8 * \
-            self.dt.UA_FZ_CND * (TCND - TENV)
+        
+        # dt.Q_FF_IN_WALL = 1.8 * dt.UA_FF * (TENV - dt.TS3)
+        # dt.CAPE_IN_WALL = 1.8 * dt.UA_FF * (TENV - TRFF)
+        # dt.CONDF_IN_WALL = 1.8 * dt.UA_FF_CND * (TCND - TENV)
+        # dt.CONDZ_IN_WALL = 1.8 *  dt.UA_FZ_CND * (TCND - TENV)
+
+        dt.Q_FF_IN_WALL = dt.UA_FF * (TENV - dt.TS3)
+        dt.CAPE_IN_WALL = dt.UA_FF * (TENV - TRFF)
+        dt.CONDF_IN_WALL = dt.UA_FF_CND * (TCND - TENV)
+        dt.CONDZ_IN_WALL = dt.UA_FZ_CND * (TCND - TENV)
+        
         #
         #	BRANCH ACCORDING TO THE TYPE OF REFRIGERATOR
         #
-        QFF = self.dt.FFQ
-        QFZ = self.dt.FZQOFF
+        QFF = dt.FFQ
+        QFZ = dt.FZQOFF
         #
 
         if IRFTYP in [1, 3]:
             if (ICYCL == 1):
-                if (self.dt.IDFRST == 0):
-                    QFF = QFF + self.dt.FROSTF
-                    QFZ = QFZ + self.dt.FROSTF
+                if (dt.IDFRST == 0):
+                    QFF = QFF + dt.FROSTF
+                    QFZ = QFZ + dt.FROSTF
 
-                # Dr. Omar Unit
                 # 1 Wh = 3.413 Btu    BTU = 1.0548 kj/hr
-                # self.dt.CAPE = QFRSH / 1.0548 \
-                    # - 3.413 * self.dt.FANE - 3.413 * self.dt.DFSTCYC	\
-                    # - 3.413 * self.dt.FFCYC - 3.413 * self.dt.FZCYC	\
-                    # - self.dt.CONDF_IN_WALL - self.dt.CONDZ_IN_WALL
+                # dt.CAPE = QFRSH / 1.0548 \
+                    # - 3.413 * dt.FANE - 3.413 * dt.DFSTCYC	\
+                    # - 3.413 * dt.FFCYC - 3.413 * dt.FZCYC	\
+                    # - dt.CONDF_IN_WALL - dt.CONDZ_IN_WALL
 
-                # both self.dt.CONDF_IN_WALL - self.dt.CONDZ_IN_WALL
+                # both dt.CONDF_IN_WALL - dt.CONDZ_IN_WALL
                 # are zero by defalut
                 
-                self.dt.CAPE = QFRSH \
-                    - self.dt.FANE \
-                    - self.dt.DFSTCYC	\
-                    - self.dt.FFCYC  \
-                    - self.dt.FZCYC	\
-                    - self.dt.CONDF_IN_WALL \
-                    - self.dt.CONDZ_IN_WALL
+                dt.CAPE = QFRSH \
+                    - dt.FANE \
+                    - dt.DFSTCYC \
+                    - dt.FFCYC  \
+                    - dt.FZCYC \
+                    - dt.CONDF_IN_WALL \
+                    - dt.CONDZ_IN_WALL
                     
-                self.dt.DUTYC = (QFF + QFZ) / self.dt.CAPE
+                dt.DUTYC = (QFF + QFZ) / dt.CAPE
                 
-                if (self.dt.DUTYC > 1.0):
-                    self.dt.DUTYC = 1.0
-                DUTYR = self.dt.DUTYC
+                if (dt.DUTYC > 1.0):
+                    dt.DUTYC = 1.0
+                DUTYR = dt.DUTYC
 
             if (ICYCL == 2):
-                QFF = QFF - self.dt.FROSTF
-                if (self.dt.IDFRST == 0):
-                    QFZ = QFZ + self.dt.FROSTF
+                QFF = QFF - dt.FROSTF
+                if (dt.IDFRST == 0):
+                    QFZ = QFZ + dt.FROSTF
                 
                 # Dr. Omar Unit
-                # self.dt.CAPZ = QFREZ / 1.0548 - 3.413 * self.dt.FANZ - 3.413 * self.dt.DFSTCYC	\
-                    # + self.dt.Q_FZ_IN_WALL + self.dt.Q_ML_IN_WALL	\
-                    # - self.dt.CAPZ_IN_WALL - self.dt.CAPM_IN_WALL	\
-                    # - self.dt.CONDZ_IN_WALL - 3.413 * self.dt.FZCYC	\
-                    # - self.dt.Q_HXS_FZ / 1.0548
+                # dt.CAPZ = QFREZ / 1.0548 - 3.413 * dt.FANZ \
+                    # - 3.413 * dt.DFSTCYC	\
+                    # + dt.Q_FZ_IN_WALL + dt.Q_ML_IN_WALL	\
+                    # - dt.CAPZ_IN_WALL - dt.CAPM_IN_WALL	\
+                    # - dt.CONDZ_IN_WALL - 3.413 * dt.FZCYC	\
+                    # - dt.Q_HXS_FZ / 1.0548
                     
-                self.dt.CAPZ = QFREZ \
-                    - self.dt.FANZ \
-                    - self.dt.DFSTCYC \
-                    + self.dt.Q_FZ_IN_WALL \
-                    + self.dt.Q_ML_IN_WALL \
-                    - self.dt.CAPZ_IN_WALL \
-                    - self.dt.CAPM_IN_WALL \
-                    - self.dt.CONDZ_IN_WALL \
-                    - self.dt.FZCYC	\
-                    - self.dt.Q_HXS_FZ 
+                dt.CAPZ = QFREZ \
+                    - dt.FANZ \
+                    - dt.DFSTCYC \
+                    + dt.Q_FZ_IN_WALL \
+                    + dt.Q_ML_IN_WALL \
+                    - dt.CAPZ_IN_WALL \
+                    - dt.CAPM_IN_WALL \
+                    - dt.CONDZ_IN_WALL \
+                    - dt.FZCYC	\
+                    - dt.Q_HXS_FZ 
 
-                if (self.dt.CAPZ <= 0.0):
+                if (dt.CAPZ <= 0.0):
                     self.showError("Incorrect Solution, Check Mass Flow")
                     self.showError("Solution being Terminated")
                     sys.exit(100)  # STOP ' '
 
-                self.dt.DUTYZ = QFZ / self.dt.CAPZ
+                dt.DUTYZ = QFZ / dt.CAPZ
 
-                # Dr. Omar Unit
-                # self.dt.CAPE = QFRSH / 1.0548 - 3.413 * self.dt.FANE - 3.413 * self.dt.FFCYC	\
-                    # + self.dt.Q_FF_IN_WALL - self.dt.CAPE_IN_WALL	\
-                    # - self.dt.CONDF_IN_WALL + self.dt.Q_FZ_FF	\
-                    # - self.dt.Q_HXS_FF / 1.0548
+                # dt.CAPE = QFRSH / 1.0548 - 3.413 * dt.FANE \
+                    # - 3.413 * dt.FFCYC	\
+                    # + dt.Q_FF_IN_WALL - dt.CAPE_IN_WALL	\
+                    # - dt.CONDF_IN_WALL + dt.Q_FZ_FF	\
+                    # - dt.Q_HXS_FF / 1.0548
 
-                self.dt.CAPE = QFRSH \
-                    - self.dt.FANE \
-                    - self.dt.FFCYC \
-                    + self.dt.Q_FF_IN_WALL \
-                    - self.dt.CAPE_IN_WALL \
-                    - self.dt.CONDF_IN_WALL \
-                    + self.dt.Q_FZ_FF \
-                    - self.dt.Q_HXS_FF
+                dt.CAPE = QFRSH \
+                    - dt.FANE \
+                    - dt.FFCYC \
+                    + dt.Q_FF_IN_WALL \
+                    - dt.CAPE_IN_WALL \
+                    - dt.CONDF_IN_WALL \
+                    + dt.Q_FZ_FF \
+                    - dt.Q_HXS_FF
 
-                self.dt.DUTYE = QFF / self.dt.CAPE
+                dt.DUTYE = QFF / dt.CAPE
 
-                self.dt.DUTYC = min(
-                    self.dt.DUTYE, self.dt.DUTYZ)
+                dt.DUTYC = min(
+                    dt.DUTYE, dt.DUTYZ)
 
-                if (self.dt.DUTYC > 1.0):
-                    self.dt.DUTYC = 1.0
+                if (dt.DUTYC > 1.0):
+                    dt.DUTYC = 1.0
                     
-                DUTYR = max(self.dt.DUTYE, self.dt.DUTYZ)
+                DUTYR = max(dt.DUTYE, dt.DUTYZ)
 
                 if (DUTYR > 1.0):
                     DUTYR = 1.0
 
             if (ICYCL == 3):
                 if (N == 1):
-                    if (self.dt.IDFRST == 0):
-                        QFZ = QFZ + self.dt.FROSTF
-                    
-                    # Dr Omar approve
-                    # self.dt.CAPZ = QFRSH / 1.0548 - 3.413 * self.dt.FANE - \
-                        # 3.413 * (self.dt.DFSTCYC + self.dt.FZCYC)
+                    if (dt.IDFRST == 0):
+                        QFZ = QFZ + dt.FROSTF
+                   
+                    # dt.CAPZ = QFRSH / 1.0548 - 3.413 * dt.FANE - \
+                        # 3.413 * (dt.DFSTCYC + dt.FZCYC)
 
-                    self.dt.CAPZ = QFRSH \
-                            - self.dt.FANE \
-                            - (self.dt.DFSTCYC + self.dt.FZCYC)
+                    dt.CAPZ = QFRSH \
+                            - dt.FANE \
+                            - (dt.DFSTCYC + dt.FZCYC)
                         
-                    self.dt.DUTYZ = QFZ / self.dt.CAPZ
+                    dt.DUTYZ = QFZ / dt.CAPZ
 
-                    self.dt.DUTYC = min(self.dt.DUTYZ, 1.0)
-                    self.dt.DUTYZ = self.dt.DUTYC
+                    dt.DUTYC = min(dt.DUTYZ, 1.0)
+                    dt.DUTYZ = dt.DUTYC
 
                 else:
-                    # Dr omar
-                    # self.dt.CAPE = QFRSH / 1.0548 - 3.413 * \
-                        # (self.dt.FANE + self.dt.FFCYC) 
-                        # + self.dt.Q_FF_IN_WALL - self.dt.CAPE_IN_WALL
+                    # dt.CAPE = QFRSH / 1.0548 - 3.413 * \
+                        # (dt.FANE + dt.FFCYC) 
+                        # + dt.Q_FF_IN_WALL - dt.CAPE_IN_WALL
 
-                    self.dt.CAPE = QFRSH \
-                        - (self.dt.FANE + self.dt.FFCYC) \
-                        + self.dt.Q_FF_IN_WALL - self.dt.CAPE_IN_WALL
+                    dt.CAPE = QFRSH \
+                        - (dt.FANE + dt.FFCYC) \
+                        + dt.Q_FF_IN_WALL - dt.CAPE_IN_WALL
                         
-                    QFF = QFF - self.dt.FROSTF
-                    self.dt.DUTYE = QFF / self.dt.CAPE
-                    self.dt.DUTYC = min(self.dt.DUTYE, 1.0)
-                    self.dt.DUTYE = self.dt.DUTYC
+                    QFF = QFF - dt.FROSTF
+                    dt.DUTYE = QFF / dt.CAPE
+                    dt.DUTYC = min(dt.DUTYE, 1.0)
+                    dt.DUTYE = dt.DUTYC
 
-                DUTYR = self.dt.DUTYC
+                DUTYR = dt.DUTYC
 
             else:
-                if (self.dt.IDFRST == 0):
-                    QFZ = QFZ + self.dt.FROSTF
+                if (dt.IDFRST == 0):
+                    QFZ = QFZ + dt.FROSTF
                 
-                # Dr Omar
-                # self.dt.CAPE = QFRSH / 1.0548 - 3.413 * (self.dt.FANE + self.dt.DFSTCYC + self.dt.FZCYC)	\
-                    # + self.dt.Q_FF_IN_WALL - self.dt.CAPE_IN_WALL						\
-                    # - self.dt.CONDF_IN_WALL - self.dt.Q_HXS_FF / 1.0548
+                # dt.CAPE = QFRSH / 1.0548 - 3.413 * (dt.FANE 
+                    # + dt.DFSTCYC + dt.FZCYC)	\
+                    # + dt.Q_FF_IN_WALL - dt.CAPE_IN_WALL	\
+                    # - dt.CONDF_IN_WALL - dt.Q_HXS_FF / 1.0548
 
-                self.dt.CAPE = QFRSH \
-                    - (self.dt.FANE + self.dt.DFSTCYC + self.dt.FZCYC) \
-                    + self.dt.Q_FF_IN_WALL - self.dt.CAPE_IN_WALL \
-                    - self.dt.CONDF_IN_WALL - self.dt.Q_HXS_FF 
+                dt.CAPE = QFRSH \
+                    - (dt.FANE + dt.DFSTCYC + dt.FZCYC) \
+                    + dt.Q_FF_IN_WALL - dt.CAPE_IN_WALL \
+                    - dt.CONDF_IN_WALL - dt.Q_HXS_FF 
                                         
 
-                self.dt.DUTYE = QFZ / self.dt.CAPE
-                self.dt.DUTYC = min(self.dt.DUTYE, 1.0)
-                DUTYR = self.dt.DUTYC
+                dt.DUTYE = QFZ / dt.CAPE
+                dt.DUTYC = min(dt.DUTYE, 1.0)
+                DUTYR = dt.DUTYC
 
         return [QFF, QFZ, DUTYR]
 

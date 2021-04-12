@@ -3,8 +3,9 @@ from abc import ABC, abstractmethod
 
 # User import
 from cycle_classes.exf4Cond_Evap import exf4Cond_Evap
-
 from cycle_classes.ErrorException import ErrorException
+from cycle_classes.Trace import *
+
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # Job 			: Create Condenser object based on ICOND
 #    input: IFRSH = 0  Natural Convection
@@ -39,6 +40,7 @@ class EvapCool_Abstract (ABC, exf4Cond_Evap):
     def __init__(self, IFRSH, objCP):
         self.IFRSH = IFRSH
         self.objCP = objCP
+        self.trace = Trace()
 
     def setParamters (self, ATOTE, CFME, TS3, N_EVAP,
                       USUPE, UTPE, TROOM, FZTEMP, 
@@ -165,6 +167,7 @@ class EvapCool_Abstract (ABC, exf4Cond_Evap):
         TE[1] = TENEW
 
         #  adjust exit air temp to 90% approach if natural convection
+        self.trace.dr_omar("Modification in Unit by Ayman for imprical Equ.") 
         JE = 2 # by Ayman to chk Dr omar
         if (self.IFRSH == 0):
             TS4 = 0.9 * TE[JE] + 0.1 * TS3
@@ -216,6 +219,7 @@ class EvapCool_FFNat (EvapCool_Abstract):  # IFRSH== 0
         SIGMA = 2.04326E-7
         EPS = 0.8 # emissivity of heat exchanger
 
+        self.trace.dr_omar("Modification in Unit by Ayman.") 
         # TENV = (self.TROOM + 459.6) / 1.8 # R
         # by Dr.Omar
         TENV = self.TROOM  # K
@@ -248,7 +252,7 @@ class EvapCool_FFNat (EvapCool_Abstract):  # IFRSH== 0
         # by Dr.Omar
         # HNAT = A_NAT * DELTA**0.33 * 20.44
         
-        # By Ayman - Dr omar to approve, imprical equation
+        self.trace.dr_omar("Modification in Unit by Ayman for imprical Equ.") 
         # HNAT = A_NAT * DELTAT**0.33 * 20.44
         HNAT = A_NAT * (DELTAT*1.8)**0.33 * 20.44
  
@@ -264,7 +268,7 @@ class EvapCool_FFNat (EvapCool_Abstract):  # IFRSH== 0
         # Dr Omar to check
         UAIR = UAIR / 1.8961 # convert to W/C/sq-length
         
-        # Dr Omar - this is not SI units
+        self.trace.dr_omar("this is not SI units")  # Dr Omar - 
         # UA_FF is  W/K,  BTU = 1.0548 J
         # Q_IN_WALL = 1.0548 * 1.8 * self.UA_FF * \
             # (TENV - TAVE) / AEVAP + self.Q_HXS_FF / AEVAP
@@ -362,7 +366,7 @@ class EvapCool_FFCross (EvapCool_Abstract):  # IFRSH== 1
         ATPC = 0
 
         TAIR = TS3
-        # by Dr.Omar
+        self.trace.dr_omar("to check Ayman Modification")  # by Dr.Omar
         # rho air = 1.354 kg/m3, CPair = 1.0058 kj/kg.K
         #    j/sec  = L/sec .kg/m3 kj/kg.K
         CAIR = self.CFME * 1.354 * 1.0058 #[OA]
