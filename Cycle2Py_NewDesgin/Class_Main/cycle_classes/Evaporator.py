@@ -44,8 +44,8 @@ class EvapCool_Abstract (exf4Cond_Evap):
         self.trace = Trace()
 
     def setParamters(self, ATOTE, CFME, TS3, N_EVAP,
-                      USUPE, UTPE, TROOM, FZTEMP, 
-                      UA_FF, Q_HXS_FF, IWALL_FF, NUM_ZONE, IRFTYP):
+                     USUPE, UTPE, TROOM, FZTEMP,
+                     UA_FF, Q_HXS_FF, IWALL_FF, NUM_ZONE, IRFTYP):
         # ATOTE m2 Total Heat Transfer Surface Area
         # CFME Air Flow Rate Across Coil (L/s) [OA]
         # TS3 htf temperature entering fresh food evaporator
@@ -162,7 +162,7 @@ class EvapCool_Abstract (exf4Cond_Evap):
 
         JEOLD = JE  # useless not used
         TE[2] = TE[1]   # [OA added this line to store the previous value!]
-        #JE = 1 #[OA changed from 2 to 1; we need to compare the new value to the old value]
+        # J E = 1 #[OA changed from 2 to 1; we need to compare the new value to the old value]
 
         # TE[JE] = TENEW
         TE[1] = TENEW
@@ -173,11 +173,11 @@ class EvapCool_Abstract (exf4Cond_Evap):
         if (self.IFRSH == 0):
             TS4 = 0.9 * TE[JE] + 0.1 * TS3
 
-        dicRes = {'TS4' : TS4,
-                     'TE' : TE,
-                     'JE' : JE,
-                     'ICONE' : ICONE    # 0=Free Error, 1=Error Found
-                 }
+        dicRes = {'TS4': TS4,
+                  'TE': TE,
+                  'JE': JE,
+                  'ICONE': ICONE    # 0=Free Error, 1=Error Found
+                  }
         return dicRes
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -189,25 +189,26 @@ class EvapCool_Abstract (exf4Cond_Evap):
 
 class EvapCool_FFNat(EvapCool_Abstract):  # IFRSH== 0
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
+
     def evap_balance(self, MREF,
-                           T5, H5, T7,
-                           TDEW,
-                           CPRVAP
-                        ):
+                     T5, H5, T7,
+                     TDEW,
+                     CPRVAP
+                     ):
         # MREF  = MREF * 2.20462 # kg to pounds is not done
         HDEW = self.objCP.Property('H', T=TDEW, X=1)  # j/kg
         
         lstRes = self.ffnat(T5=T5, H5=H5, T7=T7,
-                        TDEW=TDEW, HDEW=HDEW,
-                        TS3=self.TS3,
-                        CPRVAP=CPRVAP, IRFTYP=self.IRFTYP,
-                        MREF=MREF
-                    )
+                            TDEW=TDEW, HDEW=HDEW,
+                            TS3=self.TS3,
+                            CPRVAP=CPRVAP, IRFTYP=self.IRFTYP,
+                            MREF=MREF
+                            )
 
         dicRes = {'QFRSH': lstRes[0],  # Q
-                     'FSUPE': lstRes[1],   # Fraction subcooling
-                     'UAFF': lstRes[2]
-                 }
+                  'FSUPE': lstRes[1],   # Fraction subcooling
+                  'UAFF': lstRes[2]
+                  }
         return dicRes
         
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
@@ -313,36 +314,36 @@ class EvapCool_FFNat(EvapCool_Abstract):  # IFRSH== 0
 class EvapCool_FFCross (EvapCool_Abstract):  # IFRSH== 1
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
     def evap_balance(self, MREF,
-                           T5, H5,
-                           TDEW,
-                           CPRVAP,
-                           P5, P7
-                        ):
+                     T5, H5,
+                     TDEW,
+                     CPRVAP,
+                     P5, P7
+                     ):
         # MREF  = MREF * 2.20462 # kg to pounds is not done
         HDEW = self.objCP.Property('H', T=TDEW, X=1)  # j/kg
         
         lstRes = self.ffcross(T5_S=T5, H5_S=H5,
-                                TDEW_S=TDEW, HDEW_S=HDEW,
-                                TS3=self.TS3,
-                                CPR=CPRVAP,
-                                PIN=P5, POUT=P7,
-                                MREF=MREF, NUM_ZONE = self.NUM_ZONE
-                             )
+                              TDEW_S=TDEW, HDEW_S=HDEW,
+                              TS3=self.TS3,
+                              CPR=CPRVAP,
+                              PIN=P5, POUT=P7,
+                              MREF=MREF, NUM_ZONE=self.NUM_ZONE
+                              )
 
-        dicRes = {'QFRSH':lstRes[0],  # Q 
-                     'FSUPE': lstRes[1],  # Fraction subcooling
-                     'UAFF': lstRes[2]
-                 }
+        dicRes = {'QFRSH': lstRes[0],  # Q
+                  'FSUPE': lstRes[1],  # Fraction subcooling
+                  'UAFF': lstRes[2]
+                  }
                  
         return dicRes
 
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
     def ffcross(self, MREF,
-                    H5_S, T5_S, HDEW_S, TDEW_S,
-                    TS3,
-                    CPR,
-                    PIN, POUT,
-                    NUM_ZONE
+                H5_S, T5_S, HDEW_S, TDEW_S,
+                TS3,
+                CPR,
+                PIN, POUT,
+                NUM_ZONE
                 ):
 
         # solves for the fresh food evaporator
@@ -521,37 +522,37 @@ class EvapCool_FFCross (EvapCool_Abstract):  # IFRSH== 1
 class EvapCool_FFCount (EvapCool_Abstract):  # IFRSH== 2
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
     def evap_balance(self, MREF,
-                           T5, H5,
-                           TDEW,
-                           CPRVAP,
-                           P5, P7
+                     T5, H5,
+                     TDEW,
+                     CPRVAP,
+                     P5, P7
                      ):
         # MREF  = MREF * 2.20462 # kg to pounds is not done
         HDEW = self.objCP.Property('H', T=TDEW, X=1)  # j/kg
         
         lstRes = self.ffcount(T5_S=T5, H5_S=H5,
-                                TDEW_S=TDEW, HDEW_S=HDEW,
-                                TS3=self.TS3,
-                                CPR=CPRVAP,
-                                PIN=P5, POUT=P7,
-                                MREF=MREF, NUM_ZONE = self.NUM_ZONE
+                              TDEW_S=TDEW, HDEW_S=HDEW,
+                              TS3=self.TS3,
+                              CPR=CPRVAP,
+                              PIN=P5, POUT=P7,
+                              MREF=MREF, NUM_ZONE=self.NUM_ZONE
                               )
 
         dicRes = {'QFRSH': lstRes[0],  # Q
-                     'FSUPE': lstRes[1],  # Fraction subcooling
-                     'UAFF': lstRes[2]
-                 }
+                  'FSUPE': lstRes[1],  # Fraction subcooling
+                  'UAFF': lstRes[2]
+                  }
                  
         return dicRes
 
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
     def ffcount(self, MREF,
-                    H5_S,  T5_S,
-                    HDEW_S, TDEW_S,
-                    TS3,
-                    CPR,
-                    PIN, POUT,
-                    NUM_ZONE
+                H5_S, T5_S,
+                HDEW_S, TDEW_S,
+                TS3,
+                CPR,
+                PIN, POUT,
+                NUM_ZONE
                 ):
 
         # subroutine ffcount - solves for the fresh food evaporator   

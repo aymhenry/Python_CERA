@@ -11,6 +11,8 @@ from cycle_classes.ErrorException import ErrorException
 #
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+
+
 class CycleType_Abstract (ABC):
 
     def __init__(self, objdata):
@@ -23,7 +25,6 @@ class CycleType_Abstract (ABC):
         
         self.setup_vars_for_all_types()
         self.setup_vars_extra()
-
 
     # Abstract methods
     # -----------------------------------------------------------
@@ -85,13 +86,13 @@ class CycleType_Abstract (ABC):
 
         # get compressor file name
         # self.dt.FILMAP1 = self.getCompressorFileName(
-            # self.dt.FILMAP1_CODE) + ".cmp"
+        #   # self.dt.FILMAP1_CODE) + ".cmp"
 
         # Binary interaction parameter (BIP)
         # for int_ref in range(1, 2 + 1):
-            # self.dt.F[2][1][int_ref] = self.dt.F[1][2][int_ref]
-            # self.dt.F[3][1][int_ref] = self.dt.F[1][3][int_ref]
-            # self.dt.F[3][2][int_ref] = self.dt.F[2][3][int_ref]
+        #    # self.dt.F[2][1][int_ref] = self.dt.F[1][2][int_ref]
+        #    # self.dt.F[3][1][int_ref] = self.dt.F[1][3][int_ref]
+        #    # self.dt.F[3][2][int_ref] = self.dt.F[2][3][int_ref]
 
         # Delat Temp Refrigerant Exit Superheat (C) Or Quality (0-1)
         # add a new entry for Quality in Python only
@@ -138,8 +139,8 @@ class CycleType_Abstract (ABC):
         # TOL_COND
                 
         # Python - Temperatue input (C) and is converted to K
-        self.dt.TS1= [temp_c + 273.11 for temp_c in self.dt.TS1]
-        self.dt.TS3= [temp_c + 273.11 for temp_c in self.dt.TS3]
+        self.dt.TS1 = [temp_c + 273.11 for temp_c in self.dt.TS1]
+        self.dt.TS3 = [temp_c + 273.11 for temp_c in self.dt.TS3]
         
         # - delta -t not required
         #       self.dt.DTSBCI= [temp_c + 273.11 for temp_c in self.dt.DTSBCI]
@@ -167,20 +168,20 @@ class CycleType_Abstract (ABC):
         # self.dt.FROSTZS = self.dt.FROSTZ
 
         # error ===CONVERT UNITS need adjust may be move to other class
-        print ("=== to be checked in Cycle.type =======")
+        print("=== to be checked in Cycle.type =======")
         self.dt.CONDF = self.dt.FFQ - self.dt.FFSEN - self.dt.FFLAT \
             - self.dt.FFHTQ - self.dt.FROSTF - self.dt.FFREFQ - self.dt.FFPENA
 
         self.dt.CONDZ = self.dt.FZQ - self.dt.FZSEN - self.dt.FZLAT - \
             self.dt.FZHTQ - self.dt.FROSTZ - self.dt.FZREFQ - self.dt.FZPENA
 
-        
     # -----------------------------------------------------------
     # Job 			: add extra var for all types
     # Input 		:
     #
     # Output		:
     # -----------------------------------------------------------
+
     def setup_vars_for_all_types(self):
         self.dt.ETAF = 0.0
         self.dt.ETAV = 0.0
@@ -240,26 +241,25 @@ class CycleType_Abstract (ABC):
     # Output		:
     # -----------------------------------------------------------
     def call_cycle(self, lng_item):
-        if self.getRefName(self.dt.IR[1][1])=="":
+        if self.getRefName(self.dt.IR[1][1]) == "":
             raise ErrorException('Error refrigerant code: ', 'cyt1000')
             return
         
-        print ("Using Ref. ", self.getRefName(self.dt.IR[1][1]) )
+        print("Using Ref. ", self.getRefName(self.dt.IR[1][1]))
         
         self.objCP.setup(self.getRefName(self.dt.IR[1][1]))  # 'R12'
         
-        objCycleSolver = CycleSolver(objCP=self.objCP
-                            , objData=self.dt
-                            , lng_item=lng_item
-                            , NCYC=1
-                            )
+        objCycleSolver = CycleSolver(objCP=self.objCP,
+                                     objData=self.dt,
+                                     lng_item=lng_item,
+                                     NCYC=1
+                                     )
 
-        #=== solve
+        # === solve
         objCycleSolver.solveCycle()
         objFeedback = objCycleSolver.getSolution()
         
-        return objFeedback # obj_cycle.cycle()
-
+        return objFeedback   # obj_cycle.cycle()
 
     def getRefName(self, lng_Code):
         lstRefList = [
@@ -309,6 +309,8 @@ class CycleType_Abstract (ABC):
 #
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+
 class Type_1Standard (CycleType_Abstract):
     pass
 
@@ -316,9 +318,9 @@ class Type_1Standard (CycleType_Abstract):
         self.dt.ITYPE = 1
         self.dt.IEVAP = 0
         
-        self.dt.TS5 = -300.0 # 256
+        self.dt.TS5 = -300.0   # 256
         self.dt.DPF = 0.0
-        self.dt.CFMF = 0 # by pass required value.
+        self.dt.CFMF = 0  # by pass required value.
 
         return self.call_cycle(self.dt.ITYPE)
 
@@ -337,6 +339,8 @@ class Type_1Standard (CycleType_Abstract):
 #
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+
 class Type_2Lorenz (CycleType_Abstract):
 
     def calculte(self):
@@ -354,9 +358,11 @@ class Type_2Lorenz (CycleType_Abstract):
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # Job 			: Analisis Cycle Type 2 - Lorenz
-#				Control Method 4 -switching valve
+#               Control Method 4 -switching valve
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+
 class Type_2Lorenz_4swtchVLV (Type_2Lorenz):
     def adjust_input(self):
         # super.adjust_input()
@@ -364,21 +370,25 @@ class Type_2Lorenz_4swtchVLV (Type_2Lorenz):
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # Job 			: Analisis Cycle Type 2 - Lorenz
-#				Control Method 5 -solenoid valve
+# 				Control Method 5 -solenoid valve
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+
 class Type_2Lorenz_5solindVLV (Type_2Lorenz):
     def adjust_input(self):
-        #	if INCTRL == 5 i.e solenoid valve or fan control
-        #	set IDFRST =1 Manual Defrost to Yes
+        #   if INCTRL == 5 i.e solenoid valve or fan control
+        #   set IDFRST =1 Manual Defrost to Yes
         self.dt.IDFRST = 1
         # super.adjust_input()
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # Job 			: Analisis Cycle Type 2 - Lorenz
-#				Control Method any other ctrl method, but not 4 & 5
+# 				Control Method any other ctrl method, but not 4 & 5
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+
 class Type_2Lorenz_ctrlOthers (Type_2Lorenz):
     def adjust_input(self):
         # super.adjust_input()
@@ -389,6 +399,8 @@ class Type_2Lorenz_ctrlOthers (Type_2Lorenz):
 #
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+
 class Type_3DualLoop (CycleType_Abstract):
 
     def calculte(self):
@@ -405,16 +417,18 @@ class Type_3DualLoop (CycleType_Abstract):
 
         # get compressor file name
         # self.dt.FILMAP2 = self.getCompressorFileName(
-            # self.dt.FILMAP2_CODE)
+        #    # self.dt.FILMAP2_CODE)
 
         self.prepare_Data4Cycle(1)
-        #self.prepare_Data4Cycle (2)
+        # self.prepare_Data4Cycle (2)
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # Job 			: Analisis Cycle Type 4 - Dual Evap
 #
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+
 class Type_4DualEvap (CycleType_Abstract):
 
     def calculte(self):

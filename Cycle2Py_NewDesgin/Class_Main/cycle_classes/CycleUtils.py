@@ -7,6 +7,7 @@ import sys
 # from cycle_classes.Trace import *
 from cycle_classes.CoolPrpUtil import *
 
+
 class CycleUtils ():
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
     def enthal(self, objCP, HBUB, HDEW, XSPEC, P):
@@ -74,7 +75,8 @@ class CycleUtils ():
 
         if IC == 1:
             # SELECT CASE (IC)
-            #	 CASE [1]#Initialize
+            #   CASE [1]#Initialize
+
             dt.IBLNCE = 0
             IRET = 0
 
@@ -256,13 +258,14 @@ class CycleUtils ():
         return [TS3, TS5]
     
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
-    def lowevp(self, dt, objCP, MREF, ICYCL, ICNTRL
-            ,H, P, T
-            # XQ, XL, XV, not used
-            # ,VL, VV
-            # HL, not clear its use
-            ,TS3, TS5
-            ,DPF, ETHX2):
+    def lowevp(self, dt, objCP, MREF, ICYCL, ICNTRL,
+               H, P, T,
+               # XQ, XL, XV, not used
+               # ,VL, VV
+               # HL, not clear its use,
+               TS3, TS5,
+               DPF, ETHX2
+               ):
         # ICNTRL - CONTROL METHOD FOR EVAPORATOR LOAD
         #  FREEZER EVAPORATOR AND LOWER INTERCHANGER
         
@@ -275,14 +278,14 @@ class CycleUtils ():
         P[10] = P[6]
         P[9] = P[5]
         P[8] = P[9] + DPF
-        #XQ[10] = 0
+        #  XQ[10] = 0
         ETHX = ETHX2
         TSAV = T[9]
         
         TBUB = objCP.Property('T', P=P[8], X=0)  # K
         HBUB = objCP.Property('H', P=P[8], X=0)  # j/kg
 
-        if(NCALL == 0): # Python all times NCALL = 0 !!!
+        if(NCALL == 0):   # Python all times NCALL = 0 !!!
             TDEW = objCP.Property('T', P=P[9], X=1)  # K
             HDEW = objCP.Property('H', P=P[9], X=1)  # j/kg
             
@@ -331,7 +334,7 @@ class CycleUtils ():
             # Dr Omar
             # Ayman CFMF only on Type 2, in case of type 1 CFMF allways 0
             
-            if(dt.CFMF <= dt.CREF): # both watt. K
+            if(dt.CFMF <= dt.CREF):   # both watt. K
                 CMIN = dt.CFMF
                 CMAX = dt.CREF
             else:
@@ -342,7 +345,7 @@ class CycleUtils ():
             if(CMIN <= 0.0):
                 CMIN = 0.001
 
-            FNTU = dt.UAF / CMIN # UAF Ayman check input list
+            FNTU = dt.UAF / CMIN    # UAF Ayman check input list
             if(FNTU < 0.0):
                 FNTU = 0.0
 
@@ -358,7 +361,7 @@ class CycleUtils ():
                     if(TAVE > TS5):
                         TAVE = TS5 - 1.0
 
-                    QMAX = 0.90 * MREF * (H(7) - H[6]) /3600 # 5/9/94
+                    QMAX = 0.90 * MREF * (H(7) - H[6]) / 3600  # 5/9/94
                     HRAD = SIGMA * (TAVE + TS5) * (TAVE**2 + TS5**2) * EPS
                     DELTAT = TS5 - TAVE
 
@@ -394,7 +397,7 @@ class CycleUtils ():
                     
                     # Dr Omar Heat Unit
                     # QFREZ = QFREZ + 1.8 * UA_FZ * (TENV - TAVE) * 1.0548 \
-                        # + 1.8 * UA_ML * (TS3 - TAVE) * 1.0548 + Q_HXS_FZ
+                    # + 1.8 * UA_ML * (TS3 - TAVE) * 1.0548 + Q_HXS_FZ
                     
                     # UA_FZ Watt/K,  1.0548 btu to j (1 BTU = 1.0548 J)
                     QFREZ = QFREZ + dt.UA_FZ * (TENV - TAVE)  \
@@ -424,10 +427,9 @@ class CycleUtils ():
                 QFREZ = 0.0
                 TS6 = TS5
 
-        
-            #  UPDATE ENTHALPY ACROSS EVAPORATOR
-            #
-            H[9] = H[8] + QFREZ / MREF /3600 # MREF kg/hr *3600
+            # UPDATE ENTHALPY ACROSS EVAPORATOR
+
+            H[9] = H[8] + QFREZ / MREF / 3600   # MREF kg/hr *3600
             T[9] = objCP.Property('T', P=P[9], H=H[9])  # K
             
             if(IFREZ2 == 0):
@@ -452,15 +454,15 @@ class CycleUtils ():
                     # HHIGH = self.objCP.Property('H', V=VL[10], T=T[9])  # j/kg
                     # HLOW = self.objCP.Property('H', X=0, T=T[6])  # j/kg
 
-                    HHIGH = self.coolutil.getProp(prp='H', V=VL10 # self.VL[10]
-                                                , T=T[9], X=0)  # j/kg
+                    HHIGH = self.coolutil.getProp(prp='H', V=VL10,   # self.VL[10]
+                                                  T=T[9], X=0)    # j/kg
 
-                    HLOW = self.coolutil.getProp(prp='H', P=dt.P[1]
-                                               , T=T[6], X=1)  # j/kg
+                    HLOW = self.coolutil.getProp(prp='H', P=dt.P[1],
+                                                 T=T[6], X=1)   # j/kg
 
                     DH = min((HLOW - H[9]), (H[6] - HHIGH))
                     H[10] = H[6] - DH
-                    T[10] = objCP.Property('T', P=P[10], H=H[10])  # K
+                    T[10] = objCP.Property('T', P=P[10], H=H[10])   # K
             
             # correct guess if necessary and calculate error
            
@@ -476,7 +478,7 @@ class CycleUtils ():
                 break  # GO TO 20
             
             # j/hr K      = kg/hr . # watt. K
-            dt.CREF = MREF /3600 * abs((H[9] - H[8]) / (T[9] - T[8] + 0.0001))
+            dt.CREF = MREF / 3600 * abs((H[9] - H[8]) / (T[9] - T[8] + 0.0001))
             # Dr omar units
  
             if(dt.CREF <= 0.1):
@@ -496,10 +498,7 @@ class CycleUtils ():
             if(ITER > 10):
                 break  # GO TO 20
         # GO TO 10
-
-        
         # END OF ITERATION.  CALCULATE NEEDED PARAMETERS
-    
         # 20 CONTINUE
 
         H[5] = H[9] + (H[6] - H[10])        
@@ -507,17 +506,13 @@ class CycleUtils ():
         
         T[10] = objCP.Property('T', P=P[10], H=H[10])  # K
 
-        #return [H, P, X, T, XQ, XL, XV, VL, VV, HL, HV, TS6, QFREZ]
+        # return [H, P, X, T, XQ, XL, XV, VL, VV, HL, HV, TS6, QFREZ]
         return [H, P, T, TS6, QFREZ]
 
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
     def efcross(self, CRAT, NTU):
-        #	  SUBROUTINE EFCROSS(CRAT,NTU,EFFECT)
-        #     ******************************************************************
-        #     *     CALCULATES THE HEAT TRANSFER EFFECTIVENESS FOR A CROSS     *
-        #     *     FLOW HEAT EXCHANGER WITH BOTH FLUIDS UNMIXED               *
-        #     ******************************************************************
-
+        # CALCULATES THE HEAT TRANSFER EFFECTIVENESS FOR A CROSS     *
+        # FLOW HEAT EXCHANGER WITH BOTH FLUIDS UNMIXED               *
 
         A = [	[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
               [0.0, 2.394292, -1.19402, -1.45067, 1.938453, -0.81305, 0.118651],
@@ -555,7 +550,7 @@ class CycleUtils ():
         BETA = math.log10(NTU + 1.0)
         EFFA = 0.0
         EFFB = 0.0
-        #J = 1
+
         for J in range(1, 6 + 1):  # DO WHILE (J  <=  6)
             EX = 1.0 * J
             if (I == 1):
@@ -564,8 +559,6 @@ class CycleUtils ():
                 EFFA = EFFA + A[I - 1][J] * BETA**EX
             
             EFFB = EFFB + A[I][J] * BETA**EX
-            #J = J + 1
-       
 
         FRAC = (CRAT - (I - 1) * 0.25) / (I * 0.25 - (I - 1) * 0.25)
         EFFECT = EFFA + FRAC * (EFFB - EFFA)
@@ -603,10 +596,10 @@ class CycleUtils ():
 
         # H6STAR = objCP.Property('H', P=P7, T=T7)  # j/kg
         # H13STR = objCP.Property('H', P=P4, T=T4)  # j/kg
-        H6STAR = self.coolutil.getProp(prp='H', P=P7
-                                     , T=T7, X=0)  # j/kg
-        H13STR = self.coolutil.getProp(prp='H', P=P4
-                                     , T=T4, X=1)  # j/kg
+        H6STAR = self.coolutil.getProp(prp='H', P=P7,
+                                       T=T7, X=0)  # j/kg
+        H13STR = self.coolutil.getProp(prp='H', P=P4,
+                                       T=T4, X=1)  # j/kg
         #
         #          FIND THE MAXIMUM AND ACTUAL HEAT TRANSFER
         #
@@ -648,8 +641,8 @@ class CycleUtils ():
             # check if in wet area, return sat. liquid or sat. vap.
             # HAOSTR = self.objCP.Property('H', X=0, T=TBI)  # j/kg
             
-            HAOSTR = self.coolutil.getProp(prp='H', P=PA
-                                         , T=TBI, X=0)  # j/kg
+            HAOSTR = self.coolutil.getProp(prp='H', P=PA,
+                                           T=TBI, X=0)  # j/kg
             DHAMAX = HAI - HAOSTR
 
             # DETERMINE EXIT STATE OF STREAM B if AT TAI
@@ -659,8 +652,8 @@ class CycleUtils ():
             # check if in wet area, return sat. liquid or sat. vap.
             
             # HBOSTR = self.objCP.Property('H', X=0, T=TAI)  # j/kg
-            HBOSTR = self.coolutil.getProp(prp='H', P=PA
-                                         , T=TAI, X=0)  # j/kg
+            HBOSTR = self.coolutil.getProp(prp='H', P=PA,
+                                           T=TAI, X=0)  # j/kg
                                          
             DHBMAX = HBI - HBOSTR
 
@@ -686,24 +679,19 @@ class CycleUtils ():
         return [TBI, HBI, QACT]
     
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
-    def dutfnd(self, dt, ICAB
-            ,IRFTYP, ICYCL, N
-            ,QFRSH, QFREZ
-            ,FROSTF ,FROSTZ
-            ,TS3, TS5, T, IDFRST):
-        
-        # [P9, P10, P15] = self.dutfnd (P1 ... P8, P11 to P15 )
-        #	SUBROUTINE DUTFND(ICAB,IRFTYP,ICYCL,N,   QFRSH,QFREZ,FROSTF,FROSTZ,
-        #	QFF,QFZ,dt.TS3,TS5,   T,IDFRST, DUTYR)
-        # output    QFF,QFZ,DUTYR
-        #	*  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *
-        #	* 	CALCULATE DUTY CYCLE AND THE AVERAGE CABINET LOADS			*
-        #	*  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *
+    def dutfnd(self, dt, ICAB,
+               IRFTYP, ICYCL, N,
+               QFRSH, QFREZ,
+               FROSTF, FROSTZ,
+               TS3, TS5, T, IDFRST
+               ):
+
+        # CALCULATE DUTY CYCLE AND THE AVERAGE CABINET LOADS
 
         if (ICAB == 0):
-            return [0,0,0]
+            return [0, 0, 0]
         #
-        #	CALCULATE IN-WALL HEAT LOADS
+        # CALCULATE IN-WALL HEAT LOADS
         #
         # TENV = (dt.TROOM + 459.6) / 1.8
         TENV = dt.TROOM 
@@ -747,7 +735,7 @@ class CycleUtils ():
         dt.CONDZ_IN_WALL = dt.UA_FZ_CND * (TCND - TENV)
         
         #
-        #	BRANCH ACCORDING TO THE TYPE OF REFRIGERATOR
+        # BRANCH ACCORDING TO THE TYPE OF REFRIGERATOR
         #
         QFF = dt.FFQ
         QFZ = dt.FZQOFF
@@ -814,10 +802,10 @@ class CycleUtils ():
                 dt.DUTYZ = QFZ / dt.CAPZ
 
                 # dt.CAPE = QFRSH / 1.0548 - 3.413 * dt.FANE \
-                    # - 3.413 * dt.FFCYC	\
-                    # + dt.Q_FF_IN_WALL - dt.CAPE_IN_WALL	\
-                    # - dt.CONDF_IN_WALL + dt.Q_FZ_FF	\
-                    # - dt.Q_HXS_FF / 1.0548
+                #    # - 3.413 * dt.FFCYC	\
+                #    # + dt.Q_FF_IN_WALL - dt.CAPE_IN_WALL	\
+                #    # - dt.CONDF_IN_WALL + dt.Q_FZ_FF	\
+                #    # - dt.Q_HXS_FF / 1.0548
 
                 dt.CAPE = QFRSH \
                     - dt.FANE \
@@ -849,9 +837,7 @@ class CycleUtils ():
                     # dt.CAPZ = QFRSH / 1.0548 - 3.413 * dt.FANE - \
                         # 3.413 * (dt.DFSTCYC + dt.FZCYC)
 
-                    dt.CAPZ = QFRSH \
-                            - dt.FANE \
-                            - (dt.DFSTCYC + dt.FZCYC)
+                    dt.CAPZ = QFRSH - dt.FANE - (dt.DFSTCYC + dt.FZCYC)
                         
                     dt.DUTYZ = QFZ / dt.CAPZ
 
@@ -860,8 +846,8 @@ class CycleUtils ():
 
                 else:
                     # dt.CAPE = QFRSH / 1.0548 - 3.413 * \
-                        # (dt.FANE + dt.FFCYC) 
-                        # + dt.Q_FF_IN_WALL - dt.CAPE_IN_WALL
+                    #    # (dt.FANE + dt.FFCYC)
+                    #    # + dt.Q_FF_IN_WALL - dt.CAPE_IN_WALL
 
                     dt.CAPE = QFRSH \
                         - (dt.FANE + dt.FFCYC) \
@@ -887,7 +873,6 @@ class CycleUtils ():
                     - (dt.FANE + dt.DFSTCYC + dt.FZCYC) \
                     + dt.Q_FF_IN_WALL - dt.CAPE_IN_WALL \
                     - dt.CONDF_IN_WALL - dt.Q_HXS_FF 
-                                        
 
                 dt.DUTYE = QFZ / dt.CAPE
                 dt.DUTYC = min(dt.DUTYE, 1.0)

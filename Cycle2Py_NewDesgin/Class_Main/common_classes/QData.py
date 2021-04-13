@@ -25,7 +25,7 @@ class QData:
 			self.__setup_vars_single(arg, lst_var_names, int_confg_row, int_para_count, b_set_data_as_string)
 
 	def __setup_vars_single(self, flt_val, lst_var_names, int_confg_row, int_para_count, b_set_data_as_string=False):
-		for int_var_numer in range (int_confg_row, int_para_count + 1):
+		for int_var_numer in range(int_confg_row, int_para_count + 1):
 		
 			# check if saving the data is string , the add "'"
 			if b_set_data_as_string:
@@ -34,7 +34,7 @@ class QData:
 				flt_val = "'" + str(flt_val) + "'"
 				
 			# save values to data object	
-			exec("self." + lst_var_names[int_var_numer - int_confg_row] + "=" + str(flt_val) )
+			exec("self." + lst_var_names[int_var_numer - int_confg_row] + "=" + str(flt_val))
 		
 	def __setup_vars_list(self, lst_valuse, lst_var_names, int_confg_row, int_para_count, b_set_data_as_string=False):
 		'''
@@ -59,114 +59,114 @@ class QData:
 				feedback = "'" + str(feedback) + "'"
 
 			#  save values to data object
-			exec("self." + lst_var_names[int_var_numer - int_confg_row] + "="  + str(feedback))
+			exec("self." + lst_var_names[int_var_numer - int_confg_row] + "=" + str(feedback))
 
 		# =================================================
 		# Variable list for CYCLE module
 		# =================================================
-		#			NC - NUMBER OF COMPONENTS
-		#			IR[I] - CODE NUMBERS FOR THE I'TH COMPONENT OF THE
-		#						REFRIGERANT MIXTURE (REFER TO PROPERTIES
-		#						DOCUMENTATION)
-		#			F(I1,I2) - MIXTURE INTERACTION PARAMETER BETWEEN COMPONENT
-		#							I1 AND I2
-		#			XM[I] - COMPOSITION OF CIRCULATING REFRIGERANT (MASS
-		#						FRACTION OF IR[I])
-		#			TS1 - HEAT TRANSFER FLUID (HTF) TEMPERATURE ENTERING CONDENSER
-		#			TS3 - HTF TEMPERATURE ENTERING FRESH FOOD EVAPORATOR
-		#			TS5 - HTF TEMPERATURE ENTERING FREEZER EVAPORATOR
-		#			MEFF - MECHANICAL EFFICIENCY
-		#			QHILO - NORMALIZED HEAT LOSS FROM DISCHANGE LINE INSIDE
-		#						THE COMPRESSOR SHELL TO SUCTION GAS
-		#			QCAN - COMPRESSOR SHELL LOSS NORMALIZED TO POWER INPUT
-		#			Cycle.obj_data.DPC - PRESSURE DROP THROUGH CONDENSER
-		#			DPE - PRESSURE DROP THROUGH FRESH FOOD EVAPORATOR
-		#			DPF - PRESSURE DROP THROUGH FREEZER EVAPORATOR
-		#			ETHX1 - EFFECTIVENESS OF HIGH TEMP INTERCHANGER
-		#			ETHX2 - EFFECTIVENESS OF LOW  TEMP INTERCHANGER
-		#			DISPLC - COMPRESSOR DISPLACEMENT (CU-IN)
-		#			NCYC - NUMBER OF CALL TO CYCLE (1 OR 2 FOR DUAL LOOP)
-		#			ICAB - FLAG TO REPRESENT PRESENCE OF CABINET LOADS IN INPUT
-		#			ICYCL - CYCLE TYPE (1=STANDARD, 2=LORENZ, 3=DUAL LOOP, 4=DUAL EVAP)
-		#			ICNTRL - CONTROL METHOD FOR EVAPORATOR LOAD
-		#						0 = NONE
-		#						1 = FRESH FOOD FAN OFF
-		#						2 = FRESH FOOD EVAPORATOR SUPERHEAT CONTROL
-		#						3 = FREEZER FAN OFF
-		#						4 = FREEZER AIR DAMPER CONTROL
+		#            NC - NUMBER OF COMPONENTS
+		#            IR[I] - CODE NUMBERS FOR THE I'TH COMPONENT OF THE
+		#            			REFRIGERANT MIXTURE (REFER TO PROPERTIES
+		#            			DOCUMENTATION)
+		#            F(I1,I2) - MIXTURE INTERACTION PARAMETER BETWEEN COMPONENT
+		#            				I1 AND I2
+		#            XM[I] - COMPOSITION OF CIRCULATING REFRIGERANT (MASS
+		#            			FRACTION OF IR[I])
+		#            TS1 - HEAT TRANSFER FLUID (HTF) TEMPERATURE ENTERING CONDENSER
+		#            TS3 - HTF TEMPERATURE ENTERING FRESH FOOD EVAPORATOR
+		#            TS5 - HTF TEMPERATURE ENTERING FREEZER EVAPORATOR
+		#            MEFF - MECHANICAL EFFICIENCY
+		#            QHILO - NORMALIZED HEAT LOSS FROM DISCHANGE LINE INSIDE
+		#            			THE COMPRESSOR SHELL TO SUCTION GAS
+		#            QCAN - COMPRESSOR SHELL LOSS NORMALIZED TO POWER INPUT
+		#            Cycle.obj_data.DPC - PRESSURE DROP THROUGH CONDENSER
+		#            DPE - PRESSURE DROP THROUGH FRESH FOOD EVAPORATOR
+		#            DPF - PRESSURE DROP THROUGH FREEZER EVAPORATOR
+		#            ETHX1 - EFFECTIVENESS OF HIGH TEMP INTERCHANGER
+		#            ETHX2 - EFFECTIVENESS OF LOW  TEMP INTERCHANGER
+		#            DISPLC - COMPRESSOR DISPLACEMENT (CU-IN)
+		#            NCYC - NUMBER OF CALL TO CYCLE (1 OR 2 FOR DUAL LOOP)
+		#            ICAB - FLAG TO REPRESENT PRESENCE OF CABINET LOADS IN INPUT
+		#            ICYCL - CYCLE TYPE (1=STANDARD, 2=LORENZ, 3=DUAL LOOP, 4=DUAL EVAP)
+		#            ICNTRL - CONTROL METHOD FOR EVAPORATOR LOAD
+		#            			0 = NONE
+		#            			1 = FRESH FOOD FAN OFF
+		#            			2 = FRESH FOOD EVAPORATOR SUPERHEAT CONTROL
+		#            			3 = FREEZER FAN OFF
+		#            			4 = FREEZER AIR DAMPER CONTROL
 		#
-		#	PROPERTY ROUTINES REFERENCED:
-		#			BCONST - INITIALIZES ARRAYS OF PROPERTY COEFFICIENTS
-		#			BUBLP - SATURATION PROPERTIES AT GIVEN PRESSURE
-		#			BUBLT - SATURATION PROPERTIES AT GIVEN TEMPERATURE
-		#			ENTROP - MOLAR ENTROPY
-		#			ESPAR - SET UP COEFFICIENTS FOR EQUATION OF STATE
-		#			HCVCPS - MOLAR ENTHALPY AND HEAT CAPACITY
-		#			HPIN - TEMPERATURE, QUALITY, ETC. AS A FUNCTION OF ENTHALPY
-		#					AND PRESSURE
-		#			SPIN - TEMPERATURE, QUALITY, ETC. AS A FUNCTION OF ENTROPY
-		#					AND TEMPERATURE
-		#			VIT - CALCULATE SPECIFIC VOLUME
+		# PROPERTY ROUTINES REFERENCED:
+		#            BCONST - INITIALIZES ARRAYS OF PROPERTY COEFFICIENTS
+		#            BUBLP - SATURATION PROPERTIES AT GIVEN PRESSURE
+		#            BUBLT - SATURATION PROPERTIES AT GIVEN TEMPERATURE
+		#            ENTROP - MOLAR ENTROPY
+		#            ESPAR - SET UP COEFFICIENTS FOR EQUATION OF STATE
+		#            HCVCPS - MOLAR ENTHALPY AND HEAT CAPACITY
+		#            HPIN - TEMPERATURE, QUALITY, ETC. AS A FUNCTION OF ENTHALPY
+		#            		AND PRESSURE
+		#            SPIN - TEMPERATURE, QUALITY, ETC. AS A FUNCTION OF ENTROPY
+		#            		AND TEMPERATURE
+		#            VIT - CALCULATE SPECIFIC VOLUME
 		#
-		#	NOTE:  THE ABOVE ROUTINES REFERENCE ADDITIONAL PROPERTY ROUTINES
-		#				THE ENTIRE SET SHOULD BE INCLUDED IN THE EXECUTABLE ELEMENT
+		# NOTE:  THE ABOVE ROUTINES REFERENCE ADDITIONAL PROPERTY ROUTINES
+		#            	THE ENTIRE SET SHOULD BE INCLUDED IN THE EXECUTABLE ELEMENT
 		#
-		#	ADDITIONAL SUBROUTINES REFERENCED:
-		#			CCROSS - CROSS FLOW CONDENSER
-		#			CCOUNT - COUNTER FLOW CONDENSER
-		#			COMP - COMPRESSOR MODEL
-		#			COND - CONDENSER ALGORITHMS
-		#			FFCROSS - CROSS FLOW EVAPORATOR
-		#			FFCOUNTER - COUNTER FLOW EVAPORATOR
-		#			FRSH - FRESH FOOD EVAPORATOR ALGORITHMS
-		#			LOWEVP - FREEZER EVAPORATOR ALGORITHMS
-		#			PROGRS - DISPLAY CURRENT VALUES ON SCREEN
-		#			SHWFIG - DISPLAY A DRAWING OF THE CYCLE ON THE SCREEN
-		#			SHWOUT - PRINT OUT CALCULATED VALUES OT THE SCREEN
+		# ADDITIONAL SUBROUTINES REFERENCED:
+		#            CCROSS - CROSS FLOW CONDENSER
+		#            CCOUNT - COUNTER FLOW CONDENSER
+		#            COMP - COMPRESSOR MODEL
+		#            COND - CONDENSER ALGORITHMS
+		#            FFCROSS - CROSS FLOW EVAPORATOR
+		#            FFCOUNTER - COUNTER FLOW EVAPORATOR
+		#            FRSH - FRESH FOOD EVAPORATOR ALGORITHMS
+		#            LOWEVP - FREEZER EVAPORATOR ALGORITHMS
+		#            PROGRS - DISPLAY CURRENT VALUES ON SCREEN
+		#            SHWFIG - DISPLAY A DRAWING OF THE CYCLE ON THE SCREEN
+		#            SHWOUT - PRINT OUT CALCULATED VALUES OT THE SCREEN
 		#
-		#	NOMENCLATURE FOR FIRST LETTER(S) OF VARIABLE NAMES:
-		#			DT - TEMPERATURE DIFFERENCE
-		#			FT - CONVERGENCE VARIABLE, LOOP HAS CONVERGED WHEN FT=0
-		#			H - ENTHALPY
-		#			HREF - CHARACTER VARIABLE FOR REFRIGERANT NAMES
-		#			HSTATE - CHARACTER VARIABLE FOR CYCLE STATE POINTS:
-		#						(INLET AND OUTLET REFER TO REFRIGERANT FLOW)
-		#				1 - COMPRESSOR INLET (SATURATED VAPOR)
-		#				2 - COMPRESSOR DISCHARGE
-		#				3 - CONDENSER DEW POINT
-		#				4 - CONDENSER OUTLET
-		#				5 - INLET TO FRESH FOOD EVAPORATOR
-		#				6 - LIQUID LINE OUTLET FROM HIGH TEMP INTERCHANGER
-		#				7 - OUTLET FROM FRESH FOOD EVAPORATOR
-		#				8 - INLET TO FREEZER EVAPORATOR
-		#				9 - OUTLET FROM FREEZER EVAPORATOR
-		#				10 - LIQUID LINE OUTLET FROM LOW TEMP INTERCHANGER
-		#				11 - CONDENSER BUBBLE POINT
-		#				12 - FRESH FOOD EVAPORATOR DEW POINT
-		#				13 - SUPERHEATED GAS LEAVING THE HIGH TEMP INTERCHANGER
-		#				14 - CONDENSER INLET
-		#				15 - INTERNAL VARIABLE (NOT SHOWN) FOR EVAP DEW POINT
-		#				16 - LIQUID LINE STATE AFTER HEAT LOSS TO CABINET AND MULLION
+		# NOMENCLATURE FOR FIRST LETTER(S) OF VARIABLE NAMES:
+		#            DT - TEMPERATURE DIFFERENCE
+		#            FT - CONVERGENCE VARIABLE, LOOP HAS CONVERGED WHEN FT=0
+		#            H - ENTHALPY
+		#            HREF - CHARACTER VARIABLE FOR REFRIGERANT NAMES
+		#            HSTATE - CHARACTER VARIABLE FOR CYCLE STATE POINTS:
+		#            			(INLET AND OUTLET REFER TO REFRIGERANT FLOW)
+		#            	1 - COMPRESSOR INLET (SATURATED VAPOR)
+		#            	2 - COMPRESSOR DISCHARGE
+		#            	3 - CONDENSER DEW POINT
+		#            	4 - CONDENSER OUTLET
+		#            	5 - INLET TO FRESH FOOD EVAPORATOR
+		#            	6 - LIQUID LINE OUTLET FROM HIGH TEMP INTERCHANGER
+		#            	7 - OUTLET FROM FRESH FOOD EVAPORATOR
+		#            	8 - INLET TO FREEZER EVAPORATOR
+		#            	9 - OUTLET FROM FREEZER EVAPORATOR
+		#            	10 - LIQUID LINE OUTLET FROM LOW TEMP INTERCHANGER
+		#            	11 - CONDENSER BUBBLE POINT
+		#            	12 - FRESH FOOD EVAPORATOR DEW POINT
+		#            	13 - SUPERHEATED GAS LEAVING THE HIGH TEMP INTERCHANGER
+		#            	14 - CONDENSER INLET
+		#            	15 - INTERNAL VARIABLE (NOT SHOWN) FOR EVAP DEW POINT
+		#            	16 - LIQUID LINE STATE AFTER HEAT LOSS TO CABINET AND MULLION
 		#
-		#			L - LOGICAL VARIABLE (ERROR FLAG, ETC.)
-		#			P - PRESSURE
-		#			T - TEMPERATURE
-		#			TC - REFRIGERANT AT CONDENSER OUTLET
-		#			TE - REFRIGERANT AT EVAPORATOR OUTLET
-		#			TOL - CONVERGENCE TOLERANCE
-		#			TS - TEMPERATURE OF HEAT TRANSFER FLUID
-		#			V - VOLUME
-		#			X - COMPOSITION
-		#			XL(I,J) - LIQUID PHASE COMPOSITION AT STATE J
-		#			XV(I,J) - VAPOR PHASE COMPOSITION AT STATE J
-		#			XQ - QUALITY
+		#            L - LOGICAL VARIABLE (ERROR FLAG, ETC.)
+		#            P - PRESSURE
+		#            T - TEMPERATURE
+		#            TC - REFRIGERANT AT CONDENSER OUTLET
+		#            TE - REFRIGERANT AT EVAPORATOR OUTLET
+		#            TOL - CONVERGENCE TOLERANCE
+		#            TS - TEMPERATURE OF HEAT TRANSFER FLUID
+		#            V - VOLUME
+		#            X - COMPOSITION
+		#            XL(I,J) - LIQUID PHASE COMPOSITION AT STATE J
+		#            XV(I,J) - VAPOR PHASE COMPOSITION AT STATE J
+		#            XQ - QUALITY
 		#
 
-		#=================================================
+		# =================================================
 		# Variable list for CAB module
-		#=================================================
+		# =================================================
 		# ERMxxx is the emissivity of the Room 
-		#		(FRT = Front, BCK = Back, LFT = Left, RGT = Right, TOP = Top, BOT = Bottom)
+		# 	(FRT = Front, BCK = Back, LFT = Left, RGT = Right, TOP = Top, BOT = Bottom)
 		# For the top mount freezer (1 & 3) 
 		#        FTT = Front/Top,
 		#        FTB = Front/Bottom
@@ -192,9 +192,9 @@ class QData:
 		# TxFRNT is the air temperature on the outside of the F (Freezer) or
 		#        R (Fresh Food) cabinet on the front
 
-
 		# COMPRESSOR COMPARTMENT DIMENSIONS
-		# CWIDE - width of compressor compartment from outside wall to inner( freezer side ) wall (will be converted to INCHES )
+		# CWIDE - width of compressor compartment
+		# 	from outside wall to inner( freezer side ) wall (will be converted to INCHES )
 		# CHGT - height of compressor compartment (will be converted to INCHES )
 		
 		# LINER DATA

@@ -5,6 +5,8 @@ import datetime
 from common_classes.FileAccess import FileAccess
 
 # = . = . = . = . = . = . = . = . = . = . = . = . = . = . = . = . = . = .
+
+
 class View:
     def __init__(self, dt, objCycleSlover, str_file_cycle, str_path_cycle):
         self.str_file_cycle = str_file_cycle
@@ -24,7 +26,7 @@ class View:
         if isOnlyTest:
             print("    Error : ", strMsg)
         else:
-            #print('{},,{}'.format(strMsg, fltValue))
+            #  print('{},,{}'.format(strMsg, fltValue))
             print("    Error : ", strMsg + ",, %10.3f" % (fltValue))
         print("==========================================================\n\n")
 
@@ -33,13 +35,12 @@ class View:
         col_width = 10
         print("".join(str(word)[:8].ljust(col_width) for word in arr_data))
 
-
     def setBasicData(self):
         self.ds.AIRTMP = [0.0] * (16 + 1)
         self.ds.AIRTMP = [True,  # add new item to start list at 1    \
-                                     False, False, True, False, False,    \
-                                     True, False, False, False, False,    \
-                                     False, True, False, True, False]
+                          False, False, True, False, False,    \
+                          True, False, False, False, False,    \
+                          False, True, False, True, False]
 
         # in python add extra item for item 0
         self.dt.HSTATE = [
@@ -128,24 +129,12 @@ class View:
 
         self.prn.write_or_terminate(" ")
         #    OUTPUT REFRIGERATION MIXTURE INFORMATION
-
-        ''' later ==============
-    X2 = 100.0 * self.ds.XM[1]
-    self.prn.write_or_terminate('THE REFRIGERANT MIXTURE CONSISTS OF  %4.0f OF %s'    %(X2, self.dt.HREF[ self.dt.IR[1] ])  )
-
-    if (self.dt.NC >  1) :
-        for I in range (2, self.dt.NC+1) :
-        X2 = 100.0 * self.ds.XM[I]
-        self.prn.write_or_terminate('THE REFRIGERANT MIXTURE CONSISTS OF  %4.0f OF %s'    %(X2, self.dt.HREF[ self.dt.IR[1] ])  ) # fixed in python
-    self.prn.write_or_terminate(" ")
-    '''
-
         self.prn.write_or_terminate("OUTPUT RESULTS")
 
         # print Error message if occured in Cycle, to be improved later
         # str_err need to be created in Cycle Solver
         # if self.ds.str_err != "":
-            # self.prn.write_or_terminate(self.ds.str_err)
+        #     # self.prn.write_or_terminate(self.ds.str_err)
 
         # -----------------------------
         #
@@ -190,7 +179,7 @@ class View:
         #    OUTPUT RESULTS.  BEGIN BY CONVERTING TO ENGLISH UNITS.
         #
 
-        #TENV = (self.dt.TROOM + 459.6) / 1.8
+        # TENV = (self.dt.TROOM + 459.6) / 1.8
         TENV = self.dt.TROOM
 
         if (self.ds.T[16] < TENV):
@@ -206,12 +195,11 @@ class View:
                                       , (MASS FRAC),(MASS FRAC),(MASS FRAC)
                                       """)
 
-
-        self.print_width(['#', 'Point', 'STATE'
-                             , 'T(C)', 'T(C)'
-                             , 'P', 'H', 'V', 'S'
-                             #, 'XL', 'XV', 'XQ'
-                             ])
+        self.print_width(['#', 'Point', 'STATE',
+                               'T(C)', 'T(C)',
+                                'P', 'H', 'V', 'S'
+                                # , 'XL', 'XV', 'XQ'
+                                ])
 
         self.print_width(['', '', '', 'AIR', 'REF'
                           , 'kPa', 'kj/kg', 'm3/kg', 'kj/kg-C'
@@ -227,9 +215,9 @@ class View:
                 # self.ds.V[J] = self.ds.V[J] / 10.0
 
                 # if (self.ds.XQ[J] > 1.0):
-                    # self.ds.XQ[J] = 1.0
+                #     # self.ds.XQ[J] = 1.0
                 # if (self.ds.XQ[J] < 0.0):
-                    # self.ds.XQ[J] = 0.0
+                #     # self.ds.XQ[J] = 0.0
 
                 if (self.ds.AIRTMP[K]):
                     self.prn.write_or_terminate(

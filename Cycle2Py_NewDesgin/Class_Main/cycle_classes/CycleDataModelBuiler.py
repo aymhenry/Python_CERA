@@ -21,9 +21,9 @@ class CycleDataModelBuiler (DataModelBuiler):
     # data line more than this
     DataModelBuiler.MAX_DATA_FILE_TO_READ = 150
 
-    DataModelBuiler.CONFIGRATION_COUNT = 4 # max. number of configrations
+    DataModelBuiler.CONFIGRATION_COUNT = 4   # max. number of configrations
     # +1 			# set row number that has the configration
-    DataModelBuiler.CONFIGRATION_ROW = 5 # 4 sting lines found
+    DataModelBuiler.CONFIGRATION_ROW = 5   # 4 sting lines found
 
     # -----------------------------------------------------------
     # Job 			: Assign values from table to selected class vars
@@ -86,17 +86,17 @@ class CycleDataModelBuiler (DataModelBuiler):
             'MREFI[1]', 
             'SPEEDI[1]', 
             'TSPECI[1]', 
-            #'DISPLC[1]', 
-            #'SIZEN[1]', 
-            #'SPDNOM[1]', 
-            #'EERN[1]',
-            #'ICOOLN[1]',
-            #'CEI[1]', 
-            #'SEFFI[1]', 
-            #'MEFF[1]',
-            #'ELOSS[1]',
-            #'QCAN[1]', 
-            #'QHILO[1]',
+            #  'DISPLC[1]',
+            #  'SIZEN[1]',
+            #  'SPDNOM[1]',
+            #  'EERN[1]',
+            #  'ICOOLN[1]',
+            #  'CEI[1]',
+            #  'SEFFI[1]',
+            #  'MEFF[1]',
+            #  'ELOSS[1]',
+            #  'QCAN[1]',
+            #  'QHILO[1]',
             'SUPIHX[1]', 
             'ETHX[1]',
             'UA_FF', 
@@ -140,10 +140,8 @@ class CycleDataModelBuiler (DataModelBuiler):
             'QMUL']
 
         lst_config2 = ['TITLE', 'TITLE2', 'FILERA', 'ICYCL']
-        lst_config3 = [ # later
-            'TITLE',
-            'TITLE2']
-            
+        lst_config3 = ['TITLE', 'TITLE2', 'FILERA', 'ICYCL']
+
         # lst_config4 same as 2
 
         lst_var_names = []
@@ -174,7 +172,7 @@ class CycleDataModelBuiler (DataModelBuiler):
             self.int_parameter_count)
 
         # create a list with items title1 ,2 .. up to CONFIGRATION_ROW
-        #lst_title = ['title'+str(n) for n in range(0, self.CONFIGRATION_ROW)]
+        # lst_title = ['title'+str(n) for n in range(0, self.CONFIGRATION_ROW)]
         lst_title = ['TITLE', 'TITLE2', 'FILERA', 'FILE_NAME']
 
         # create vars title1 up to CONFIGRATION_ROW, with the given values in
@@ -206,7 +204,7 @@ class CycleDataModelBuiler (DataModelBuiler):
                              for i in range(5 + 1)] for j in range(5 + 1)]
 
         self.obj_qdata.NC = [0.0] * (2 + 1)
-        #self.obj_qdata.pythNC = [0.0] * (2+1)
+        # self.obj_qdata.pythNC = [0.0] * (2+1)
 
         self.obj_qdata.ICONDI = [0.0] * (2 + 1)
         self.obj_qdata.TS1 = [0.0] * (2 + 1)
@@ -250,65 +248,65 @@ class CycleDataModelBuiler (DataModelBuiler):
 
     # Control Variables definitions
     # =====================
-        # INCTRL: 	0 = none,
-        #			1 = adjust evaporator areas,
-        #			2 = adjust fresh food section tempeature,
-        #			3 = adjust freezer    section tempeature,
-        # 			4 = switching valve (only one section is cooled  at a time)
-        #			5 = solenoid valve or fan control provides evaporator capacity to only one cabinet
-        #				during part of the cycle
+    # INCTRL: 	0 = none,
+    #            1 = adjust evaporator areas,
+    #            2 = adjust fresh food section tempeature,
+    #            3 = adjust freezer    section tempeature,
+    # 			4 = switching valve (only one section is cooled  at a time)
+    #            5 = solenoid valve or fan control provides evaporator capacity to only one cabinet
+    #            	during part of the cycle
 
-        # ICYCL		1 =	Standard
-        #			2 =	Lorenz
-        #			3 =	Dual Loop
-        #			4 =	Dual Evap
+    # ICYCL		1 =	Standard
+    #            2 =	Lorenz
+    #            3 =	Dual Loop
+    #            4 =	Dual Evap
 
-        # ICOMP		1 = Reciprocating
-        #			2 = Rotary
+    # ICOMP		1 = Reciprocating
+    #            2 = Rotary
 
-        # N			1 =	Single Component
-        #			2 =	Two Components
-        #			3 =	Three Components
+    # N			1 =	Single Component
+    #            2 =	Two Components
+    #            3 =	Three Components
 
-        # ICONDI or	0 =	Natural Convection
-        # ISPECI		1 =	Cross-Flow
-        #			2 =	Counter-Flow
+    # ICONDI or	0 =	Natural Convection
+    # ISPECI		1 =	Cross-Flow
+    #            2 =	Counter-Flow
 
-        # IMAP 		0 =	Map
-        # 			1 =	EER
-        # 			2 =	Efficiency Model
+    # IMAP 		0 =	Map
+    # 			1 =	EER
+    # 			2 =	Efficiency Model
 
-        # ISPECI	1 =	Evap Exit Superheat
-        # 			2 =	Interchanger Exit Superheat
-        # 			3 =	Evap Exit Quality
+    # ISPECI	1 =	Evap Exit Superheat
+    # 			2 =	Interchanger Exit Superheat
+    # 			3 =	Evap Exit Quality
 
-        # ICOOLN	0 =	Static
-        # 			1 =	Fan-Forced
+    # ICOOLN	0 =	Static
+    # 			1 =	Fan-Forced
 
-        # FILMAP1_CODE and FILMAP2_CODE
-        #		1  = 1ABB_EMX70HSC
-        #		2  = 2BADBAD
-        #		3  = 3DG57C84TAU6
-        #		4  = 4DG73C12
-        #		5  = 5DG73C12RAU6
-        #		6  = 6DGH66C94
-        #		7  = 7EGX90HLC
-        #		8  = 8EGZ100HLP
-        #		9  = 9EMBRACO MODEL
-        #		10  = 10EMBRACO_NT6215Z
-        #		11  = 11EMU30HSC
-        #		12  = 12EMX70HSC
-        #		13  = 13EMY60HER
-        #		14  = 14FILES.TXT
-        #		15  = 15GVT44AD
-        #		16  = 16GVY44AD
-        #		17  = 17SF51C97
-        #		18  = 18SF51NEW
-        #		19  = 19SMOOTHED
-        #		20  = 20SP51C97
-        #		21  = 21TESTMAP
-        #		22  = 22TSA1374YAS
-        #		23  = 23TTE46FK
+    # FILMAP1_CODE and FILMAP2_CODE
+    # 1  = 1ABB_EMX70HSC
+    # 2  = 2BADBAD
+    # 3  = 3DG57C84TAU6
+    # 4  = 4DG73C12
+    # 5  = 5DG73C12RAU6
+    # 6  = 6DGH66C94
+    # 7  = 7EGX90HLC
+    # 8  = 8EGZ100HLP
+    # 9  = 9EMBRACO MODEL
+    # 10  = 10EMBRACO_NT6215Z
+    # 11  = 11EMU30HSC
+    # 12  = 12EMX70HSC
+    # 13  = 13EMY60HER
+    # 14  = 14FILES.TXT
+    # 15  = 15GVT44AD
+    # 16  = 16GVY44AD
+    # 17  = 17SF51C97
+    # 18  = 18SF51NEW
+    # 19  = 19SMOOTHED
+    # 20  = 20SP51C97
+    # 21  = 21TESTMAP
+    # 22  = 22TSA1374YAS
+    # 23  = 23TTE46FK
 
     # Variables definitions
     # =====================
