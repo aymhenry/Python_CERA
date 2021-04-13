@@ -11,13 +11,14 @@ from cycle_classes.ErrorException import ErrorException
 # Editor        : aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
+
 class CoolPrpUtil:
     ERR_MARGIN = 0.001
+
     def __init__(self, objCP):
         self.objCP = objCP
     
-    def getProp (self, P, T, prp="H", X=1 ):
-
+    def getProp(self, P, T, prp="H", X=1):
         P_sat = self.objCP.Property('P', T=T, X=0)  # Pa
         
         # check if in wet area
@@ -30,7 +31,7 @@ class CoolPrpUtil:
         
         return prop
 
-    def get_coolQuality (self, Enthalpy, P, T):
+    def get_coolQuality(self, Enthalpy, P, T):
         # as, liquid, twophase,  supercritical_gas
         P_sat = self.objCP.Property('P', T=T, X=0)  # Pa
 
@@ -54,7 +55,6 @@ class CoolPrpUtil:
                         + "\n min: " + str(H_liq)
                         + "\n quality: " + str(quality)
                     , 'CycleSolver1001')
-                return None
 
         else:
             # not in sat.

@@ -2,13 +2,15 @@
 import sys
 
 # User import
-# from .Data import Data
 from cycle_classes.CompMap import CompMap
-from cycle_classes.ErrorException import ErrorException
 from cycle_classes.CoolPrpUtil import *
 from cycle_classes.Trace import *
 
-from common_classes.FileAccess import FileAccess
+# from .Data import Data
+# from cycle_classes.ErrorException import ErrorException
+# from common_classes.FileAccess import FileAccess
+
+
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # Job 			: Create Compressor object
 #               : objCP = CoolProp object
@@ -18,26 +20,26 @@ from common_classes.FileAccess import FileAccess
 #                 strFileName = "SomName.cmp"  # File name
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-class Compressor ():
+class Compressor:
     IUNITS = None
     TEDATA = None
     TCDATA = None
     CAPAC = None
     POWER = None
-    
+
     def __init__(self, objCP, TAMB, ICOMP, FRACT_SPEED, strFileName):
         self.objCP = objCP
 
         self.TAMB = TAMB
         self.ICOMP = ICOMP
-        
+
         self.FRACT_SPEED = FRACT_SPEED
         self.strFileName = strFileName
         self.coolutil = CoolPrpUtil(objCP)
         self.trace = Trace()
 
     def comp_balance(self, PSUCT, PDISC, TSUCT, VSUCT, MREF):
-            
+
         OLDMAS = MREF
 
         lstRes = self.compcall(
@@ -45,38 +47,38 @@ class Compressor ():
             TAMB=self.TAMB,
             FRACT_SPEED=self.FRACT_SPEED,
             ICOMP=self.ICOMP
-            )
+        )
 
-        MREF = (lstRes[9] + 2.0 * OLDMAS) / 3.0 # to review
+        MREF = (lstRes[9] + 2.0 * OLDMAS) / 3.0  # to review
 
-        if (MREF > 1.05 * OLDMAS):
+        if MREF > 1.05 * OLDMAS:
             MREF = 1.05 * OLDMAS
-        if (MREF < 0.95 * OLDMAS):
+        if MREF < 0.95 * OLDMAS:
             MREF = 0.95 * OLDMAS
-        
+
         # output list
         # return [HOUT, QCAN, VSUC, VV2, TSP, TDISC, GAMA, RN, ETAS, MREF]
-        dicRes = {'TDISC':lstRes[5]  # Discharge Temp (K)
-                 ,'HOUT':lstRes[0]  # Discharge Enthaply (j/kg)
-                 ,'QCAN':lstRes[1]  # comp. shell loss normalized to power j/kg
-                 ,'VSUC':lstRes[2]  # Suction sp.volume (m3/kg)
-                 ,'VV2':lstRes[3]  # Discharge sp.volume (m3/kg)
-                 ,'GAMA':lstRes[6]  # Cp/Cv ration
-                 ,'ETAC':lstRes[8]  # Compressor Effe.
-                 ,'MREF':MREF  # get input from compcall
-                 ,'TSP':lstRes[4]  # Compressor Exit (K)
-                 }
+        dicRes = {'TDISC': lstRes[5],  # Discharge Temp (K)
+                  'HOUT': lstRes[0],  # Discharge Enthaply (j/kg)
+                  'QCAN': lstRes[1],  # comp. shell loss normalized to power j/kg
+                  'VSUC': lstRes[2],  # Suction sp.volume (m3/kg)
+                  'VV2': lstRes[3],  # Discharge sp.volume (m3/kg)
+                  'GAMA': lstRes[6],  # Cp/Cv ration
+                  'ETAC': lstRes[8],  # Compressor Effe.
+                  'MREF': MREF,  # get input from compcall
+                  'TSP': lstRes[4]  # Compressor Exit (K)
+                  }
 
         return dicRes
 
-    def compcall( self, PSUCT, PDISC, TSUCT, VSUCT,
-                  TAMB, FRACT_SPEED, ICOMP):
+    def compcall(self, PSUCT, PDISC, TSUCT, VSUCT,
+                 TAMB, FRACT_SPEED, ICOMP):
         # ************************************************************
         # true compressor map routine.  applies to refrigerant        *
         # subroutine compcall calculates isentropic compressor        *
         # performance and calls subroutine compmap                    *
         # *************************************************************
-        
+
         H1 = self.objCP.Property('H', T=TSUCT, V=VSUCT)  # j/kg
 
         CP = self.objCP.Property('CP', T=TSUCT, V=VSUCT)  # j/kg/K
@@ -92,18 +94,18 @@ class Compressor ():
 
         # determine actual compressor performance [TSP, WDOT, MDOT, QSHELL]
         # K, kj/hr, kg/hr, kj/hr
-        [TSP, WDOT, MREF, QSHELL] =\
-        self.compmap(PSUCT=PSUCT, PDISC=PDISC, TSUCT=TSUCT,
-                    VSUCT=VSUCT,
-                    GAMA=GAMA, TAMB=TAMB,
-                    FRACT_SPEED=FRACT_SPEED, ICOMP=ICOMP)
+        [TSP, WDOT, MREF, QSHELL] = \
+            self.compmap(PSUCT=PSUCT, PDISC=PDISC, TSUCT=TSUCT,
+                         VSUCT=VSUCT,
+                         GAMA=GAMA, TAMB=TAMB,
+                         FRACT_SPEED=FRACT_SPEED, ICOMP=ICOMP)
 
         # calculate isentropic power requirement
-        WDOTS = MREF * (H2S - H1)/1000  # kj/hr = kg/hr * (j/kg)/1000
+        WDOTS = MREF * (H2S - H1) / 1000  # kj/hr = kg/hr * (j/kg)/1000
 
         # calculate refrigerant exit enthalpy and temperature
         # j/kg = (j/kg) + (kj/hr) /(kg/hr) *1000
-        HOUT = H1  + (WDOT - QSHELL) / MREF * 1000  # j/kg
+        HOUT = H1 + (WDOT - QSHELL) / MREF * 1000  # j/kg
 
         # HOUT = H2  # send to output
         QCAN = QSHELL / WDOT  # no unit
@@ -124,13 +126,13 @@ class Compressor ():
                 strFolder=None):
 
         # interpolation job
-        def interpolation (x_value, y_value, x_series, y_series, data):
+        def interpolation(x_value, y_value, x_series, y_series, data):
 
-            def find_nerest_index (flt_value, lst):
+            def find_nerest_index(flt_value, lst):
                 items_x = [itm for itm in lst if flt_value >= itm]
                 return len(items_x)
 
-            def interplate (x_val, x1, x2, y1, y2):
+            def interplate(x_val, x1, x2, y1, y2):
                 if x1 == x2:
                     return y2
                 else:
@@ -138,14 +140,12 @@ class Compressor ():
 
             if len(x_series) != len(data[0]) or len(y_series) != len(data):
                 raise ErrorException('Reading value out of range', 'Comp1001')
-                return None
 
-            if x_value > max(x_series) or y_value > max(y_series)\
+            if x_value > max(x_series) or y_value > max(y_series) \
                     or x_value < min(x_series) or y_value < min(y_series):
-                print ("\n\n Temp x_series", x_series, " x_value=", x_value)
-                print ("\n Pressure y_series", y_series, "y_value=", y_value)
+                print("\n\n Temp x_series", x_series, " x_value=", x_value)
+                print("\n Pressure y_series", y_series, "y_value=", y_value)
                 raise ErrorException('Reading value out of range', 'Comp1002')
-                return None
 
             x_pos = find_nerest_index(x_value, x_series) - 1
             y_pos = find_nerest_index(y_value, y_series) - 1
@@ -160,29 +160,29 @@ class Compressor ():
             else:
                 y_pos_next = y_pos + 1
 
-            value1 = interplate (x_value=x_value,
-                                 x1=x_series [x_pos],
-                                 x2=x_series [x_pos_next],
-                                 y1=data [y_pos][x_pos],
-                                 y2=data [y_pos][x_pos_next]
-                                 )
+            value1 = interplate(x_val=x_value,
+                                x1=x_series[x_pos],
+                                x2=x_series[x_pos_next],
+                                y1=data[y_pos][x_pos],
+                                y2=data[y_pos][x_pos_next]
+                                )
 
-            value2 = interplate (x_value=x_value,
-                                 x1=x_series [x_pos],
-                                 x2=x_series [x_pos_next],
-                                 y1=data [y_pos_next][x_pos],
-                                 y2=data [y_pos_next][x_pos_next]
-                                 )
+            value2 = interplate(x_val=x_value,
+                                x1=x_series[x_pos],
+                                x2=x_series[x_pos_next],
+                                y1=data[y_pos_next][x_pos],
+                                y2=data[y_pos_next][x_pos_next]
+                                )
 
-            value = interplate (x_value=y_value,
-                                 x1=y_series [y_pos],
-                                 x2=y_series [y_pos_next],
-                                 y1=value1,
-                                 y2=value2
-                                 )
+            value = interplate(x_val=y_value,
+                               x1=y_series[y_pos],
+                               x2=y_series[y_pos_next],
+                               y1=value1,
+                               y2=value2
+                               )
             return value
 
-        def read_comp_file(strFile_name, strFolder=None):
+        def read_comp_file(strFile_name, strFoldr=None):
             # ============Python commnet : data description and sample data
             '''
                 SAMPLE CALORIMETER-BASED MAP
@@ -241,7 +241,8 @@ class Compressor ():
             # ==============================================================
 
             # set the default folder is folder is none
-            if strFolder is None:
+            strFolder = strFoldr
+            if strFoldr is None:
                 strFolder = sys.path[0] + "\\" + "compmap"
 
             obj_Compressor = CompMap(strFile_name, strFolder)
@@ -261,8 +262,8 @@ class Compressor ():
             # NCOND : Integer 3 digits, number of data points
             #           along condensing temperature axis.
 
-            NEVAP = obj_Compressor.getX_count()
-            NCOND = obj_Compressor.getY_count()
+            # NEVAP = obj_Compressor.getX_count()
+            # NCOND = obj_Compressor.getY_count()
 
             # this input is cancelled in Python, compressor type is defined
             #  in basic entry data.
@@ -294,7 +295,7 @@ class Compressor ():
             # READ COMPRESSOR POWER DATA
             POWER = obj_Compressor.getPower()
 
-            del(obj_Compressor) 	# close file
+            del obj_Compressor  # close file
 
             return [Compressor.IUNITS, TEDATA, TCDATA, CAPAC, POWER]
 
@@ -303,7 +304,7 @@ class Compressor ():
         # data and corrects for suction temperature other than 90f
         # ******************************************************************
 
-        if (Compressor.IUNITS is None):  # if None then data was not fetched
+        if Compressor.IUNITS is None:  # if None then data was not fetched
             [Compressor.IUNITS,
              Compressor.TEDATA,
              Compressor.TCDATA,
@@ -312,8 +313,8 @@ class Compressor ():
              ] = read_comp_file(self.strFileName, strFolder)
 
         # Determine the saturation temperatures corresponding to PSUCT, PDISC
-        TEVAPK = self.objCP.Property('T', P=PSUCT, X=1) # K
-        TCONDK = self.objCP.Property('T', P=PDISC, X=0) # K
+        TEVAPK = self.objCP.Property('T', P=PSUCT, X=1)  # K
+        TCONDK = self.objCP.Property('T', P=PDISC, X=0)  # K
 
         # Determine the enthalpies at each pressure for the following:
         # 	VAPOR - 90F or 32.2222C or 305.372K
@@ -328,13 +329,13 @@ class Compressor ():
         # HIN = self.objCP.Property('H', T=T90F_in_K, P=PSUCT)  # j/kg
 
         HIN = self.coolutil.getProp(prp='H', P=PSUCT
-                                  , T=T90F_in_K , X=1)  # j/kg        
+                                    , T=T90F_in_K, X=1)  # j/kg
 
         # liquid leaving condenser
         self.trace.dr_omar("Wet region issue")  # Dr. Omar to approve
         # HOUT = self.objCP.Property('H', T=T90F_in_K, P=PDISC)  # j/kg
         HOUT = self.coolutil.getProp(prp='H', P=PDISC
-                                            , T=T90F_in_K , X=0)  # j/kg 
+                                     , T=T90F_in_K, X=0)  # j/kg
 
         # determine isentropic compression enthalpy (HS)
         SSUC = self.objCP.Property('S', T=T90F_in_K, P=PSUCT)  # j/kg/K
@@ -347,27 +348,27 @@ class Compressor ():
         # HS = self.objCP.Property('H', T=TS, P=PDISC)  # j/kg
 
         HS = self.coolutil.getProp(prp='H', P=PDISC
-                                 , T=TS, X=1)  # j/kg 
-                                   
+                                   , T=TS, X=1)  # j/kg
+
         # or HS = self.objCP.Property('H', S=SSUC, P=PDISC)  # j/kg
 
         # convert the saturation temperatures to corresspond to map data units
-        if (Compressor.IUNITS == 2): # i.e temp in F
+        if Compressor.IUNITS == 2:  # i.e temp in F
             TEVAP = TEVAPK * 1.8 - 459.67  # convert from Deg K to F
             TCOND = TCONDK * 1.8 - 459.67
         else:
             TEVAP = TEVAPK - 273.16  # convert from Deg K to C
             TCOND = TCONDK - 273.16
 
-        CAP = interpolation (x_value=TEVAP, y_value=TCOND,
-                             x_series=Compressor.TEDATA,
-                             y_series=Compressor.TCDATA,
-                             data=Compressor.CAPAC)
+        CAP = interpolation(x_value=TEVAP, y_value=TCOND,
+                            x_series=Compressor.TEDATA,
+                            y_series=Compressor.TCDATA,
+                            data=Compressor.CAPAC)
 
-        POW = interpolation (x_value=TEVAP, y_value=TCOND,
-                             x_series=Compressor.TEDATA,
-                             y_series=Compressor.TCDATA,
-                             data=Compressor.POWER)
+        POW = interpolation(x_value=TEVAP, y_value=TCOND,
+                            x_series=Compressor.TEDATA,
+                            y_series=Compressor.TCDATA,
+                            data=Compressor.POWER)
 
         # handle off-speed operation (use Danfoss variable speed data)
         REL_CAP = -0.046073 \
@@ -382,25 +383,25 @@ class Compressor ():
         POW = POW * REL_POW
 
         # convert the capacity to kj/hr
-        if (Compressor.IUNITS == 2): # i.e temp in F
+        if Compressor.IUNITS == 2:  # i.e temp in F
             CAP = CAP * 1.0548  # from but/hr to kj/hr
         else:
-            CAP = CAP * 4.184   # from kcal/hr to kj/hr
+            CAP = CAP * 4.184  # from kcal/hr to kj/hr
 
-        if (Compressor.IUNITS != 1 and Compressor.IUNITS != 2):
+        if Compressor.IUNITS != 1 and Compressor.IUNITS != 2:
             print("###CHECK COMPRESSOR MAP UNITS###")
 
         # convert to kj/hr
         WDOT90 = POW / 1000.0 * 3600.0  # from watt to kj/hr
 
         # calculate the mass flow rate in kg/hr
-        MDOT90 = 1000 * CAP / (HIN - HOUT) # kg/hr=(kj/hr)/(j/kg) *1000
+        MDOT90 = 1000 * CAP / (HIN - HOUT)  # kg/hr=(kj/hr)/(j/kg) *1000
 
         # correct mass flow rate for suction temperature other than 90 f
         # Check that point @ PSUCT and T90F_in_K (90 F or 305.372 K)
         #  is not in wet area
         if self.objCP.is_two_phase(
-                self.objCP.phase_byPressTemp (PSUCT, T90F_in_K)):
+                self.objCP.phase_byPressTemp(PSUCT, T90F_in_K)):
             VVAP = self.objCP.Property('V', T=T90F_in_K, X=1)  # m3/kg
         else:
             VVAP = self.objCP.Property('V', T=T90F_in_K, P=PSUCT)  # m3/kg
@@ -411,32 +412,32 @@ class Compressor ():
         # estimate effect on compressor power as ratio of
         #  suction plenum temperatures
         # none =(kg/hr) * (j/kg)     /(kj/hr) /1000
-        EFFS = MDOT90 * (HS - HIN) / WDOT90 /1000
+        EFFS = MDOT90 * (HS - HIN) / WDOT90 / 1000
 
         HSUCT = self.objCP.Property('H', T=TSUCT, V=VSUCT)  # j/kg
         SSUC = self.objCP.Property('S', T=TSUCT, V=VSUCT)  # j/kg/K
         TS = self.objCP.Property('T', S=SSUC, P=PDISC)  # K
-        
+
         VSUCT = self.objCP.Property('V', T=TS, X=1)  # m3/kg
         HS = self.objCP.Property('H', T=TS, V=VSUCT)  # j/kg
 
         # kj/hr = kg/hr * J/kg /1000
         WDOT = MDOT * (HS - HSUCT) / EFFS / 1000
-  
+
         # estimate shell heat loss including effect of different ambient
-        if (ICOMP == 1):  # Reciprocating compressor
+        if ICOMP == 1:  # Reciprocating compressor
             DELTIN = 67.0
             TSUCTF = TSUCT * 1.8 - 459.67
             DTSUCT = 67.0 - 0.43333 * (TSUCTF - 90.0)
             TSP = TSUCT + DTSUCT / 1.8
 
-        else: # Rotary compressor
+        else:  # Rotary compressor
             DELTIN = 30.0
             TSP = TSUCT + DELTIN / 1.8
 
         TSP90 = (90.0 + DELTIN + 459.67) / 1.8
 
-        AAA = (PDISC / PSUCT)**((GAMA - 1.0) / GAMA)
+        AAA = (PDISC / PSUCT) ** ((GAMA - 1.0) / GAMA)
         TMAX90 = TSP90 * AAA
         TMAX = TSP * AAA
 

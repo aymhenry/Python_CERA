@@ -128,11 +128,11 @@ class CoolPrp:
                 result = 1 / result
 
             return result
-        except: # BaseException:
+
+        except:   # BaseException:
             self.m_error = CoolPrp.ERR_PROB_ERROR
             self.m_error_desc = str_command
-            raise ValueError (self.err_description())
-            return None
+            raise ValueError(self.err_description())
 
     # -----------------------------------------------------------
     # Job 			: Get Used Fuild

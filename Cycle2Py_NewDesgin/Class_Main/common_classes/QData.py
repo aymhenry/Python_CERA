@@ -2,42 +2,41 @@
 
 
 # User Import
-#-----------------------------------------------------------
+# -----------------------------------------------------------
 # Job 			: Creates Data Model for Q files
 # 		
 # Editor		: aymhenry@gmail.com
-#-----------------------------------------------------------
+# -----------------------------------------------------------
 
 class QData:
 	
-	def setup_vars( self, arg, lst_var_names, int_confg_row=0, int_var_names_count=-1, b_set_data_as_string = False):
+	def setup_vars(self, arg, lst_var_names, int_confg_row=0, int_var_names_count=-1, b_set_data_as_string=False):
 		int_para_count = int_var_names_count
 		
 		# if int_var_names_count = -1 then use all list items
 		if int_para_count == -1:
-			int_para_count = len(lst_var_names) -1
+			int_para_count = len(lst_var_names) - 1
 		
 		# simulate override function in Python
 		if type(arg) is list:
-			self.__setup_vars_list ( arg, lst_var_names, int_confg_row, int_para_count, b_set_data_as_string)
+			self.__setup_vars_list(arg, lst_var_names, int_confg_row, int_para_count, b_set_data_as_string)
 			
 		if type(arg) is float:
-			self.__setup_vars_single ( arg, lst_var_names, int_confg_row, int_para_count, b_set_data_as_string)
+			self.__setup_vars_single(arg, lst_var_names, int_confg_row, int_para_count, b_set_data_as_string)
 
-			
-	def __setup_vars_single (self, flt_val, lst_var_names, int_confg_row, int_para_count, b_set_data_as_string = False ):
-		for int_var_numer in range (int_confg_row, int_para_count +1):
+	def __setup_vars_single(self, flt_val, lst_var_names, int_confg_row, int_para_count, b_set_data_as_string=False):
+		for int_var_numer in range (int_confg_row, int_para_count + 1):
 		
 			# check if saving the data is string , the add "'"
-			if b_set_data_as_string :
-				flt_val = flt_val.replace ("'",'"')
-				flt_val = flt_val.replace ("\n",'')
+			if b_set_data_as_string:
+				flt_val = flt_val.replace("'", '"')
+				flt_val = flt_val.replace("\n", '')
 				flt_val = "'" + str(flt_val) + "'"
 				
 			# save values to data object	
-			exec ("self." + lst_var_names[int_var_numer - int_confg_row] + "=" + str(flt_val)  )
+			exec("self." + lst_var_names[int_var_numer - int_confg_row] + "=" + str(flt_val) )
 		
-	def __setup_vars_list (self, lst_valuse, lst_var_names, int_confg_row, int_para_count, b_set_data_as_string = False):
+	def __setup_vars_list(self, lst_valuse, lst_var_names, int_confg_row, int_para_count, b_set_data_as_string=False):
 		'''
 		Creates a list of vars, its names in lst_var_names, and values in lst_valuse
 		Input
@@ -49,23 +48,22 @@ class QData:
 			Vars creaed iside this object
 		'''
 		
-		for int_var_numer in range (int_confg_row, int_para_count +1):
-			feedback = lst_valuse [int_var_numer]
+		for int_var_numer in range(int_confg_row, int_para_count + 1):
+			feedback = lst_valuse[int_var_numer]
 			
 			# check if saving the data is string , the add "'"
-			if b_set_data_as_string :
-				feedback = feedback.replace ("'",'"')
-				feedback = feedback.replace ("\n",'')
+			if b_set_data_as_string:
+				feedback = feedback.replace("'", '"')
+				feedback = feedback.replace("\n", '')
 
 				feedback = "'" + str(feedback) + "'"
 
-			
-			# save values to data object
-			exec ("self." + lst_var_names[int_var_numer - int_confg_row] + "="  + str(feedback) )
+			#  save values to data object
+			exec("self." + lst_var_names[int_var_numer - int_confg_row] + "="  + str(feedback))
 
-		#=================================================
+		# =================================================
 		# Variable list for CYCLE module
-		#=================================================
+		# =================================================
 		#			NC - NUMBER OF COMPONENTS
 		#			IR[I] - CODE NUMBERS FOR THE I'TH COMPONENT OF THE
 		#						REFRIGERANT MIXTURE (REFER TO PROPERTIES
@@ -248,15 +246,18 @@ class QData:
 		# HO - outside film coefficient (will be converted to  BTU/HR-FT2-DEG F )
 		# HI - Inside film coefficient (will be converted to  BTU/HR-FT2-DEG F )
 		# HLRG - gasket heat leak for fresh food compartment for UNITS 1,2,3 OR 4 (will be converted to BTU/HR IN DEG F)
-		# HLGZN - fan on gasket heat leak for freezer compartment for UNITS 1,2 OR 3 OR total unit for UNITS 5,6 OR 7 will be converted to( BTU/HR IN DEG F )
-		# HLGZF - fan off gasket heat leak for freezer compartment for UNITS 1,2 OR 3 OR total unit for units 5,6 OR 7, will be converted to (BTU/HR IN DEG F )
+		# HLGZN - fan on gasket heat leak for freezer compartment
+		# 			for UNITS 1,2 OR 3 OR total unit for UNITS 5,6 OR 7 will be converted to( BTU/HR IN DEG F )
+		# HLGZF - fan off gasket heat leak for freezer compartment for UNITS 1,2 OR 3 OR total unit
+		# 			for units 5,6 OR 7, will be converted to (BTU/HR IN DEG F )
 		# WKIN - thermal conductivity of fz wedge insulation (will be converted to  BTU/HR FT DEG F )
 		# WKINR - thermal conductivity of ff wedge insulation (will be converted to BTU/HR FT DEG F )
 		# RKIN - thermal conductivity of refrigerator insulation (will be converted to  BTU/HR FT DEG F )
 		# TKIN - thermal conductivity of insulation in top of chest freezeR (will be converted to BTU/HR FT DEG F )
 		# CKMUL - thermal conductivity of the mullion insulation (will be converted to BTU/HR FT DEG F )
 		
-		# the Door Gasket Heater Watts and calculate the BTU's of heat into the cabinet, the ANTI - SWEAT heater watss and the
+		# the Door Gasket Heater Watts and calculate the BTU's of heat into the cabinet
+		# 			, the ANTI - SWEAT heater watss and the
 		# BTU's into the cabinet and finally the AUXILIARY energy and the BTU's into the cabinet.
 		# FFxxx and FZxxx for Frish food and Frizer compartment.
-		
+

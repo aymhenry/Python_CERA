@@ -13,8 +13,10 @@ from cycle_classes.Trace import *
 #         : objCP = CoolProp object
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+
+
 class Evaporator:
-    def getObject (self, IFRSH, objCP):
+    def getObject(self, IFRSH, objCP):
         if (IFRSH == 0):  # Natural Convection
             objEvapCool = EvapCool_FFNat(IFRSH, objCP)
 
@@ -41,7 +43,7 @@ class EvapCool_Abstract (exf4Cond_Evap):
         self.objCP = objCP
         self.trace = Trace()
 
-    def setParamters (self, ATOTE, CFME, TS3, N_EVAP,
+    def setParamters(self, ATOTE, CFME, TS3, N_EVAP,
                       USUPE, UTPE, TROOM, FZTEMP, 
                       UA_FF, Q_HXS_FF, IWALL_FF, NUM_ZONE, IRFTYP):
         # ATOTE m2 Total Heat Transfer Surface Area
@@ -65,13 +67,13 @@ class EvapCool_Abstract (exf4Cond_Evap):
         # by Dr.Omar
         # rho air = 1.354 kg/m3, CPair = 1.0058 kj/kg.K
         #    j/sec  = L/sec .kg/m3 kj/kg.K
-        self.CFME = CFME #  l/sec  #1.8961 * (316.8/TS3 *  )/0.4720
+        self.CFME = CFME   # l/sec  #1.8961 * (316.8/TS3 *  )/0.4720
                 
-        self.UTPE =  UTPE   # * 3.600  # W/m2-C *3.600 = kj/hr/m2/c
+        self.UTPE = UTPE   # * 3.600  # W/m2-C *3.600 = kj/hr/m2/c
         self.USUPE = USUPE  # * 3.600  # W/m2-C *3.600 = kj/hr/m2/c
         self.UA_FF = UA_FF  # * 1.8961
 
-        self.ATOTE = ATOTE # m2
+        self.ATOTE = ATOTE   # m2
         self.TS3 = TS3
         
         self.N_EVAP = N_EVAP       
@@ -85,7 +87,7 @@ class EvapCool_Abstract (exf4Cond_Evap):
         self.NUM_ZONE = NUM_ZONE
         self.IRFTYP = IRFTYP
 
-    def getExtarOutputs (self):
+    def getExtarOutputs(self):
         pass
 
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
@@ -119,7 +121,7 @@ class EvapCool_Abstract (exf4Cond_Evap):
         if (TEOUT > TS3):
             TEOUT = TS3
 
-        FTE[JE] = TEOUT - TE[JE] # allways equall DELT !!!
+        FTE[JE] = TEOUT - TE[JE]   # allways equall DELT !!!
 
         if (JE == 1):
             TENEW = TEOUT
@@ -149,8 +151,8 @@ class EvapCool_Abstract (exf4Cond_Evap):
         # See source code Cycle.for Line 0801
         if (ERROR < TOL_FRSH):
             ICONE = 1  # ok no error
-        else :    
-            ICONE = 0 # out of limit error
+        else:
+            ICONE = 0   # out of limit error
         
         # if (ERROR < TOL_FRSH):
             # ICONE = 0 # ok no error
@@ -159,7 +161,7 @@ class EvapCool_Abstract (exf4Cond_Evap):
         # ======================End of Ayman Modification
 
         JEOLD = JE  # useless not used
-        TE[2]=TE[1] #[OA added this line to store the previous value!]
+        TE[2] = TE[1]   # [OA added this line to store the previous value!]
         #JE = 1 #[OA changed from 2 to 1; we need to compare the new value to the old value]
 
         # TE[JE] = TENEW
@@ -167,14 +169,14 @@ class EvapCool_Abstract (exf4Cond_Evap):
 
         #  adjust exit air temp to 90% approach if natural convection
         self.trace.dr_omar("Modification in Unit by Ayman for imprical Equ.") 
-        JE = 2 # by Ayman to chk Dr omar
+        JE = 2   # by Ayman to chk Dr omar
         if (self.IFRSH == 0):
             TS4 = 0.9 * TE[JE] + 0.1 * TS3
 
-        dicRes = {'TS4':TS4,
-                 'TE':TE, 
-                 'JE':JE,
-                 'ICONE':ICONE  # 0=Free Error, 1=Error Found
+        dicRes = {'TS4' : TS4,
+                     'TE' : TE,
+                     'JE' : JE,
+                     'ICONE' : ICONE    # 0=Free Error, 1=Error Found
                  }
         return dicRes
 
@@ -183,26 +185,28 @@ class EvapCool_Abstract (exf4Cond_Evap):
 #
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-class EvapCool_FFNat (EvapCool_Abstract):  # IFRSH== 0
+
+
+class EvapCool_FFNat(EvapCool_Abstract):  # IFRSH== 0
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
     def evap_balance(self, MREF,
-                       T5, H5, T7,
-                       TDEW, 
-                       CPRVAP
+                           T5, H5, T7,
+                           TDEW,
+                           CPRVAP
                         ):
         # MREF  = MREF * 2.20462 # kg to pounds is not done
         HDEW = self.objCP.Property('H', T=TDEW, X=1)  # j/kg
         
         lstRes = self.ffnat(T5=T5, H5=H5, T7=T7,
-                    TDEW=TDEW, HDEW=HDEW,
-                    TS3=self.TS3,
-                    CPRVAP=CPRVAP, IRFTYP=self.IRFTYP,
-                    MREF=MREF
+                        TDEW=TDEW, HDEW=HDEW,
+                        TS3=self.TS3,
+                        CPRVAP=CPRVAP, IRFTYP=self.IRFTYP,
+                        MREF=MREF
                     )
 
-        dicRes = {'QFRSH':lstRes[0],  # Q 
-                 'FSUPE':lstRes[1],  #  Fraction subcooling  
-                 'UAFF':lstRes[2]  
+        dicRes = {'QFRSH': lstRes[0],  # Q
+                     'FSUPE': lstRes[1],   # Fraction subcooling
+                     'UAFF': lstRes[2]
                  }
         return dicRes
         
@@ -216,23 +220,23 @@ class EvapCool_FFNat (EvapCool_Abstract):  # IFRSH== 0
         #  coefficient using small delta t approximation (black body)
         #  use the refrigerant dew point to evaluate h radiation
         SIGMA = 2.04326E-7
-        EPS = 0.8 # emissivity of heat exchanger
+        EPS = 0.8   # emissivity of heat exchanger
 
         self.trace.dr_omar("Modification in Unit by Ayman.") 
         # TENV = (self.TROOM + 459.6) / 1.8 # R
         # by Dr.Omar
         TENV = self.TROOM  # K
         
-        TAVE = (T5 + T7) / 2.0 # K
+        TAVE = (T5 + T7) / 2.0   # K
 
-        TAIR = TS3 # K
-        #[OA] commented next line - not used elsewhere
+        TAIR = TS3   # K
+        # [OA] commented next line - not used elsewhere
         # FZTMPK = (self.FZTEMP + 459.6) / 1.8 # R
 
         HRAD = SIGMA * (TAVE + TAIR) * (TAVE**2 + TAIR**2) * EPS
 
         # get the net evaporator area
-        AEVAP = self.ATOTE # m2
+        AEVAP = self.ATOTE   # m2
         if (IRFTYP == 6):
             AEVAP = self.ATOTE + self.ATOTE
 
@@ -243,7 +247,6 @@ class EvapCool_FFNat (EvapCool_Abstract):  # IFRSH== 0
 
         # by Dr.Omar Cancel next line
         # DELTA = DELTAT * 1.8 # DTemp F.
-        
 
         TBAR = 0.67 * TAVE + 0.33 * TAIR
         A_NAT = 0.239 + 3.34E-04 * (273.0 - TBAR)
@@ -265,41 +268,39 @@ class EvapCool_FFNat (EvapCool_Abstract):  # IFRSH== 0
             
         # by Ayman ( not in Fortran)
         # Dr Omar to check
-        UAIR = UAIR / 1.8961 # convert to W/C/sq-length
+        UAIR = UAIR / 1.8961   # convert to W/C/sq-length
         
         self.trace.dr_omar("this is not SI units")  # Dr Omar - 
         # UA_FF is  W/K,  BTU = 1.0548 J
         # Q_IN_WALL = 1.0548 * 1.8 * self.UA_FF * \
-            # (TENV - TAVE) / AEVAP + self.Q_HXS_FF / AEVAP
+        # (TENV - TAVE) / AEVAP + self.Q_HXS_FF / AEVAP
 
         # UA_FF W/C,  W/C = 1.8961 Btu/(h.Feh); 
-        Q_IN_WALL = self.UA_FF * (TENV - TAVE) / AEVAP \
-                    + self.Q_HXS_FF / AEVAP # watt/m2
+        Q_IN_WALL = self.UA_FF * (TENV - TAVE) / AEVAP + self.Q_HXS_FF / AEVAP   # watt/m2
 
         # Calculate the heat transfer assuming that the air side
         #  resistance dominates
         #
         # Calculate the are necessary to evaporate the refrigerant
-        QTPNEC = MREF * (HDEW - H5) # j/s [OA changed /hr to /s]
+        QTPNEC = MREF * (HDEW - H5)   # j/s [OA changed /hr to /s]
         ATPNEC = QTPNEC / (UAIR * DELTAT + Q_IN_WALL)
 
         # Calculate the superheating area fraction
         if (ATPNEC < AEVAP):
-            QTPE = QTPNEC # j/s [OA changed to /hr to /s]
+            QTPE = QTPNEC   # j/s [OA changed to /hr to /s]
             ASUPE = AEVAP - ATPNEC
-            QSUPMX = MREF * CPRVAP * (TAIR - TDEW) # j/s [OA changed /hr to /s]
-            QSUPE = UAIR * ASUPE * DELTAT + ASUPE * Q_IN_WALL # J/s [OA changed /hr to /s]
-            
-            
+            QSUPMX = MREF * CPRVAP * (TAIR - TDEW)   # j/s [OA changed /hr to /s]
+            QSUPE = UAIR * ASUPE * DELTAT + ASUPE * Q_IN_WALL   # J/s [OA changed /hr to /s]
+
             if (QSUPE > QSUPMX):
                 QSUPE = QSUPMX
-            QTOTE = QTPE + QSUPE # j/s [OA changed /hr to /s]
+            QTOTE = QTPE + QSUPE   # j/s [OA changed /hr to /s]
             FSUPE = ASUPE / AEVAP
         else:
             QTOTE = UAIR * AEVAP * DELTAT + AEVAP * Q_IN_WALL
             FSUPE = 0
 
-        UAFF = UAIR * AEVAP     #  Watt/K * m2
+        UAFF = UAIR * AEVAP   # Watt/K * m2
 
         return [QTOTE, FSUPE, UAFF]
 
@@ -312,36 +313,37 @@ class EvapCool_FFNat (EvapCool_Abstract):  # IFRSH== 0
 class EvapCool_FFCross (EvapCool_Abstract):  # IFRSH== 1
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
     def evap_balance(self, MREF,
-                       T5, H5, 
-                       TDEW, 
-                       CPRVAP, 
-                       P5, P7
+                           T5, H5,
+                           TDEW,
+                           CPRVAP,
+                           P5, P7
                         ):
         # MREF  = MREF * 2.20462 # kg to pounds is not done
         HDEW = self.objCP.Property('H', T=TDEW, X=1)  # j/kg
         
         lstRes = self.ffcross(T5_S=T5, H5_S=H5,
-                    TDEW_S=TDEW, HDEW_S=HDEW,
-                    TS3=self.TS3,
-                    CPR=CPRVAP,
-                    PIN=P5, POUT=P7,
-                    MREF=MREF, NUM_ZONE = self.NUM_ZONE
-                    )
+                                TDEW_S=TDEW, HDEW_S=HDEW,
+                                TS3=self.TS3,
+                                CPR=CPRVAP,
+                                PIN=P5, POUT=P7,
+                                MREF=MREF, NUM_ZONE = self.NUM_ZONE
+                             )
 
         dicRes = {'QFRSH':lstRes[0],  # Q 
-                 'FSUPE':lstRes[1],  #  Fraction subcooling  
-                 'UAFF':lstRes[2]
+                     'FSUPE': lstRes[1],  # Fraction subcooling
+                     'UAFF': lstRes[2]
                  }
                  
         return dicRes
 
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
     def ffcross(self, MREF,
-            H5_S, T5_S, HDEW_S, TDEW_S,
-            TS3,
-            CPR,
-            PIN, POUT,
-            NUM_ZONE):
+                    H5_S, T5_S, HDEW_S, TDEW_S,
+                    TS3,
+                    CPR,
+                    PIN, POUT,
+                    NUM_ZONE
+                ):
 
         # solves for the fresh food evaporator
         #   heat transfer for cross heat exchanger
@@ -368,7 +370,7 @@ class EvapCool_FFCross (EvapCool_Abstract):  # IFRSH== 1
         self.trace.dr_omar("to check Ayman Modification")  # by Dr.Omar
         # rho air = 1.354 kg/m3, CPair = 1.0058 kj/kg.K
         #    j/sec  = L/sec .kg/m3 kj/kg.K
-        CAIR = self.CFME * 1.354 * 1.0058 #[OA]
+        CAIR = self.CFME * 1.354 * 1.0058   # [OA]
         HAVE_NOT_USED_FULL_AREA = True
 
         # begin  with two-phase area
@@ -400,8 +402,7 @@ class EvapCool_FFCross (EvapCool_Abstract):  # IFRSH== 1
                 QDUM = MREF * (HDEW - H5)
 
                 EFF_TPC = QDUM / QMAX
-                [EFFTPC, DEXDAR] = self.exf(2,
-                        ALEFT, self.UTPE, CMINTP, CMAXTP)
+                [EFFTPC, DEXDAR] = self.exf(2, ALEFT, self.UTPE, CMINTP, CMAXTP)
   
                 if(EFFTPC <= EFF_TPC):  # Need more area
                     ATPC = ATPC + ALEFT
@@ -437,13 +438,12 @@ class EvapCool_FFCross (EvapCool_Abstract):  # IFRSH== 1
                         QMAX = CMINTP * (TAIR - T5)
                         EFF_TPC = QDUM / QMAX
 
-                        [EFFTPC, DEXDAR] = self.exf(2,
-                                ADUM, self.UTPE, CMINTP, CMAXTP)
+                        [EFFTPC, DEXDAR] = self.exf(2, ADUM, self.UTPE, CMINTP, CMAXTP)
 
                         ERROR = abs(QTOL)
                         if(ERROR <= AREA_TOL):
                             LOOKING_FOR_AREA = False
-                            #Continue [OA commented this line - no continue in python!]
+                            # Continue [OA commented this line - no continue in python!]
                             continue  # [Ayman commented fixed to lower case ok]
 
                         QRAT = EFFTPC * QMAX / QDUM
@@ -486,19 +486,17 @@ class EvapCool_FFCross (EvapCool_Abstract):  # IFRSH== 1
             CAIR = (ALEFT / self.ATOTE) * self.CFME
 
             # if(CAIR  <=  CR) :
-            #	CMINDS = CAIR
-            #	CMAXDS = CR
+            # CMINDS = CAIR
+            # CMAXDS = CR
             # else:
-            #	CMINDS = CR
-            #	CMAXDS = CAIR
+            # CMINDS = CR
+            # CMAXDS = CAIR
 
             CMINDS = min(CR, CAIR)
             CMAXDS = max(CR, CAIR)
 
             # determine the net heat transfer
-            [EFFDSC, DEXDAR] = self.exf(2,
-                ALEFT, self.USUPE, CMINDS, CMAXDS)
-
+            [EFFDSC, DEXDAR] = self.exf(2, ALEFT, self.USUPE, CMINDS, CMAXDS)
 
             QSUP = CMINDS * EFFDSC * (TS3 - TDEW)
 
@@ -523,37 +521,38 @@ class EvapCool_FFCross (EvapCool_Abstract):  # IFRSH== 1
 class EvapCool_FFCount (EvapCool_Abstract):  # IFRSH== 2
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
     def evap_balance(self, MREF,
-                       T5, H5,
-                       TDEW, 
-                       CPRVAP, 
-                       P5, P7
-                        ):
+                           T5, H5,
+                           TDEW,
+                           CPRVAP,
+                           P5, P7
+                     ):
         # MREF  = MREF * 2.20462 # kg to pounds is not done
         HDEW = self.objCP.Property('H', T=TDEW, X=1)  # j/kg
         
         lstRes = self.ffcount(T5_S=T5, H5_S=H5,
-                    TDEW_S=TDEW, HDEW_S=HDEW,
-                    TS3=self.TS3,
-                    CPR=CPRVAP,
-                    PIN=P5, POUT=P7,
-                    MREF=MREF, NUM_ZONE = self.NUM_ZONE
-                    )
+                                TDEW_S=TDEW, HDEW_S=HDEW,
+                                TS3=self.TS3,
+                                CPR=CPRVAP,
+                                PIN=P5, POUT=P7,
+                                MREF=MREF, NUM_ZONE = self.NUM_ZONE
+                              )
 
-        dicRes = {'QFRSH':lstRes[0],  # Q 
-                 'FSUPE':lstRes[1],  #  Fraction subcooling  
-                 'UAFF':lstRes[2]
+        dicRes = {'QFRSH': lstRes[0],  # Q
+                     'FSUPE': lstRes[1],  # Fraction subcooling
+                     'UAFF': lstRes[2]
                  }
                  
         return dicRes
 
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
     def ffcount(self, MREF,
-            H5_S,  T5_S,
-            HDEW_S, TDEW_S,
-            TS3,
-            CPR,
-            PIN, POUT,
-            NUM_ZONE):
+                    H5_S,  T5_S,
+                    HDEW_S, TDEW_S,
+                    TS3,
+                    CPR,
+                    PIN, POUT,
+                    NUM_ZONE
+                ):
 
         # subroutine ffcount - solves for the fresh food evaporator   
         #    heat transfer for counterflow heat exchanger                
@@ -589,7 +588,6 @@ class EvapCool_FFCount (EvapCool_Abstract):  # IFRSH== 2
             # TAIR = TAIR_GUESS
             TAIR_GUESS = TS3
 
-
         CAIR = self.CFME
         HAVE_NOT_USED_FULL_AREA = True
 
@@ -604,8 +602,8 @@ class EvapCool_FFCount (EvapCool_Abstract):  # IFRSH== 2
                 HDEW = H5 + DELH
 
                 if(HAVE_NOT_USED_FULL_AREA):
-                    #[TDEW, XQ, XL, XV, VL, VV, HL,
-                    #    HV] = self.hpin(HDEW, PDEW, X)
+                    # [TDEW, XQ, XL, XV, VL, VV, HL,
+                    #  HV] = self.hpin(HDEW, PDEW, X)
                     TDEW = self.objCP.Property('T', H=HDEW, P=PDEW)  # K
                     
                     CPRTP = (HDEW - H5) / abs(TDEW - T5 + 0.0001)
@@ -627,8 +625,7 @@ class EvapCool_FFCount (EvapCool_Abstract):  # IFRSH== 2
 
                     EFF_TPC = QDUM / QMAX
 
-                    [EFFTPC, DEXDAR] = self.exf(1,
-                        ALEFT, self.UTPE, CMINTP, CMAXTP)
+                    [EFFTPC, DEXDAR] = self.exf(1, ALEFT, self.UTPE, CMINTP, CMAXTP)
                         
                     if(EFFTPC <= EFF_TPC):
                         ATPC = ATPC + ALEFT
@@ -646,8 +643,7 @@ class EvapCool_FFCount (EvapCool_Abstract):  # IFRSH== 2
                         ILOOK = 0
                         while (LOOKING_FOR_AREA):
                             ILOOK = ILOOK + 1
-                            [EFFTPC, DEXDAR] = self.exf(1,
-                                ADUM, self.UTPE, CMINTP, CMAXTP)
+                            [EFFTPC, DEXDAR] = self.exf(1, ADUM, self.UTPE, CMINTP, CMAXTP)
 
                             ERROR = abs(EFFTPC - EFF_TPC)
                             if(ERROR <= AREA_TOL or ILOOK >= 10):
@@ -697,8 +693,7 @@ class EvapCool_FFCount (EvapCool_Abstract):  # IFRSH== 2
                     CMAXDS = CAIR
 
                 # determine the net heat transfer
-                [EFFDSC, DEXDAR] = self.exf(1,
-                    ALEFT, self.USUPE, CMINDS, CMAXDS)
+                [EFFDSC, DEXDAR] = self.exf(1, ALEFT, self.USUPE, CMINDS, CMAXDS)
 
                 QSUP = CMINDS * EFFDSC * (TS3 - TDEW)
                 TAIR = TAIR + QSUP / CAIR

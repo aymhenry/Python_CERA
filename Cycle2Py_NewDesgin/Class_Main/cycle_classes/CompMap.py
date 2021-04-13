@@ -382,7 +382,7 @@ class CompMap(FileAccess):
     def getUnit(self):
         if self.isError():
             return
-        #	     capacity, temper, mass flow
+        # capacity, temper, mass flow
         # unit 1 - kcal/hr, deg c, kg/hr
         # unit 2 - btu/hr,  deg f, lb/hr
         #
