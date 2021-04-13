@@ -290,7 +290,7 @@ class CycleUtils ():
             HDEW = objCP.Property('H', P=P[9], X=1)  # j/kg
             
             # dt.CREF watt.K
-            dt.CREF = MREF * (HDEW - HBUB) / (TDEW - TBUB + 0.001)/3600
+            dt.CREF = MREF * (HDEW - HBUB) / (TDEW - TBUB + 0.001) / 3600
             if(dt.CREF <= 0.1):
                 dt.CREF = 1000000.0  # 5/9/94
 
@@ -571,45 +571,21 @@ class CycleUtils ():
     # job interchanger for subcooling condenser liquid
     #     used when the inlet states of both streams specified
     # -----------------------------------------------------------
-    def inter1(self, objCP, T4, P4, H4, T7, P7, H7, ETHX1):
+    def inter1(self, objCP, T16, T7, P7, ETHX1):
+        #  by Dr. Omar
+        # MREF kg/hr
         # objCP cool prob object
         # ETHX1 - effectiveness of high temp interchanger
         # T temp in KEY
         # H Enthalpy j/kg
-        # 4 - condenser outlet
-        # 7 - outlet from fresh food evaporator
         
-        #     ******************************************************************
-        #     *    INTERCHANGER FOR SUBCOOLING CONDENSER LIQUID                *
-        #     *    USED WHEN THE INLET STATES OF BOTH STREAMS SPECIFIED        *
-        #     ******************************************************************
-        #
-        #     STATEPOINTS:  4 = CONDENSER OUTLET,
-        #                   6 = LIQUID OUTLET FROM INTERCHANGER
-        #                   7 = OUTLET FROM FRESH FOOD EVAPORATOR
-        #                  13 = LOW PRESSURE SIDE OUTLET FROM INTERCHANGER
-
-        # Dr. Omar to approve
-        # Ayman modification, in case DTSUPI = 0
-        # the given point came to wet area.
-        # check if in wet area, return sat. liquid or sat. vap.
-
-        # H6STAR = objCP.Property('H', P=P7, T=T7)  # j/kg
-        # H13STR = objCP.Property('H', P=P4, T=T4)  # j/kg
-        H6STAR = self.coolutil.getProp(prp='H', P=P7,
-                                       T=T7, X=0)  # j/kg
-        H13STR = self.coolutil.getProp(prp='H', P=P4,
-                                       T=T4, X=1)  # j/kg
-        #
-        #          FIND THE MAXIMUM AND ACTUAL HEAT TRANSFER
-        #
-        # DELH1 = H4 - H6STAR
-        # DELH2 = H13STR - H7
-        # QBEST = min(H4 - H6STAR, H13STR - H7)
-        # QACT = ETHX1 * QBEST
-        # return QACT
+        #  INTERCHANGER FOR SUBCOOLING CONDENSER LIQUID               
+        #  USED WHEN THE INLET STATES OF BOTH STREAMS SPECIFIED       
         
-        return ETHX1 * min(H4 - H6STAR, H13STR - H7)
+        CP7 = objCP.Property('CP', T=T7 , P=P7)  # j/kg K
+        QINT = ETHX1 * (T16 -T7) * CP7
+
+        return QINT
 
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
     def inter2(self, objCP, PA, TAI, HAI, VAI, PB, HBO, TDEW, HDEW, VDEW, ETA):

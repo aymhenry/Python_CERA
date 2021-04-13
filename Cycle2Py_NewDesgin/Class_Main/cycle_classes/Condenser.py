@@ -355,7 +355,7 @@ class CondCool_CNat(CondCool_Abstract):  # Natural Convection= 0
         if (TS5 < 94.2611):  # not sure 290 F to K
             self.Q_CND_FZ = 0  # watt
 
-        self.trace.dr_omar("Wet region issue")  # Dr Omar to approve
+        # Approve concept self.trace.dr_omar("Wet region issue")
         # if (TS5 < -290.0):
         if (TS5 < 94.2611):  # not sure 290 F to K
             self.Q_HXS_FZ = 0
@@ -404,7 +404,7 @@ class CondCool_CNat(CondCool_Abstract):  # Natural Convection= 0
         # calculate combined air-side heat transfer coefficient
         UAIR = HRAD + HNAT
 
-        self.trace.dr_omar("Wet region issue")  # Dr Omar to approve
+        # Approve concept self.trace.dr_omar("Wet region issue")
         # Ayman UAIR was kW/m2 K
         # by Ayman  kW/m2 K = 0.04892 Btu/ (s ft2 F)
         # U2 = UAIR * 0.04892 

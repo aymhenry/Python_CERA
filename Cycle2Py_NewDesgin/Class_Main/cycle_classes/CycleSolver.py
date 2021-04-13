@@ -287,7 +287,7 @@ class CycleSolver(CycleUtils):
         # MREF kg/hr = MREF/2.20462 LBM /hr
         # N.B (5/9) *(1/2) = (1/3.6)
         # self.TC[1] = self.TS1 + self.dt.MREF / 3.6
-        self.trace.dr_omar("MREF kg/hr = MREF/2.20462 LBM /hr")
+        # Approved - self.trace.dr_omar("MREF kg/hr = MREF/2.20462 LBM /hr")
         self.TC[1] = self.TS1 + 0.5 * 5 / 9 * (self.MREF / 2.20462)
 
         # -----------------------
@@ -309,10 +309,13 @@ class CycleSolver(CycleUtils):
         self.IC = 1  # Condenser iteration counter
         self.ITMAXC = 100  # Condenser max. number of iterations
 
-        self.DUTYR = 0.5
+        self.DUTYR = 0.5 # duty ratio
 
+        # fraction superheat area
         self.FSUPC = 0.1  # unit (%) in python only
         self.FSUPE = 0  # unit (%) in python only
+        
+        # fraction subcool area
         self.FSUBC = 0  # unit (%) in python only
         # -----------------------
 
@@ -327,7 +330,9 @@ class CycleSolver(CycleUtils):
             self.P[15] = self.objCP.Property('P', X=1, T=self.T[15])  # Pa
             self.V[15] = self.objCP.Property('V', X=1, T=self.T[15])  # m3/kg
 
-            self.TE[1] = self.T[15] + self.DTSUPE
+            # self.TE[1] = self.T[15] + self.DTSUPE
+            self.TE[1] = self.TS3 - 2
+            
             self.T[7] = self.TE[1]  # 7 - OUTLET FROM FRESH FOOD EVAPORATOR
             self.P[7] = self.P[15]
 
@@ -445,7 +450,7 @@ class CycleSolver(CycleUtils):
             # Evaporator iteration
             self.evapIteration()
 
-            self.enthalp_p7()
+            self.evap_out7()   # 7 - OUTLET FROM FRESH FOOD EVAPORATOR
 
             #  ---------
             self.T[6] = self.objCP.Property('T', P=self.P[6]
@@ -467,7 +472,7 @@ class CycleSolver(CycleUtils):
 
             if (self.TSPEC > 0.0):
                 self.T[1] = self.TSPEC
-                self.trace.dr_omar("Wet region issue")  # Dr. Omar to approve
+                # Approve concept self.trace.dr_omar("Wet region issue")
                 # Ayman modification, in case DTSUPI = 0
                 # the given point came to wet area.
                 # check if in wet area, return sat. liquid or sat. vap.
@@ -702,7 +707,7 @@ class CycleSolver(CycleUtils):
         # determine the specific volume of the liquid
         #
         if (self.TS1 < self.T[4]):
-            self.trace.dr_omar("Wet region issue")  # Dr. Omar to approve
+            # Approve concept self.trace.dr_omar("Wet region issue")
             # Ayman modification, in case DTSUPI = 0
             # the given point came to wet area.
             # check if in wet area, return sat. liquid or sat. vap.
@@ -798,11 +803,11 @@ class CycleSolver(CycleUtils):
                                              X=1)  # j/kg
             self.HBUB15 = self.objCP.Property('H', X=0, P=self.P[15])  # j/kg
 
-            self.enthalp_p7()
+            self.evap_out7()   # 7 - OUTLET FROM FRESH FOOD EVAPORATOR
             self.calc_lowevap()
 
             # Calculate fresh food section heat exchange
-            self.calc_ff_exchanger()
+            self.evap_dew12() # 12 - FRESH FOOD EVAPORATOR DEW POINT
 
             if self.IC != 1:  # skip first trail to calc. some values later
                 [QFF, QFZ, DUTYR] = \
@@ -931,7 +936,7 @@ class CycleSolver(CycleUtils):
             # calculate the average effectiveness of the ff evaporator
             # calculate the heat transfer if the refrigerant left at TS3
 
-            self.trace.dr_omar("Wet region issue")  # Dr. Omar to approve
+            # Approve concept self.trace.dr_omar("Wet region issue")
             # Ayman modification, in case DTSUPI = 0
             # the given point came to wet area.
             # check if in wet area, return sat. liquid or sat. vap.
@@ -976,7 +981,7 @@ class CycleSolver(CycleUtils):
         self.T[7] = self.TE[self.JE]
         self.TE[1] = self.TE[self.JE]
 
-    def calc_ff_exchanger(self):
+    def evap_dew12(self):   # 12 - FRESH FOOD EVAPORATOR DEW POINT
         # Calculate fresh food section heat exchange
         PDEWE = self.P[5] - (1.0 - self.FSUPE) * self.DPE
 
@@ -1003,10 +1008,10 @@ class CycleSolver(CycleUtils):
         #  self.V[12] = VDEW
         self.H[12] = HDEW
 
-    def enthalp_p7(self):
+    def evap_out7(self):   # 7 - OUTLET FROM FRESH FOOD EVAPORATOR
         # determine the enthalpy at [7]
         if (self.ISPEC == 1):  # Evap superheat:
-            self.trace.dr_omar("Wet region issue")  # Dr. Omar to approve
+            # Approve concept self.trace.dr_omar("Wet region issue")
             # Ayman modification, in case DTSUPI = 0
             # the given point came to wet area.
             # check if in wet area, return sat. liquid or sat. vap.
@@ -1049,17 +1054,26 @@ class CycleSolver(CycleUtils):
             self.T[7] = self.TE[self.JE]
 
         if (self.ISPEC != 2):
-            self.QINT = self.inter1(self.objCP,
-                                    self.T[16], self.P[16], self.H[16],
-                                    self.T[7], self.P[7], self.H[7],
-                                    self.ETHX1
-                                    )
+            # by Dr. Omar
+            # self.QINT = self.inter1(self.objCP, self.T[16],
+            # self.T[7], self.P[7], self.ETHX1 )
 
+            #  interchanger for subcooling condenser liquid
+            #  used when the inlet states of both streams specified
+            # CP7 = self.objCP.Property('CP', self.T=T[7], P=self.P[7]) j/kg K
+            CP7 = self.coolutil.getProp(prp='CP', T=self.T[7],
+                                                  P=self.P[7], X=1)  # j/kg K
+                                              
+            
+            self.QINT = self.ETHX1 * (self.T[16] - self.T[7]) * CP7
+            
             self.H[13] = self.H[7] + self.QINT
 
     def calc_lowevap(self):
-
-        self.H[6] = self.H[16] + self.QINT
+        # by Dr. Omar
+        # self.H[6] = self.H[16] + self.QINT
+        self.H[6] = self.H[16] - self.QINT
+        
         self.P[6] = self.P[4]
 
         self.P[13] = self.P[7]
@@ -1077,7 +1091,7 @@ class CycleSolver(CycleUtils):
         # -----------------------------
 
         # find conditions at evaporator inlet assuming isenthalpic expansion
-        self.P[5] = self.P[13] + self.DPE
+        self.P[5] = self.P[13] + self.DPE # pa
 
         [self.H, self.P, self.T, self.TS6, self.QFREZ] = \
             self.lowevp(self.dt, self.objCP, self.MREF, self.dt.ICYCL,

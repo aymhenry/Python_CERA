@@ -17,7 +17,7 @@ class Trace:
     # must be true to print anythins
     DATA_ALL = True 
     
-    DR_OMAR = True
+    DR_OMAR = False
     
     COMP_INS = False   # for comp_ins
     COMP_OUT = False   # for comp_out
@@ -61,22 +61,23 @@ class Trace:
         if self.is_canc_print(Trace.PNT_LST):
             return
             
-        print('1 - Compressor inlet (saturated vapor)')
-        print('2 - Compressor discharge')
-        print('3 - Condenser dew point')
-        print('4 - Condenser outlet')
-        print('5 - Inlet to fresh food evaporator')
-        print('6 - Iiquid line outlet from high temp interchanger')
-        print('7 - Outlet from fresh food evaporator')
-        print('8 - Inlet to freezer evaporator')
-        print('9 - Outlet from freezer evaporator')
-        print('10 - Liquid line outlet from low temp interchanger')
-        print('11 - Condenser bubble point')
-        print('12 - Fresh food evaporator dew point')
-        print('13 - Superheated gas leaving the high temp interchanger')
-        print('14 - Condenser inlet')
-        print('15 - Internal variable (not shown) for evap dew point')
-        print('16 - Liquid line state after heat loss to cabinet and mullion')
+        print('\t1- Compressor inlet (saturated vapor)')
+        print('\t2- Compressor discharge')
+        print('\t3- Condenser dew point')
+        print('\t4- Condenser outlet')
+        print('\t5- Inlet to fresh food evaporator')
+        print('\t6- Iiquid line outlet from high temp interchanger')
+        print('\t7- Outlet from fresh food evaporator')
+        print('\t8- Inlet to freezer evaporator')
+        print('\t9- Outlet from freezer evaporator')
+        print('\t10- Liquid line outlet from low temp interchanger')
+        print('\t11- Condenser bubble point')
+        print('\t12- Fresh food evaporator dew point')
+        print('\t13- Superheated gas leaving the high temp interchanger')
+        print('\t14- Condenser inlet')
+        print('\t15- Internal variable (not shown) for evap dew point')
+        print('\t16- Liquid line state after heat loss to cabinet and mullion')
+        print('\n\n')
 
     def cyc_pid(self):
         if self.is_canc_print(Trace.CYC_PID):

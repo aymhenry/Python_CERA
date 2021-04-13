@@ -30,12 +30,13 @@ class Start:
         self.str_path_cyc_in = ""
         self.str_path_cyc_out = ""
 
-    def set_filenames(
-            self,
-            str_file_cyc_in="",
-            str_file_cyc_out="",
-            str_path_cyc_in="",
-            str_path_cyc_out=""):
+    def set_filenames(self,
+                      str_file_cyc_in="",
+                      str_file_cyc_out="",
+                      str_path_cyc_in="",
+                      str_path_cyc_out=""
+                      ):
+                      
         self.str_path_cyc_in = str_path_cyc_in
         self.str_path_cyc_out = str_path_cyc_out
 
@@ -99,12 +100,8 @@ class Start:
     # -----------------------------------------------------------
     def data_prepare(self):
         # Set main data file name
-        obj_datamodel = CycleDataModelBuiler()
-
-        # save file name in data object
-        obj_datamodel.set_init_data(
-            self.str_FILE_CYC_INPUT,
-            self.str_path_cyc_in)     # Input data file name
+        obj_datamodel = CycleDataModelBuiler(self.str_FILE_CYC_INPUT,
+                                             self.str_path_cyc_in)
 
         # check if error, if so exit application
         if obj_datamodel.isError():

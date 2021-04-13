@@ -29,7 +29,7 @@ class DataModelBuiler (FileAccess):
     ERR_FOUND_MAXLIE = 105		   	# lines in file more than expected
     ERR_FOUND_DATA_TYPE2 = 106   	# more than one decimal point, or (-) sign
 
-    def __init__(self, strFileName):
+    def __init__(self, strFileName, strPath=""):
         super().__init__(strFileName)
 
         self.lst_data = []
@@ -38,30 +38,24 @@ class DataModelBuiler (FileAccess):
 
         self.int_configration = None 		# configration selected
 
+        super().__init__(strFileName, "read", strPath)
+
     # -----------------------------------------------------------
     # Job 			: get created data class
     # Input 		:
     #
     # Output		:
     # -----------------------------------------------------------
+
     def get_data_object(self):
         return self.obj_qdata
-    # -----------------------------------------------------------
-    # Job 			: Set basic data for super class
-    # Input 		:
-    #
-    # Output		:
-    # -----------------------------------------------------------
-
-    def set_init_data(self, strFileName, strPath=""):
-        super().__init__(strFileName, "read", strPath)
-
     # -----------------------------------------------------------
     # Job 			: Create vars in object
     # Input 		:
     #
     # Output		: object from this sigle tone class
     # -----------------------------------------------------------
+
     def build_var_list(self):
         # if error return
         if not self.readlines():

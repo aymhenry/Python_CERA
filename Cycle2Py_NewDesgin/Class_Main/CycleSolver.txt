@@ -40,7 +40,7 @@ ATOTCI[1]  =  0.849      m2      Condenser Total Heat Transfer Surface Area
 DTSBCI[1]  =  0          DEG C   Refrigerant Exit Subcooling
 CONDHT[1]  =  4          watt    Liquid-Line Anti-Sweat Heat
 CONDVP[1]  =  0          watt    Vapor-Line Anti-Sweat Heat
-ISPECI[1]  =  2          #       Evaporator Specification
+ISPECI[1]  =  1          #       Evaporator Specification
 IFRSHI[1]  =  0          #       Heat Exchanger Configuration
 TS3[1]  =  -11.334       DEG C   Temp Of Air Entering Fresh Food Section Evaporator
 CFMEI[1]  =  23.6        L/s     Air Flow Rate Across Coil
@@ -61,7 +61,7 @@ UA_FZ  =  0      W/K     Evap: A/R In Freezer Section Walls (If Separate Section
 UA_ML  =  0      W/K     Evap: A/R In Mullion Section (If Present)
 UA_FF_CND  =  0          W/K     Cond: A/R In Fresh Food Section (Or Cabinet Walls)
 UA_FZ_CND  =  0          W/K     Cond: A/R In Freezer Section Walls (If Separate Section)
-UA_FF_HXS  =  0          W/k     Both: A/R In Fresh Food Section (Or Cabinet Walls)
+UA_FF_HXS  =  0          W/K     Both: A/R In Fresh Food Section (Or Cabinet Walls)
 UA_FZ_HXS  =  0          W/K     Both: A/R In Freezer Section Walls (If Separate Section)
 FRACT_FF  =  0   watt    Fraction Of Fresh Food Section (Or Cabinet Walls)
 FRACT_FZ  =  0   watt    Fraction Of Freezer Section Walls (Including Mullion)
@@ -95,56 +95,77 @@ FZHTQ  =  1.38   watt    Freezer Heaters And Controls
 FFREFQ  =  0     watt    Fresh Food Refrigerant Line
 FZREFQ  =  1.2   watt    Freezer Refrigerant Line
 QMUL  =  2.6     watt    Mullion Heat Load
-===============to be checked ============cycle type====
-=== to be checked in Cycle.type =======
+
+
+      Line Diagram for single cycle
+
+              COND BUB    COND-DEW
+ COND OUT     11          3         COND IN
+         4    +-----------+         14
+         +----| Condenser +----------+------<---+
+         |    +-----------+                     | 2  COMP DIS
+         |                                    +-+--+
+HX MULL  |+---------+------------>--+         |    |
+      16 ||         13              |         |Comp|
+       +-||-+     HX OUT            |         +-+--+
+       | || |                       |           | 1  COMP IN
+       | || |interchanger           |           |
+       | || |                       |           |
+       +-||-+                       +---->------+
+       6 ||
+SUBCOOL  ||
+         |+------<------------------------------+
+         |  EVAP DEW                            |
+         |    12                                |
+        (X)   +----------+                      |
+         +->--|Evaparator|-->-------------------+
+         5    +----------+    7
+       EVAP IN              EVAP OUT
+
+
+
+        1- Compressor inlet (saturated vapor)
+        2- Compressor discharge
+        3- Condenser dew point
+        4- Condenser outlet
+        5- Inlet to fresh food evaporator
+        6- Iiquid line outlet from high temp interchanger
+        7- Outlet from fresh food evaporator
+        8- Inlet to freezer evaporator
+        9- Outlet from freezer evaporator
+        10- Liquid line outlet from low temp interchanger
+        11- Condenser bubble point
+        12- Fresh food evaporator dew point
+        13- Superheated gas leaving the high temp interchanger
+        14- Condenser inlet
+        15- Internal variable (not shown) for evap dew point
+        16- Liquid line state after heat loss to cabinet and mullion
+
+
+
 Using Ref.  R12
 
 
 == Starting processing ===
-----------------------------
-#               T C     P kPa   H kj/kg
-1          -13.33          193.62          346.73
-2           39.92          956.02          364.19
-3           39.90          955.55          368.91
-4           35.72          951.30          234.79
-5          -12.34          200.82          267.77
-6           39.72          951.30          267.77
-7          -13.33          193.62          311.12
-8          -12.34          200.82          267.77
-9          -12.34          200.82          267.77
-10          39.72          951.30          267.77
-11          39.74          951.81          238.91
-12         -13.33          193.62          346.73
-13         -13.33          193.62          346.73
-14          39.92          956.06          364.19
-15         -13.33          193.62          346.73
-16          33.12          951.30          232.16
-----------------------
-
-
-Show cycle result in View Class ... later ...
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #         Point     STATE     T(C)      T(C)      P         H         V         S
                               AIR       REF       kPa       kj/kg     m3/kg     kj/kg-C
-1         1         COMP IN   N/A       -13.3339  193.6176  346.7340  0.086795  1.566341
-2         2         COMP DIS  N/A       39.92111  956.0239  364.1850  0.017788  1.531386
-3         14        COND IN   35.64924  39.92244  956.0554  364.1852  0.017787  1.531386
-4         3         COND DEW  N/A       39.90237  955.5519  368.9143  0.018441  1.546533
-5         11        COND BUB  N/A       39.74152  951.8074  238.9127  0.000796  1.131214
-6         4         COND OUT  35.0      35.72004  951.3039  234.7908  0.000786  1.117955
-7         16        LIQ LINE  N/A       33.12073  951.3039  232.1559  0.000779  1.109387
-8         6         SUBCOOL   N/A       39.72004  951.3039  267.7747  0.004737  1.223496
-9         5         EVAP IN   -13.1339  -12.3359  200.8176  267.7747  0.042232  1.261195
-10        12        EVAP DEW  N/A       -13.3339  193.6176  346.7340  0.086795  1.566341
-11        7         EVAP OUT  -11.3340  -13.3339  193.6176  311.1152  0.067517  1.429212
-12        13        HX OUT    N/A       -13.3339  193.6176  346.7340  0.086795  1.566341
+1         1         COMP IN   N/A       22.46992  173.1614  368.7954  0.113384  1.653213
+2         2         COMP DIS  N/A       45.40767  956.0290  373.0399  0.019046  1.559569
+3         14        COND IN   35.65012  45.40326  956.0782  373.0359  0.019044  1.559553
+4         3         COND DEW  N/A       39.90334  955.5570  368.9146  0.018441  1.546534
+5         11        COND BUB  N/A       39.72235  951.3582  238.8929  0.000796  1.131152
+6         4         COND OUT  35.0      35.72025  951.3090  234.7910  0.000786  1.117956
+7         16        LIQ LINE  N/A       32.23822  951.3090  231.2662  0.000777  1.106478
+8         6         SUBCOOL   N/A       10.05860  951.3090  209.5962  0.000732  1.032826
+9         5         EVAP IN   -13.1340  -15.2485  180.3614  209.5962  0.014338  1.039109
+10        12        EVAP DEW  N/A       -16.3340  173.1614  345.3442  0.096385  1.568201
+11        7         EVAP OUT  -11.3340  -13.3340  173.1614  347.1254  0.097736  1.575097
+12        13        HX OUT    N/A       22.46992  173.1614  368.7954  0.113384  1.653213
 
-LEAVING CYCLE WITH IC:18
-LEAVING CYCLE WITH IE:6
-aym @ 77 self.view === later .....
-
-
-        Show all results in View Class ... later ...
+                Leaving cycle with IC:12
+                Leaving cycle with IE:8
 
 
 |==================================================|
@@ -159,5 +180,3 @@ aym @ 77 self.view === later .....
 |     Cycle       : 1 - Standard                   |
 |==================================================|
 Press any key to continue . . .
-
-

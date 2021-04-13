@@ -168,7 +168,7 @@ class CycleType_Abstract (ABC):
         # self.dt.FROSTZS = self.dt.FROSTZ
 
         # error ===CONVERT UNITS need adjust may be move to other class
-        print("=== to be checked in Cycle.type =======")
+        
         self.dt.CONDF = self.dt.FFQ - self.dt.FFSEN - self.dt.FFLAT \
             - self.dt.FFHTQ - self.dt.FROSTF - self.dt.FFREFQ - self.dt.FFPENA
 

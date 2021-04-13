@@ -322,7 +322,7 @@ class Compressor:
 
         T90F_in_K = 305.372  # K
 
-        self.trace.dr_omar("Wet region issue")  # Dr. Omar to approve
+        # Approve concept self.trace.dr_omar("Wet region issue")
         # Ayman modification, in case DTSUPI = 0
         # the given point came to wet area.
         # check if in wet area, return sat. liquid or sat. vap.
@@ -332,7 +332,7 @@ class Compressor:
                                     , T=T90F_in_K, X=1)  # j/kg
 
         # liquid leaving condenser
-        self.trace.dr_omar("Wet region issue")  # Dr. Omar to approve
+        # Approve concept self.trace.dr_omar("Wet region issue")
         # HOUT = self.objCP.Property('H', T=T90F_in_K, P=PDISC)  # j/kg
         HOUT = self.coolutil.getProp(prp='H', P=PDISC
                                      , T=T90F_in_K, X=0)  # j/kg
@@ -341,7 +341,7 @@ class Compressor:
         SSUC = self.objCP.Property('S', T=T90F_in_K, P=PSUCT)  # j/kg/K
         TS = self.objCP.Property('T', S=SSUC, P=PDISC)  # K
 
-        self.trace.dr_omar("Wet region issue")  # Dr. Omar to approve
+        # Approve concept self.trace.dr_omar("Wet region issue")
         # Ayman modification, in case DTSUPI = 0
         # the given point came to wet area.
         # check if in wet area, return sat. liquid or sat. vap.
