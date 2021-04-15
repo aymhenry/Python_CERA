@@ -60,7 +60,7 @@ class Compressor:
         # return [HOUT, QCAN, VSUC, VV2, TSP, TDISC, GAMA, RN, ETAS, MREF]
         dicRes = {'TDISC': lstRes[5],  # Discharge Temp (K)
                   'HOUT': lstRes[0],  # Discharge Enthaply (j/kg)
-                  'QCAN': lstRes[1],  # comp. shell loss normalized to power j/kg
+                  'QCAN': lstRes[1],  # comp. shell loss normalized to power %
                   'VSUC': lstRes[2],  # Suction sp.volume (m3/kg)
                   'VV2': lstRes[3],  # Discharge sp.volume (m3/kg)
                   'GAMA': lstRes[6],  # Cp/Cv ration
@@ -93,7 +93,7 @@ class Compressor:
         # moved by Dr-Omar WDOTS = MREF * (H2S - H1)/1000  # kj/hr = kg/hr * (j/kg)/1000
 
         # determine actual compressor performance [TSP, WDOT, MDOT, QSHELL]
-        # K, kj/hr, kg/hr, kj/hr
+        # K, kj/hr   kg/hr  kj/hr
         [TSP, WDOT, MREF, QSHELL] = \
             self.compmap(PSUCT=PSUCT, PDISC=PDISC, TSUCT=TSUCT,
                          VSUCT=VSUCT,
@@ -435,14 +435,14 @@ class Compressor:
             DELTIN = 30.0
             TSP = TSUCT + DELTIN / 1.8
 
-        TSP90 = (90.0 + DELTIN + 459.67) / 1.8
+        TSP90 = (90.0 + DELTIN + 459.67) / 1.8  # K converted from F
 
         AAA = (PDISC / PSUCT) ** ((GAMA - 1.0) / GAMA)
         TMAX90 = TSP90 * AAA
         TMAX = TSP * AAA
 
-        T90K = 305.372  # K (90.0 F + 459.67) / 1.8
+        T90K = 305.372  # K = (90.0 + F + 459.67) / 1.8, 90K in F
         QLOSS = 0.80
         QSHELL = WDOT * QLOSS * (TMAX - TAMB) / (TMAX90 - T90K)  # kj/hr
-
+        #       K, kj/hr   kg/hr  kj/hr
         return [TSP, WDOT, MDOT, QSHELL]

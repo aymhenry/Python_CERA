@@ -73,10 +73,10 @@ class CycleSolver(CycleUtils):
         def setupComp(ICOMP, TAMB, FRACT_SPEED, strFileName):
             self.ICOMP = ICOMP
             self.objComp = Compressor(objCP=self.objCP,
-                                      TAMB=TAMB,
-                                      ICOMP=ICOMP,
-                                      FRACT_SPEED=FRACT_SPEED,
-                                      strFileName=strFileName
+                                      TAMB=TAMB,                   # K
+                                      ICOMP=ICOMP,                 # none
+                                      FRACT_SPEED=FRACT_SPEED,     # none
+                                      strFileName=strFileName      # none
                                       )
 
         # -- send basic configration
@@ -295,9 +295,9 @@ class CycleSolver(CycleUtils):
         self.TC[1] = self.TS1 + 0.5 * 5 / 9 * (self.MREF / 2.20462)
 
         # -----------------------
-        # steps for change MREF from kg/hr to kmole/hr was ignored
         # stepts was simplifed, all vars equal to self.MREF
-        self.FLOW = self.FLOW2 = self.FLWREF = self.MREFSV = self.MREF
+        # not used self.FLOW=self.FLOW2=self.FLWREF=self.MREFSV = self.MREF
+        self.FLOW = self.MREFSV = self.MREF
 
         # set outer loop data       
         self.JC = 1
@@ -504,11 +504,11 @@ class CycleSolver(CycleUtils):
             self.trace.comp_ins()  # compress_inputs
 
             # only one type
-            self.dicRest = self.objComp.comp_balance(PSUCT=self.P[1],
-                                                     PDISC=self.P[2],
-                                                     TSUCT=self.T[1],
-                                                     MREF=self.MREF,
-                                                     VSUCT=self.V[1]
+            self.dicRest = self.objComp.comp_balance(PSUCT=self.P[1],   # pa
+                                                     PDISC=self.P[2],   # pa
+                                                     TSUCT=self.T[1],   # K
+                                                     MREF=self.MREF,    # kg/hr
+                                                     VSUCT=self.V[1]    # m3/kg
                                                      )
 
             self.trace.comp_out()
@@ -517,13 +517,13 @@ class CycleSolver(CycleUtils):
             # self.T[1] = dicRest['TSP']
 
             # Dischare Temp K
-            self.T[2] = self.dicRest['TDISC']
+            self.T[2] = self.dicRest['TDISC']   # K
 
             # Dischare Enthalpy    j/kg
-            self.H[2] = self.HOUT = self.dicRest['HOUT']
+            self.H[2] = self.HOUT = self.dicRest['HOUT']   # j/kg
 
-            # compressor shell loss normalized to power input j/kg
-            self.QCAN = self.dicRest['QCAN']
+            # compressor shell loss normalized to power input 
+            self.QCAN = self.dicRest['QCAN']   # unitless
 
             # Suction sp.volume m3/kg
             VSUC = self.dicRest['VSUC']
@@ -545,7 +545,7 @@ class CycleSolver(CycleUtils):
             self.MREF = self.dicRest['MREF']
             # ........End Compreesor Class
 
-            self.FLOW2 = self.FLWREF * self.MREF / self.MREFSV
+            # not used self.FLOW2 = self.FLWREF * self.MREF / self.MREFSV
 
             self.trace.dr_omar("Python why calculate T[2]")  # Dr Omar
             # CONDITIONS OF GAS LEAVING COMPRESSOR SHELL
@@ -553,10 +553,10 @@ class CycleSolver(CycleUtils):
             self.H[2] = self.objCP.Property('H', P=self.P[2], V=VV2)  # j/kg
             self.T[2] = self.objCP.Property('T', P=self.P[2], V=VV2)  # K
             self.V[2] = self.objCP.Property('V', P=self.P[2]
-                                            , H=self.H[2])  # j/kg
+                                            , H=self.H[2])  # m3/kg
 
-            # ENTROPY OF GAS LEAVING COMPRESSOR
-            self.S[2] = self.objCP.Property('S', T=self.T[2], V=self.V[2])  # K
+            # ENTROPY OF GAS LEAVING COMPRESSOR  - j/kg K
+            self.S[2] = self.objCP.Property('S', T=self.T[2], V=self.V[2])  
 
             if self.ICONC == 1:  # flag in Condenser class if iteration is good
                 self.LCCON = False  # exit loop
@@ -610,87 +610,94 @@ class CycleSolver(CycleUtils):
 
         # ........Conderser Class..................
         if self.ICOND == 0:
-            dicRest = self.objCond.cond_balance(T14=self.T[14],
-                                                H14=self.H[14],
-                                                T3=self.T[3],
-                                                H3=self.H[3],
-                                                T5=self.T[5],
-                                                T8=self.T[8],
-                                                T9=self.T[9],
-                                                T12=self.T[12],
-                                                TBUB=TBUB,
-                                                HBUB=HBUB,
+            dicRest = self.objCond.cond_balance(T14=self.T[14],   # K
+                                                H14=self.H[14],   # pa
+                                                T3=self.T[3],     # K
+                                                H3=self.H[3],     # j/kg
+                                                T5=self.T[5],     # K
+                                                T8=self.T[8],     # K
+                                                T9=self.T[9],     # K
+                                                T12=self.T[12],   # K
+                                                TBUB=TBUB,        # K
+                                                HBUB=HBUB,        # j/kg
                                                 MREF=self.MREF,   # kg/hr
                                                 CPRLIQ=CPRLIQ     # j/kg K
                                                 )
 
         elif self.ICOND == 1:
-            dicRest = self.objCond.cond_balance(T14=self.T[14],
-                                                H14=self.H[14],
-                                                T3=self.T[3],
-                                                H3=self.H[3],
-                                                TBUB=TBUB,
-                                                HBUB=HBUB,
+            dicRest = self.objCond.cond_balance(T14=self.T[14],   # K
+                                                H14=self.H[14],   # j/kg
+                                                T3=self.T[3],     # K
+                                                H3=self.H[3],     # j/kg
+                                                TBUB=TBUB,        # K
+                                                HBUB=HBUB,        # j/kg
                                                 MREF=self.MREF,   # kg/hr
                                                 CPRLIQ=CPRLIQ,    # j/kg K
-                                                PBUB=PBUB,
-                                                P4=self.P[4]
+                                                PBUB=PBUB,        # pa
+                                                P4=self.P[4]      # pa
                                                 )
 
         elif self.ICOND == 2:
-            dicRest = self.objCond.cond_balance(T14=self.T[14],
-                                                H14=self.H[14],
-                                                T3=self.T[3],
-                                                H3=self.H[3],
-                                                TBUB=TBUB,
-                                                HBUB=HBUB,
+            dicRest = self.objCond.cond_balance(T14=self.T[14],  # K
+                                                H14=self.H[14],  # j/kg
+                                                T3=self.T[3],    # K
+                                                H3=self.H[3],    # j/kg
+                                                TBUB=TBUB,       # K
+                                                HBUB=HBUB,       # j/kg
                                                 MREF=self.MREF,  # kg/hr
                                                 CPRLIQ=CPRLIQ,   # j/kg K
-                                                PBUB=PBUB,
-                                                P4=self.P[4]
+                                                PBUB=PBUB,       # pa
+                                                P4=self.P[4]     # pa
                                                 )
 
         # == Output of condenser class --------
-        QDSC = dicRest['QDSC']   # watt
-        QTPC = dicRest['QTPC']   # watt
-        QSCC = dicRest['QSCC']   # watt
-        QTOTC = dicRest['QTOTC']   # watt
+        QDSC = dicRest['QDSC']       # watt
+        QTPC = dicRest['QTPC']       # watt
+        QSCC = dicRest['QSCC']       # watt
+        QTOTC = dicRest['QTOTC']     # watt
 
         FSUP = dicRest['FSUP']   # unitless
         FSUB = dicRest['FSUB']   # unitless
 
-        [Q_CND_FF, Q_CND_FZ, Q_HXS_FF, Q_HXS_FZ, self.UACOND, UDSC, USCC, UTPC] = \
-            self.objCond.getExtarOutputs()
+        [Q_CND_FF,         # watt
+         Q_CND_FZ,         # watt
+         Q_HXS_FF,         # watt
+         Q_HXS_FZ,         # watt
+         self.UACOND,      # watt/K
+         UDSC,             # watt/m2 K
+         USCC,             # watt/m2 K
+         UTPC              # watt/m2 K
+        ] = self.objCond.getExtarOutputs()
 
-        # Condenser Heat Fresh Food,  Q_CND_FF
-        # Condenser Heat Freezer,     Q_CND_FZ
-        # Heat Exchanger Fresh Food   Q_HXS_FF
-        # Heat Exchanger Freezer      Q_HXS_FZ
-        # Condenser UA                UACOND
-        # Desuperheating Heat Transfer Conductance, kj/hr/m2/C UDSC
-        # Subcooling Heat Transfer Conductance, kj/hr/m2/C     USCC
-        # Two-Phase Heat Transfer Conductance,   kj/hr/m2/C    UTPC
+        # Condenser Heat Fresh Food,                 Q_CND_FF
+        # Condenser Heat Freezer,                    Q_CND_FZ
+        # Heat Exchanger Fresh Food                  Q_HXS_FF
+        # Heat Exchanger Freezer                     Q_HXS_FZ
+        # Condenser                                  UACOND
+        # Desuperheating Heat Transfer Conductance,  UDSC
+        # Subcooling Heat Transfer Conductance,      USCC
+        # Two-Phase Heat Transfer Conductance,       UTPC
 
         # - cond method
         self.trace.dr_omar("Use of MROLD")
-        lstRest = self.objCond.cond(T4=self.T[4],
-                                    H4=self.H[4],  # j/kg
-                                    H14=self.H[4],  # j/kg
-                                    TC=self.TC,  # K
-                                    JC=self.JC,  # number unit less
-                                    QCONDS=QDSC,      # watt
-                                    QCONDC=QTPC,      # watt
-                                    QSCC=QSCC,       # watt
+        lstRest = self.objCond.cond(T4=self.T[4],       # K
+                                    H4=self.H[4],       # j/kg
+                                    H14=self.H[4],      # j/kg
+                                    TC=self.TC,         # K
+                                    JC=self.JC,         # number unit less
+                                    QCONDS=QDSC,        # watt
+                                    QCONDC=QTPC,        # watt
+                                    QSCC=QSCC,          # watt
                                     MROLD=self.MROLD,   # kg/hr
-                                    MREF=self.MREF,  # kg/hr
-                                    UACOND=self.UACOND   # watt/K
+                                    MREF=self.MREF,     # kg/hr
+                                    UACOND=self.UACOND  # watt/K
                                     )
 
         # output of cond method
-        self.TS2 = lstRest[0]   # K
-        self.TC = lstRest[1]    # K
-        self.JC = lstRest[2]
-        self.ICONC = lstRest[3]
+        self.TS2 = lstRest[0]    # K
+        self.TC = lstRest[1]     # K
+        self.JC = lstRest[2]     # unitless
+        self.ICONC = lstRest[3]  # unitless
 
         # ........End Conderser Class .............
 
@@ -871,32 +878,32 @@ class CycleSolver(CycleUtils):
 
             # CPRVAP  j/kg K
             if self.IFRSH == 0:
-                dicRest = self.objEvap.evap_balance(MREF=self.MREF,   #kg/hr
-                                                    T5=self.T[5],
-                                                    H5=self.H[5],
-                                                    T7=self.T[7],
-                                                    TDEW=self.TDEW,
-                                                    CPRVAP=self.CPRVAP
+                dicRest = self.objEvap.evap_balance(MREF=self.MREF,   # kg/hr
+                                                    T5=self.T[5],     # K
+                                                    H5=self.H[5],     # j/kg
+                                                    T7=self.T[7],     # K
+                                                    TDEW=self.TDEW,   # K
+                                                    CPRVAP=self.CPRVAP   # j/kg K
                                                     )
 
             elif self.IFRSH == 1:
-                dicRest = self.objEvap.evap_balance(MREF=self.MREF,   #kg/hr
-                                                    T5=self.T[5],
-                                                    H5=self.H[5],
-                                                    TDEW=self.TDEW,
-                                                    CPRVAP=self.CPRVAP,
-                                                    P5=self.P[5],
-                                                    P7=self.P[7]
+                dicRest = self.objEvap.evap_balance(MREF=self.MREF,   # kg/hr
+                                                    T5=self.T[5],     # K
+                                                    H5=self.H[5],     # K
+                                                    TDEW=self.TDEW,   # K
+                                                    CPRVAP=self.CPRVAP,   # j/kg K
+                                                    P5=self.P[5],      # pa
+                                                    P7=self.P[7]       # pa
                                                     )
 
             elif self.IFRSH == 2:
-                dicRest = self.objEvap.evap_balance(MREF=self.MREF,    #kg/hr
-                                                    T5=self.T[5],
-                                                    H5=self.H[5],
-                                                    TDEW=self.TDEW,
-                                                    CPRVAP=self.CPRVAP,
-                                                    P5=self.P[5],
-                                                    P7=self.P[7]
+                dicRest = self.objEvap.evap_balance(MREF=self.MREF,   # kg/hr
+                                                    T5=self.T[5],     # K
+                                                    H5=self.H[5],     # j/kg
+                                                    TDEW=self.TDEW,   # K
+                                                    CPRVAP=self.CPRVAP,   # j/kg K
+                                                    P5=self.P[5],     # pa
+                                                    P7=self.P[7]      # pa
                                                     )
 
             # ... Output ....
@@ -919,19 +926,20 @@ class CycleSolver(CycleUtils):
             # fresh food section evaporator
             self.trace.frsh_ins()
 
-            dicRest = self.objEvap.frsh(T5=self.T[5],
-                                        H5=self.H[5],
-                                        H7=self.H[7],
-                                        TS3=self.TS3,
-                                        TE=self.TE, JE=self.JE,
-                                        QFRSH=self.QFRSH,
-                                        MREF=self.MREF,
-                                        UAFF=self.UAFF
+            dicRest = self.objEvap.frsh(T5=self.T[5],               # K
+                                        H5=self.H[5],               # j/kg
+                                        H7=self.H[7],               # j/kg
+                                        TS3=self.TS3,               # K
+                                        TE=self.TE,                 # K
+                                        JE=self.JE,                 # none
+                                        QFRSH=self.QFRSH,           # watt
+                                        MREF=self.MREF,             # kg/kg
+                                        UAFF=self.UAFF              # watt/m2 K
                                         )
 
-            self.TE = dicRest['TE']
+            self.TE = dicRest['TE']          # K
             self.JE = dicRest['JE']
-            self.TS4 = dicRest['TS4']
+            self.TS4 = dicRest['TS4']        # K
             ICONE = dicRest['ICONE']
 
             self.trace.frsh_out(ICONE)
@@ -1098,6 +1106,7 @@ class CycleSolver(CycleUtils):
         # find conditions at evaporator inlet assuming isenthalpic expansion
         self.P[5] = self.P[13] + self.DPE # pa
 
+        self.trace.dr_omar("chk lowevp") 
         [self.H, self.P, self.T, self.TS6, self.QFREZ] = \
             self.lowevp(self.dt, self,
                         self.objCP, self.MREF, self.dt.ICYCL,
@@ -1107,7 +1116,10 @@ class CycleSolver(CycleUtils):
                         # ,HL not clear its use
                         self.TS3, self.dt.TS5, self.dt.DPF,
                         self.ETHX2)
-
+                        
+        # self.H[5] = self.H[4] +self.H[7] - self.H[13] # by Ayman
+        
+    # -----------------------------
     def getSolution(self):
         objSolution = QData()
 

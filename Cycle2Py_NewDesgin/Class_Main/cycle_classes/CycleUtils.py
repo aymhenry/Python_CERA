@@ -11,8 +11,8 @@ from cycle_classes.CoolPrpUtil import *
 class CycleUtils ():
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
     def enthal(self, objCP, HBUB, HDEW, XSPEC, P):
-        # ITERATES TO DETERMINE THE ENTHALPY.                 
-        #  THE PRESSURE AND QUALITY ARE INPUTS                      
+        # ITERATES TO DETERMINE THE ENTHALPY.
+        #  THE PRESSURE AND QUALITY ARE INPUTS
 
         # MAKE INITIAL GUESS ASSUMING A LINEAR VARIATION IN ENTHALPY
         #   WITH THE EXIT QUALITY
@@ -62,11 +62,11 @@ class CycleUtils ():
 
         # TS3 - K - HTF temperature entering fresh food evaporator
         # TS5 - K - HTF temperature entering freezer evaporator
-         
+
         # FROSTF : watt,Fresh Food Door Frost Load
         # FROSTZ : watt,Freezer Door Sensible Load
 
-        # IDFRST : #, if 0 Manual Defrost, auto 1     
+        # IDFRST : #, if 0 Manual Defrost, auto 1
 
         # BRANCH ON THE VALUE IC.AVE VARIABLES AND INITIALIZE ON THE
         # FIRST CALL AND : WAIT UNTIL THE 4TH CALL TO MAKE ADJUSTMENTS
@@ -85,20 +85,20 @@ class CycleUtils ():
 
             FFTEMP_S = dt.FFTEMP
             FZTEMP_S = dt.FZTEMP
-            
+
             FFQ_S = dt.FFQ
             FZQON_S = dt.FZQON
             FZQOFF_S = dt.FZQOFF
-            
+
             FFLAT_S = dt.FFLAT
             FZLAT_S = dt.FZLAT
-            
+
             FFSEN_S = dt.FFSEN
             FZSEN_S = dt.FZSEN
-            
+
             FFHTQ_S = dt.FFHTQ
             FZHTQ_S = dt.FZHTQ
-            
+
             FROSTF_S = FROSTF
             FROSTZ_S = FROSTZ
 
@@ -107,7 +107,7 @@ class CycleUtils ():
 
             dt.ATOTE_S = dt.ATOTE
             dt.AREAFZ_S = dt.AREAFZ
-            
+
             UAF_S = dt.UAF  # only in Type = 2 cycle
             dt.ATOTE_A = dt.ATOTE
             dt.AREAFZ_A = dt.AREAFZ
@@ -131,7 +131,7 @@ class CycleUtils ():
 
             TS3_S = TS3
             TS5_S = TS5
-            
+
             dt.FFTEMP_A = dt.FFTEMP
             dt.FZTEMP_A = dt.FZTEMP
 
@@ -152,7 +152,7 @@ class CycleUtils ():
             # Determine needed rebalancing of cabinet loads
             FFLOAD = dt.DUTYE * dt.CAPE + dt.DUTYZ * dt.Q_FZ_FF
             FZLOAD = dt.DUTYZ * dt.CAPZ
-            
+
             DELLOD = (FFLOAD * dt.CAPZ - FZLOAD * \
                       dt.CAPE) / (dt.CAPE + dt.CAPZ)
 
@@ -165,7 +165,7 @@ class CycleUtils ():
 
             if (DUTERR <= 0.001):
                 return [TS3, TS5]
-                
+
             if (DUTDIF >= 0.025):
                 dt.IBLNCE = 1
 
@@ -178,7 +178,7 @@ class CycleUtils ():
                 # CASE [1]#Evap area ratio
                 FFNEW = FFLOAD + DELLOD
                 FZNEW = FZLOAD - DELLOD
-                
+
                 DAREAF = (FFNEW / FFLOAD - 1.0) * dt.ATOTE
                 DAREAZ = (FZNEW / FZLOAD - 1.0) * dt.AREAFZ
 
@@ -202,7 +202,7 @@ class CycleUtils ():
                 if (abs(DAREAF) < abs(DAREAZ)):
                     dt.ATOTE = dt.ATOTE + DAREAF
                     dt.AREAFZ = dt.AREAFZ - DAREAF
-                    
+
                 else:
                     dt.AREAFZ = dt.AREAFZ + DAREAZ
                     dt.ATOTE = dt.ATOTE - DAREAZ
@@ -226,8 +226,8 @@ class CycleUtils ():
                 # dt.FFTEMP_A = 1.8 * TS3 - 459.6
 
                 TS3 = dt.TS3_S - DELTS3
-                dt.FFTEMP_A = TS3 
-                
+                dt.FFTEMP_A = TS3
+
                 dt.FFSEN = dt.UFF_SEN * (dt.TROOM - dt.FFTEMP_A)
                 dt.CONDF = dt.UCND_F * (dt.TROOM - dt.FFTEMP_A) - dt.QMUL
 
@@ -235,7 +235,7 @@ class CycleUtils ():
                 # CASE (3)#Freezer temp
                 DUTYN = 0.25 * dt.DUTYE + 0.75 * dt.DUTYZ
                 FZQ = DUTYN * dt.CAPZ
-                
+
                 if (IDFRST == 0):
                     FZQ = FZQ - dt.FROSTZ_S
 
@@ -256,7 +256,7 @@ class CycleUtils ():
                 pass
 
         return [TS3, TS5]
-    
+
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
     def lowevp(self, dt, ds, objCP, MREF, ICYCL, ICNTRL,
                H, P, T,
@@ -268,7 +268,7 @@ class CycleUtils ():
                ):
         # ICNTRL - CONTROL METHOD FOR EVAPORATOR LOAD
         #  FREEZER EVAPORATOR AND LOWER INTERCHANGER
-        
+
         self.coolutil = CoolPrpUtil(objCP)
         NCALL = 0
         SIGMA = 2.0432E-7
@@ -281,16 +281,16 @@ class CycleUtils ():
         #  XQ[10] = 0
         ETHX = ETHX2
         TSAV = T[9]
-        
+
         TBUB = objCP.Property('T', P=P[8], X=0)  # K
         HBUB = objCP.Property('H', P=P[8], X=0)  # j/kg
 
         if(NCALL == 0):   # Python all times NCALL = 0 !!!
             TDEW = objCP.Property('T', P=P[9], X=1)  # K
             HDEW = objCP.Property('H', P=P[9], X=1)  # j/kg
-            
+
             # dt.CREF watt/K
-            dt.CREF = MREF * (HDEW - HBUB) / (TDEW - TBUB + 0.001) / 3600
+            dt.CREF = (MREF / 3600) * (HDEW - HBUB) / (TDEW - TBUB + 0.001)
             if(dt.CREF <= 0.1):
                 dt.CREF = 1000000.0  # 5/9/94
 
@@ -311,39 +311,39 @@ class CycleUtils ():
 
         if(dt.ITYPE == 1):
             ETHX = 0
-        
+
         # begin iteration for temperature at point 10
 
         ITER = 1
         # the next statment by Ayman VL[10] = VL[6]
         VL10 = objCP.Property('V', P=P[6], H=H[6])  # m3/kg
         # 10 CONTINUE
-        
+
         while (True):
             ITER = ITER + 1
 
             H[10] = objCP.Property('H', T=T[10], V=VL10)  # j/kg
-            
+
             # I think it is T[10]
             T[10] = objCP.Property('T', P=P[10], H=H[10])  # K
-            
+
             H[8] = H[10]
             T[8] = objCP.Property('T', P=P[8], H=H[8])  # K
 
             # DETERMINE CMIN AND CMAX
             # Dr Omar
             # Ayman CFMF only on Type 2, in case of type 1 CFMF allways 0
-            
+
             # if(dt.CFMF <= dt.CREF):   # both watt/ K
             #    # CMIN = dt.CFMF
             #    # CMAX = dt.CREF
             # else:
             #    # CMIN = dt.CREF
             #    # CMAX = dt.CFMF
-                
-            CMIN = min (dt.CREF, dt.CFMF)   # watt/K
-            CMAX = max (dt.CREF, dt.CFMF)   # watt/K
-            
+
+            CMIN = min(dt.CREF, dt.CFMF)   # watt/K
+            CMAX = max(dt.CREF, dt.CFMF)   # watt/K
+
             CAPRAT = CMIN / CMAX        # unitless
             if(CMIN <= 0.0):
                 CMIN = 0.001
@@ -364,7 +364,7 @@ class CycleUtils ():
                     if(TAVE > TS5):
                         TAVE = TS5 - 1.0
 
-                    QMAX = 0.90 * MREF * (H(7) - H[6]) / 3600  # watt
+                    QMAX = 0.90 * (MREF / 3600) * (H(7) - H[6])   # watt
 
                     # in Fortran HRAD is converted from kW/m2 K using eq:-
                     # kW/m2 K = 0.04892 Btu/(s ft2 F)
@@ -378,10 +378,10 @@ class CycleUtils ():
                     # Dr. Omar Units
                     # DELTA = DELTAT * 1.8
                     # DELTA in K
-                    
+
                     # fixed Ayman - Emprical equation use F
                     DELTA = DELTAT  * 1.8 # defrance to F
-                    
+
                     TBAR = 0.67 * TAVE + 0.33 * TS5
                     A_NAT = 0.239 + 3.34E-04 * (273.0 - TBAR)
                     HNAT = A_NAT * (DELTA**0.33) * 20.44 # kW/m2 K
@@ -391,31 +391,31 @@ class CycleUtils ():
                     #
                     #  HRAD = (1.0 - FRACT_FZ)*HRAD
                     #  HNAT = 0.5*HNAT
-                    
+
                     # Dr. Omar
                     UAIR = HRAD + HNAT   # W/m2 K
-                    
+
                     if(dt.IWALL_FZ == 1):
                         UAIR = 1.0 / (1.0 / UAIR + 0.1389 / 20.44) # kW/m2 K
 
                     UAIR = 1000 * UAIR      # W/m2 K
 
                     # UAF[m2] * UAIR[watt/m2 K] * DELTAT[K]
-                    QFREZ = dt.UAF * UAIR * DELTAT      #  as Q_HXS_FZ watt 
-                    
+                    QFREZ = dt.UAF * UAIR * DELTAT      #  as Q_HXS_FZ watt
+
                     # UAF[m2] * UAIR[watt/m2 K]
                     dt.UAFZ = dt.UAF * UAIR     # watt/K
 
                     # Dr Omar Temp Unit
                     # TENV = (TROOM + 459.6) / 1.8
                     TENV = dt.TROOM
-                    
+
                     # Q_HXS_FZ in watt as given from Condenser class
-                    
+
                     # Dr Omar Heat Unit
                     # QFREZ = QFREZ + 1.8 * UA_FZ * (TENV - TAVE) * 1.0548 \
                     # + 1.8 * UA_ML * (TS3 - TAVE) * 1.0548 + Q_HXS_FZ
-                    
+
                     # UA_FZ Watt/K,  1.0548 btu to j (1 BTU = 1.0548 J)
                     # QFREZ[watt] + UA_FZ[watt/K] * [K] + UA_ML[watt/K]*[K]
                     QFREZ = QFREZ + dt.UA_FZ * (TENV - TAVE)  \
@@ -449,21 +449,21 @@ class CycleUtils ():
 
             H[9] = H[8] + QFREZ / (MREF / 3600)   # MREF kg/hr *3600
             T[9] = objCP.Property('T', P=P[9], H=H[9])  # K
-            
+
             if(IFREZ2 == 0):
                 break  # GO TO 20
-  
+
             #          GET NEW GUESS FOR TEMPERATURE AT POINT 10
-     
+
             TOLD = T[10]
             if(ICYCL != 2 or ICNTRL != 2):
                 TNEW = T[6] - ETHX * (T[6] - T[9])     # K
-                
+
             else:
                 TD = objCP.Property('T', X=1, P=P[9])  # K
                 if(TD > T[6]):
                     TNEW = T[6] - ETHX * (T[6] - T[9])
-                    
+
                 else:
                     # to be checked later no VL[10]
 
@@ -483,24 +483,24 @@ class CycleUtils ():
                     DH = min((HLOW - H[9]), (H[6] - HHIGH))
                     H[10] = H[6] - DH
                     T[10] = objCP.Property('T', P=P[10], H=H[10])   # K
-            
+
             # correct guess if necessary and calculate error
-           
+
             if(T[9] > T[6]):
                 TNEW = T[10] - 0.9 * ERROR
                 T[10] = TNEW
-            
+
             T[10] = TNEW
             ERROR = TSAV - T[9]
             TSAV = T[9]
 
             if(abs(ERROR) < dt.TOL_FRZ):
                 break  # GO TO 20
-            
-            # j/hr K      = kg/hr . # watt. K
+
+            # j/hr K      = kg/hr . # watt/K
             dt.CREF = MREF / 3600 * abs((H[9] - H[8]) / (T[9] - T[8] + 0.0001))
             # Dr omar units
- 
+
             if(dt.CREF <= 0.1):
                 dt.CREF = 1000000.0  # /5/9/94
 
@@ -520,10 +520,10 @@ class CycleUtils ():
         # GO TO 10
         # END OF ITERATION.  CALCULATE NEEDED PARAMETERS
         # 20 CONTINUE
-
-        H[5] = H[9] + (H[6] - H[10])        
-        T[5] = objCP.Property('T', P=P[5], H=H[5])  # K
         
+        H[5] = H[9] + (H[6] - H[10])
+        T[5] = objCP.Property('T', P=P[5], H=H[5])  # K
+
         T[10] = objCP.Property('T', P=P[10], H=H[10])  # K
 
         # j/kg   pa   K  watt
@@ -551,19 +551,19 @@ class CycleUtils ():
         #
         #          FIND POSITION IN ARRAY BASED ON THE CAPACITY RATIO
         #          OF THE TWO STREAMS
-        
+
         if 0.00 <= CRAT <= 0.25:
             I = 1
-        
+
         if 0.25 < CRAT <= 0.50:
             I = 2
-        
+
         if 0.50 < CRAT <= 0.75:
             I = 3
-        
+
         if 0.75 < CRAT <= 1.00:
             I = 4
-        
+
         if(NTU <= 0.0):
             NTU = 0.0
 
@@ -577,22 +577,22 @@ class CycleUtils ():
                 EFFA = 1.0 - math.exp(-NTU)
             else:
                 EFFA = EFFA + A[I - 1][J] * BETA**EX
-            
+
             EFFB = EFFB + A[I][J] * BETA**EX
 
         FRAC = (CRAT - (I - 1) * 0.25) / (I * 0.25 - (I - 1) * 0.25)
         EFFECT = EFFA + FRAC * (EFFB - EFFA)
-        
+
         if (EFFECT > 1.0):
             EFFECT = 1.0
         return EFFECT
 
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
     def inter2(self, objCP, PA, TAI, HAI, VAI, PB, HBO, TDEW, HDEW, VDEW, ETA):
-        # iterates to solve for interchanger heat transfer knowing    
-        # the inlet state of one stream and outlet state of the       
-        # other for a counterflow heat exchanger.                     
-        # equal mass flow rates of the same fluid                     
+        # iterates to solve for interchanger heat transfer knowing
+        # the inlet state of one stream and outlet state of the
+        # other for a counterflow heat exchanger.
+        # equal mass flow rates of the same fluid
 
         LCONV = False
 
@@ -600,23 +600,23 @@ class CycleUtils ():
         #        OUTLET STATE OF STREAM B
 
         # GUESS THE INLET STATE FOR STREAM B
-        
+
         HBI = HDEW - 5.0
         ITER = 0
         HTOL = 1000.0
-        
+
         while (ITER <= 100 and HTOL > 0.001):
             # [TBI, XQBI, XL, XV, VL, VV, HL, HV] = self.hpin(HBI, PB, X)
             TBI = objCP.Property('T', H=HBI, P=PB)  # K
-            
+
             # DETERMINE EXIT STATE OF STREAM A if AT TBI
-            
+
             # Dr. Omar to approve
             # Ayman modification, in case DTSUPI = 0
             # the given point came to wet area.
             # check if in wet area, return sat. liquid or sat. vap.
             # HAOSTR = self.objCP.Property('H', X=0, T=TBI)  # j/kg
-            
+
             HAOSTR = self.coolutil.getProp(prp='H', P=PA,
                                            T=TBI, X=0)  # j/kg
             DHAMAX = HAI - HAOSTR
@@ -626,17 +626,17 @@ class CycleUtils ():
             # Ayman modification, in case DTSUPI = 0
             # the given point came to wet area.
             # check if in wet area, return sat. liquid or sat. vap.
-            
+
             # HBOSTR = self.objCP.Property('H', X=0, T=TAI)  # j/kg
             HBOSTR = self.coolutil.getProp(prp='H', P=PA,
                                            T=TAI, X=0)  # j/kg
-                                         
+
             DHBMAX = HBI - HBOSTR
 
             # DETERMINE THE HEAT TRANSFER FOR THE GUESSED INLET STATE HBI
             QMAX = min(DHAMAX, DHBMAX)
             QACT = ETA * QMAX
-            
+
             # ADJUST THE STREAM B ENTHALPY GUESS
             DELTA = QACT / (HBO - HBI)
             HTOL = abs(1.0 - DELTA)
@@ -644,16 +644,16 @@ class CycleUtils ():
 
             if(HBI2 > 1.1 * HBI):
                 HBI2 = 1.1 * HBI
-                
+
             if(HBI2 < 0.9 * HBI):
                 HBI2 = 0.9 * HBI
-                
+
             HBI = HBI2
 
             ITER = ITER + 1
 
         return [TBI, HBI, QACT]
-    
+
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
     def dutfnd(self, dt, ICAB,
                IRFTYP, ICYCL, N,
@@ -670,24 +670,24 @@ class CycleUtils ():
         # CALCULATE IN-WALL HEAT LOADS
         #
         # TENV = (dt.TROOM + 459.6) / 1.8
-        TENV = dt.TROOM 
+        TENV = dt.TROOM
         TCND = 0.2 * T[14] + 0.4 * T[3] + 0.4 * T[11]
 
         if (TS5 > -300.0):  # Freezer evaporator
             TRFZ = (T[8] + T[9]) / 2.0
-            
+
             # dt.Q_FZ_IN_WALL = 1.8 * dt.UA_FZ * (TENV - TS5)
             # dt.Q_ML_IN_WALL = 1.8 * dt.UA_ML * (dt.TS3 - TS5)
             # dt.CAPZ_IN_WALL = 1.8 * dt.UA_FZ * (TENV - TRFZ)
             # dt.CAPM_IN_WALL = 1.8 * dt.UA_ML * (dt.TS3 - TRFZ)
             # dt.Q_FZ_FF = 1.8 * dt.UA_ML * (TS5 - TRFZ)
-            
+
             dt.Q_FZ_IN_WALL = dt.UA_FZ * (TENV - TS5)
             dt.Q_ML_IN_WALL = dt.UA_ML * (dt.TS3 - TS5)
             dt.CAPZ_IN_WALL = dt.UA_FZ * (TENV - TRFZ)
             dt.CAPM_IN_WALL = dt.UA_ML * (dt.TS3 - TRFZ)
             dt.Q_FZ_FF = dt.UA_ML * (TS5 - TRFZ)
-            
+
         else:
             dt.Q_FZ_IN_WALL = 0
             dt.Q_ML_IN_WALL = 0
@@ -699,7 +699,7 @@ class CycleUtils ():
         # End if
 
         TRFF = (T[5] + T[7]) / 2.0
-        
+
         # dt.Q_FF_IN_WALL = 1.8 * dt.UA_FF * (TENV - dt.TS3)
         # dt.CAPE_IN_WALL = 1.8 * dt.UA_FF * (TENV - TRFF)
         # dt.CONDF_IN_WALL = 1.8 * dt.UA_FF_CND * (TCND - TENV)
@@ -709,7 +709,7 @@ class CycleUtils ():
         dt.CAPE_IN_WALL = dt.UA_FF * (TENV - TRFF)
         dt.CONDF_IN_WALL = dt.UA_FF_CND * (TCND - TENV)
         dt.CONDZ_IN_WALL = dt.UA_FZ_CND * (TCND - TENV)
-        
+
         #
         # BRANCH ACCORDING TO THE TYPE OF REFRIGERATOR
         #
@@ -731,7 +731,7 @@ class CycleUtils ():
 
                 # both dt.CONDF_IN_WALL - dt.CONDZ_IN_WALL
                 # are zero by defalut
-                
+
                 dt.CAPE = QFRSH \
                     - dt.FANE \
                     - dt.DFSTCYC \
@@ -739,9 +739,9 @@ class CycleUtils ():
                     - dt.FZCYC \
                     - dt.CONDF_IN_WALL \
                     - dt.CONDZ_IN_WALL
-                    
+
                 dt.DUTYC = (QFF + QFZ) / dt.CAPE
-                
+
                 if (dt.DUTYC > 1.0):
                     dt.DUTYC = 1.0
                 DUTYR = dt.DUTYC
@@ -750,7 +750,7 @@ class CycleUtils ():
                 QFF = QFF - dt.FROSTF
                 if (dt.IDFRST == 0):
                     QFZ = QFZ + dt.FROSTF
-                
+
                 # Dr. Omar Unit
                 # dt.CAPZ = QFREZ / 1.0548 - 3.413 * dt.FANZ \
                     # - 3.413 * dt.DFSTCYC	\
@@ -758,7 +758,7 @@ class CycleUtils ():
                     # - dt.CAPZ_IN_WALL - dt.CAPM_IN_WALL	\
                     # - dt.CONDZ_IN_WALL - 3.413 * dt.FZCYC	\
                     # - dt.Q_HXS_FZ / 1.0548
-                    
+
                 dt.CAPZ = QFREZ \
                     - dt.FANZ \
                     - dt.DFSTCYC \
@@ -768,7 +768,7 @@ class CycleUtils ():
                     - dt.CAPM_IN_WALL \
                     - dt.CONDZ_IN_WALL \
                     - dt.FZCYC	\
-                    - dt.Q_HXS_FZ 
+                    - dt.Q_HXS_FZ
 
                 if (dt.CAPZ <= 0.0):
                     # self.showError("Incorrect Solution, Check Mass Flow")
@@ -799,7 +799,7 @@ class CycleUtils ():
 
                 if (dt.DUTYC > 1.0):
                     dt.DUTYC = 1.0
-                    
+
                 DUTYR = max(dt.DUTYE, dt.DUTYZ)
 
                 if (DUTYR > 1.0):
@@ -809,12 +809,12 @@ class CycleUtils ():
                 if (N == 1):
                     if (dt.IDFRST == 0):
                         QFZ = QFZ + dt.FROSTF
-                   
+
                     # dt.CAPZ = QFRSH / 1.0548 - 3.413 * dt.FANE - \
                         # 3.413 * (dt.DFSTCYC + dt.FZCYC)
 
                     dt.CAPZ = QFRSH - dt.FANE - (dt.DFSTCYC + dt.FZCYC)
-                        
+
                     dt.DUTYZ = QFZ / dt.CAPZ
 
                     dt.DUTYC = min(dt.DUTYZ, 1.0)
@@ -828,7 +828,7 @@ class CycleUtils ():
                     dt.CAPE = QFRSH \
                         - (dt.FANE + dt.FFCYC) \
                         + dt.Q_FF_IN_WALL - dt.CAPE_IN_WALL
-                        
+
                     QFF = QFF - dt.FROSTF
                     dt.DUTYE = QFF / dt.CAPE
                     dt.DUTYC = min(dt.DUTYE, 1.0)
@@ -839,8 +839,8 @@ class CycleUtils ():
             else:
                 if (dt.IDFRST == 0):
                     QFZ = QFZ + dt.FROSTF
-                
-                # dt.CAPE = QFRSH / 1.0548 - 3.413 * (dt.FANE 
+
+                # dt.CAPE = QFRSH / 1.0548 - 3.413 * (dt.FANE
                     # + dt.DFSTCYC + dt.FZCYC)	\
                     # + dt.Q_FF_IN_WALL - dt.CAPE_IN_WALL	\
                     # - dt.CONDF_IN_WALL - dt.Q_HXS_FF / 1.0548
@@ -848,7 +848,7 @@ class CycleUtils ():
                 dt.CAPE = QFRSH \
                     - (dt.FANE + dt.DFSTCYC + dt.FZCYC) \
                     + dt.Q_FF_IN_WALL - dt.CAPE_IN_WALL \
-                    - dt.CONDF_IN_WALL - dt.Q_HXS_FF 
+                    - dt.CONDF_IN_WALL - dt.Q_HXS_FF
 
                 dt.DUTYE = QFZ / dt.CAPE
                 dt.DUTYC = min(dt.DUTYE, 1.0)
@@ -857,7 +857,7 @@ class CycleUtils ():
         return [QFF, QFZ, DUTYR]
 
     def mixair(self, CAP, QFF, QFZ, TFF, TFZ, CFME):
-        #     *     CALCULATE INLET TEMPERATURE TO THE EVAPORATOR            
+        #     *     CALCULATE INLET TEMPERATURE TO THE EVAPORATOR
         #          SET UP THE QUADRATIC EQUATION COEFFICIENTS
         #
 
@@ -868,7 +868,7 @@ class CycleUtils ():
         # Solve the quadratic equation
         X = - B / (2.0 * A) - math.sqrt(B**2 - 4.0 * A * C) / (2.0 * A)
         TIN = X * TFF + (1.0 - X) * TFZ
-        
+
         # Ayman not used anywhere Data.obj_cdata.FF_AIR = X
-        
+
         return [TIN, X]

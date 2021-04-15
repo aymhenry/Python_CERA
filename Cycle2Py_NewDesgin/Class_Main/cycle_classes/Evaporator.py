@@ -92,7 +92,7 @@ class EvapCool_Abstract (exf4Cond_Evap):
         pass
 
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
-    def frsh(self, H5, H7, T5, TS3, TE, JE, QFRSH, MREF, UAFF=0):
+    def frsh_old_not_used(self, H5, H7, T5, TS3, TE, JE, QFRSH, MREF, UAFF=0):
 
         # calculate fresh food section exit temperature
         #   initialize
@@ -173,6 +173,69 @@ class EvapCool_Abstract (exf4Cond_Evap):
         if (self.IFRSH == 0):
             TS4 = 0.9 * TE[JE] + 0.1 * TS3
 
+        dicRes = {'TS4': TS4,
+                  'TE': TE,
+                  'JE': JE,
+                  'ICONE': ICONE    # 0=Free Error, 1=Error Found
+                  }
+        return dicRes
+
+    # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
+    def frsh(self, H5, H7, T5, TS3, TE, JE, QFRSH, MREF, UAFF=0):
+
+        # calculate fresh food section exit temperature
+        #   initialize
+        MREF_kg_s = MREF / 3600
+        TOL_FRSH = 0.1   # Tolerance
+
+        ICONE = 0
+        
+        EPS = MREF_kg_s * (H7 - H5) - QFRSH  # watt
+        DELT = EPS / UAFF     # K
+        
+        if (DELT > 5.0):
+            DELT = 5.0
+
+        if (DELT < -5.0):
+            DELT = -5.0
+
+        TEOUT = TE[JE] + DELT
+        TS4 = TS3 - QFRSH / self.CFME   # K - [j/kg] [j/kg/K]
+        
+        if (TEOUT > TS3):
+            # TEOUT = TS3
+            TEOUT = (TS3 + TE[JE]) / 2.0
+
+        if (JE < 2):
+            TENEW = TEOUT
+            
+        else:
+            if ((TEOUT > TE[1] > TE[2]) or (TEOUT < TE[2] < TE[1])):
+                TCNEW = 0.5 * (TE[1] + TE[2])
+                
+            else:
+                TENEW = TEOUT
+
+            if (TENEW < TS3):
+                TENEW = (TS3 + TE[JE]) / 2.0
+
+        ERROR = abs(TENEW - TE[1])
+
+        # ==============this block modified by Ayman
+        # Iteration is finised when ICONE = 1, i.e LECON = False
+        # See source code Cycle.for Line 0801
+        if (ERROR < TOL_FRSH):
+            ICONE = 1  # ok no error
+        else:
+            ICONE = 0   # out of limit error
+
+
+        self.trace.dr_omar("New method other than the old")
+        
+        JE = 2   # by Ayman to chk Dr omar
+        TE[1] = TE[2]
+        TE[2] = TENEW
+ 
         dicRes = {'TS4': TS4,
                   'TE': TE,
                   'JE': JE,
