@@ -108,7 +108,7 @@ class CycleUtils ():
             dt.ATOTE_S = dt.ATOTE
             dt.AREAFZ_S = dt.AREAFZ
             
-            UAF_S = dt.UAF
+            UAF_S = dt.UAF  # only in Type = 2 cycle
             dt.ATOTE_A = dt.ATOTE
             dt.AREAFZ_A = dt.AREAFZ
 
@@ -258,7 +258,7 @@ class CycleUtils ():
         return [TS3, TS5]
     
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
-    def lowevp(self, dt, objCP, MREF, ICYCL, ICNTRL,
+    def lowevp(self, dt, ds, objCP, MREF, ICYCL, ICNTRL,
                H, P, T,
                # XQ, XL, XV, not used
                # ,VL, VV
@@ -289,7 +289,7 @@ class CycleUtils ():
             TDEW = objCP.Property('T', P=P[9], X=1)  # K
             HDEW = objCP.Property('H', P=P[9], X=1)  # j/kg
             
-            # dt.CREF watt.K
+            # dt.CREF watt/K
             dt.CREF = MREF * (HDEW - HBUB) / (TDEW - TBUB + 0.001) / 3600
             if(dt.CREF <= 0.1):
                 dt.CREF = 1000000.0  # 5/9/94
@@ -315,7 +315,7 @@ class CycleUtils ():
         # begin iteration for temperature at point 10
 
         ITER = 1
-        # the next statment by Ayman
+        # the next statment by Ayman VL[10] = VL[6]
         VL10 = objCP.Property('V', P=P[6], H=H[6])  # m3/kg
         # 10 CONTINUE
         
@@ -334,14 +334,17 @@ class CycleUtils ():
             # Dr Omar
             # Ayman CFMF only on Type 2, in case of type 1 CFMF allways 0
             
-            if(dt.CFMF <= dt.CREF):   # both watt. K
-                CMIN = dt.CFMF
-                CMAX = dt.CREF
-            else:
-                CMIN = dt.CREF
-                CMAX = dt.CFMF
-
-            CAPRAT = CMIN / CMAX
+            # if(dt.CFMF <= dt.CREF):   # both watt/ K
+            #    # CMIN = dt.CFMF
+            #    # CMAX = dt.CREF
+            # else:
+            #    # CMIN = dt.CREF
+            #    # CMAX = dt.CFMF
+                
+            CMIN = min (dt.CREF, dt.CFMF)   # watt/K
+            CMAX = max (dt.CREF, dt.CFMF)   # watt/K
+            
+            CAPRAT = CMIN / CMAX        # unitless
             if(CMIN <= 0.0):
                 CMIN = 0.001
 
@@ -361,7 +364,11 @@ class CycleUtils ():
                     if(TAVE > TS5):
                         TAVE = TS5 - 1.0
 
-                    QMAX = 0.90 * MREF * (H(7) - H[6]) / 3600  # 5/9/94
+                    QMAX = 0.90 * MREF * (H(7) - H[6]) / 3600  # watt
+
+                    # in Fortran HRAD is converted from kW/m2 K using eq:-
+                    # kW/m2 K = 0.04892 Btu/(s ft2 F)
+                    # so HRAD in kW/m2 K
                     HRAD = SIGMA * (TAVE + TS5) * (TAVE**2 + TS5**2) * EPS
                     DELTAT = TS5 - TAVE
 
@@ -371,11 +378,13 @@ class CycleUtils ():
                     # Dr. Omar Units
                     # DELTA = DELTAT * 1.8
                     # DELTA in K
-                    DELTA = DELTAT 
+                    
+                    # fixed Ayman - Emprical equation use F
+                    DELTA = DELTAT  * 1.8 # defrance to F
                     
                     TBAR = 0.67 * TAVE + 0.33 * TS5
                     A_NAT = 0.239 + 3.34E-04 * (273.0 - TBAR)
-                    HNAT = A_NAT * (DELTA**0.33) * 20.44
+                    HNAT = A_NAT * (DELTA**0.33) * 20.44 # kW/m2 K
 
                     #  MAKE APPROXIMATE CORRECTIONS FOR VIEW FACTORS AND ASSUMED
                     #    ORIENTATION OF THE EVAPORATOR PANELS.
@@ -384,52 +393,61 @@ class CycleUtils ():
                     #  HNAT = 0.5*HNAT
                     
                     # Dr. Omar
-                    UAIR = HRAD + HNAT
+                    UAIR = HRAD + HNAT   # W/m2 K
+                    
                     if(dt.IWALL_FZ == 1):
-                        UAIR = 1.0 / (1.0 / UAIR + 0.1389 / 20.44)
+                        UAIR = 1.0 / (1.0 / UAIR + 0.1389 / 20.44) # kW/m2 K
 
-                    QFREZ = dt.UAF * UAIR * DELTAT
-                    dt.UAFZ = dt.UAF * UAIR
+                    UAIR = 1000 * UAIR      # W/m2 K
+
+                    # UAF[m2] * UAIR[watt/m2 K] * DELTAT[K]
+                    QFREZ = dt.UAF * UAIR * DELTAT      #  as Q_HXS_FZ watt 
+                    
+                    # UAF[m2] * UAIR[watt/m2 K]
+                    dt.UAFZ = dt.UAF * UAIR     # watt/K
 
                     # Dr Omar Temp Unit
                     # TENV = (TROOM + 459.6) / 1.8
                     TENV = dt.TROOM
+                    
+                    # Q_HXS_FZ in watt as given from Condenser class
                     
                     # Dr Omar Heat Unit
                     # QFREZ = QFREZ + 1.8 * UA_FZ * (TENV - TAVE) * 1.0548 \
                     # + 1.8 * UA_ML * (TS3 - TAVE) * 1.0548 + Q_HXS_FZ
                     
                     # UA_FZ Watt/K,  1.0548 btu to j (1 BTU = 1.0548 J)
+                    # QFREZ[watt] + UA_FZ[watt/K] * [K] + UA_ML[watt/K]*[K]
                     QFREZ = QFREZ + dt.UA_FZ * (TENV - TAVE)  \
-                        + dt.UA_ML * (TS3 - TAVE) + dt.Q_HXS_FZ  # watt
+                        + dt.UA_ML * (TS3 - TAVE) + ds.Q_HXS_FZ  # watt
 
                     if(QFREZ > QMAX):
                         QFREZ = QMAX
 
                 elif dt.IFREZ == 1:
-                    EXFR = self.efcross(CAPRAT, FNTU)
+                    EXFR = self.efcross(CAPRAT, FNTU) # unitless
 
-                    QFREZ = EXFR * CMIN * (TS5 - T[8])
-                    dt.ETAF = EXFR
+                    QFREZ = EXFR * CMIN * (TS5 - T[8])   # watt
+                    dt.ETAF = EXFR      # unitless
 
                 elif dt.IFREZ == 2:
-                    XX = 1.0 - CAPRAT
-                    XXX = math.exp(-FNTU * XX)
-                    EXFR = (1.0 - XXX) / (1.0 - CAPRAT * XXX)
-                    QFREZ = EXFR * CMIN * (TS5 - T[8])
-                    dt.ETAF = EXFR
+                    XX = 1.0 - CAPRAT    # unitless
+                    XXX = math.exp(-FNTU * XX)   # unitless
+                    EXFR = (1.0 - XXX) / (1.0 - CAPRAT * XXX)    # unitless
+                    QFREZ = EXFR * CMIN * (TS5 - T[8])   # watt
+                    dt.ETAF = EXFR      # unitless
 
-                TS6 = TS5 - QFREZ / dt.CFMF
+                TS6 = TS5 - QFREZ / dt.CFMF     # K
 
                 if(dt.IFREZ == 0):
-                    TS6 = 0.9 * TAVE + 0.1 * TS5
+                    TS6 = 0.9 * TAVE + 0.1 * TS5     # K
             else:
                 QFREZ = 0.0
-                TS6 = TS5
+                TS6 = TS5     # K
 
             # UPDATE ENTHALPY ACROSS EVAPORATOR
 
-            H[9] = H[8] + QFREZ / MREF / 3600   # MREF kg/hr *3600
+            H[9] = H[8] + QFREZ / (MREF / 3600)   # MREF kg/hr *3600
             T[9] = objCP.Property('T', P=P[9], H=H[9])  # K
             
             if(IFREZ2 == 0):
@@ -439,11 +457,13 @@ class CycleUtils ():
      
             TOLD = T[10]
             if(ICYCL != 2 or ICNTRL != 2):
-                TNEW = T[6] - ETHX * (T[6] - T[9])
+                TNEW = T[6] - ETHX * (T[6] - T[9])     # K
+                
             else:
                 TD = objCP.Property('T', X=1, P=P[9])  # K
                 if(TD > T[6]):
                     TNEW = T[6] - ETHX * (T[6] - T[9])
+                    
                 else:
                     # to be checked later no VL[10]
 
@@ -506,7 +526,7 @@ class CycleUtils ():
         
         T[10] = objCP.Property('T', P=P[10], H=H[10])  # K
 
-        # return [H, P, X, T, XQ, XL, XV, VL, VV, HL, HV, TS6, QFREZ]
+        # j/kg   pa   K  watt
         return [H, P, T, TS6, QFREZ]
 
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
@@ -566,26 +586,6 @@ class CycleUtils ():
         if (EFFECT > 1.0):
             EFFECT = 1.0
         return EFFECT
-
-    # -----------------------------------------------------------
-    # job interchanger for subcooling condenser liquid
-    #     used when the inlet states of both streams specified
-    # -----------------------------------------------------------
-    def inter1(self, objCP, T16, T7, P7, ETHX1):
-        #  by Dr. Omar
-        # MREF kg/hr
-        # objCP cool prob object
-        # ETHX1 - effectiveness of high temp interchanger
-        # T temp in KEY
-        # H Enthalpy j/kg
-        
-        #  INTERCHANGER FOR SUBCOOLING CONDENSER LIQUID               
-        #  USED WHEN THE INLET STATES OF BOTH STREAMS SPECIFIED       
-        
-        CP7 = objCP.Property('CP', T=T7 , P=P7)  # j/kg K
-        QINT = ETHX1 * (T16 -T7) * CP7
-
-        return QINT
 
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
     def inter2(self, objCP, PA, TAI, HAI, VAI, PB, HBO, TDEW, HDEW, VDEW, ETA):

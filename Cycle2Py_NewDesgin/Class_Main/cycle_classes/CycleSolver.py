@@ -1099,7 +1099,8 @@ class CycleSolver(CycleUtils):
         self.P[5] = self.P[13] + self.DPE # pa
 
         [self.H, self.P, self.T, self.TS6, self.QFREZ] = \
-            self.lowevp(self.dt, self.objCP, self.MREF, self.dt.ICYCL,
+            self.lowevp(self.dt, self,
+                        self.objCP, self.MREF, self.dt.ICYCL,
                         0,  # ICNTRL no value set in Fortran
                         self.H, self.P, self.T,
                         # , VL
