@@ -38,8 +38,8 @@ class CycleSolver(CycleUtils):
                                       CFME=self.dt.CFME,  # watt/K
                                       TS3=self.TS3,
                                       N_EVAP=self.dt.N_EVAP,
-                                      USUPE=self.USUPE,
-                                      UTPE=self.UTPE,
+                                      USUPE=self.USUPE,    # watt/m2-K
+                                      UTPE=self.UTPE,    # watt/m2-K
                                       TROOM=self.dt.TROOM,
                                       FZTEMP=self.dt.FZTEMP,
                                       UA_FF=self.dt.UA_FF,
@@ -869,8 +869,9 @@ class CycleSolver(CycleUtils):
             #  ........Evaporator Class..................
             # add evaporator class here
 
+            # CPRVAP  j/kg K
             if self.IFRSH == 0:
-                dicRest = self.objEvap.evap_balance(MREF=self.MREF / 3600,
+                dicRest = self.objEvap.evap_balance(MREF=self.MREF,   #kg/hr
                                                     T5=self.T[5],
                                                     H5=self.H[5],
                                                     T7=self.T[7],
@@ -879,7 +880,7 @@ class CycleSolver(CycleUtils):
                                                     )
 
             elif self.IFRSH == 1:
-                dicRest = self.objEvap.evap_balance(MREF=self.MREF / 3600,
+                dicRest = self.objEvap.evap_balance(MREF=self.MREF,   #kg/hr
                                                     T5=self.T[5],
                                                     H5=self.H[5],
                                                     TDEW=self.TDEW,
@@ -889,7 +890,7 @@ class CycleSolver(CycleUtils):
                                                     )
 
             elif self.IFRSH == 2:
-                dicRest = self.objEvap.evap_balance(MREF=self.MREF / 3600,
+                dicRest = self.objEvap.evap_balance(MREF=self.MREF,    #kg/hr
                                                     T5=self.T[5],
                                                     H5=self.H[5],
                                                     TDEW=self.TDEW,
@@ -899,9 +900,9 @@ class CycleSolver(CycleUtils):
                                                     )
 
             # ... Output ....
-            self.QFRSH = dicRest['QFRSH']
-            self.UAFF = dicRest['UAFF']
-            self.FSUPE = dicRest['FSUPE']
+            self.QFRSH = dicRest['QFRSH']       # watt
+            self.UAFF = dicRest['UAFF']         # watt/K
+            self.FSUPE = dicRest['FSUPE']       # unitless
             # ..........................................
 
             # Superheating fraction
