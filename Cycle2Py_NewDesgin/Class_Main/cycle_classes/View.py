@@ -606,7 +606,7 @@ class View:
 
         if (self.ds.ICOND  !=  0) :
             self.prn.write_or_terminate  ('''CONDENSER,
-                %9.3f,%9.3f, %9.3f ''' %(self.dt.ETAC
+                %9.3f,%9.3f, %9.3f ''' %(self.ds.ETAC
                                        , self.ds.FSUBC
                                        , self.ds.FSUPC ) )
         else:
