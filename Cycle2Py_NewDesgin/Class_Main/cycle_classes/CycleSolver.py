@@ -925,7 +925,7 @@ class CycleSolver(CycleUtils):
                                         TS3=self.TS3,
                                         TE=self.TE, JE=self.JE,
                                         QFRSH=self.QFRSH,
-                                        MREF=self.MREF / 3600,
+                                        MREF=self.MREF,
                                         UAFF=self.UAFF
                                         )
 

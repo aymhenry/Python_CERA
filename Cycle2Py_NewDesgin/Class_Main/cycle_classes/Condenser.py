@@ -215,8 +215,8 @@ class CondCool_Abstract(ABC, exf4Cond_Evap):
         JC = 2
         # ICNT = ICNT + 1  # useless
         # TC[JC] = TCNEW
-        TC[2] = TC[1]
-        TC[1] = TCNEW
+        TC[1] = TC[2]
+        TC[2] = TCNEW
         # modification by Ayman - MROLD = MREF to be moved out of class
         # MROLD = MREF
 
