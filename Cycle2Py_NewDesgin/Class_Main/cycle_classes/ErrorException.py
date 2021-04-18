@@ -2,6 +2,7 @@
 
 # User import
 
+
 class ErrorException(Exception):
     def __init__(self, message, errors):
         # Call Exception.__init__(message)
@@ -10,9 +11,9 @@ class ErrorException(Exception):
         self.errors = errors
         
         # Display the errors
-        print ("\n=-=-=-=-=-=-=-=-=-=-=-=-=-=-")
-        print ('       Error in app Data Entry:')
-        print (message)
-        print ("-------------------------------\n")
-        print ("Error Details\n")
+        print("\n=-=-=-=-=-=-=-=-=-=-=-=-=-=-")
+        print('       Error in app Data Entry:')
+        print(message)
+        print("-------------------------------\n")
+        print("Error Details\n")
         print(errors)

@@ -4,7 +4,7 @@ import math
 # User import
 
 
-class exf4Cond_Evap ():
+class exf4Cond_Evap:
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
     def exf(self, LOC, AREA, U, CMIN, CMAX):
         # calculate counter flow efficiency parameters                
@@ -13,7 +13,8 @@ class exf4Cond_Evap ():
         # AREA m2
         # U  W/m2 K
         # CMIN, CMAX watt/K
-        
+        DEFFDA = EFF = 0
+
         EFF_CROSS = [0.0] * (2 + 1)
         coff_A = [
             [2.394292, -1.19402, -1.45067, 1.938453, -0.81305, 0.118651],
@@ -37,12 +38,16 @@ class exf4Cond_Evap ():
         int_row = 0
         
         if LOC == 2:  # Cross-flow
-            if 0.00 <= CRAT <= 0.25: int_row = 1
-            if 0.25 < CRAT <= 0.50: int_row = 2
-            if 0.50 < CRAT <= 0.75: int_row = 3
-            if 0.75 < CRAT <= 1.00: int_row = 4
+            if 0.00 <= CRAT <= 0.25:
+                int_row = 1
+            if 0.25 < CRAT <= 0.50:
+                int_row = 2
+            if 0.50 < CRAT <= 0.75:
+                int_row = 3
+            if 0.75 < CRAT <= 1.00:
+                int_row = 4
 
-            if (NTU <= 0.0):
+            if NTU <= 0.0:
                 NTU = 0.0
 
             for L in range(1, 2 + 1):
@@ -52,26 +57,27 @@ class exf4Cond_Evap ():
 
                 for J in range(1, 6 + 1): 
                     EX = 1.0 * J
-                    if (int_row == 1):
+                    if int_row == 1:
                         EFFA = 1.0 - math.exp(-NTU)
                     else:
-                        EFFA = EFFA + coff_A[int_row - 1 - 1][J - 1] * BETA**EX
+                        EFFA += coff_A[int_row - 1 - 1][J - 1] * BETA ** EX
 
-                    EFFB = EFFB + coff_A[int_row - 1][J - 1] * BETA**EX
+                    EFFB += coff_A[int_row - 1][J - 1] * BETA ** EX
 
                 FRAC = (CRAT - (int_row - 1) * 0.25) / \
                     (int_row * 0.25 - (int_row - 1) * 0.25)
                 EFFECT = EFFA + FRAC * (EFFB - EFFA)
 
-                if (EFFECT > 1.0):
+                if EFFECT > 1.0:
                     EFFECT = 1.0
 
                 EFF_CROSS[L] = EFFECT
-                NTU = 0.9 * NTU
+                NTU *= 0.9
 
             EFF = EFF_CROSS[1]
             DEFFDA = 10.0 * (EFF_CROSS[1] - EFF_CROSS[2]) / AREA   # 1/m2
 
-        if(DEFFDA <= 0.0):
+        if DEFFDA <= 0.0:
             DEFFDA = 0.0001
+
         return [EFF, DEFFDA]    # [unitless]  [1/m2]

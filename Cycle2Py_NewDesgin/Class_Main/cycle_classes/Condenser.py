@@ -1,5 +1,5 @@
 # Python import
-from abc import ABC, abstractmethod
+# from abc import ABC, abstractmethod
 
 # User import
 from .exf4Cond_Evap import exf4Cond_Evap
@@ -20,19 +20,18 @@ from cycle_classes.Trace import *
 
 class Condenser:
     def getObject(self, ICOND, objCP):
-        if (ICOND == 0):  # Natural Convection
-            objCondType = CondCool_CNat(ICOND, objCP)
+        if ICOND == 0:  # Natural Convection
+            return CondCool_CNat(ICOND, objCP)
 
-        elif (ICOND == 1):  # Cross-Flow
-            objCondType = CondCool_CCross(ICOND, objCP)
+        elif ICOND == 1:  # Cross-Flow
+            return CondCool_CCross(ICOND, objCP)
 
-        elif (ICOND == 2):  # Counter-Flow
-            objCondType = CondCool_CCount(ICOND, objCP)
+        elif ICOND == 2:  # Counter-Flow
+            return CondCool_CCount(ICOND, objCP)
 
         else:
-            objCondType = None
             raise ErrorException('ICOND value error', 'Cond1000')
-        return objCondType
+
 
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -40,7 +39,7 @@ class Condenser:
 #
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-class CondCool_Abstract(ABC, exf4Cond_Evap):
+class CondCool_Abstract(exf4Cond_Evap):
     DATA_PARA = 0  # if set to 1 parameters was set
 
     def __init__(self, ICOND, objCP):
@@ -151,8 +150,8 @@ class CondCool_Abstract(ABC, exf4Cond_Evap):
 
         # useless ICNT = 10  # any value but not 0,1,2, Python only to be checked
 
-        ICONC = 0
-        if (JC == 1):
+        # ICONC = 0
+        if JC == 1:
             # ICNT = 0
             MROLD_kg_s = 0.0
 
@@ -166,33 +165,33 @@ class CondCool_Abstract(ABC, exf4Cond_Evap):
         # EPS[watt] / UACOND[watt/m2-K]
         DELT = EPS / UACOND     # K
 
-        if (DELT > 5.0):
+        if DELT > 5.0:
             DELT = 5.0
 
-        if (DELT < -5.0):
+        if DELT < -5.0:
             DELT = -5.0
 
         TCOUT = TC[JC] + DELT
         TS2 = self.TS1 + (QCONDS + QCONDC + QSCC) / self.CFMC
 
-        if (self.ICOND == 0):
+        if self.ICOND == 0:
             TS2 = 0.9 * T4 + 0.1 * self.TS1
 
-        if (TCOUT < self.TS1):
+        if TCOUT < self.TS1:
             TCOUT = (self.TS1 + TC[JC]) / 2.0
 
         # modification by Ayman if(ICNT <= 2):
-        if (JC < 2):
+        if JC < 2:
             TCNEW = TCOUT
         
         else:
-            if ((TCOUT > TC[1] > TC[2]) or (TCOUT < TC[2] < TC[1])):
+            if (TCOUT > TC[1] > TC[2]) or (TCOUT < TC[2] < TC[1]):
                 TCNEW = 0.5 * (TC[1] + TC[2])
                 
             else:
                 TCNEW = TCOUT
 
-            if (TCNEW < self.TS1):
+            if TCNEW < self.TS1:
                 TCNEW = (self.TS1 + TC[JC]) / 2.0
 
             # ayman TC[1] = TC[2]
@@ -206,7 +205,7 @@ class CondCool_Abstract(ABC, exf4Cond_Evap):
         # if(ERRORT < TOL_COND and ERRORM <= TOL_MASS):
         #   ICONC = 1
 
-        if (ERRORT < TOL_COND and ERRORM <= TOL_MASS):
+        if ERRORT < TOL_COND and ERRORM <= TOL_MASS:
             ICONC = 1
         else:
             ICONC = 0
@@ -296,7 +295,7 @@ class CondCool_CNat(CondCool_Abstract):  # Natural Convection= 0
         # Set up the HDEW and TDEW parameters.
         # account for a wet gas entering the condenser
 
-        if (H3 < H14):
+        if H3 < H14:
             TDEW = T3
             HDEW = H3
         else:
@@ -321,7 +320,7 @@ class CondCool_CNat(CondCool_Abstract):  # Natural Convection= 0
 
         # calculate the natural convection heat transfer coefficient
         DELTAT = TAVE - TS1
-        if (DELTAT < 0.0):
+        if DELTAT < 0.0:
             DELTAT = 0.0001
 
         DELTA = DELTAT * 1.8    # defrance to F
@@ -365,17 +364,17 @@ class CondCool_CNat(CondCool_Abstract):  # Natural Convection= 0
 
         # Dr Omar to approve
         # if (TS5 < -290.0): # -290K = 94.2611 K
-        if (TS5 < 94.2611):  # not sure 290 F to K
+        if TS5 < 94.2611:  # not sure 290 F to K
             self.Q_CND_FZ = 0  # watt
 
         # Approve concept self.trace.dr_omar("Wet region issue")
         # if (TS5 < -290.0):
-        if (TS5 < 94.2611):  # not sure 290 F to K
+        if TS5 < 94.2611:  # not sure 290 F to K
             self.Q_HXS_FZ = 0
 
         #  watt /m2
-        Q_IN_WALL = (self.Q_CND_FF + self.Q_CND_FZ) / self.ATOTC \
-                    + (self.Q_HXS_FF + self.Q_HXS_FZ) / self.ATOTC  # W/m2
+        Q_IN_WALL = (self.Q_CND_FF + self.Q_CND_FZ) / self.ATOTC + \
+                    (self.Q_HXS_FF + self.Q_HXS_FZ) / self.ATOTC  # W/m2
 
         # MREF_kg_s [kg/s] * [j/kg] = j/sec = watt
         QDSNEC = MREF_kg_s * (H14 - HDEW)  # watt
@@ -384,7 +383,7 @@ class CondCool_CNat(CondCool_Abstract):  # Natural Convection= 0
         # QDSNEC [j/hr] / [watt/m2] = m2
         ADSNEC = QDSNEC / (UAIR * DELTAT + Q_IN_WALL)  # m2
 
-        if (ADSNEC > self.ATOTC):
+        if ADSNEC > self.ATOTC:
             ADSNEC = self.ATOTC
 
         # UAIR [watt/m2 K] * ADSNEC [m2] * DELTAT [K] = watt
@@ -402,7 +401,7 @@ class CondCool_CNat(CondCool_Abstract):  # Natural Convection= 0
         # ATOTC[m2] * UDSC[watt/m2 K] 
         self.UACOND = self.ATOTC * self.UDSC    # watt/K
 
-        if (FSUP == 1.0):
+        if FSUP == 1.0:
             return [QDSC, QTPC, QSCC, QTOTC, FSUP, FSUB]
 
         # calculate the heat transfer coefficients for the two-phase and
@@ -416,7 +415,7 @@ class CondCool_CNat(CondCool_Abstract):  # Natural Convection= 0
         # calculate the natural convection heat transfer coefficient
         DELTAT = TAVE - TS1     # K
 
-        if (DELTAT < 0.0):
+        if DELTAT < 0.0:
             DELTAT = 0.0001
 
         DELTA = DELTAT * 1.8    # defrance to F
@@ -443,7 +442,7 @@ class CondCool_CNat(CondCool_Abstract):  # Natural Convection= 0
         # Q_IN_WALL [watt/m2] * ANET[m2] = watt
         QTPC = UAIR * ANET * DELTAT + ANET * Q_IN_WALL  # watt
 
-        if (QTPC > QTPNEC):
+        if QTPC > QTPNEC:
             QTPC = QTPNEC
 
         # calculate the area in the two-phase region
@@ -456,11 +455,11 @@ class CondCool_CNat(CondCool_Abstract):  # Natural Convection= 0
         FSUB = 0.0
 
         self.UTPC = UAIR  # W/m2 K
-        self.UACOND = self.ATOTC * (FSUP * self.UDSC 
-                                   + (1.0 - FSUP) * self.UTPC
-                                   )   # W/K
+        self.UACOND = self.ATOTC * (FSUP * self.UDSC +
+                                    (1.0 - FSUP) * self.UTPC
+                                    )   # W/K
 
-        if (QTPC < QTPNEC):
+        if QTPC < QTPNEC:
             return [QDSC, QTPC, QSCC, QTOTC, FSUP, FSUB]
 
         # calculate the remaining surface area
@@ -475,7 +474,7 @@ class CondCool_CNat(CondCool_Abstract):  # Natural Convection= 0
         # ANET[m2] * Q_IN_WALL[watt/m2]
         QSCC = UAIR * ANET * DELTAT + ANET * Q_IN_WALL  # watt
 
-        if (QSCC > QSCMAX):
+        if QSCC > QSCMAX:
             QSCC = QSCMAX
 
         QTOTC = QDSC + QTPC + QSCC  # watt
@@ -540,7 +539,7 @@ class CondCool_CCross(CondCool_Abstract):  # Cross-Flow= 1
         TBUB = TBUB_S   # K
         HBUB = HBUB_S   # K
 
-        if (H2 <= HDEW_S):
+        if H2 <= HDEW_S:
             HDEW = H2   # j/kg
             TDEW = T2   # j/kg
             ENTERS_WET = True
@@ -570,19 +569,12 @@ class CondCool_CCross(CondCool_Abstract):  # Cross-Flow= 1
         HAVE_NOT_USED_FULL_AREA = True
 
         # Start off with the subcooling area.
-        if (self.DTSUBC > 0.0):
+        if self.DTSUBC > 0.0:
             TCSUB = TBUB - self.DTSUBC  # K
             CRSC = MREF_kg_s * CPRLIQ    # [kg/s] *[j/kg K] = j/sec = watt/K
-
-            # if (CAIR <= CRSC):
-                # CMINSC = CAIR
-                # CMAXSC = CRSC
-            # else:
-                # CMINSC = CRSC
-                # CMAXSC = CAIR
             
-            CMINSC = min (CAIR, CRSC)   # watt/K
-            CMAXSC = max (CAIR, CRSC)   # watt/K
+            CMINSC = min(CAIR, CRSC)   # watt/K
+            CMAXSC = max(CAIR, CRSC)   # watt/K
             
             # is area big enough for subcooling
             QMAX = CMINSC * (TBUB - TAIR)   # watt
@@ -594,7 +586,7 @@ class CondCool_CCross(CondCool_Abstract):  # Cross-Flow= 1
             [EFFSCC, DEXDAR] = self.exf(2, self.ATOTC, self.USCC,
                                         CMINSC, CMAXSC)
 
-            if (EFFSCC <= EFF_SUB):  # Need more area
+            if EFFSCC <= EFF_SUB:  # Need more area
                 ASCC = self.ATOTC   # m2
                 HAVE_NOT_USED_FULL_AREA = False
                 #  begin iteration process to determine solution for the
@@ -608,24 +600,17 @@ class CondCool_CCross(CondCool_Abstract):  # Cross-Flow= 1
                 ICOUNT = 0
                 QTOL = 1.0
 
-                while (LOOKING_FOR_AREA):
-                    ICOUNT = ICOUNT + 1
+                while LOOKING_FOR_AREA:
+                    ICOUNT += 1
                     
-                    if (ICOUNT > 100):
+                    if ICOUNT > 100:
                         LOOKING_FOR_AREA = False
                         continue
                     #   (ASCC[m2] / ATOTC[m2]) * CFMC[watt/k]
                     CAIR = (ASCC / self.ATOTC) * self.CFMC   # watt/k
-                    
-                    # if (CAIR <= CRSC):
-                        # CMINSC = CAIR
-                        # CMAXSC = CRSC
-                    # else:
-                        # CMINSC = CRSC
-                        # CMAXSC = CAIR
 
-                    CMINSC = min (CAIR, CRSC)   # watt/K
-                    CMAXSC = max (CAIR, CRSC)   # watt/K
+                    CMINSC = min(CAIR, CRSC)   # watt/K
+                    CMAXSC = max(CAIR, CRSC)   # watt/K
                     
                     # CMINSC[watt/K] * K
                     QMAX = CMINSC * (TBUB - TAIR)    # watt
@@ -636,7 +621,7 @@ class CondCool_CCross(CondCool_Abstract):  # Cross-Flow= 1
                                                 CMINSC, CMAXSC)
 
                     ERROR = abs(QTOL)
-                    if (ERROR <= AREA_TOL):
+                    if ERROR <= AREA_TOL:
                         LOOKING_FOR_AREA = False
                         continue
 
@@ -648,10 +633,10 @@ class CondCool_CCross(CondCool_Abstract):  # Cross-Flow= 1
                     DAREA_MIN = -0.50 * ASCC
                     DAREA_MAX = 0.50 * (self.ATOTC - ASCC)
 
-                    if (DAREA < DAREA_MIN):
+                    if DAREA < DAREA_MIN:
                         DAREA = DAREA_MIN   # m2
                         
-                    if (DAREA > DAREA_MAX):
+                    if DAREA > DAREA_MAX:
                         DAREA = DAREA_MAX   # m2
 
                     ASCC = ASCC + DAREA   # m2
@@ -668,23 +653,16 @@ class CondCool_CCross(CondCool_Abstract):  # Cross-Flow= 1
             # [TDEW, XQ, XL, XV, VL, VV, HL, HV] = self.hpin(HDEW, PDEW, X)
             TDEW = self.objCP.Property('T', H=HDEW, P=PDEW)  # K
 
-            if (HAVE_NOT_USED_FULL_AREA):
+            if HAVE_NOT_USED_FULL_AREA:
                 CPRTP = (HDEW - HBUB) / abs(TDEW - TBUB + 0.0001)   # j/kg K
                 #  MREF_kg_s[kg/s] * CPRTP[j/kg K]
                 CRTP = MREF_kg_s * CPRTP   # watt/K
 
                 #  determine cmin and cmax in the two-phase region
                 CAIR = (ALEFT / self.ATOTC) * self.CFMC    # watt/K
-                
-                # if (CAIR <= CRTP):
-                    # CMINTP = CAIR
-                    # CMAXTP = CRTP
-                # else:
-                    # CMINTP = CRTP
-                    # CMAXTP = CAIR
 
-                CMINTP = min (CAIR, CRTP)   # watt/K
-                CMAXTP = max (CAIR, CRTP)   # watt/K
+                CMINTP = min(CAIR, CRTP)   # watt/K
+                CMAXTP = max(CAIR, CRTP)   # watt/K
                 
                 #  is area big enough for condensation
                 QMAX = CMINTP * (TDEW - TAIR)   # watt
@@ -697,7 +675,7 @@ class CondCool_CCross(CondCool_Abstract):  # Cross-Flow= 1
                 [EFFTPC, DEXDAR] = self.exf(2, ALEFT, self.UTPC,
                                             CMINTP, CMAXTP)
 
-                if (EFFTPC <= EFF_TPC or ENTERS_WET):  # Need more area
+                if EFFTPC <= EFF_TPC or ENTERS_WET:  # Need more area
                     ATPC = ATPC + ALEFT
                     HAVE_NOT_USED_FULL_AREA = False
 
@@ -711,24 +689,17 @@ class CondCool_CCross(CondCool_Abstract):  # Cross-Flow= 1
 
                     ICOUNT = 0
                     QTOL = 1.0
-                    while (LOOKING_FOR_AREA):
-                        ICOUNT = ICOUNT + 1
-                        if (ICOUNT > 100):
+                    while LOOKING_FOR_AREA:
+                        ICOUNT += 1
+                        if ICOUNT > 100:
                             LOOKING_FOR_AREA = False
                             continue
 
                         # ADUM[m2] / ATOTC[m2] * CFMC[watt/K]
                         CAIR = (ADUM / self.ATOTC) * self.CFMC   # watt/K
-                        
-                        # if (CAIR <= CRTP):
-                            # CMINTP = CAIR
-                            # CMAXTP = CRTP
-                        # else:
-                            # CMINTP = CRTP
-                            # CMAXTP = CAIR
-                        
-                        CMINTP = min (CAIR, CRTP)   # watt/K
-                        CMAXTP = max (CAIR, CRTP)   # watt/K
+
+                        CMINTP = min(CAIR, CRTP)   # watt/K
+                        CMAXTP = max(CAIR, CRTP)   # watt/K
                         
                         QMAX = CMINTP * (TDEW - TAIR)   # watt
                         EFF_TPC = QDUM / QMAX       # unitless
@@ -738,7 +709,7 @@ class CondCool_CCross(CondCool_Abstract):  # Cross-Flow= 1
                                                     CMINTP, CMAXTP)
 
                         ERROR = abs(QTOL)
-                        if (ERROR <= AREA_TOL):
+                        if ERROR <= AREA_TOL:
                             LOOKING_FOR_AREA = False
                             continue
 
@@ -750,10 +721,10 @@ class CondCool_CCross(CondCool_Abstract):  # Cross-Flow= 1
                         DAREA_MIN = -0.75 * ADUM
                         DAREA_MAX = 0.50 * (ALEFT - ADUM)
 
-                        if (DAREA < DAREA_MIN):
+                        if DAREA < DAREA_MIN:
                             DAREA = DAREA_MIN
                             
-                        if (DAREA > DAREA_MAX):
+                        if DAREA > DAREA_MAX:
                             DAREA = DAREA_MAX
 
                         ADUM = ADUM + DAREA     # m2
@@ -769,13 +740,13 @@ class CondCool_CCross(CondCool_Abstract):  # Cross-Flow= 1
 
         #  continue with desuperheating area
         ALEFT = self.ATOTC - ASCC - ATPC        # m2
-        if (ALEFT <= 0.0):
+        if ALEFT <= 0.0:
             HAVE_NOT_USED_FULL_AREA = False
 
         HDEW = HDEW_START     # j/kg
         TDEW = TDEW_START     # j/kg
 
-        if (HAVE_NOT_USED_FULL_AREA):
+        if HAVE_NOT_USED_FULL_AREA:
             CPRVAP = (H2 - HDEW) / (T2 - TDEW)  # j/kg K
             # MREF_kg_s[kg/s] * CPRVAP[j/kg K] 
             CRDS = MREF_kg_s * CPRVAP  # watt/K
@@ -791,8 +762,8 @@ class CondCool_CCross(CondCool_Abstract):  # Cross-Flow= 1
             #    # CMINDS = CRDS
             #    # CMAXDS = CAIR
 
-            CMINDS = min (CAIR, CRDS)   # watt/K
-            CMAXDS = max (CAIR, CRDS)   # watt/K
+            CMINDS = min(CAIR, CRDS)   # watt/K
+            CMAXDS = max(CAIR, CRDS)   # watt/K
             
             #  determine the net heat transfer
             # [unitless]  [1/m2]
@@ -867,7 +838,7 @@ class CondCool_CCount(CondCool_Abstract):  # Counter-Flow = 2
         TBUB = TBUB_S       # K
         HBUB = HBUB_S       # j/kg 
 
-        if (H2 < HDEW_S):
+        if H2 < HDEW_S:
             HDEW = H2       # j/kg 
             TDEW = T2       # K
             ENTERS_WET = True
@@ -896,7 +867,7 @@ class CondCool_CCount(CondCool_Abstract):  # Counter-Flow = 2
         HAVE_NOT_USED_FULL_AREA = True
 
         #  start off with the subcooling area.
-        if (self.DTSUBC > 0.0):
+        if self.DTSUBC > 0.0:
             TCSUB = TBUB - self.DTSUBC           # K
             CRSC = MREF_kg_s * CPRLIQ   # [kg/s] *[j/kg K] = j/sec = watt/K 
 
@@ -907,8 +878,8 @@ class CondCool_CCount(CondCool_Abstract):  # Counter-Flow = 2
             #    # CMINSC = CRSC
             #    # CMAXSC = CAIR
             
-            CMINSC = min (CAIR, CRSC)   # watt/K
-            CMAXSC = max (CAIR, CRSC)   # watt/K
+            CMINSC = min(CAIR, CRSC)   # watt/K
+            CMAXSC = max(CAIR, CRSC)   # watt/K
             
             #  is area big enough for subcooling
             QMAX = CMINSC * (TBUB - TAIR)   # watt
@@ -918,9 +889,9 @@ class CondCool_CCount(CondCool_Abstract):  # Counter-Flow = 2
             
             # [unitless]  [1/m2]
             [EFFSCC, DEXDAR] = self.exf(1, self.ATOTC, self.USCC,
-                                       CMINSC, CMAXSC)
+                                        CMINSC, CMAXSC)
 
-            if (EFFSCC < EFF_SUB):  # Need more area
+            if EFFSCC < EFF_SUB:  # Need more area
                 ASCC = self.ATOTC     # m2
                 HAVE_NOT_USED_FULL_AREA = False
 
@@ -932,14 +903,14 @@ class CondCool_CCount(CondCool_Abstract):  # Counter-Flow = 2
                 ASCC = self.ATOTC / 10.0   # m2
                 LOOKING_FOR_AREA = True
 
-                while (LOOKING_FOR_AREA):
+                while LOOKING_FOR_AREA:
                     # [unitless]  [1/m2]
                     [EFFSCC, DEXDAR] = self.exf(1, ASCC, self.USCC,
                                                 CMINSC, CMAXSC)
 
                     ERROR = abs(EFFSCC - EFF_SUB)  # unitless
 
-                    if (ERROR < AREA_TOL):
+                    if ERROR < AREA_TOL:
                         LOOKING_FOR_AREA = False
                         continue
 
@@ -947,10 +918,10 @@ class CondCool_CCount(CondCool_Abstract):  # Counter-Flow = 2
                     DAREA_MIN = -0.50 * ASCC        # m2
                     DAREA_MAX = 0.50 * (self.ATOTC - ASCC)      # m2
 
-                    if (DAREA < DAREA_MIN):
+                    if DAREA < DAREA_MIN:
                         DAREA = DAREA_MIN
                         
-                    if (DAREA > DAREA_MAX):
+                    if DAREA > DAREA_MAX:
                         DAREA = DAREA_MAX
 
                     ASCC = ASCC + DAREA     # m2
@@ -967,7 +938,7 @@ class CondCool_CCount(CondCool_Abstract):  # Counter-Flow = 2
             # [TDEW, XQ, XL, XV, VL, VV, HL, HV] = self.hpin(HDEW, PDEW, X)
             TDEW = self.objCP.Property('T', H=HDEW, P=PDEW)  # K
 
-            if (HAVE_NOT_USED_FULL_AREA):
+            if HAVE_NOT_USED_FULL_AREA:
                 # j/kg K
                 CPRTP = (HDEW - HBUB) / abs(TDEW - TBUB + 0.0001)
                 # MREF_kg_s[kg/s] * CPRTP[j/kg K]
@@ -981,8 +952,8 @@ class CondCool_CCount(CondCool_Abstract):  # Counter-Flow = 2
                 #    # CMINTP = CRTP
                 #    # CMAXTP = CAIR
 
-                CMINTP = min (CAIR, CRTP)   # watt/K
-                CMAXTP = max (CAIR, CRTP)   # watt/K
+                CMINTP = min(CAIR, CRTP)   # watt/K
+                CMAXTP = max(CAIR, CRTP)   # watt/K
             
                 #  is area big enough for condensation
                 QMAX = CMINTP * (TDEW - TAIR)   # watt
@@ -994,7 +965,7 @@ class CondCool_CCount(CondCool_Abstract):  # Counter-Flow = 2
                 [EFFTPC, DEXDAR] = self.exf(1, ALEFT, self.UTPC,
                                             CMINTP, CMAXTP)
 
-                if (EFFTPC < EFF_TPC or (ENTERS_WET.AND.N == NUM_ZONE)):
+                if EFFTPC < EFF_TPC or (ENTERS_WET and N == NUM_ZONE):
                     ATPC = ATPC + ALEFT     # m2
                     HAVE_NOT_USED_FULL_AREA = False
 
@@ -1007,16 +978,16 @@ class CondCool_CCount(CondCool_Abstract):  # Counter-Flow = 2
                     LOOKING_FOR_AREA = True
 
                     ILOOK = 0
-                    while (LOOKING_FOR_AREA):
-                        ILOOK = ILOOK + 1
+                    while LOOKING_FOR_AREA:
+                        ILOOK += 1
                         
                         # [unitless]  [1/m2]
                         [EFFTPC, DEXDAR] = self.exf(1, ADUM, self.UTPC,
-                                                   CMINTP, CMAXTP)
+                                                    CMINTP, CMAXTP)
 
                         ERROR = abs(EFFTPC - EFF_TPC)
 
-                        if (ERROR < AREA_TOL or ILOOK >= 10):
+                        if ERROR < AREA_TOL or ILOOK >= 10:
                             OOKING_FOR_AREA = False
                             continue
 
@@ -1024,9 +995,9 @@ class CondCool_CCount(CondCool_Abstract):  # Counter-Flow = 2
                         DAREA_MIN = -0.75 * ADUM       # m2
                         DAREA_MAX = 0.50 * (ALEFT - ADUM)      # m2
 
-                        if (DAREA < DAREA_MIN):
+                        if DAREA < DAREA_MIN:
                             DAREA = DAREA_MIN
-                        if (DAREA > DAREA_MAX):
+                        if DAREA > DAREA_MAX:
                             DAREA = DAREA_MAX
 
                         ADUM = ADUM + DAREA      # m2
@@ -1042,14 +1013,14 @@ class CondCool_CCount(CondCool_Abstract):  # Counter-Flow = 2
             TBUB = TDEW         # K
             PBUB = PBUB + DELP  # pa
 
-        if (ALEFT < 0.0):
+        if ALEFT < 0.0:
             HAVE_NOT_USED_FULL_AREA = False
 
         #  continue with desuperheating area
         HDEW = HDEW_START     # j/kg
         TDEW = TDEW_START     # K
 
-        if (HAVE_NOT_USED_FULL_AREA):
+        if HAVE_NOT_USED_FULL_AREA:
             CPRVAP = (H2 - HDEW) / (T2 - TDEW)  # j/kg K
             # MREF_kg_s[kg/s] * CPRVAP[j/kg K] 
             CRDS = MREF_kg_s * CPRVAP    # watt/K
@@ -1062,14 +1033,14 @@ class CondCool_CCount(CondCool_Abstract):  # Counter-Flow = 2
             #    CMINDS = CRDS
             #    CMAXDS = CAIR
 
-            CMINDS = min (CAIR, CRDS)   # watt/K
-            CMAXDS = max (CAIR, CRDS)   # watt/K
+            CMINDS = min(CAIR, CRDS)   # watt/K
+            CMAXDS = max(CAIR, CRDS)   # watt/K
             
             #  determine the net heat transfer
             [EFFDSC, DEXDAR] = self.exf(1, ALEFT, self.UDSC,
                                         CMINDS, CMAXDS)
 
-            QDSC = CMINDS * EFFDSC * (T2 - TAIR) # watt
+            QDSC = CMINDS * EFFDSC * (T2 - TAIR)   # watt
 
             ADSC = ALEFT    # m2
 

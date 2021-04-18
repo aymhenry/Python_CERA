@@ -91,7 +91,7 @@ class CompMap(FileAccess):
 
         flt_value = float(str_text)
         if n_count_muns == 1:
-            flt_value = -1.0 * flt_value
+            flt_value *= -1.0
 
         return True
 
@@ -120,7 +120,7 @@ class CompMap(FileAccess):
             while True:
                 self.bytes = self.m_handler.read(
                     int_bytes_count)  # read rec. length
-                self.current_pos = self.current_pos + int_bytes_count
+                self.current_pos += int_bytes_count
 
                 if self.bytes == b"":
                     self.m_error = FileAccess.ERR_BLANK_LINE
@@ -154,7 +154,7 @@ class CompMap(FileAccess):
             self.m_handler.seek(self.current_pos)
             while True:
                 byte = self.m_handler.read(1)  # read rec. length
-                self.current_pos = self.current_pos + 1
+                self.current_pos += 1
 
                 if byte == b"":
                     self.m_error = FileAccess.ERR_BLANK_LINE

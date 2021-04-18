@@ -21,20 +21,20 @@ class Trace:
     
     COMP_INS = False   # for comp_ins
     COMP_OUT = False   # for comp_out
-    COND_IC = False    #   for cond_ic
-    EVAP_IE = False   #   for evap_ie
-    FRSH_INS = False  #   for frsh_ins
-    FRSH_OUT = False   #   for frsh_out
-    CYCLE_OUT = False  #   for cycle_out
-    APP_INS = True     #   for app ins
-    CYC_PID = True     #   for cycle pid
-    PNT_LST = True     #   for list of points name
+    COND_IC = False    # for cond_ic
+    EVAP_IE = False   # for evap_ie
+    FRSH_INS = False  # for frsh_ins
+    FRSH_OUT = False   # for frsh_out
+    CYCLE_OUT = False  # for cycle_out
+    APP_INS = True     # for app ins
+    CYC_PID = True     # for cycle pid
+    PNT_LST = True     # for list of points name
     
-    RANDAM = True      #   for randam
+    RANDAM = True      # for randam
     
     def __init__(self, dt=None, obj_cycletype=None):
-        self.dt = dt     #   app data
-        self.ds = obj_cycletype     #   CycleSolver object
+        self.dt = dt     # app data
+        self.ds = obj_cycletype     # CycleSolver object
 
     def file_line(self):
         #  Returns the current file name & line number in our program
@@ -55,7 +55,7 @@ class Trace:
         print("Description: Dr Omar Inspection Required" + " - " + str_msg)
         
         print(self.file_line(), "\n")
-         #   print("\n")
+        # print("\n")
         
     def pnt_lst(self):
         if self.is_canc_print(Trace.PNT_LST):
@@ -94,8 +94,8 @@ class Trace:
         obj_show.show()
     
     def randam(self, *args, **kargs):
-         #  how to call
-         #  self.trace.randam ("Some Data", T=5)
+        # how to call
+        # self.trace.randam ("Some Data", T=5)
         
         if self.is_canc_print(Trace.RANDAM):
             return
@@ -113,7 +113,7 @@ class Trace:
         if self.is_canc_print(Trace.CYCLE_OUT):
             return
         print("\n----------------------------")
-        n = 0
+        # n = 0
         print("#\t\tT C\tP kPa\tH kj/kg")
         for n in range(1, 17):
             print(n, "\t%9.2f\t%9.2f\t%9.2f"
@@ -182,8 +182,8 @@ class Trace:
         print('\tDischare Temp K           TDISC = ', self.ds.dicRest['TDISC'])
         print('\tDischare Enthalpy    j/kg  HOUT = ', self.ds.dicRest['HOUT'])
         print("""\tcompressor shell loss
-               normalized to power input j/kg QCAN  = """
-            , self.ds.dicRest['QCAN'])
+              normalized to power input j/kg QCAN  = """,
+              self.ds.dicRest['QCAN'])
 
         print('\tSuction sp.volume m3/kg    VSUC = ', self.ds.dicRest['VSUC'])
         print('\tDischare sp.volume m3/kg    VV2 = ', self.ds.dicRest['VV2'])

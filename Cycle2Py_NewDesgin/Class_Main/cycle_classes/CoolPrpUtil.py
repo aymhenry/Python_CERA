@@ -49,12 +49,12 @@ class CoolPrpUtil:
             
             if quality < 0 or quality > 1:
                 raise ErrorException(
-                    'Error in Entry data for quality '
-                        + "\ngive: " + str(Enthalpy)
-                        + "\n max: " + str(H_vap)
-                        + "\n min: " + str(H_liq)
-                        + "\n quality: " + str(quality)
-                    , 'CycleSolver1001')
+                    'Error in Entry data for quality ' +
+                    "\ngive: " + str(Enthalpy) +
+                    "\n max: " + str(H_vap) +
+                    "\n min: " + str(H_liq) +
+                    "\n quality: " + str(quality),
+                    'CycleSolver1001')
 
         else:
             # not in sat.

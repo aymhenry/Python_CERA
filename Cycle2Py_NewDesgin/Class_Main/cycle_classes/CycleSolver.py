@@ -16,7 +16,7 @@ from cycle_classes.Trace import *
 
 # from cycle_classes.ErrorException import ErrorException
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-# Job             : Create Class object cycle parameters
+# Job            : Create Class object cycle parameters
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
@@ -24,238 +24,238 @@ from cycle_classes.Trace import *
 class CycleSolver(CycleUtils):
     K_C_DEG = 273.11
 
-    def __init__(self, objCP, objData, lng_item, NCYC=1):
-        #  setup basic objects
-        def setupEvap(IFRSH, ISPEC):
-            self.IFRSH = IFRSH
-            self.ISPEC = ISPEC
+    #  setup basic objects
+    def setupEvap(self, IFRSH, ISPEC):
+        self.IFRSH = IFRSH
+        self.ISPEC = ISPEC
 
-            objEvaporator = Evaporator()
-            self.objEvap = objEvaporator.getObject(objCP=self.objCP, IFRSH=IFRSH)
+        objEvaporator = Evaporator()
+        self.objEvap = objEvaporator.getObject(objCP=self.objCP, IFRSH=IFRSH)
 
-            # ------- Setup paramters
-            self.objEvap.setParamters(ATOTE=self.dt.ATOTEI[self.lng_item],
-                                      CFME=self.dt.CFME,  # watt/K
-                                      TS3=self.TS3,
-                                      N_EVAP=self.dt.N_EVAP,
-                                      USUPE=self.USUPE,    # watt/m2-K
-                                      UTPE=self.UTPE,    # watt/m2-K
-                                      TROOM=self.dt.TROOM,
-                                      FZTEMP=self.dt.FZTEMP,
-                                      UA_FF=self.dt.UA_FF,
-                                      Q_HXS_FF=self.dt.Q_HXS_FF,  # defalut =0 in Fortran
-                                      IWALL_FF=self.dt.IWALL_FF,
-                                      NUM_ZONE=self.dt.N_EVAP,
-                                      IRFTYP=self.dt.IRFTYP
-                                      )
+        # ------- Setup paramters
+        self.objEvap.setParamters(ATOTE=self.dt.ATOTEI[self.lng_item],
+                                  CFME=self.dt.CFME,  # watt/K
+                                  TS3=self.TS3,
+                                  N_EVAP=self.dt.N_EVAP,
+                                  USUPE=self.USUPE,  # watt/m2-K
+                                  UTPE=self.UTPE,  # watt/m2-K
+                                  TROOM=self.dt.TROOM,
+                                  FZTEMP=self.dt.FZTEMP,
+                                  UA_FF=self.dt.UA_FF,
+                                  Q_HXS_FF=self.dt.Q_HXS_FF,  # defalut =0 in Fortran
+                                  IWALL_FF=self.dt.IWALL_FF,
+                                  NUM_ZONE=self.dt.N_EVAP,
+                                  IRFTYP=self.dt.IRFTYP
+                                  )
 
-        def setupCond(ICOND):
-            self.ICOND = ICOND
-            objCondenser = Condenser()
-            self.objCond = objCondenser.getObject(objCP=self.objCP, ICOND=ICOND)
+    def setupCond(self, ICOND):
+        self.ICOND = ICOND
+        objCondenser = Condenser()
+        self.objCond = objCondenser.getObject(objCP=self.objCP, ICOND=ICOND)
 
-            self.objCond.setParamters(ATOTC=self.dt.ATOTCI[self.lng_item],
-                                      UA_FF_CND=self.dt.UA_FF_CND,
-                                      UA_FZ_CND=self.dt.UA_FZ_CND,
-                                      UA_FF_HXS=self.dt.UA_FF_HXS,
-                                      UA_FZ_HXS=self.dt.UA_FZ_HXS,
-                                      CFMC=self.dt.CFMC,  # watt/K
-                                      DTSUBC=self.DTSUBC,
-                                      N_COND=self.dt.N_COND,
-                                      TS1=self.TS1,
-                                      TS3=self.TS3,
-                                      TS5=self.TS5,
-                                      USCC=self.USCC,   # W/m2-K
-                                      UTPC=self.UTPC,   # W/m2-K
-                                      UDSC=self.UDSC    # W/m2-K
-                                      )
+        self.objCond.setParamters(ATOTC=self.dt.ATOTCI[self.lng_item],
+                                  UA_FF_CND=self.dt.UA_FF_CND,
+                                  UA_FZ_CND=self.dt.UA_FZ_CND,
+                                  UA_FF_HXS=self.dt.UA_FF_HXS,
+                                  UA_FZ_HXS=self.dt.UA_FZ_HXS,
+                                  CFMC=self.dt.CFMC,  # watt/K
+                                  DTSUBC=self.DTSUBC,
+                                  N_COND=self.dt.N_COND,
+                                  TS1=self.TS1,
+                                  TS3=self.TS3,
+                                  TS5=self.TS5,
+                                  USCC=self.USCC,  # W/m2-K
+                                  UTPC=self.UTPC,  # W/m2-K
+                                  UDSC=self.UDSC  # W/m2-K
+                                  )
 
-        def setupComp(ICOMP, TAMB, FRACT_SPEED, strFileName):
-            self.ICOMP = ICOMP
-            self.objComp = Compressor(objCP=self.objCP,
-                                      TAMB=TAMB,                   # K
-                                      ICOMP=ICOMP,                 # none
-                                      FRACT_SPEED=FRACT_SPEED,     # none
-                                      strFileName=strFileName      # none
-                                      )
+    def setupComp(self, ICOMP, TAMB, FRACT_SPEED, strFileName):
+        self.ICOMP = ICOMP
+        self.objComp = Compressor(objCP=self.objCP,
+                                  TAMB=TAMB,  # K
+                                  ICOMP=ICOMP,  # none
+                                  FRACT_SPEED=FRACT_SPEED,  # none
+                                  strFileName=strFileName  # none
+                                  )
 
-        # -- send basic configration
-        def paraCycle():
-            # TS1 - HEAT TRANSFER FLUID (HTF) TEMPERATURE ENTERING CONDENSER
-            # TS3 - HTF TEMPERATURE ENTERING FRESH FOOD EVAPORATOR
-            # TS5 - HTF TEMPERATURE ENTERING FREEZER EVAPORATOR
-            self.TS1 = self.dt.TS1[self.lng_item]
-            self.TS3 = self.dt.TS3[self.lng_item]
-            self.TS5 = self.dt.TS5
+    def paraCycle(self):
+        # TS1 - HEAT TRANSFER FLUID (HTF) TEMPERATURE ENTERING CONDENSER
+        # TS3 - HTF TEMPERATURE ENTERING FRESH FOOD EVAPORATOR
+        # TS5 - HTF TEMPERATURE ENTERING FREEZER EVAPORATOR
+        self.TS1 = self.dt.TS1[self.lng_item]
+        self.TS3 = self.dt.TS3[self.lng_item]
+        self.TS5 = self.dt.TS5
 
-            # Evaporator Total Heat Transfer Surface Area m2
-            self.ATOTE = self.dt.ATOTEI[self.lng_item]
+        # Evaporator Total Heat Transfer Surface Area m2
+        self.ATOTE = self.dt.ATOTEI[self.lng_item]
 
-            # Condenser Total Heat Transfer Surface Area
-            self.ATOTC = self.dt.ATOTCI[self.lng_item]
+        # Condenser Total Heat Transfer Surface Area
+        self.ATOTC = self.dt.ATOTCI[self.lng_item]
 
-            self.IFRSH = self.dt.IFRSHI[self.lng_item]
-            self.ICOND = self.dt.ICONDI[self.lng_item]
+        self.IFRSH = self.dt.IFRSHI[self.lng_item]
+        self.ICOND = self.dt.ICONDI[self.lng_item]
 
-            # Refrigerant Exit Superheat (C)
-            self.DTSUPE = self.dt.DTSPEI[self.lng_item]
+        # Refrigerant Exit Superheat (C)
+        self.DTSUPE = self.dt.DTSPEI[self.lng_item]
 
-            # Quality (0-1))
-            self.XEXITE = self.dt.QUALITY[self.lng_item]
+        # Quality (0-1))
+        self.XEXITE = self.dt.QUALITY[self.lng_item]
 
-            # 'Interchanger exit superheat C
-            self.DTSUPI = self.dt.SUPIHX[self.lng_item]
+        # 'Interchanger exit superheat C
+        self.DTSUPI = self.dt.SUPIHX[self.lng_item]
 
-            # Liquid-Line Anti-Sweat Heat watt
-            self.DTSUBC = self.dt.CONDHT[self.lng_item]
+        # Liquid-Line Anti-Sweat Heat watt
+        self.DTSUBC = self.dt.CONDHT[self.lng_item]
 
-            # Condenser Fan Power (watt)
-            self.FANCL = self.dt.FNPWRC[self.lng_item]
+        # Condenser Fan Power (watt)
+        self.FANCL = self.dt.FNPWRC[self.lng_item]
 
-            # Evaporator Fan Power (watt)
-            self.FANES = self.dt.FNPWRE[self.lng_item]
+        # Evaporator Fan Power (watt)
+        self.FANES = self.dt.FNPWRE[self.lng_item]
 
-            # Desuperheating Heat Transfer Conductance W/m2-c
-            self.UDSC = self.dt.UDSCI[self.lng_item]
+        # Desuperheating Heat Transfer Conductance W/m2-c
+        self.UDSC = self.dt.UDSCI[self.lng_item]
 
-            # Two-Phase Heat Transfer Conductance W/m2-c
-            self.UTPC = self.dt.UTPCI[self.lng_item]
+        # Two-Phase Heat Transfer Conductance W/m2-c
+        self.UTPC = self.dt.UTPCI[self.lng_item]
 
-            # Subcooling Heat Transfer Conductance W/m2-c
-            self.USCC = self.dt.USCCI[self.lng_item]
+        # Subcooling Heat Transfer Conductance W/m2-c
+        self.USCC = self.dt.USCCI[self.lng_item]
 
-            # Initial Guess For Refrigerant Mas Flow Rate kg/hr
-            self.MREF = self.dt.MREFI[self.lng_item]  # kg/hr
+        # Initial Guess For Refrigerant Mas Flow Rate kg/hr
+        self.MREF = self.dt.MREFI[self.lng_item]  # kg/hr
 
-            # self.dt.DTSBCI[self.lng_item]
-            # self.dt.ELOSS[self.lng_item]
-            # self.dt.CONDVP[self.lng_item]
+        # self.dt.DTSBCI[self.lng_item]
+        # self.dt.ELOSS[self.lng_item]
+        # self.dt.CONDVP[self.lng_item]
 
-            # Two-Phase Heat Transfer Conductance W/m2-c
-            self.UTPE = self.dt.UTPEI[self.lng_item]
+        # Two-Phase Heat Transfer Conductance W/m2-c
+        self.UTPE = self.dt.UTPEI[self.lng_item]
 
-            # Superheat Region Conductance W/m2-c
-            self.USUPE = self.dt.USUPEI[self.lng_item]
+        # Superheat Region Conductance W/m2-c
+        self.USUPE = self.dt.USUPEI[self.lng_item]
 
-            # Nominal Speed rpm
-            self.SPEED = self.dt.SPEEDI[self.lng_item]
+        # Nominal Speed rpm
+        self.SPEED = self.dt.SPEEDI[self.lng_item]
 
-            # self.CFME Air Flow Rate Across Coil
-            # self.CFMC Air Flow Rate Across Coil (L/S)
+        # self.CFME Air Flow Rate Across Coil
+        # self.CFMC Air Flow Rate Across Coil (L/S)
 
-            # ===================        Air mass flow rate -----
-            self.trace.dr_omar("Approved")  # Dr Omar
-            # RHOCPF   = 316.8/TS5
-            # CFMF     = 1.8961*(RHOCPF*CFMF)/0.4720
+        # ===================        Air mass flow rate -----
+        self.trace.dr_omar("Approved")  # Dr Omar
+        # RHOCPF   = 316.8/TS5
+        # CFMF     = 1.8961*(RHOCPF*CFMF)/0.4720
 
-            # CFMCI, CFMEI L/sec --> CFMC,CFME kg/sec
-            # Roh air kg/m3 = Temp_C_Deg/417.25 + 1.2934
+        # CFMCI, CFMEI L/sec --> CFMC,CFME kg/sec
+        # Roh air kg/m3 = Temp_C_Deg/417.25 + 1.2934
 
-            # RHOCPC = 316.8 / self.dt.TS1[lng_item]
-            # RHOCPE = 316.8 / self.dt.TS3[lng_item]
+        # RHOCPC = 316.8 / self.dt.TS1[lng_item]
+        # RHOCPE = 316.8 / self.dt.TS3[lng_item]
 
-            # modification by Ayman
-            # ------------------------------------
-            # https://www.ohio.edu/mechanical/thermo/property_tables
-            # /air/air_Cp_Cv.html#:~
-            # :text=The%20nominal%20values%20used%20for,v%20%3D%200.718%20kJ%2Fkg
+        # modification by Ayman
+        # ------------------------------------
+        # https://www.ohio.edu/mechanical/thermo/property_tables
+        # /air/air_Cp_Cv.html#:~
+        # :text=The%20nominal%20values%20used%20for,v%20%3D%200.718%20kJ%2Fkg
 
-            # kj/kg K
-            AirHeatCapacityC = 0.0003 * (self.TS1 ** 2) - 0.129 * self.TS1 + 1016.55
+        # kj/kg K
+        AirHeatCapacityC = 0.0003 * (self.TS1 ** 2) - 0.129 * self.TS1 + 1016.55
 
-            # https://www.gribble.org/cycling/air_density.html
-            # self.CFMC = 1.8961 * (RHOCPC * self.dt.CFMCI[lng_item]) / 0.4720
+        # https://www.gribble.org/cycling/air_density.html
+        # self.CFMC = 1.8961 * (RHOCPC * self.dt.CFMCI[lng_item]) / 0.4720
 
-            # CFMCI L/sec = 1000 cm3/sec = 1000/100^3 m3/sec= 1/1000 m3/sec
+        # CFMCI L/sec = 1000 cm3/sec = 1000/100^3 m3/sec= 1/1000 m3/sec
 
-            # equation change to account for correct pressure 101.325 kPa,
-            #       and interpolate between rho at 0 C and rho at 10 C
+        # equation change to account for correct pressure 101.325 kPa,
+        #       and interpolate between rho at 0 C and rho at 10 C
 
-            air_densityC = 1.2873 + (self.TS1 - CycleSolver.K_C_DEG) / 10 * (1.2418 - 1.2873)
+        air_densityC = 1.2873 + (self.TS1 - CycleSolver.K_C_DEG) / 10 * (1.2418 - 1.2873)
 
-            # [m3/sec] * [kg/m3] * [kj/kg/K]*1000 =j/sec/K = watt/K
-            self.dt.CFMC = self.dt.CFMCI[self.lng_item] / 1000 * air_densityC * AirHeatCapacityC * 1000
+        # [m3/sec] * [kg/m3] * [kj/kg/K]*1000 =j/sec/K = watt/K
+        self.dt.CFMC = self.dt.CFMCI[self.lng_item] / 1000 * air_densityC * AirHeatCapacityC * 1000
 
-            # ------------------------------------
-            # self.CFME = 1.8961 * (RHOCPE * self.dt.CFMEI[lng_item]) / 0.4720
+        # ------------------------------------
+        # self.CFME = 1.8961 * (RHOCPE * self.dt.CFMEI[lng_item]) / 0.4720
 
-            # kj/kg K
-            AirHeatCapacityE = 0.0003 * (self.TS3 ** 2) - 0.129 * self.TS3 + 1016.55
+        # kj/kg K
+        AirHeatCapacityE = 0.0003 * (self.TS3 ** 2) - 0.129 * self.TS3 + 1016.55
 
-            air_densityE = 1.2873 + (self.dt.TS3[self.lng_item] - CycleSolver.K_C_DEG) / 10 * (1.2418 - 1.2873)
+        air_densityE = 1.2873 + (self.dt.TS3[self.lng_item] - CycleSolver.K_C_DEG) / 10 * (1.2418 - 1.2873)
 
-            # [m3/sec] * [kg/m3] * [kj/kg K]*1000 =j/sec K = watt/K
-            self.dt.CFME = self.dt.CFMEI[self.lng_item] / 1000 * air_densityE * AirHeatCapacityE * 1000
+        # [m3/sec] * [kg/m3] * [kj/kg K]*1000 =j/sec K = watt/K
+        self.dt.CFME = self.dt.CFMEI[self.lng_item] / 1000 * air_densityE * AirHeatCapacityE * 1000
 
-            # ------------------------------------
-            # kj/kg K
-            AirHeatCapacityF = 0.0003 * (self.TS5) ** 2 - 0.129 * self.TS5 + 1016.55
+        # ------------------------------------
+        # kj/kg K
+        AirHeatCapacityF = 0.0003 * self.TS5 ** 2 - 0.129 * self.TS5 + 1016.55
 
-            air_densityF = 1.2873 + (self.TS5 - CycleSolver.K_C_DEG) / 10 * (1.2418 - 1.2873)
+        air_densityF = 1.2873 + (self.TS5 - CycleSolver.K_C_DEG) / 10 * (1.2418 - 1.2873)
 
-            # [m3/sec] * [kg/m3] * [kj/kg K]*1000 =j/sec K = watt/K
-            self.dt.CFMF = self.dt.CFMF / 1000 * air_densityF * AirHeatCapacityF * 1000
-            # =================================
+        # [m3/sec] * [kg/m3] * [kj/kg K]*1000 =j/sec K = watt/K
+        self.dt.CFMF = self.dt.CFMF / 1000 * air_densityF * AirHeatCapacityF * 1000
+        # =================================
 
-            # Temp. At Comp., Inlet or -1 If Unspecified
-            # converted before from C to K
-            self.TSPEC = self.dt.TSPECI[self.lng_item]
+        # Temp. At Comp., Inlet or -1 If Unspecified
+        # converted before from C to K
+        self.TSPEC = self.dt.TSPECI[self.lng_item]
 
-            # DPC - PRESSURE DROP THROUGH CONDENSER
-            # DPE - PRESSURE DROP THROUGH FRESH FOOD EVAPORATOR
-            self.DPC = self.dt.DPC[self.lng_item]
-            self.DPE = self.dt.DPE[self.lng_item]
+        # DPC - PRESSURE DROP THROUGH CONDENSER
+        # DPE - PRESSURE DROP THROUGH FRESH FOOD EVAPORATOR
+        self.DPC = self.dt.DPC[self.lng_item]
+        self.DPE = self.dt.DPE[self.lng_item]
 
-            # ETHX1 - EFFECTIVENESS OF HIGH TEMP INTERCHANGER
-            # ETHX2 - EFFECTIVENESS OF LOW  TEMP INTERCHANGER
-            self.ETHX1 = self.dt.ETHX[self.lng_item]  # both same value
-            self.ETHX2 = self.dt.ETHX[self.lng_item]
+        # ETHX1 - EFFECTIVENESS OF HIGH TEMP INTERCHANGER
+        # ETHX2 - EFFECTIVENESS OF LOW  TEMP INTERCHANGER
+        self.ETHX1 = self.dt.ETHX[self.lng_item]  # both same value
+        self.ETHX2 = self.dt.ETHX[self.lng_item]
 
-            #   setup basic variables
-            #  ----------------------------------------------
-            # 1 - COMPRESSOR INLET (SATURATED VAPOR)
-            # 2 - COMPRESSOR DISCHARGE
-            # 3 - CONDENSER DEW POINT
-            # 4 - CONDENSER OUTLET
-            # 5 - INLET TO FRESH FOOD EVAPORATOR
-            # 6 - LIQUID LINE OUTLET FROM HIGH TEMP INTERCHANGER
-            # 7 - OUTLET FROM FRESH FOOD EVAPORATOR
-            # 8 - INLET TO FREEZER EVAPORATOR
-            # 9 - OUTLET FROM FREEZER EVAPORATOR
-            # 10 - LIQUID LINE OUTLET FROM LOW TEMP INTERCHANGER
-            # 11 - CONDENSER BUBBLE POINT
-            # 12 - FRESH FOOD EVAPORATOR DEW POINT
-            # 13 - SUPERHEATED GAS LEAVING THE HIGH TEMP INTERCHANGER
-            # 14 - CONDENSER INLET
-            # 15 - INTERNAL VARIABLE (NOT SHOWN) FOR EVAP DEW POINT
-            # 16 - LIQUID LINE STATE AFTER HEAT LOSS TO CABINET AND MULLION
+        #   setup basic variables
+        #  ----------------------------------------------
+        # 1 - COMPRESSOR INLET (SATURATED VAPOR)
+        # 2 - COMPRESSOR DISCHARGE
+        # 3 - CONDENSER DEW POINT
+        # 4 - CONDENSER OUTLET
+        # 5 - INLET TO FRESH FOOD EVAPORATOR
+        # 6 - LIQUID LINE OUTLET FROM HIGH TEMP INTERCHANGER
+        # 7 - OUTLET FROM FRESH FOOD EVAPORATOR
+        # 8 - INLET TO FREEZER EVAPORATOR
+        # 9 - OUTLET FROM FREEZER EVAPORATOR
+        # 10 - LIQUID LINE OUTLET FROM LOW TEMP INTERCHANGER
+        # 11 - CONDENSER BUBBLE POINT
+        # 12 - FRESH FOOD EVAPORATOR DEW POINT
+        # 13 - SUPERHEATED GAS LEAVING THE HIGH TEMP INTERCHANGER
+        # 14 - CONDENSER INLET
+        # 15 - INTERNAL VARIABLE (NOT SHOWN) FOR EVAP DEW POINT
+        # 16 - LIQUID LINE STATE AFTER HEAT LOSS TO CABINET AND MULLION
 
-            # L - LOGICAL VARIABLE (ERROR FLAG, ETC.)
-            # P - PRESSURE
-            # T - TEMPERATURE
-            # TC - REFRIGERANT AT CONDENSER OUTLET
-            # TE - REFRIGERANT AT EVAPORATOR OUTLET
-            # TOL - CONVERGENCE TOLERANCE
-            # TS - TEMPERATURE OF HEAT TRANSFER FLUID
-            # V - VOLUME
-            # X - COMPOSITION
+        # L - LOGICAL VARIABLE (ERROR FLAG, ETC.)
+        # P - PRESSURE
+        # T - TEMPERATURE
+        # TC - REFRIGERANT AT CONDENSER OUTLET
+        # TE - REFRIGERANT AT EVAPORATOR OUTLET
+        # TOL - CONVERGENCE TOLERANCE
+        # TS - TEMPERATURE OF HEAT TRANSFER FLUID
+        # V - VOLUME
+        # X - COMPOSITION
 
-            self.T = [0.0] * (16 + 1)  # Temp in K
-            self.P = [0.0] * (16 + 1)  # Pressure in pascal
-            self.V = [0.0] * (16 + 1)  # Volume in m3/kg
+        self.T = [0.0] * (16 + 1)  # Temp in K
+        self.P = [0.0] * (16 + 1)  # Pressure in pascal
+        self.V = [0.0] * (16 + 1)  # Volume in m3/kg
 
-            self.H = [0.0] * (16 + 1)  # Enthalpy in j/kg
-            self.S = [0.0] * (16 + 1)  # Entorpy in j/kg K
+        self.H = [0.0] * (16 + 1)  # Enthalpy in j/kg
+        self.S = [0.0] * (16 + 1)  # Entorpy in j/kg K
 
-            self.TE = [0, 0, 0]
-            self.TC = [0, 0, 0]
+        self.TE = [0, 0, 0]
+        self.TC = [0, 0, 0]
 
-            self.objCP = objCP
-             
+        # self.objCP = objCP
+
+    def __init__(self, objCP, dt, lng_item, NCYC=1):
         # --------------------------------------------------
-        # main init method 
+        # main init method
         # --------------------------------------------------
-        self.dt = objData
+        self.objCP = objCP
+        self.dt = dt
         self.lng_item = lng_item
 
         # Trace Data
@@ -266,22 +266,22 @@ class CycleSolver(CycleUtils):
         # NCYC number of calls to cycle (1=Single or 2= Dual cycle)
         self.NCYC = NCYC
 
-        paraCycle()
+        self.paraCycle()
 
         # Create Basic objects
-        setupCond(self.dt.ICONDI[self.lng_item])  # ICOND
+        self.setupCond(self.dt.ICONDI[self.lng_item])  # ICOND
 
-        setupEvap(self.dt.IFRSHI[self.lng_item],  # IFRSH
-                  self.dt.ISPECI[self.lng_item]  # ISPEC
-                  )
+        self.setupEvap(self.dt.IFRSHI[self.lng_item],  # IFRSH
+                       self.dt.ISPECI[self.lng_item]  # ISPEC
+                       )
 
-        setupComp(ICOMP=self.dt.ICOMP,
-                  TAMB=self.TS1,
-                  FRACT_SPEED=1,  # not used in IMAP=0
-                  strFileName=self.dt.FILE_NAME
-                  )
+        self.setupComp(ICOMP=self.dt.ICOMP,
+                       TAMB=self.TS1,
+                       FRACT_SPEED=1,  # not used in IMAP=0
+                       strFileName=self.dt.FILE_NAME
+                       )
 
-   #  -- Soving actions
+    #  -- Soving actions
     def solveCycle(self):
         print("\n\n== Starting processing ===")
         print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
@@ -313,7 +313,7 @@ class CycleSolver(CycleUtils):
         self.IC = 1  # Condenser iteration counter
         self.ITMAXC = 100  # Condenser max. number of iterations
 
-        self.DUTYR = 0.5 # duty ratio
+        self.DUTYR = 0.5   # duty ratio
 
         # fraction superheat area
         self.FSUPC = 0.1  # unit (%) in python only
@@ -329,7 +329,7 @@ class CycleSolver(CycleUtils):
     def __solveCycle(self):
         # GUESS A DEW POINT TEMPERATURE AT THE EVAPORATOR EXIT
         # -----------------------------
-        if (self.ISPEC == 1):  # Evap superheat:
+        if self.ISPEC == 1:  # Evap superheat:
             self.T[15] = self.TS3 - (self.DTSUPE + 2.0)
             self.P[15] = self.objCP.Property('P', X=1, T=self.T[15])  # Pa
             self.V[15] = self.objCP.Property('V', X=1, T=self.T[15])  # m3/kg
@@ -340,7 +340,7 @@ class CycleSolver(CycleUtils):
             self.T[7] = self.TE[1]  # 7 - OUTLET FROM FRESH FOOD EVAPORATOR
             self.P[7] = self.P[15]
 
-        elif (self.ISPEC == 2):  # Interchanger superheat specified
+        elif self.ISPEC == 2:  # Interchanger superheat specified
             self.T[15] = self.TS3 - 2.0
             self.V[15] = self.objCP.Property('V', X=1, T=self.T[15])  # m3/kg
 
@@ -356,7 +356,7 @@ class CycleSolver(CycleUtils):
             self.T[7] = self.TE[1]
             self.P[7] = self.P[15]
 
-        elif (self.ISPEC == 3):  # Evap exit quality
+        elif self.ISPEC == 3:  # Evap exit quality
             self.T[15] = self.TS3 - 2.0
             self.V[15] = self.objCP.Property('V', X=self.XEXITE
                                              , T=self.T[15])  # m3/kg
@@ -378,16 +378,16 @@ class CycleSolver(CycleUtils):
         # -----------------------------
 
         # Condenser itaration loop
-        while (self.IC <= self.ITMAXC and self.LCCON):
+        while self.IC <= self.ITMAXC and self.LCCON:
             self.trace.cond_ic()  # self.IC
 
             # ICAB - flag to represent presence of cabinet loads in input
 
             self.trace.dr_omar("adjlod is not tested nor used")  # Dr. Omar
             #  ICAB Flag to represent presence of cabinet loads in input, 0 =No
-            if (self.dt.ICAB == 1):
-                [self.TS3, self.TS5] = self.adjlod(self.dt, self.MREF / 3600,
-                                                   # , self.dt.ATOTEI[self.lng_item],
+            if self.dt.ICAB == 1:
+                [self.TS3, self.TS5] = self.adjlod(self.dt,    # self.MREF / 3600,
+                                                   # self.dt.ATOTEI[self.lng_item],
                                                    self.dt.ICYCL,
                                                    self.IC,
                                                    self.TS3,
@@ -434,14 +434,14 @@ class CycleSolver(CycleUtils):
             # self.H[16] = self.H[4] \
             #    - self.dt.CONDHT[self.NCYC] / self.MREF / self.DUTYR
 
-            self.H[16] = self.H[4] \
-                         - self.dt.CONDHT[self.NCYC] / (self.MREF / 3600) / self.DUTYR
+            self.H[16] = self.H[4] -\
+                         self.dt.CONDHT[self.NCYC] / (self.MREF / 3600) / self.DUTYR
 
             self.P[16] = self.P[4]
 
             # 16 - LIQUID LINE STATE AFTER HEAT LOSS TO CABINET AND MULLION
-            self.T[16] = self.objCP.Property('T', P=self.P[16]
-                                             , H=self.H[16])  # K
+            self.T[16] = self.objCP.Property('T', P=self.P[16],
+                                             H=self.H[16])  # K
             # if (VL[16] == 0.0):
             #     VL[16] = V[4]
             # V[16] = VL[16]
@@ -459,7 +459,7 @@ class CycleSolver(CycleUtils):
             #  ---------
             self.T[6] = self.objCP.Property('T', P=self.P[6]
                                             , H=self.H[6])  # K
-            if (self.ISPEC != 2):
+            if self.ISPEC != 2:
                 self.T[13] = self.objCP.Property('T', P=self.P[13]
                                                  , H=self.H[13])  # K
                 self.V[13] = self.objCP.Property('V', P=self.P[13]
@@ -474,7 +474,7 @@ class CycleSolver(CycleUtils):
 
             self.P[1] = self.P[13]
 
-            if (self.TSPEC > 0.0):
+            if self.TSPEC > 0.0:
                 self.T[1] = self.TSPEC
                 # Approve concept self.trace.dr_omar("Wet region issue")
                 # Ayman modification, in case DTSUPI = 0
@@ -486,10 +486,10 @@ class CycleSolver(CycleUtils):
                 #                                    , P=self.P[1])  # m3/kg
 
                 self.V[1] = self.coolutil.getProp(prp='V', P=self.P[1],
-                                                  T=self.T[1], X=1)  # m3/kg
+                                                  T=self.T[1])  # m3/kg
 
-                self.H[1] = self.coolutil.getProp(prp='H', P=self.P[1],
-                                                  T=self.T[1], X=1)  # j/kg
+                self.H[1] = self.coolutil.getProp(P=self.P[1],
+                                                  T=self.T[1])  # j/kg
             else:
                 self.V[1] = self.V[13]
                 self.T[1] = self.T[13]
@@ -563,15 +563,15 @@ class CycleSolver(CycleUtils):
             else:
                 self.condenser_calc()
 
-            self.IC = self.IC + 1  # do another trail
+            self.IC += 1  # do another trail
 
             if self.dt.INCTRL in [0, 3]:
-                if (self.IC <= 4):
+                if self.IC <= 4:
                     self.LCCON = True
                     self.ICONC = 0
 
             if self.dt.INCTRL in [1, 2, 4]:
-                if (self.IC <= 10):
+                if self.IC <= 10:
                     self.LCCON = True
                     self.ICONC = 0
 
@@ -637,7 +637,7 @@ class CycleSolver(CycleUtils):
                                                 P4=self.P[4]      # pa
                                                 )
 
-        elif self.ICOND == 2:
+        else:  # self.ICOND == 2:
             dicRest = self.objCond.cond_balance(T14=self.T[14],  # K
                                                 H14=self.H[14],  # j/kg
                                                 T3=self.T[3],    # K
@@ -667,7 +667,7 @@ class CycleSolver(CycleUtils):
          UDSC,             # watt/m2 K
          USCC,             # watt/m2 K
          UTPC              # watt/m2 K
-        ] = self.objCond.getExtarOutputs()
+         ] = self.objCond.getExtarOutputs()
 
         # Condenser Heat Fresh Food,                 Q_CND_FF
         # Condenser Heat Freezer,                    Q_CND_FZ
@@ -705,19 +705,19 @@ class CycleSolver(CycleUtils):
         # self.H[16] = self.H[4] \
         #            - self.dt.CONDHT[self.NCYC] / self.MREF / self.DUTYR
 
-        self.H[16] = self.H[4] \
-                     - self.dt.CONDHT[self.NCYC] / (self.MREF / 3600) / self.DUTYR
+        self.H[16] = self.H[4] -\
+                     self.dt.CONDHT[self.NCYC] / (self.MREF / 3600) / self.DUTYR
 
         self.P[16] = self.P[4]
-        self.T[16] = self.objCP.Property('T', T=self.H[16]
-                                         , P=self.P[16])  # K
+        self.T[16] = self.objCP.Property('T', T=self.H[16],
+                                         P=self.P[16])  # K
 
         # calculate the average effectiveness of the heat exchanger
         # calculate the heat transfer if the refrigerant left aT TS1
         #
         # determine the specific volume of the liquid
         #
-        if (self.TS1 < self.T[4]):
+        if self.TS1 < self.T[4]:
             # Approve concept self.trace.dr_omar("Wet region issue")
             # Ayman modification, in case DTSUPI = 0
             # the given point came to wet area.
@@ -737,7 +737,7 @@ class CycleSolver(CycleUtils):
         QAMAX = self.dt.CFMC * (self.T[14] - self.TS1)  # watt/K * K = watt
         QMAXC = QAMAX
 
-        if (QRMAX < QAMAX):
+        if QRMAX < QAMAX:
             QMAXC = QRMAX
 
         self.ETAC = QTOTC / QMAXC   # watt/watt
@@ -757,18 +757,18 @@ class CycleSolver(CycleUtils):
         #  Evap itaration loop
         #  enter iteration for evaporator outlet temperature
         self.IE = 1
-        while ((self.IE <= ITMAXE) and self.LECON):
+        while (self.IE <= ITMAXE) and self.LECON:
             self.I_ERROR_INTER = 0
 
             # -----------------------------
-            if (self.ISPEC == 1):  # Evap superheat:
+            if self.ISPEC == 1:  # Evap superheat:
                 self.TE[self.JE] = self.T[15] + self.DTSUPE
 
                 self.P[15] = self.objCP.Property('P', X=1, T=self.T[15])  # pa
 
                 self.P[7] = self.P[15]
 
-            elif (self.ISPEC == 2):  # Interchanger superheat specified
+            elif self.ISPEC == 2:  # Interchanger superheat specified
                 self.P[15] = self.objCP.Property('P', X=1, T=self.T[15])  # pa
 
                 self.P[13] = self.P[15]
@@ -784,20 +784,20 @@ class CycleSolver(CycleUtils):
                 #                                    # , T=self.T[13])  # j/kg
 
                 self.V[13] = self.coolutil.getProp(prp='V', P=self.P[13],
-                                                   T=self.T[13], X=1)  # m3/kg
+                                                   T=self.T[13])  # m3/kg
 
-                self.H[13] = self.coolutil.getProp(prp='H', P=self.P[13],
-                                                   T=self.T[13], X=1)  # j/kg
+                self.H[13] = self.coolutil.getProp(P=self.P[13],
+                                                   T=self.T[13])  # j/kg
 
                 self.P[7] = self.P[15]
                 self.TE[self.JE] = self.T[7]
 
-                if (self.T[13] >= self.T[16]):
+                if self.T[13] >= self.T[16]:
                     self.LECON = False
                     self.I_ERROR_INTER = 1
                     continue
 
-            elif (self.ISPEC == 3):  # Evap exit quality
+            elif self.ISPEC == 3:  # Evap exit quality
                 self.P[15] = self.objCP.Property('P', X=1, T=self.T[15])  # pa
 
                 self.P[7] = self.P[15]
@@ -818,7 +818,10 @@ class CycleSolver(CycleUtils):
             self.calc_lowevap()
 
             # Calculate fresh food section heat exchange
-            self.evap_dew12() # 12 - FRESH FOOD EVAPORATOR DEW POINT
+            self.evap_dew12()   # 12 - FRESH FOOD EVAPORATOR DEW POINT
+
+            QFF = 0  # prevent error if IC=1
+            QFZ = 0
 
             if self.IC != 1:  # skip first trail to calc. some values later
                 [QFF, QFZ, DUTYR] = \
@@ -840,14 +843,13 @@ class CycleSolver(CycleUtils):
             # TEST FOR STANDARD DESIGN.
 
             self.trace.dr_omar("General review for this point")
-            if (self.dt.IRFTYP <= 3):
+            if self.dt.IRFTYP <= 3:
 
-                if (self.dt.ICYCL == 1
-                    and self.dt.ICAB != 0
-                    and self.IFRSH != 0
-                ):
+                if (self.dt.ICYCL == 1 and
+                        self.dt.ICAB != 0 and
+                        self.IFRSH != 0):
 
-                    if (self.dt.IC == 1):
+                    if self.dt.IC == 1:
                         TIN = 0.15 * self.TFF + 0.85 * self.TFZ
                         self.FF_FRACT = 0.0  # in Python only
 
@@ -896,7 +898,7 @@ class CycleSolver(CycleUtils):
                                                     P7=self.P[7]       # pa
                                                     )
 
-            elif self.IFRSH == 2:
+            else:   #  self.IFRSH == 2:
                 dicRest = self.objEvap.evap_balance(MREF=self.MREF,   # kg/hr
                                                     T5=self.T[5],     # K
                                                     H5=self.H[5],     # j/kg
@@ -956,8 +958,8 @@ class CycleSolver(CycleUtils):
 
             # HS3 = self.objCP.Property('H', P=self.P[7], T=self.TS3)  # j/kg            
 
-            HS3 = self.coolutil.getProp(prp='H', P=self.P[7],
-                                        T=self.TS3, X=1)  # m3/kg
+            HS3 = self.coolutil.getProp(P=self.P[7],
+                                        T=self.TS3)  # m3/kg
 
             QRMAX = self.MREF * (HS3 - self.H[5]) / 3600  # kg/hr/3600 j/kg = watt
 
@@ -969,7 +971,7 @@ class CycleSolver(CycleUtils):
             QAMAX = self.dt.CFME * (self.TS3 - self.T[5])  # watt
             QMAXE = QAMAX  # watt
 
-            if (QRMAX < QAMAX):
+            if QRMAX < QAMAX:
                 QMAXE = QRMAX
 
             ETAE = self.QFRSH / QMAXE  # QMAXE= watt
@@ -985,7 +987,7 @@ class CycleSolver(CycleUtils):
             if (ICONE == 1) or (self.TE[self.JE] <= TEMIN):
                 self.LECON = False  # Exit loop
 
-            self.IE = self.IE + 1
+            self.IE += 1
         #  -----------------------------------------------------------
         #  END OF EVAPORATOR ITERATION
         #  -----------------------------------------------------------
@@ -998,17 +1000,17 @@ class CycleSolver(CycleUtils):
         # Calculate fresh food section heat exchange
         PDEWE = self.P[5] - (1.0 - self.FSUPE) * self.DPE
 
-        if (PDEWE > self.P[5]):
+        if PDEWE > self.P[5]:
             PDEWE = self.P[5]
 
         self.TDEW = self.objCP.Property('T', P=PDEWE, X=1)  # K
 
         # Python POLDE is not used !!!
         POLDE = PDEWE
-        if (self.TDEW >= self.TS3):
+        if self.TDEW >= self.TS3:
             self.TDEW = self.TS3 - 1.0
 
-        if (self.T[5] >= self.TS3):
+        if self.T[5] >= self.TS3:
             self.T[5] = self.TS3 - 1.0
 
         HDEW = self.objCP.Property('H', X=1, P=PDEWE)  # j/kg
@@ -1023,7 +1025,7 @@ class CycleSolver(CycleUtils):
 
     def evap_out7(self):   # 7 - OUTLET FROM FRESH FOOD EVAPORATOR
         # determine the enthalpy at [7]
-        if (self.ISPEC == 1):  # Evap superheat:
+        if self.ISPEC == 1:  # Evap superheat:
             # Approve concept self.trace.dr_omar("Wet region issue")
             # Ayman modification, in case DTSUPI = 0
             # the given point came to wet area.
@@ -1031,13 +1033,13 @@ class CycleSolver(CycleUtils):
             # self.H[7] = self.objCP.Property('H', P=self.P[7]
             # , T=self.T[7])  # j/kg 
 
-            self.H[7] = self.coolutil.getProp(prp='H', P=self.P[7],
-                                              T=self.T[7], X=1)  # j/kg
+            self.H[7] = self.coolutil.getProp(P=self.P[7],
+                                              T=self.T[7])  # j/kg
 
             #  VV[7] = V[7]
             self.T[7] = self.TE[self.JE]
 
-        elif (self.ISPEC == 2):  # Interchanger superheat specified
+        elif self.ISPEC == 2:  # Interchanger superheat specified
             [self.T[7], self.H[7], self.QINT] = \
                 self.inter2(self.objCP,
                             self.P[16], self.T[16], self.H[16],
@@ -1053,7 +1055,7 @@ class CycleSolver(CycleUtils):
             # V[7] = (1.0-XQ[7])*VL[7] + XQ[7]*VV[7]
             self.TE[self.JE] = self.T[7]
 
-        elif (self.ISPEC == 3):  # Evap exit quality
+        elif self.ISPEC == 3:  # Evap exit quality
             # XQ[7] = Data.XEXITE
             # CALL ENTHAL(HBUB15,H[15],XQ[7],X,P[7],H[7])
 
@@ -1066,7 +1068,7 @@ class CycleSolver(CycleUtils):
             # V[7] = (1.0-XQ[7])*VL[7] + XQ[7]*VV[7]
             self.T[7] = self.TE[self.JE]
 
-        if (self.ISPEC != 2):
+        if self.ISPEC != 2:
             # by Dr. Omar
             # self.QINT = self.inter1(self.objCP, self.T[16],
             # self.T[7], self.P[7], self.ETHX1 )
@@ -1075,9 +1077,8 @@ class CycleSolver(CycleUtils):
             #  used when the inlet states of both streams specified
             # CP7 = self.objCP.Property('CP', self.T=T[7], P=self.P[7]) j/kg K
             CP7 = self.coolutil.getProp(prp='CP', T=self.T[7],
-                                                  P=self.P[7], X=1)  # j/kg K
-                                              
-            
+                                        P=self.P[7])  # j/kg K
+
             self.QINT = self.ETHX1 * (self.T[16] - self.T[7]) * CP7
             
             self.H[13] = self.H[7] + self.QINT
@@ -1095,7 +1096,7 @@ class CycleSolver(CycleUtils):
                                         , H=self.H[6])  # K
 
         # -----------------------------
-        if (self.ISPEC != 2):
+        if self.ISPEC != 2:
             self.T[13] = self.objCP.Property('T', P=self.P[13]
                                              , H=self.H[13])  # K
 
@@ -1104,7 +1105,7 @@ class CycleSolver(CycleUtils):
         # -----------------------------
 
         # find conditions at evaporator inlet assuming isenthalpic expansion
-        self.P[5] = self.P[13] + self.DPE # pa
+        self.P[5] = self.P[13] + self.DPE   # pa
 
         self.trace.dr_omar("chk lowevp") 
         [self.H, self.P, self.T, self.TS6, self.QFREZ] = \
@@ -1277,7 +1278,7 @@ class CycleSolver(CycleUtils):
 
         # correct cop dur to cycling losses
         #
-        if (self.dt.I_CYCLE == 0):
+        if self.dt.I_CYCLE == 0:
             self.CORR_COP = 1.0
         else:
             self.TENV = self.dt.TROOM

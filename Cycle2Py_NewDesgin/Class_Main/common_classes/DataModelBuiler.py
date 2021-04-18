@@ -485,27 +485,27 @@ class DataModelBuiler (FileAccess):
                 + show_extar_err_desc()
 
         elif self.m_error == DataModelBuiler.ERR_FOUND_DATA_TYPE:
-            return "Err " + str(DataModelBuiler.ERR_FOUND_DATA_TYPE) 	\
-                + " data type error, given string not float in input file "	\
-                + show_extar_err_desc()
+            return "Err " + str(DataModelBuiler.ERR_FOUND_DATA_TYPE) +	\
+                " data type error, given string not float in input file " + \
+                show_extar_err_desc()
 
         elif self.m_error == DataModelBuiler.ERR_NOT_FOUND:
-            return "No error found" + + show_extar_err_desc()
+            return "No error found" + show_extar_err_desc()
 
         elif self.m_error == DataModelBuiler.ERR_FOUND_LIST:
-            return "Err " + str(DataModelBuiler.ERR_FOUND_LIST) +	\
-                + " empty list,or very short list "	\
-                + show_extar_err_desc()
+            return "Err " + str(DataModelBuiler.ERR_FOUND_LIST) + \
+                  " empty list,or very short list " + \
+                  show_extar_err_desc()
 
         elif self.m_error == DataModelBuiler.ERR_FOUND_DATA_CONF:
-            return "Err " + str(DataModelBuiler.ERR_FOUND_DATA_CONF) 	\
-                + " configration num is not valid"	\
-                + show_extar_err_desc()
+            return "Err " + str(DataModelBuiler.ERR_FOUND_DATA_CONF) +	\
+                  " configration num is not valid" + \
+                  show_extar_err_desc()
 
         elif self.m_error == DataModelBuiler.ERR_FOUND_DATA_COUNT:
-            return "Err " + str(DataModelBuiler.ERR_FOUND_DATA_COUNT) 	\
-                + " error in number of parameter for the given file"	\
-                + show_extar_err_desc()
+            return "Err " + str(DataModelBuiler.ERR_FOUND_DATA_COUNT) + \
+                " error in number of parameter for the given file" + \
+                show_extar_err_desc()
 
         elif self.m_error == DataModelBuiler.ERR_FOUND_READLINE:
             return "Err " + \
@@ -528,8 +528,8 @@ class DataModelBuiler (FileAccess):
     # Input 		:
     #
     # Output		: True if data is written,false if error
-    #	Set the int_configration  : configration number
-    #			return True  if no error, else Flase
+    # Set the int_configration  : configration number
+    #    return True  if no error, else Flase
     # -----------------------------------------------------------
     def chk_data_model(self):
         # Configration from 1 to CONFIGRATION_ROW
@@ -610,7 +610,7 @@ class DataModelBuiler (FileAccess):
             # do until check finish all lines
             while True:
                 # set line count + 1
-                self.m_lineNo = self.m_lineNo + 1
+                self.m_lineNo += 1
 
                 # check that lines is not more this max. value, this for safety
                 # only
@@ -644,9 +644,9 @@ class DataModelBuiler (FileAccess):
     # Job 			: Read data from list,as the given type
     #
     # Input 		: int_row_number : row number to access
-    #				: strType : 'int','float','string' according to required type.
+    #               : strType : 'int','float','string' according to required type.
     # Output		: if Error, flag is set, and return string of error descript
-    #				other, return return string of the catched value
+    #               other, return return string of the catched value
     # -----------------------------------------------------------
     def getData_from_list(self, int_row_number, strType=""):
         # check input parameter, if not good return
@@ -692,7 +692,7 @@ class DataModelBuiler (FileAccess):
 
         # if there was (-), convert number to -ve.
         if n_count_muns == 1:
-            flt_value = -1.0 * flt_value
+            flt_value *= -1.0
 
         # if the required type is float, then job is done.
         if strType == "float":

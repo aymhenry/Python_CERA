@@ -3,37 +3,38 @@
 #
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-def show_input_output (show= None):
+
+
+def show_input_output(show=None):
     SHOW_INS = "IN"
     SHOW_OUT = "OUT"
     SHOW_ALL = "ALL"
 
-    if show is None or show not in[SHOW_INS, SHOW_OUT, SHOW_ALL]:
+    if show is None or show not in [SHOW_INS, SHOW_OUT, SHOW_ALL]:
         show = SHOW_ALL
 
-    def warper_fun_name (func_name):
+    def warper_fun_name(func_name):
         def wraper_args(*args, **kargs):
             # actual func_name logic here
 
             if show in [SHOW_INS, SHOW_ALL]:
-                print ("    #-- Inputs for Function Name: "  + func_name.__name__ )
+                print("    #-- Inputs for Function Name: " + func_name.__name__)
 
                 int_count = 1
                 for arg in args:
-                    print ("        arg no " + str(int_count) + " = ", arg)
-                    int_count +=1
+                    print("        arg no " + str(int_count) + " = ", arg)
+                    int_count += 1
 
                 for key, value in kargs.items():
-                    print ("        " + key + " = ", value)
-                    int_count +=1
-
+                    print("        " + key + " = ", value)
+                    int_count += 1
 
             result = func_name(*args, **kargs)
 
             if show in [SHOW_OUT, SHOW_ALL]:
-                print ("    #-- Outputs for Function Name: "  + func_name.__name__ )
-                print ("        Result =", result)
-                print ("\n")
+                print("    #-- Outputs for Function Name: " + func_name.__name__)
+                print("        Result =", result)
+                print("\n")
 
             return result
 

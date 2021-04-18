@@ -92,7 +92,7 @@ class CoolPrp:
 
         # adjust id for Cp and Cv
         if getProp_adj in lst_prob_o:
-            getProp_adj = getProp_adj + "MASS"
+            getProp_adj += "MASS"
 
         # adjust V (volume) - CoolPrp use D for dencity
         if getProp == 'V':
@@ -100,12 +100,12 @@ class CoolPrp:
 
         # get two referance parameters
         int_count = 0
-
+        str_command = ''
         try:
             str_command = "PropsSI(" + "'" + getProp_adj + "'"
             for prop in lst_prob_io + lst_prob_i:
                 if eval(prop + " !=None"):
-                    int_count = int_count + 1
+                    int_count += 1
 
                     if prop == 'V':  # CoolPrp use D for density
                         prob_code = "D"
@@ -120,7 +120,7 @@ class CoolPrp:
                     if int_count >= MAX_PARA:
                         break  # only limited number of parameters
 
-            str_command = str_command + ', self.m_fluid)'
+            str_command += ', self.m_fluid)'
             # print ("str_command: ",str_command)
 
             result = eval(str_command)
@@ -129,7 +129,7 @@ class CoolPrp:
 
             return result
 
-        except:   # BaseException:
+        except():   # BaseException:
             self.m_error = CoolPrp.ERR_PROB_ERROR
             self.m_error_desc = str_command
             raise ValueError(self.err_description())
@@ -197,19 +197,19 @@ class CoolPrp:
     # Output		: True or false
     # -----------------------------------------------------------
     def is_gas_phase(self, strPhase):
-        if CoolPrp.PHASE_GAS in (strPhase):
+        if CoolPrp.PHASE_GAS in strPhase:
             return True
         else:
             return False
 
     def is_liquid_phase(self, strPhase):
-        if CoolPrp.PHASE_LIQ in (strPhase):
+        if CoolPrp.PHASE_LIQ in strPhase:
             return True
         else:
             return False
 
     def is_two_phase(self, strPhase):
-        if CoolPrp.PHASE_TWO in (strPhase):
+        if CoolPrp.PHASE_TWO in strPhase:
             return True
         else:
             return False

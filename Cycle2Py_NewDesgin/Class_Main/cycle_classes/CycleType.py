@@ -1,4 +1,5 @@
 # Python Import ====================
+from abc import ABC, abstractmethod
 
 # User Import ======================
 from cycle_classes.CycleSolver import *
@@ -76,7 +77,7 @@ class CycleType_Abstract (ABC):
     # -----------------------------------------------------------
 
     def adjust_input_for_all_types(self):
-        QZ_NET = 0.0
+        # QZ_NET = 0.0
 
         # set Temperatue 17.11 C
         self.dt.TS5 = 256.0
@@ -98,9 +99,9 @@ class CycleType_Abstract (ABC):
         # add a new entry for Quality in Python only
         # self.dt.QUALTY = self.dt.DTSPEI[:]
 
-        # if IDFRST(Manual Defrost) =1  (i.e Autoamtic ) DFSTCYC :Closed-Door
+        # if IDFRST(Manual Defrost) =1  (i.e Autoamtic ) DFSTCYC:Closed-Door
         # Automatic Defrost (W)
-        if(self.dt.IDFRST == 1):
+        if self.dt.IDFRST == 1:
             self.dt.DFSTCYC = 0.0
 
         #  zero condenser heat loads to cabinet and evaporators
@@ -122,7 +123,7 @@ class CycleType_Abstract (ABC):
 
         # Python comment: if 4- chest freezer, change it to 2- two-door
         # bottom-mount befrigerator/freezer
-        if(self.dt.ICYCL == 4):
+        if self.dt.ICYCL == 4:
             self.dt.ICYCL = 2
 
     # -----------------------------------------------------------
@@ -133,7 +134,7 @@ class CycleType_Abstract (ABC):
     # -----------------------------------------------------------
     def adjust_units_for_all_types(self):
 
-        self.dt.FILE_NAME = self.dt.FILE_NAME + '.cmp'
+        self.dt.FILE_NAME += '.cmp'
         # TOL_FRSH 
         # TOL_FRZ 
         # TOL_COND
@@ -149,13 +150,13 @@ class CycleType_Abstract (ABC):
         # -----------------------------------
         
         for item in range(0, len(self.dt.TSPECI)):
-            if(self.dt.TSPECI[item] > 0.0):
-                self.dt.TSPECI[item] = self.dt.TSPECI[item] + 273.11
-            
-        self.dt.TS5 = self.dt.TS5 + 273.11
-        self.dt.TROOM = self.dt.TROOM + 273.11
-        self.dt.FFTEMP = self.dt.FFTEMP + 273.11
-        self.dt.FZTEMP = self.dt.FZTEMP + 273.11
+            if self.dt.TSPECI[item] > 0.0:
+                self.dt.TSPECI[item] += 273.11
+
+        self.dt.TS5 += 273.11
+        self.dt.TROOM += 273.11
+        self.dt.FFTEMP += 273.11
+        self.dt.FZTEMP += 273.11
                 
         # kpa to pa
         self.dt.DPC = [kpa * 1000 for kpa in self.dt.DPC]
@@ -230,8 +231,8 @@ class CycleType_Abstract (ABC):
         # self.dt.DISPLC[lng_item] = self.dt.DISPLC[lng_item] # / 16.3871
 
         # only for type 2
-        if(self.dt.IFREZI[lng_item] != 0):
-            self.dt.UAF = 3.600 * self.dt.UAF
+        if self.dt.IFREZI[lng_item] != 0:
+            self.dt.UAF *= 3.600
         # ============= end of data to be checked ==========
 
     # -----------------------------------------------------------
@@ -243,16 +244,15 @@ class CycleType_Abstract (ABC):
     def call_cycle(self, lng_item):
         if self.getRefName(self.dt.IR[1][1]) == "":
             raise ErrorException('Error refrigerant code: ', 'cyt1000')
-            return
-        
+
         print("Using Ref. ", self.getRefName(self.dt.IR[1][1]))
         
         self.objCP.setup(self.getRefName(self.dt.IR[1][1]))  # 'R12'
         
         objCycleSolver = CycleSolver(objCP=self.objCP,
-                                     objData=self.dt,
-                                     lng_item=lng_item,
-                                     NCYC=1
+                                     dt=self.dt,
+                                     lng_item=lng_item
+                                     # NCYC=1
                                      )
 
         # === solve

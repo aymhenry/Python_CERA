@@ -59,6 +59,7 @@ class QData:
 				feedback = "'" + str(feedback) + "'"
 
 			#  save values to data object
+			# print("self." + lst_var_names[int_var_numer - int_confg_row] + "=" + str(feedback))
 			exec("self." + lst_var_names[int_var_numer - int_confg_row] + "=" + str(feedback))
 
 		# =================================================

@@ -1,8 +1,8 @@
 # Python import
-import sys
+# import sys
 
 # User import
-from .CoolPrp import *
+# from .CoolPrp import *
 from .decorators import *
 from .CompMap import *
 
@@ -89,8 +89,8 @@ def read_comp_file(strFile_name, strFolder=None):
     # NCOND : Integer 3 digits, number of data points
     #           along condensing temperature axis.
 
-    NEVAP = obj_comp_map.getX_count()
-    NCOND = obj_comp_map.getY_count()
+    # NEVAP = obj_comp_map.getX_count()
+    # NCOND = obj_comp_map.getY_count()
 
     # this input is cancelled in Python, compressor type is defined
     #  in basic entry data.
@@ -122,6 +122,6 @@ def read_comp_file(strFile_name, strFolder=None):
     # READ COMPRESSOR POWER DATA
     POWER = obj_comp_map.getPower()
 
-    del(obj_comp_map) 	# close file
+    del obj_comp_map  # close file
 
     return [IUNITS, TEDATA, TCDATA, CAPAC, POWER]

@@ -8,28 +8,28 @@ from cycle_classes.Trace import *
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # Job 			: Create Condenser object based on ICOND
 #    input: IFRSH = 0  Natural Convection
-#         : IFRSH = 1  Cross-Flow
-#         : IFRSH = 2  Counter-Flow
-#         : objCP = CoolProp object
+#        : IFRSH = 1  Cross-Flow
+#        : IFRSH = 2  Counter-Flow
+#        : objCP = CoolProp object
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
 
 class Evaporator:
     def getObject(self, IFRSH, objCP):
-        if (IFRSH == 0):  # Natural Convection
-            objEvapCool = EvapCool_FFNat(IFRSH, objCP)
+        if IFRSH == 0:  # Natural Convection
+            return EvapCool_FFNat(IFRSH, objCP)
 
-        elif (IFRSH == 1):  # Cross-Flow
-            objEvapCool = EvapCool_FFCross(IFRSH, objCP)
+        elif IFRSH == 1:  # Cross-Flow
+            return EvapCool_FFCross(IFRSH, objCP)
 
-        elif (IFRSH == 2):  # Counter-Flow
-            objEvapCool = EvapCool_FFCount(IFRSH, objCP)
+        elif IFRSH == 2:  # Counter-Flow
+            return EvapCool_FFCount(IFRSH, objCP)
 
         else:
-            objEvapCool = None
+            # objEvapCool = None
             raise ErrorException('IFRSH value error', 'Evap1000')
-        return objEvapCool
+
 
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -107,27 +107,27 @@ class EvapCool_Abstract (exf4Cond_Evap):
         # = (W)/(kg/s * j/kg) = %Ration [OA changed /hr to /s]
         ALPHA = QFRSH / (MREF_kg_s * (H7 - H5))
 
-        if (QFRSH == 0.0):
+        if QFRSH == 0.0:
             ALPHA = 0.01
 
         # estimate new value for exit temperature
         DELT = (TS3 - T5) * (1.0 - 1.0 / ALPHA)
-        if (-DELT > TE[JE]):
+        if -DELT > TE[JE]:
             DELT = -0.5 * TE[JE]
 
         TEOUT = TE[JE] + DELT
 
         TS4 = TS3 - QFRSH / self.CFME   # K - [j/kg] [j/kg/K]
-        if (TEOUT > TS3):
+        if TEOUT > TS3:
             TEOUT = TS3
 
         FTE[JE] = TEOUT - TE[JE]   # allways equall DELT !!!
 
-        if (JE == 1):
+        if JE == 1:
             TENEW = TEOUT
         else:
             TENEW = TEOUT
-            if (FTE[2] != FTE[1]):
+            if FTE[2] != FTE[1]:
                 TENEW = TE[2] - FTE[2] * (TE[2] - TE[1]) / (FTE[2] - FTE[1])
 
             TE[1] = TE[2]
@@ -135,13 +135,13 @@ class EvapCool_Abstract (exf4Cond_Evap):
 
         TENEW = (TENEW + TE[JE]) / 2.0
 
-        if (TENEW > 1.05 * TE[JE]):
+        if TENEW > 1.05 * TE[JE]:
             TENEW = 1.05 * TE[JE]
 
-        if (TENEW < 0.95 * TE[JE]):
+        if TENEW < 0.95 * TE[JE]:
             TENEW = 0.95 * TE[JE]
 
-        if (TENEW > TS3):
+        if TENEW > TS3:
             TENEW = TS3
 
         ERROR = abs(TENEW - TE[JE])
@@ -149,7 +149,7 @@ class EvapCool_Abstract (exf4Cond_Evap):
         # ==============this block modified by Ayman
         # Iteration is finised when ICONE = 1, i.e LECON = False
         # See source code Cycle.for Line 0801
-        if (ERROR < TOL_FRSH):
+        if ERROR < TOL_FRSH:
             ICONE = 1  # ok no error
         else:
             ICONE = 0   # out of limit error
@@ -170,7 +170,7 @@ class EvapCool_Abstract (exf4Cond_Evap):
         #  adjust exit air temp to 90% approach if natural convection
         self.trace.dr_omar("Modification in Unit by Ayman for imprical Equ.")
         JE = 2   # by Ayman to chk Dr omar
-        if (self.IFRSH == 0):
+        if self.IFRSH == 0:
             TS4 = 0.9 * TE[JE] + 0.1 * TS3
 
         dicRes = {'TS4': TS4,
@@ -189,34 +189,35 @@ class EvapCool_Abstract (exf4Cond_Evap):
         TOL_FRSH = 0.1   # Tolerance
 
         ICONE = 0
-        
+        TENEW = 0
+
         EPS = MREF_kg_s * (H7 - H5) - QFRSH  # watt
         DELT = EPS / UAFF     # K
         
-        if (DELT > 5.0):
+        if DELT > 5.0:
             DELT = 5.0
 
-        if (DELT < -5.0):
+        if DELT < -5.0:
             DELT = -5.0
 
         TEOUT = TE[JE] + DELT
         TS4 = TS3 - QFRSH / self.CFME   # K - [j/kg] [j/kg/K]
         
-        if (TEOUT > TS3):
+        if TEOUT > TS3:
             # TEOUT = TS3
             TEOUT = (TS3 + TE[JE]) / 2.0
 
-        if (JE < 2):
+        if JE < 2:
             TENEW = TEOUT
             
         else:
-            if ((TEOUT > TE[1] > TE[2]) or (TEOUT < TE[2] < TE[1])):
+            if (TEOUT > TE[1] > TE[2]) or (TEOUT < TE[2] < TE[1]):
                 TCNEW = 0.5 * (TE[1] + TE[2])
                 
             else:
                 TENEW = TEOUT
 
-            if (TENEW < TS3):
+            if TENEW < TS3:
                 TENEW = (TS3 + TE[JE]) / 2.0
 
         ERROR = abs(TENEW - TE[1])
@@ -224,11 +225,10 @@ class EvapCool_Abstract (exf4Cond_Evap):
         # ==============this block modified by Ayman
         # Iteration is finised when ICONE = 1, i.e LECON = False
         # See source code Cycle.for Line 0801
-        if (ERROR < TOL_FRSH):
+        if ERROR < TOL_FRSH:
             ICONE = 1  # ok no error
         else:
             ICONE = 0   # out of limit error
-
 
         self.trace.dr_omar("New method other than the old")
         
@@ -307,12 +307,12 @@ class EvapCool_FFNat(EvapCool_Abstract):  # IFRSH== 0
 
         # get the net evaporator area
         AEVAP = self.ATOTE   # m2
-        if (IRFTYP == 6):
+        if IRFTYP == 6:
             AEVAP = self.ATOTE + self.ATOTE   # m2
 
         # calculate the natural convection heat transfer coefficient
         DELTAT = TAIR - TAVE      # K
-        if(DELTAT <= 0.0):
+        if DELTAT <= 0.0:
             DELTAT = 0.0001
 
         # by Dr.Omar Cancel next line
@@ -331,14 +331,14 @@ class EvapCool_FFNat(EvapCool_Abstract):  # IFRSH== 0
         # Calculate combined air-side heat transfer coefficient
         UAIR = HRAD + HNAT  # kW/m2 K feedback from condenser class
 
-        if (self.IWALL_FF == 1):
+        if self.IWALL_FF == 1:
             UAIR = 1.0 / (1.0 / UAIR + 0.1389 / 20.44)   # kW/m2 K
             # UAIR by ayman units is power/Temp/sq-lenght
             # Btu/hr/Feh/(length * Length)
 
         # by Ayman ( not in Fortran)
         # info is feedback from condener
-        UAIR = UAIR * 1000   # convert to W/m2 K
+        UAIR *= 1000  # convert to W/m2 K
 
         self.trace.dr_omar("this is not SI units")
         # UA_FF is  W/K,  BTU = 1.0548 J
@@ -357,14 +357,14 @@ class EvapCool_FFNat(EvapCool_Abstract):  # IFRSH== 0
         ATPNEC = QTPNEC / (UAIR * DELTAT + Q_IN_WALL)   # m2
 
         # Calculate the superheating area fraction
-        if (ATPNEC < AEVAP):
+        if ATPNEC < AEVAP:
             QTPE = QTPNEC   # j/s [OA changed to /hr to /s]
             ASUPE = AEVAP - ATPNEC  # m2
             QSUPMX = MREF_kg_s * CPRVAP * (TAIR - TDEW)   # j/s [OA changed /hr to /s]
             # J/s [OA changed /hr to /s]
             QSUPE = UAIR * ASUPE * DELTAT + ASUPE * Q_IN_WALL   # watt
 
-            if (QSUPE > QSUPMX):
+            if QSUPE > QSUPMX:
                 QSUPE = QSUPMX
             QTOTE = QTPE + QSUPE   # j/s [OA changed /hr to /s]
             FSUPE = ASUPE / AEVAP   # unitless
@@ -422,6 +422,8 @@ class EvapCool_FFCross (EvapCool_Abstract):  # IFRSH== 1
         # solves for the fresh food evaporator
         #   heat transfer for cross heat exchanger
 
+        MREF_kg_s = MREF / 3600
+
         AREA_TOL = 0.001
 
         # initialize
@@ -430,9 +432,9 @@ class EvapCool_FFCross (EvapCool_Abstract):  # IFRSH== 1
         HDEW = HDEW_S   # j/kg
         TDEW = TDEW_S   # j/kg
 
-        DELP = (PIN - POUT) / (NUM_ZONE)    # pa
-        DELH = (HDEW - H5) / (NUM_ZONE)    # pa
-        P5 = POUT   #  pa
+        DELP = (PIN - POUT) / NUM_ZONE  # pa
+        DELH = (HDEW - H5) / NUM_ZONE  # pa
+        P5 = POUT    # pa
 
         QSUP = 0.0
         QTPC = 0.0
@@ -459,23 +461,16 @@ class EvapCool_FFCross (EvapCool_Abstract):  # IFRSH== 1
             # [TDEW, XQ, XL, XV, VL, VV, HL, HV] = self.hpin(HDEW, PDEW, X)
             TDEW = self.objCP.Property('T', H=HDEW, P=PDEW)  # K
 
-            if(HAVE_NOT_USED_FULL_AREA):
-                CPRTP = (HDEW - H5) / abs(TDEW - T5 + 0.0001) # j/kg K
+            if HAVE_NOT_USED_FULL_AREA:
+                CPRTP = (HDEW - H5) / abs(TDEW - T5 + 0.0001)   # j/kg K
                 CRTP = MREF_kg_s * CPRTP   # watt/K
 
                 # determine CMIN and CMAX in the two-phase region
 
                 CAIR = (ALEFT / self.ATOTE) * self.CFME    # watt/K
 
-                # if (CAIR <= CRTP):
-                #    CMINTP = CAIR
-                #    CMAXTP = CRTP
-                # else:
-                #    CMINTP = CRTP
-                #    CMAXTP = CAIR
-
-                CMINTP = min (CAIR, CRTP)   # watt/K
-                CMAXTP = max (CAIR, CRTP)   # watt/K
+                CMINTP = min(CAIR, CRTP)   # watt/K
+                CMAXTP = max(CAIR, CRTP)   # watt/K
 
                 # is area big enough for condensation
 
@@ -488,7 +483,7 @@ class EvapCool_FFCross (EvapCool_Abstract):  # IFRSH== 1
                 [EFFTPC, DEXDAR] = self.exf(2, ALEFT, self.UTPE,
                                             CMINTP, CMAXTP)
 
-                if(EFFTPC <= EFF_TPC):  # Need more area
+                if EFFTPC <= EFF_TPC:  # Need more area
                     ATPC = ATPC + ALEFT     # m2
                     HAVE_NOT_USED_FULL_AREA = False
 
@@ -504,33 +499,27 @@ class EvapCool_FFCross (EvapCool_Abstract):  # IFRSH== 1
                     ICOUNT = 0
                     QTOL = 1.0
 
-                    while (LOOKING_FOR_AREA):
-                        ICOUNT = ICOUNT + 1
-                        if(ICOUNT > 100):
+                    while LOOKING_FOR_AREA:
+                        ICOUNT += 1
+                        if ICOUNT > 100:
                             LOOKING_FOR_AREA = False
                             continue
 
                         CAIR = (ADUM / self.ATOTE) * \
                             self.CFME
-                        # if(CAIR <= CRTP):
-                        #    # CMINTP = CAIR
-                        #    # CMAXTP = CRTP
-                        # else:
-                        #    # CMINTP = CRTP
-                        #    # CMAXTP = CAIR
 
-                        CMINTP = min (CAIR, CRTP)   # watt/K
-                        CMAXTP = max (CAIR, CRTP)   # watt/K
+                        CMINTP = min(CAIR, CRTP)   # watt/K
+                        CMAXTP = max(CAIR, CRTP)   # watt/K
 
                         QMAX = CMINTP * (TAIR - T5)    # watt
                         EFF_TPC = QDUM / QMAX          # unitless
 
                         # [unitless]  [1/m2]
                         [EFFTPC, DEXDAR] = self.exf(2, ADUM, self.UTPE,
-                                                   CMINTP, CMAXTP)
+                                                    CMINTP, CMAXTP)
 
                         ERROR = abs(QTOL)
-                        if(ERROR <= AREA_TOL):
+                        if ERROR <= AREA_TOL:
                             LOOKING_FOR_AREA = False
                             # Continue [OA commented this line - no continue in python!]
                             continue  # [Ayman commented fixed to lower case ok]
@@ -543,9 +532,9 @@ class EvapCool_FFCross (EvapCool_Abstract):  # IFRSH== 1
                         DAREA_MIN = -0.75 * ADUM   # m2
                         DAREA_MAX = 0.50 * (ALEFT - ADUM)   # m2
 
-                        if(DAREA < DAREA_MIN):
+                        if DAREA < DAREA_MIN:
                             DAREA = DAREA_MIN      # m2
-                        if(DAREA > DAREA_MAX):
+                        if DAREA > DAREA_MAX:
                             DAREA = DAREA_MAX   # m2
 
                         ADUM = ADUM + DAREA   # m2
@@ -559,9 +548,9 @@ class EvapCool_FFCross (EvapCool_Abstract):  # IFRSH== 1
                 H5 = H5 + DELH      # j/kg
                 T5 = TDEW           # K
                 P5 = P5 + DELP      # pa
-                N = N + 1
+                N += 1
 
-        if(ALEFT <= 0.0):
+        if ALEFT <= 0.0:
             HAVE_NOT_USED_FULL_AREA = False
 
         # continue with desuperheating area
@@ -569,14 +558,14 @@ class EvapCool_FFCross (EvapCool_Abstract):  # IFRSH== 1
         HDEW = HDEW_S      # j/kg
         TDEW = TDEW_S      # K
 
-        if(HAVE_NOT_USED_FULL_AREA):
+        if HAVE_NOT_USED_FULL_AREA:
             # MREF_kg_s[kg/sec] * CPR[[j/kg K]] *
             CR = MREF_kg_s * CPR    # watt/K
 
             # determine cmin and cmax in the two-phase region
             CAIR = (ALEFT / self.ATOTE) * self.CFME      # watt/K
 
-            # if(CAIR  <=  CR) :
+            # if(CAIR  <=  CR):
             # CMINDS = CAIR
             # CMAXDS = CR
             # else:
@@ -664,8 +653,8 @@ class EvapCool_FFCount (EvapCool_Abstract):  # IFRSH== 2
         HDEW = HDEW_S       # j/kg
         TDEW = TDEW_S       # j/kg
 
-        DELP = (POUT - PIN) / (NUM_ZONE)        # pa
-        DELH = (HDEW - H5) / (NUM_ZONE)         # pa
+        DELP = (POUT - PIN) / NUM_ZONE  # pa
+        DELH = (HDEW - H5) / NUM_ZONE  # pa
         P5 = PIN           # pa
 
         QSUP = 0.0
@@ -675,7 +664,7 @@ class EvapCool_FFCount (EvapCool_Abstract):  # IFRSH== 2
         ASUP = 0.0
         ATPC = 0.0
 
-        if(NCALL == 0):
+        if NCALL == 0:
             TAIR = TS3 - 2             # K
             TAIR_GUESS = TAIR          # K
             NCALL = 1
@@ -687,17 +676,19 @@ class EvapCool_FFCount (EvapCool_Abstract):  # IFRSH== 2
         CAIR = self.CFME    # watt/K
         HAVE_NOT_USED_FULL_AREA = True
 
+        TAIR = QTOTE = 0
+
         # begin with two-phase area
         CONVERGED = False
-        while (not CONVERGED):
-            ICOUNT = ICOUNT + 1
+        while not CONVERGED:
+            ICOUNT += 1
             ALEFT = self.ATOTE  # m2
 
             for N in range(1, NUM_ZONE + 1):
                 PDEW = P5 + DELP    # pa
                 HDEW = H5 + DELH    # pa
 
-                if(HAVE_NOT_USED_FULL_AREA):
+                if HAVE_NOT_USED_FULL_AREA:
                     # [TDEW, XQ, XL, XV, VL, VV, HL,
                     #  HV] = self.hpin(HDEW, PDEW, X)
                     TDEW = self.objCP.Property('T', H=HDEW, P=PDEW)  # K
@@ -706,15 +697,8 @@ class EvapCool_FFCount (EvapCool_Abstract):  # IFRSH== 2
                     CRTP = MREF_kg_s * CPRTP   # watt
 
                     # determine cmin and cmax in the two-phase region
-                    # if(CAIR <= CRTP):
-                    #    # CMINTP = CAIR
-                    #    # CMAXTP = CRTP
-                    # else:
-                    #    # CMINTP = CRTP
-                    #    # CMAXTP = CAIR
-
-                    CMINTP = min (CAIR, CRTP)   # watt/K
-                    CMAXTP = max (CAIR, CRTP)   # watt/K
+                    CMINTP = min(CAIR, CRTP)   # watt/K
+                    CMAXTP = max(CAIR, CRTP)   # watt/K
             
                     #  is area big enough for evaporation
 
@@ -730,7 +714,7 @@ class EvapCool_FFCount (EvapCool_Abstract):  # IFRSH== 2
                                                 CMINTP, CMAXTP
                                                 )
 
-                    if(EFFTPC <= EFF_TPC):
+                    if EFFTPC <= EFF_TPC:
                         ATPC = ATPC + ALEFT
                         HAVE_NOT_USED_FULL_AREA = False
 
@@ -744,8 +728,8 @@ class EvapCool_FFCount (EvapCool_Abstract):  # IFRSH== 2
                         LOOKING_FOR_AREA = True
 
                         ILOOK = 0
-                        while (LOOKING_FOR_AREA):
-                            ILOOK = ILOOK + 1
+                        while LOOKING_FOR_AREA:
+                            ILOOK += 1
                             
                             # [unitless]  [1/m2]
                             [EFFTPC, DEXDAR] = self.exf(1, ADUM, self.UTPE,
@@ -753,7 +737,7 @@ class EvapCool_FFCount (EvapCool_Abstract):  # IFRSH== 2
                                                         )
 
                             ERROR = abs(EFFTPC - EFF_TPC)
-                            if(ERROR <= AREA_TOL or ILOOK >= 10):
+                            if ERROR <= AREA_TOL or ILOOK >= 10:
                                 LOOKING_FOR_AREA = False
                                 continue
 
@@ -762,12 +746,12 @@ class EvapCool_FFCount (EvapCool_Abstract):  # IFRSH== 2
                             DAREA_MIN = -0.75 * ADUM     # m2
                             DAREA_MAX = 0.50 * (ALEFT - ADUM)   # m2
 
-                            if(DAREA < DAREA_MIN):
+                            if DAREA < DAREA_MIN:
                                 DAREA = DAREA_MIN     # m2
-                            if(DAREA > DAREA_MAX):
+                            if DAREA > DAREA_MAX:
                                 DAREA = DAREA_MAX     # m2
 
-                            if(abs(DAREA) <= 0.001 * self.ATOTE):
+                            if abs(DAREA) <= 0.001 * self.ATOTE:
                                 LOOKING_FOR_AREA = False
                                 continue
 
@@ -782,26 +766,19 @@ class EvapCool_FFCount (EvapCool_Abstract):  # IFRSH== 2
                 T5 = TDEW       # K
                 P5 = P5 + DELP  # pa
 
-            if(ALEFT <= 0.0):
+            if ALEFT <= 0.0:
                 HAVE_NOT_USED_FULL_AREA = False
 
             #   continue with desuperheating area
             HDEW = HDEW_S    # j/kg
             TDEW = TDEW_S    # K
 
-            if(HAVE_NOT_USED_FULL_AREA):
+            if HAVE_NOT_USED_FULL_AREA:
                 CR = MREF_kg_s * CPR  # watt/K
 
                 #  determine cmin and cmax in the two-phase region
-                # if(CAIR <= CR):
-                #    # CMINDS = CAIR
-                #    # CMAXDS = CR
-                # else:
-                #    # CMINDS = CR
-                #    # CMAXDS = CAIR
-
-                CMINDS = min (CAIR, CR)   # watt/K
-                CMAXDS = max (CAIR, CR)   # watt/K
+                CMINDS = min(CAIR, CR)   # watt/K
+                CMAXDS = max(CAIR, CR)   # watt/K
                 
                 # determine the net heat transfer
                 # [unitless]  [1/m2]
@@ -819,14 +796,14 @@ class EvapCool_FFCount (EvapCool_Abstract):  # IFRSH== 2
             QTOTE_LAST = QTOTE
 
             ERROR = abs(TAIR - TS3)
-            if(ERROR < 0.05 or ERROR_Q <= 0.01 or ICOUNT >= 10):
+            if ERROR < 0.05 or ERROR_Q <= 0.01 or ICOUNT >= 10:
                 CONVERGED = True
                 continue
             else:
                 DEL_AIR = TAIR - TS3    # K
 
                 TAIR_NEW = TAIR_GUESS - 0.5 * DEL_AIR    # K
-                if(TAIR_NEW <= T5_S):
+                if TAIR_NEW <= T5_S:
                     TAIR_NEW = 0.9 * T5_S + 0.1 * TAIR_GUESS    # K
                 TAIR = TAIR_NEW    # K
                 TAIR_GUESS = TAIR    # K

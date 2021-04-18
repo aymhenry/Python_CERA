@@ -150,7 +150,7 @@ class FileAccess:
             if str_all_line == "":
                 self.m_error = FileAccess.ERR_BLANK_LINE
 
-                self.m_lineNo = self.m_lineNo + 1
+                self.m_lineNo += 1
                 return not self.isError()
 
             if num_col_num < 0:
@@ -166,7 +166,7 @@ class FileAccess:
         except OSError as err:
             self.m_error = err
 
-        self.m_lineNo = self.m_lineNo + 1
+        self.m_lineNo += 1
         # --for test only   print (self.m_lineNo, self.m_text)
         return not self.isError()  # if read done, then true, else false
 

@@ -328,14 +328,14 @@ class Compressor:
         # check if in wet area, return sat. liquid or sat. vap.
         # HIN = self.objCP.Property('H', T=T90F_in_K, P=PSUCT)  # j/kg
 
-        HIN = self.coolutil.getProp(prp='H', P=PSUCT
-                                    , T=T90F_in_K, X=1)  # j/kg
+        HIN = self.coolutil.getProp(P=PSUCT,
+                                    T=T90F_in_K)  # j/kg
 
         # liquid leaving condenser
         # Approve concept self.trace.dr_omar("Wet region issue")
         # HOUT = self.objCP.Property('H', T=T90F_in_K, P=PDISC)  # j/kg
-        HOUT = self.coolutil.getProp(prp='H', P=PDISC
-                                     , T=T90F_in_K, X=0)  # j/kg
+        HOUT = self.coolutil.getProp(P=PDISC,
+                                     T=T90F_in_K, X=0)  # j/kg
 
         # determine isentropic compression enthalpy (HS)
         SSUC = self.objCP.Property('S', T=T90F_in_K, P=PSUCT)  # j/kg/K
@@ -347,8 +347,8 @@ class Compressor:
         # check if in wet area, return sat. liquid or sat. vap.
         # HS = self.objCP.Property('H', T=TS, P=PDISC)  # j/kg
 
-        HS = self.coolutil.getProp(prp='H', P=PDISC
-                                   , T=TS, X=1)  # j/kg
+        HS = self.coolutil.getProp(P=PDISC,
+                                   T=TS)  # j/kg
 
         # or HS = self.objCP.Property('H', S=SSUC, P=PDISC)  # j/kg
 
@@ -371,7 +371,7 @@ class Compressor:
                             data=Compressor.POWER)
 
         # handle off-speed operation (use Danfoss variable speed data)
-        REL_CAP = -0.046073 \
+        REL_CAP = - 0.046073 + \
                   + 1.41364 * FRACT_SPEED \
                   - 0.366744 * FRACT_SPEED * FRACT_SPEED
 
@@ -384,9 +384,9 @@ class Compressor:
 
         # convert the capacity to kj/hr
         if Compressor.IUNITS == 2:  # i.e temp in F
-            CAP = CAP * 1.0548  # from but/hr to kj/hr
+            CAP *= 1.0548  # from but/hr to kj/hr
         else:
-            CAP = CAP * 4.184  # from kcal/hr to kj/hr
+            CAP *= 4.184  # from kcal/hr to kj/hr
 
         if Compressor.IUNITS != 1 and Compressor.IUNITS != 2:
             print("###CHECK COMPRESSOR MAP UNITS###")

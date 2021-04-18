@@ -9,16 +9,16 @@
 #
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-class ShowInput ():
+class ShowInput:
         
     def __init__(self, dt):
         self.dt = dt
 
     def showdata(self, str_var_name, str_var_unit, str_var_desc):
         print(str_var_name,
-             " = ", eval('self.dt.' + str_var_name),
-             "\t", str_var_unit,
-             "\t", str_var_desc
+              " = ", eval('self.dt.' + str_var_name),
+              "\t", str_var_unit,
+              "\t", str_var_desc
               )
 
     def graph(self):
@@ -162,7 +162,7 @@ class ShowInput ():
         self.showdata('OUTCYC', 'watt', 'Outside Cabinet')
         
         self.showdata('ICAB', '#',
-                     'Flag to represent presence of cabinet loads in input, 0 =No')
+                      'Flag to represent presence of cabinet loads in input, 0 =No')
             
         self.showdata('FFASH', 'watt', 'Fresh Food Antisweat Heater')
         self.showdata('FFAUX', 'watt', 'Fresh Food Auxiliary Power')

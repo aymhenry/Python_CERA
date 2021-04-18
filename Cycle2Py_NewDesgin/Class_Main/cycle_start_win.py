@@ -82,8 +82,8 @@ class CycleApp(Frame):
     # -----------------------------------------------------------
     # Job 			: run the main object class Start, using input file name
     # Input 		: Configration number
-    #				 Creates input file name "n-Cabinet_dat.csv" and output "n-Cabinet_out.csv"
-    #				  n is the configration number
+    #              Creates input file name "n-Cabinet_dat.csv" and output "n-Cabinet_out.csv"
+    #               n is the configration number
     # Output		:
     # -----------------------------------------------------------
     def set_config(self, int_config=0):
@@ -129,11 +129,11 @@ class CycleApp(Frame):
                     self.obj_start.FILE_CYC_OUTPUT +
                     "\n\n" +
                     "Configration: " +
-                    str(self.obj_start.obj_data.IRFTYP) +
+                    str(self.obj_start.dt.IRFTYP) +
                     "\n" +
                     "Cycle        : " +
-                    str(self.obj_start.obj_data.ICYCL) +
-                    CycleApp.lst_Cycle_Type[self.obj_start.obj_data.ICYCL -
+                    str(self.obj_start.dt.ICYCL) +
+                    CycleApp.lst_Cycle_Type[self.obj_start.dt.ICYCL -
                                             1])
 
         print("==================================================")
@@ -145,9 +145,9 @@ class CycleApp(Frame):
         print("      Output File: " + strPath + "\\" + Start.FILE_CYC_OUTPUT)
         print("|                                                |")
         print("            Configration: " +
-              str(self.obj_start.obj_data.IRFTYP))
-        print("            Cycle       : " + str(self.obj_start.obj_data.ICYCL)
-              + CycleApp.lst_Cycle_Type[self.obj_start.obj_data.ICYCL - 1])
+              str(self.obj_start.dt.IRFTYP))
+        print("            Cycle       : " + str(self.obj_start.dt.ICYCL)
+              + CycleApp.lst_Cycle_Type[self.obj_start.dt.ICYCL - 1])
         print("==================================================")
 
     # -----------------------------------------------------------

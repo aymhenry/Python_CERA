@@ -72,10 +72,10 @@ class Start:
             print ("=======================================\n\n")
         '''
         obj_view = View(
-            self.dt
-            , objSolution # will be named ds for short
-            , self.str_FILE_CYCLE_OUTPUT
-            , self.str_path_cyc_out
+            self.dt,
+            objSolution,    # will be named ds for short
+            self.str_FILE_CYCLE_OUTPUT,
+            self.str_path_cyc_out
             )
             
         obj_view.show_overall()
@@ -107,7 +107,7 @@ class Start:
         if obj_datamodel.isError():
             print("Error Opening file")
             print(obj_datamodel.err_description())  # print error description
-            obj_datamodel = ""     # clean object and close file
+            self.obj_datamodel = ""     # clean object and close file
             sys.exit('3000')  # terminat application
             # --------------
 
@@ -123,7 +123,7 @@ class Start:
         self.dt = obj_datamodel.get_data_object()
 
         # show row data input
-        trace = Trace (self.dt, None)
+        trace = Trace(dt=self.dt)
         trace.app_ins()     # show list of app inputs
         trace.cyc_pid()     # show cycle graph
         trace.pnt_lst()     # show cycle graph
@@ -149,14 +149,14 @@ class Start:
             #               or fan control provides evaporator capacity 
             #               to only one cabinet during part of the cycle
             
-            if self.dt.INCTRL == 4:
-                self.obj_control = Type_2Lorenz_4swtchVLV(self.dt)
+            # if self.dt.INCTRL == 4:
+            #    self.obj_control = Type_2Lorenz_4swtchVLV(self.dt)
 
-            elif self.dt.INCTRL == 5:
-                self.obj_control = Type_2Lorenz_5solindVLV(self.dt)
+            # elif self.dt.INCTRL == 5:
+            #    self.obj_control = Type_2Lorenz_5solindVLV(self.dt)
 
-            else:
-                self.obj_control = Type_2Lorenz_ctrlOthers(self.dt)
+            # else:
+            #    self.obj_control = Type_2Lorenz_ctrlOthers(self.dt)
 
         # 3: Dual Loop
         elif self.dt.ICYCL == 3:
