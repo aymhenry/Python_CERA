@@ -166,7 +166,7 @@ class CompMap(FileAccess):
 
                 self.bytes = self.m_handler.read(
                     int_rec_len)  # read rec. length
-                self.current_pos = self.current_pos + int_rec_len
+                self.current_pos += int_rec_len
                 break
 
         except OSError as err:
@@ -288,7 +288,7 @@ class CompMap(FileAccess):
         str_last_err = ""
         # skip all zeros or errors if any
         while nTry < CompMap.TRY_COUNT and (Value == 0 or Value >= 100000):
-            nTry = nTry + 1
+            nTry += 1
             if not self.readrecord():
                 return
 

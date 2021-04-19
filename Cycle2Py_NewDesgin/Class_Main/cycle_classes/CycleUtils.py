@@ -211,8 +211,8 @@ class CycleUtils(exf4Cond_Evap):
                     dt.ATOTE = dt.ATOTE - DAREAZ
 
                 dt.UAF = dt.UAF_S * dt.AREAFZ / dt.AREAFZ_S
-                dt.ATOTE_A = dt.ATOTE   #  chk
-                dt.AREAFZ_A = dt.AREAFZ  #  chk
+                dt.ATOTE_A = dt.ATOTE    # chk
+                dt.AREAFZ_A = dt.AREAFZ   # chk
 
                 dt.UA_FZ = dt.UA_FZ_S * dt.AREAFZ / dt.AREAFZ_S
                 dt.UA_ML = dt.UA_ML_S * dt.AREAFZ / dt.AREAFZ_S
@@ -275,7 +275,7 @@ class CycleUtils(exf4Cond_Evap):
         # ICNTRL - CONTROL METHOD FOR EVAPORATOR LOAD
         #  FREEZER EVAPORATOR AND LOWER INTERCHANGER
 
-        self.coolutil = CoolPrpUtil(objCP)
+        coolutil = CoolPrpUtil(objCP)
         NCALL = 0
 
         # SET UP PRESSURES AND QUALITIES
@@ -386,7 +386,7 @@ class CycleUtils(exf4Cond_Evap):
 
                     # DELTA = DELTAT * 1.8   # defrance to F
 
-                    # TBAR = 0.67 * TAVE + 0.33 * TS5
+                    TBAR = 0.67 * TAVE + 0.33 * TS5
                     A_NAT = 0.239 + 3.34E-04 * (273.0 - TBAR)
                     # HNAT = A_NAT * (DELTA**0.33) * 20.44   # W/m2 K
                     
@@ -483,11 +483,11 @@ class CycleUtils(exf4Cond_Evap):
 
                     # VL10 = objCP.Property('V', P=P[6], H=H[6])  # m3/kg
                     HHIGH = H[6]
-                    # HHIGH = self.coolutil.getProp(prp='H', V=VL10,   # self.VL[10]
+                    # HHIGH = coolutil.getProp(prp='H', V=VL10,   # self.VL[10]
                     #                              T=T[9], X=0)    # j/kg
 
-                    HLOW = self.coolutil.getProp(P=dt.P[1],
-                                                 T=T[6])   # j/kg
+                    HLOW = coolutil.getProp(P=dt.P[1],
+                                            T=T[6])   # j/kg
 
                     DH = min((HLOW - H[9]), (H[6] - HHIGH))
                     H[10] = H[6] - DH
@@ -611,6 +611,7 @@ class CycleUtils(exf4Cond_Evap):
         #        OUTLET STATE OF STREAM B
 
         # GUESS THE INLET STATE FOR STREAM B
+        coolutil = CoolPrpUtil(objCP)
 
         HBI = HDEW - 5.0
         ITER = 0
@@ -630,8 +631,8 @@ class CycleUtils(exf4Cond_Evap):
             # check if in wet area, return sat. liquid or sat. vap.
             # HAOSTR = self.objCP.Property('H', X=0, T=TBI)  # j/kg
 
-            HAOSTR = self.coolutil.getProp(P=PA,
-                                           T=TBI, X=0)  # j/kg
+            HAOSTR = coolutil.getProp(P=PA,
+                                      T=TBI, X=0)  # j/kg
             DHAMAX = HAI - HAOSTR
 
             # DETERMINE EXIT STATE OF STREAM B if AT TAI
@@ -641,8 +642,8 @@ class CycleUtils(exf4Cond_Evap):
             # check if in wet area, return sat. liquid or sat. vap.
 
             # HBOSTR = self.objCP.Property('H', X=0, T=TAI)  # j/kg
-            HBOSTR = self.coolutil.getProp(P=PA,
-                                           T=TAI, X=0)  # j/kg
+            HBOSTR = coolutil.getProp(P=PA,
+                                      T=TAI, X=0)  # j/kg
 
             DHBMAX = HBI - HBOSTR
 

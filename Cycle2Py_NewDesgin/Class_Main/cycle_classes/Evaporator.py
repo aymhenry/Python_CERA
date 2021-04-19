@@ -31,7 +31,6 @@ class Evaporator:
             raise ErrorException('IFRSH value error', 'Evap1000')
 
 
-
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # Job 			: Abstract Class from Evaprator cooling
 #                   method (Natural, Cross, Counter-flow
