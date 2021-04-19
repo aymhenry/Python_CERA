@@ -6,7 +6,7 @@ OUTPUT RESULTSCYCLE PERFORMANCE SUMMARYEVAPORATOR CAPACITY,
             SUBCOOLED FRACTION, SUPERHEATED FRACTIONEVAPORATOR,     , N/A, N/A,
                         0.998CONDENSER,     , N/A,
                     0.000,    0.100 COMPRESSOR PERFORMANCE SUMMARYREFRIGERANT MASS FLOW RATE.,
-                5.800, kg/hrPRESSURE RATIO,       5.517  02 25 03 18 Apr 2021 - Python Output aymhenry@gmailSTANDARD ONE EVAPORATOR CYCLE OUTPUT RESULTS, STATE
+                5.800, kg/hrPRESSURE RATIO,       5.517  14 37 09 19 Apr 2021 - Python Output aymhenry@gmailSTANDARD ONE EVAPORATOR CYCLE OUTPUT RESULTS, STATE
                                       , T(C), T(C)
                                       , P, H, V, S
                                       , XL, XV, XQ, , AIR,   REF
