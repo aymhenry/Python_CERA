@@ -199,8 +199,10 @@ class EvapCool_Abstract (exf4Cond_Evap):
         if DELT < -5.0:
             DELT = -5.0
 
-        TEOUT = TE[JE] + DELT
-        TS4 = TS3 - QFRSH / self.CFME   # K - [j/kg] [j/kg/K]
+        #TEOUT = TE[JE] + DELT
+        #Omar correction - the TE is lower not higher!
+        TEOUT = TE[JE] - DELT
+        TS4 = TS3 - QFRSH / self.CFME   # K - [J/kg] [J/kg/K]
         
         if TEOUT > TS3:
             # TEOUT = TS3
@@ -210,13 +212,13 @@ class EvapCool_Abstract (exf4Cond_Evap):
             TENEW = TEOUT
             
         else:
-            if (TEOUT > TE[1] > TE[2]) or (TEOUT < TE[2] < TE[1]):
-                TCNEW = 0.5 * (TE[1] + TE[2])
+            if (TEOUT < TE[1] < TE[2]) or (TEOUT > TE[2] > TE[1]) and TE[1]!=0: # need to make sure that TE[1] is not zero
+                TENEW = 0.5 * (TE[1] + TE[2])
                 
             else:
                 TENEW = TEOUT
 
-            if TENEW < TS3:
+            if TENEW > TS3:
                 TENEW = (TS3 + TE[JE]) / 2.0
 
         ERROR = abs(TENEW - TE[1])

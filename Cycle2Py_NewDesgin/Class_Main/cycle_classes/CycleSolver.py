@@ -158,7 +158,7 @@ class CycleSolver(CycleUtils):
         # /air/air_Cp_Cv.html#:~
         # :text=The%20nominal%20values%20used%20for,v%20%3D%200.718%20kJ%2Fkg
 
-        # kj/kg K
+        # J/kg K
         AirHeatCapacityC = 0.0003 * (self.TS1 ** 2) - 0.129 * self.TS1 + 1016.55
 
         # https://www.gribble.org/cycling/air_density.html
@@ -171,28 +171,28 @@ class CycleSolver(CycleUtils):
 
         air_densityC = 1.2873 + (self.TS1 - CycleSolver.K_C_DEG) / 10 * (1.2418 - 1.2873)
 
-        # [m3/sec] * [kg/m3] * [kj/kg/K]*1000 =j/sec/K = watt/K
-        self.dt.CFMC = self.dt.CFMCI[self.lng_item] / 1000 * air_densityC * AirHeatCapacityC * 1000
+        # [m3/sec] * [kg/m3] * [j/kg/K] =j/sec/K = watt/K
+        self.dt.CFMC = self.dt.CFMCI[self.lng_item] / 1000 * air_densityC * AirHeatCapacityC
 
         # ------------------------------------
         # self.CFME = 1.8961 * (RHOCPE * self.dt.CFMEI[lng_item]) / 0.4720
 
-        # kj/kg K
+        # J/kg K
         AirHeatCapacityE = 0.0003 * (self.TS3 ** 2) - 0.129 * self.TS3 + 1016.55
 
         air_densityE = 1.2873 + (self.dt.TS3[self.lng_item] - CycleSolver.K_C_DEG) / 10 * (1.2418 - 1.2873)
 
-        # [m3/sec] * [kg/m3] * [kj/kg K]*1000 =j/sec K = watt/K
-        self.dt.CFME = self.dt.CFMEI[self.lng_item] / 1000 * air_densityE * AirHeatCapacityE * 1000
+        # [m3/sec] * [kg/m3] * [J/kg K]*1000 =j/sec K = watt/K
+        self.dt.CFME = self.dt.CFMEI[self.lng_item] / 1000 * air_densityE * AirHeatCapacityE
 
         # ------------------------------------
-        # kj/kg K
+        # J/kg K
         AirHeatCapacityF = 0.0003 * self.TS5 ** 2 - 0.129 * self.TS5 + 1016.55
 
         air_densityF = 1.2873 + (self.TS5 - CycleSolver.K_C_DEG) / 10 * (1.2418 - 1.2873)
 
-        # [m3/sec] * [kg/m3] * [kj/kg K]*1000 =j/sec K = watt/K
-        self.dt.CFMF = self.dt.CFMF / 1000 * air_densityF * AirHeatCapacityF * 1000
+        # [m3/sec] * [kg/m3] * [J/kg K]*1000 =j/sec K = watt/K
+        self.dt.CFMF = self.dt.CFMF / 1000 * air_densityF * AirHeatCapacityF
         # =================================
 
         # Temp. At Comp., Inlet or -1 If Unspecified
