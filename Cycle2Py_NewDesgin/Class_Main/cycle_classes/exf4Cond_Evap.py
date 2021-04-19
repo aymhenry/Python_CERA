@@ -5,6 +5,25 @@ import math
 
 
 class exf4Cond_Evap:
+
+    def getHNAT(self, detal_T_K, A_NAT):
+        detal_T_F = detal_T_K * 1.8     # defrance to F
+        
+        # HNAT = 0.19 * DELTA ** 0.33 * 20.44   # W/m2 K
+        # A_NAT = 0.239 + 3.34E-04 * (273.0 - TBAR)
+        
+        HNAT = A_NAT * detal_T_F**0.33 * 20.44   # kW/m2 K
+        return HNAT   # W/m2 K
+
+    def getHRAD(self, TAVE_K, TS_K, EPS):
+        # SIGMA = 2.0432E-7
+        SIGMA = 5.670374419E-8   # W/m2 K4   # by Dr Omar
+        # EPS = 0.8
+        
+        # HRAD = SIGMA * (TAVE + TS1) * (TAVE ** 2 + TS1 ** 2)    # W/m2 K
+        HRAD = SIGMA * (TAVE_K + TS_K) * (TAVE_K**2 + TS_K**2) * EPS
+        return HRAD     # W/m2 K
+        
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
     def exf(self, LOC, AREA, U, CMIN, CMAX):
         # calculate counter flow efficiency parameters                

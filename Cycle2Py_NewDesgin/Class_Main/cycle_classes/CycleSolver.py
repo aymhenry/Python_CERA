@@ -1207,17 +1207,20 @@ class CycleSolver(CycleUtils):
         # ==================================
         # ENTROPIES AROUND THE CYCLE
         # for J in range(3, 16 + 1):
+        rec_quality = [0, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0]
         for J in range(1, 16 + 1):
             # if (J != 5):
             #    # self.S[J] = self.entrop(self.T[J], self.V[J], self.X)
+            X = rec_quality[J]
             quality = self.coolutil.get_coolQuality(self.H[J],
                                                     self.P[J],
                                                     self.T[J])
             if quality == -1:
-                self.S[J] = self.objCP.Property('S', T=self.T[J],
-                                                P=self.P[J])  # j/kg K
-                self.V[J] = self.objCP.Property('V', T=self.T[J],
-                                                P=self.P[J])  # m3/kg
+                                                  
+                self.S[J] = self.coolutil.getProp(prp='S', T=self.T[J],
+                                                  P=self.P[J], X=X)  # j/kg K
+                self.V[J] = self.coolutil.getProp(prp='V', T=self.T[J],
+                                                  P=self.P[J], X=X)  # m3/kg
 
             else:
                 # j/kg K

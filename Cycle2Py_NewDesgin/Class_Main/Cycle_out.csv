@@ -1,17 +1,17 @@
 OUTPUT RESULTSCYCLE PERFORMANCE SUMMARYEVAPORATOR CAPACITY,
-            137545.119, watt, 137545.119, WCONDENSER HEAT REJECTION RATE,
-                138272.889, KJ/HR,  138272.889, WCOMPRESSOR POWER REQUIREMENT,
-                16147.242, KJ/HR,  16147.242, WCOEFFICIENT OF PERFORMANCE,
-                    8.518 HEAT EXCHANGER PERFORMANCE SUMMARYEXCHANGER, EFFECTIVENESS,
+            137851.469, watt, 137851.469, WCONDENSER HEAT REJECTION RATE,
+                139003.855, KJ/HR,  139003.855, WCOMPRESSOR POWER REQUIREMENT,
+                16469.691, KJ/HR,  16469.691, WCOEFFICIENT OF PERFORMANCE,
+                    8.370 HEAT EXCHANGER PERFORMANCE SUMMARYEXCHANGER, EFFECTIVENESS,
             SUBCOOLED FRACTION, SUPERHEATED FRACTIONEVAPORATOR,     , N/A, N/A,
-                        0.998CONDENSER,     , N/A,
+                        0.000CONDENSER,     , N/A,
                     0.000,    0.100 COMPRESSOR PERFORMANCE SUMMARYREFRIGERANT MASS FLOW RATE.,
-                5.800, kg/hrPRESSURE RATIO,       5.517  14 37 09 19 Apr 2021 - Python Output aymhenry@gmailSTANDARD ONE EVAPORATOR CYCLE OUTPUT RESULTS, STATE
+                5.800, kg/hrPRESSURE RATIO,       5.039  19 09 37 19 Apr 2021 - Python Output aymhenry@gmailSTANDARD ONE EVAPORATOR CYCLE OUTPUT RESULTS, STATE
                                       , T(C), T(C)
                                       , P, H, V, S
                                       , XL, XV, XQ, , AIR,   REF
                                       ,  kPa,  kj/kg ,  m3/kg ,  kj/kg-C
                                       , (MASS FRAC),(MASS FRAC),(MASS FRAC)
-                                      1, COMP IN , N/A,     22.45,    173.16,    368.78,      0.11,      1.652, COMP DIS , N/A,     45.39,    955.33,    373.04,      0.02,      1.563, COND IN,     35.63,     45.39,    955.60,    373.03,      0.02,      1.564, COND DEW , N/A,     39.88,    954.86,    368.91,      0.02,      1.555, COND BUB , N/A,     39.70,    950.88,    238.87,      0.00,      1.136, COND OUT,     35.00,     35.69,    950.61,    234.76,      0.00,      1.127, LIQ LINE , N/A,     32.21,    950.61,    231.24,      0.00,      1.118, SUBCOOL  , N/A,     10.04,    950.61,    209.58,      0.00,      1.039, EVAP IN ,    -11.34,    -15.25,    180.36,    209.58,      0.01,      1.0410, EVAP DEW , N/A,    -15.25,    180.34,    345.85,      0.09,      1.5711, EVAP OUT,    -11.33,    -13.33,    173.16,    347.13,      0.10,      1.5812, HX OUT   , N/A,     22.45,    173.16,    368.78,      0.11,      1.65CYCLE PERFORMANCE SUMMARYEVAPORATOR CAPACITY,  1129192.91, KJ/HR,  1129192.91, WCONDENSER HEAT REJECTION RATE,  1135167.62, KJ/HR,  1135167.62, WCOMPRESSOR POWER REQUIREMENT,     132562.69, KJ/HR,  132562.69, WCOEFFICIENT OF PERFORMANCE,
-                 8.52 HEAT EXCHANGER PERFORMANCE SUMMARYEXCHANGER, EFFECTIVENESS,
-            SUBCOOLED FRACTION, SUPERHEATED FRACTIONEVAPORATOR,     , N/A, N/A,     99.78 CONDENSER,     , N/A,     10.00,     10.00 COMPRESSOR PERFORMANCE SUMMARYREFRIGERANT MASS FLOW RATE.,        5.80, KG/HRPRESSURE RATIO,        5.52 
+                                      1, COMP IN , N/A,     22.69,    186.60,    368.75,      0.11,      1.652, COMP DIS , N/A,     45.16,    940.27,    373.10,      0.02,      1.563, COND IN,     35.08,     45.18,    941.27,    373.11,      0.02,      1.564, COND DEW , N/A,     39.27,    939.79,    368.69,      0.02,      1.555, COND BUB , N/A,     39.09,    936.55,    238.24,      0.00,      1.136, COND OUT,     35.00,     35.04,    935.55,    234.10,      0.00,      1.127, LIQ LINE , N/A,     31.88,    935.55,    230.90,      0.00,      1.118, SUBCOOL  , N/A,     10.71,    935.55,    210.21,      0.00,      1.049, EVAP IN ,    -11.33,    -13.31,    193.80,    210.21,      0.01,      1.0410, EVAP DEW , N/A,    -14.33,    186.60,    346.27,      0.09,      1.5711, EVAP OUT,    -11.33,    -11.33,    186.60,    348.07,      0.09,      1.5712, HX OUT   , N/A,     22.69,    186.60,    368.75,      0.11,      1.65CYCLE PERFORMANCE SUMMARYEVAPORATOR CAPACITY,  1245753.15, KJ/HR,  1245753.15, WCONDENSER HEAT REJECTION RATE,  1256167.17, KJ/HR,  1256167.17, WCOMPRESSOR POWER REQUIREMENT,     148835.33, KJ/HR,  148835.33, WCOEFFICIENT OF PERFORMANCE,
+                 8.37 HEAT EXCHANGER PERFORMANCE SUMMARYEXCHANGER, EFFECTIVENESS,
+            SUBCOOLED FRACTION, SUPERHEATED FRACTIONEVAPORATOR,     , N/A, N/A,      0.00 CONDENSER,     , N/A,     10.00,     10.00 COMPRESSOR PERFORMANCE SUMMARYREFRIGERANT MASS FLOW RATE.,        5.80, KG/HRPRESSURE RATIO,        5.04 

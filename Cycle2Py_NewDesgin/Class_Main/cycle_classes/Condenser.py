@@ -290,8 +290,9 @@ class CondCool_CNat(CondCool_Abstract):  # Natural Convection= 0
         
         MREF_kg_s = MREF / 3600
         
-        SIGMA = 2.04326E-7
-
+        # SIGMA = 2.04326E-7
+        # SIGMA = 5.670374419E-8   # W/m2 K4   # by Dr Omar
+         
         # Set up the HDEW and TDEW parameters.
         # account for a wet gas entering the condenser
 
@@ -316,18 +317,25 @@ class CondCool_CNat(CondCool_Abstract):  # Natural Convection= 0
         # in Fortran HRAD is converted from kW/m2 K using eq:-
         # kW/m2 K = 0.04892 Btu/(s ft2 F)
         # so HRAD in kW/m2 K
-        HRAD = SIGMA * (TAVE + TS1) * (TAVE ** 2 + TS1 ** 2)    # kW/m2 K
+        
+        # HRAD = SIGMA * (TAVE + TS1) * (TAVE ** 2 + TS1 ** 2)    # W/m2 K
+        
+        # Dr. Omar modification
+        HRAD = self.getHRAD(TAVE, TS1, 1)     # W/m2 K
 
         # calculate the natural convection heat transfer coefficient
         DELTAT = TAVE - TS1
         if DELTAT < 0.0:
             DELTAT = 0.0001
 
-        DELTA = DELTAT * 1.8    # defrance to F
-        HNAT = 0.19 * DELTA ** 0.33 * 20.44   # kW/m2 K
-
+        # DELTA = DELTAT * 1.8    # defrance to F
+        # HNAT = 0.19 * DELTA ** 0.33 * 20.44   # W/m2 K
+        
+        # Dr. Omar modification
+        HNAT = self.getHNAT(DELTAT, 0.19)   # W/m2 K
+        
         #  calculate combined air-side heat transfer coefficient
-        UAIR = 1000 * (HRAD + HNAT)      # W/m2 K
+        UAIR = HRAD + HNAT      # W/m2 K
 
         self.trace.dr_omar("Unit Adjusted")  # Dr Omar to approve
         # Ayman UAIR was kW/m2 K
@@ -410,19 +418,25 @@ class CondCool_CNat(CondCool_Abstract):  # Natural Convection= 0
         # T2 = TAVE * 1.8 - 459.6   useless
 
         # HRAD = 4. * SIGMA * TAVE**3 # useless
-        HRAD = SIGMA * (TAVE + TS1) * (TAVE ** 2 + TS1 ** 2)     # kW/m2 K
+        # HRAD = SIGMA * (TAVE + TS1) * (TAVE ** 2 + TS1 ** 2)     # kW/m2 K
 
+        # Dr. Omar modification
+        HRAD = self.getHRAD(TAVE, TS1, 1)     # W/m2 K        
+        
         # calculate the natural convection heat transfer coefficient
         DELTAT = TAVE - TS1     # K
 
         if DELTAT < 0.0:
             DELTAT = 0.0001
 
-        DELTA = DELTAT * 1.8    # defrance to F
-        HNAT = 0.19 * DELTA ** 0.33 * 20.44
+        # DELTA = DELTAT * 1.8    # defrance to F
+        # HNAT = 0.19 * DELTA ** 0.33 * 20.44
+        
+        # Dr. Omar modification
+        HNAT = self.getHNAT(DELTAT, 0.19)   # W/m2 K
 
         # calculate combined air-side heat transfer coefficient
-        UAIR = 1000 * (HRAD + HNAT)    # W/m2 K
+        UAIR = HRAD + HNAT     # W/m2 K
 
         # Approve concept self.trace.dr_omar("Wet region issue")
         # Ayman UAIR was kW/m2 K

@@ -6,10 +6,12 @@ import sys
 # from cycle_classes.CoolPrp import *
 # from cycle_classes.Trace import *
 from cycle_classes.CoolPrpUtil import *
+from cycle_classes.exf4Cond_Evap import *
 
 
-class CycleUtils:
+class CycleUtils(exf4Cond_Evap):
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
+    
     def enthal(self, objCP, HBUB, HDEW, XSPEC, P):
         # ITERATES TO DETERMINE THE ENTHALPY.
         #  THE PRESSURE AND QUALITY ARE INPUTS
@@ -209,8 +211,8 @@ class CycleUtils:
                     dt.ATOTE = dt.ATOTE - DAREAZ
 
                 dt.UAF = dt.UAF_S * dt.AREAFZ / dt.AREAFZ_S
-                dt.ATOTE_A = dt.ATOTE
-                dt.AREAFZ_A = dt.AREAFZ
+                dt.ATOTE_A = dt.ATOTE   #  chk
+                dt.AREAFZ_A = dt.AREAFZ  #  chk
 
                 dt.UA_FZ = dt.UA_FZ_S * dt.AREAFZ / dt.AREAFZ_S
                 dt.UA_ML = dt.UA_ML_S * dt.AREAFZ / dt.AREAFZ_S
@@ -247,8 +249,11 @@ class CycleUtils:
                 dt.FZQON = FZQ
                 dt.FZQOFF = FZQ
 
-                TS5 = dt.TS5_S - DELTS5 / 1.8
-                dt.FZTEMP_A = 1.8 * TS5 - 459.6
+                # TS5 = dt.TS5_S - DELTS5 / 1.8
+                TS5 = dt.TS5_S - DELTS5     # K
+                
+                # dt.FZTEMP_A = 1.8 * TS5 - 459.6
+                dt.FZTEMP_A = TS5   # K
 
                 dt.FZSEN = dt.UFZ_SEN * (dt.TROOM - dt.FZTEMP_A)
                 dt.CONDZ = dt.UCND_Z * (dt.TROOM - dt.FZTEMP_A) + dt.QMUL
@@ -272,8 +277,6 @@ class CycleUtils:
 
         self.coolutil = CoolPrpUtil(objCP)
         NCALL = 0
-        SIGMA = 2.0432E-7
-        EPS = 0.8
 
         # SET UP PRESSURES AND QUALITIES
         P[10] = P[6]
@@ -331,17 +334,6 @@ class CycleUtils:
             H[8] = H[10]
             T[8] = objCP.Property('T', P=P[8], H=H[8])  # K
 
-            # DETERMINE CMIN AND CMAX
-            # Dr Omar
-            # Ayman CFMF only on Type 2, in case of type 1 CFMF allways 0
-
-            # if(dt.CFMF <= dt.CREF):   # both watt/ K
-            #    # CMIN = dt.CFMF
-            #    # CMAX = dt.CREF
-            # else:
-            #    # CMIN = dt.CREF
-            #    # CMAX = dt.CFMF
-
             CMIN = min(dt.CREF, dt.CFMF)   # watt/K
             CMAX = max(dt.CREF, dt.CFMF)   # watt/K
 
@@ -353,20 +345,23 @@ class CycleUtils:
 
             if CMIN <= 0.0:
                 CMIN = 0.001
-
-            FNTU = dt.UAF / CMIN    # UAF Ayman check input list
+            
+            FNTU = dt.UAF / CMIN    # unitless
             if FNTU < 0.0:
                 FNTU = 0.0
 
             #          CALCULATE EFFECTIVENESS
             #
-            dt.UAFZ = dt.UAF
+            dt.UAFZ = dt.UAF    # watt/K
             if IFREZ2 == 1:
                 if dt.IFREZ == 0:
-                    TAVE = (T[8] + T[9]) / 2.0
+                    # TAVE = (T[8] + T[9]) / 2.0   # Dr Omar
 
                     if T[9] < -1000.0:
                         TAVE = T[8]  # Jan 20, 1993
+                    
+                    TAVE = (T[8] + T[9]) / 2.0   # Dr Omar moved
+                    
                     if TAVE > TS5:
                         TAVE = TS5 - 1.0
 
@@ -375,7 +370,11 @@ class CycleUtils:
                     # in Fortran HRAD is converted from kW/m2 K using eq:-
                     # kW/m2 K = 0.04892 Btu/(s ft2 F)
                     # so HRAD in kW/m2 K
-                    HRAD = SIGMA * (TAVE + TS5) * (TAVE**2 + TS5**2) * EPS
+                    
+                    # W/m2 K modification by Dr omar
+                    # HRAD = SIGMA * (TAVE + TS5) * (TAVE**2 + TS5**2) * EPS
+                    
+                    HRAD = self.getHRAD(TAVE, TS5, 0.8)     # W/m2 K
                     DELTAT = TS5 - TAVE
 
                     if DELTAT <= 0.0:
@@ -385,12 +384,14 @@ class CycleUtils:
                     # DELTA = DELTAT * 1.8
                     # DELTA in K
 
-                    # fixed Ayman - Emprical equation use F
-                    DELTA = DELTAT * 1.8   # defrance to F
+                    # DELTA = DELTAT * 1.8   # defrance to F
 
-                    TBAR = 0.67 * TAVE + 0.33 * TS5
+                    # TBAR = 0.67 * TAVE + 0.33 * TS5
                     A_NAT = 0.239 + 3.34E-04 * (273.0 - TBAR)
-                    HNAT = A_NAT * (DELTA**0.33) * 20.44   # kW/m2 K
+                    # HNAT = A_NAT * (DELTA**0.33) * 20.44   # W/m2 K
+                    
+                    # Dr. Omar modification
+                    HNAT = self.getHNAT(DELTAT, A_NAT)   # W/m2 K
 
                     #  MAKE APPROXIMATE CORRECTIONS FOR VIEW FACTORS AND ASSUMED
                     #    ORIENTATION OF THE EVAPORATOR PANELS.

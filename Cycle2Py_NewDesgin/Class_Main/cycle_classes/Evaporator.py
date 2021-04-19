@@ -285,8 +285,8 @@ class EvapCool_FFNat(EvapCool_Abstract):  # IFRSH== 0
         #  use the refrigerant dew point to evaluate h radiation
         MREF_kg_s = MREF / 3600
 
-        SIGMA = 2.04326E-7
-        EPS = 0.8   # emissivity of heat exchanger
+        # SIGMA = 2.04326E-7
+        # EPS = 0.8   # emissivity of heat exchanger
 
         self.trace.dr_omar("Modification in Unit by Ayman.")
         # TENV = (self.TROOM + 459.6) / 1.8 # R
@@ -303,7 +303,9 @@ class EvapCool_FFNat(EvapCool_Abstract):  # IFRSH== 0
         # kW/m2 K = 0.04892 Btu/(s ft2 F)
         # so HRAD in kW/m2 K
 
-        HRAD = SIGMA * (TAVE + TAIR) * (TAVE**2 + TAIR**2) * EPS    # kW/m2 K
+        # HRAD = SIGMA * (TAVE + TAIR) * (TAVE**2 + TAIR**2) * EPS    # kW/m2 K
+        # Dr. Omar modification
+        HRAD = self.getHRAD(TAVE, TAIR, 0.8)     # W/m2 K
 
         # get the net evaporator area
         AEVAP = self.ATOTE   # m2
@@ -326,19 +328,18 @@ class EvapCool_FFNat(EvapCool_Abstract):  # IFRSH== 0
 
         self.trace.dr_omar("Modification in Unit by Ayman for imprical Equ.")
         # HNAT = A_NAT * DELTAT**0.33 * 20.44
-        HNAT = A_NAT * (DELTAT*1.8)**0.33 * 20.44   # kW/m2 K
+        # HNAT = A_NAT * (DELTAT*1.8)**0.33 * 20.44   # kW/m2 K
 
+        # Dr. Omar modification
+        HNAT = self.getHNAT(DELTAT, A_NAT)   # W/m2 K
+        
         # Calculate combined air-side heat transfer coefficient
-        UAIR = HRAD + HNAT  # kW/m2 K feedback from condenser class
+        UAIR = HRAD + HNAT  # W/m2 K feedback from condenser class
 
         if self.IWALL_FF == 1:
             UAIR = 1.0 / (1.0 / UAIR + 0.1389 / 20.44)   # kW/m2 K
             # UAIR by ayman units is power/Temp/sq-lenght
             # Btu/hr/Feh/(length * Length)
-
-        # by Ayman ( not in Fortran)
-        # info is feedback from condener
-        UAIR *= 1000  # convert to W/m2 K
 
         self.trace.dr_omar("this is not SI units")
         # UA_FF is  W/K,  BTU = 1.0548 J

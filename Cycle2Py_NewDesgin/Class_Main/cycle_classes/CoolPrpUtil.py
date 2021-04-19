@@ -13,14 +13,14 @@ from cycle_classes.ErrorException import ErrorException
 
 
 class CoolPrpUtil:
-    ERR_MARGIN = 0.001
+    ERR_MARGIN = 0.1
 
     def __init__(self, objCP):
         self.objCP = objCP
     
     def getProp(self, P, T, prp="H", X=1):
         P_sat = self.objCP.Property('P', T=T, X=0)  # Pa
-        
+
         # check if in wet area
         if abs(P_sat - P) > CoolPrpUtil.ERR_MARGIN:
             # if so, get liquid or vap. value
