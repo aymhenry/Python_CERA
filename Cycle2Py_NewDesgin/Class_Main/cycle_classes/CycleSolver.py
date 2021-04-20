@@ -674,12 +674,12 @@ class CycleSolver(CycleUtils):
         # Desuperheating Heat Transfer Conductance,  UDSC
         # Subcooling Heat Transfer Conductance,      USCC
         # Two-Phase Heat Transfer Conductance,       UTPC
-
+        
         # - cond method
         self.trace.dr_omar("Use of MROLD")
         lstRest = self.objCond.cond(T4=self.T[4],       # K
                                     H4=self.H[4],       # j/kg
-                                    H14=self.H[4],      # j/kg
+                                    H14=self.H[14],     # j/kg
                                     TC=self.TC,         # K
                                     JC=self.JC,         # number unit less
                                     QCONDS=QDSC,        # watt

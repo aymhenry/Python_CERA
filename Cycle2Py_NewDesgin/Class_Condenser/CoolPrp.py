@@ -1,8 +1,8 @@
 # Python import
-from CoolProp.CoolProp import PhaseSI, PropsSI, get_global_param_string
+import sys
 
 # User import
-
+from CoolProp.CoolProp import PhaseSI, PropsSI, get_global_param_string
 
 class CoolPrp:
     # Class Startic vars
@@ -16,11 +16,15 @@ class CoolPrp:
     PHASE_LIQ = "liquid"
     PHASE_GAS = "gas"
 
-    def setup(self, strFluid):
+    def __init__(self):
         # member varbiable
+        
         self.m_error = CoolPrp.ERR_FUILD_NOT_FOUND
         self.m_error_desc = ""
         self.m_fluid = None
+        self.m_coolprp_err = ""
+        
+    def setup(self, strFluid):
 
         lstFluid = get_global_param_string("FluidsList").split(',')
 
@@ -48,23 +52,36 @@ class CoolPrp:
     # Output		: text of error number and error description
     # -----------------------------------------------------------
     def err_description(self):
+        
         if self.m_error == CoolPrp.ERR_FUILD_NOT_FOUND:
             return "Err " + str(CoolPrp.ERR_FUILD_NOT_FOUND) + \
-                " Fuild is not supported: " + str(self.m_error_desc)
+                " Fuild is not supported: " + \
+                str(self.m_error_desc) + \
+                "\n\n" + \
+                self.m_coolprp_err
 
         elif self.m_error == CoolPrp.ERR_PROB_ERROR:
             return "Err " + str(CoolPrp.ERR_PROB_ERROR) + \
-                " Call Prop error, error in parameters " + str(self.m_error_desc)
+                " Call Prop error, error in parameters " + \
+                str(self.m_error_desc) + \
+                "\n\n" + \
+                self.m_coolprp_err
 
         elif self.m_error == CoolPrp.ERR_PROB_NOT_FOUND:
             return "Err " + str(CoolPrp.ERR_PROB_NOT_FOUND) + \
-                " Property not supported: " + str(self.m_error_desc)
+                " Property not supported: " + \
+                str(self.m_error_desc) + \
+                "\n\n" + \
+                self.m_coolprp_err
 
         elif self.m_error == CoolPrp.ERR_NOT_FOUND:
             return "No error."
+        
         else:
             return "No error description, info. number CoolPrp:" + \
-                str(self.m_error)
+                str(self.m_error) + \
+                "\n\n" + \
+                self.m_coolprp_err
 
     # -----------------------------------------------------------
     # Job 			: get of of the properties 'P','T','V','V','H','S','CP','CV'
@@ -92,7 +109,7 @@ class CoolPrp:
 
         # adjust id for Cp and Cv
         if getProp_adj in lst_prob_o:
-            getProp_adj = getProp_adj + "MASS"
+            getProp_adj += "MASS"
 
         # adjust V (volume) - CoolPrp use D for dencity
         if getProp == 'V':
@@ -100,14 +117,14 @@ class CoolPrp:
 
         # get two referance parameters
         int_count = 0
-
+        str_command = ''
         try:
             str_command = "PropsSI(" + "'" + getProp_adj + "'"
             for prop in lst_prob_io + lst_prob_i:
                 if eval(prop + " !=None"):
-                    int_count = int_count + 1
+                    int_count += 1
 
-                    if prop == 'V':  # CoolPrp use D for dencity
+                    if prop == 'V':  # CoolPrp use D for density
                         prob_code = "D"
                         prob_val = 1 / eval(prop)
                     else:
@@ -120,7 +137,7 @@ class CoolPrp:
                     if int_count >= MAX_PARA:
                         break  # only limited number of parameters
 
-            str_command = str_command + ', self.m_fluid)'
+            str_command += ', self.m_fluid)'
             # print ("str_command: ",str_command)
 
             result = eval(str_command)
@@ -128,10 +145,12 @@ class CoolPrp:
                 result = 1 / result
 
             return result
-        except: # BaseException:
+
+        except:   # BaseException:
             self.m_error = CoolPrp.ERR_PROB_ERROR
             self.m_error_desc = str_command
-            raise ValueError (self.err_description())
+            self.m_coolprp_err = str(ValueError())
+            raise ValueError(self.err_description())
             return None
 
     # -----------------------------------------------------------
@@ -196,20 +215,23 @@ class CoolPrp:
     #
     # Output		: True or false
     # -----------------------------------------------------------
-    def is_gas_phase(self, strPhase):
-        if CoolPrp.PHASE_GAS in (strPhase):
+    @staticmethod
+    def is_gas_phase(strPhase):
+        if CoolPrp.PHASE_GAS in strPhase:
             return True
         else:
             return False
 
-    def is_liquid_phase(self, strPhase):
-        if CoolPrp.PHASE_LIQ in (strPhase):
+    @staticmethod
+    def is_liquid_phase(strPhase):
+        if CoolPrp.PHASE_LIQ in strPhase:
             return True
         else:
             return False
 
-    def is_two_phase(self, strPhase):
-        if CoolPrp.PHASE_TWO in (strPhase):
+    @staticmethod
+    def is_two_phase(strPhase):
+        if CoolPrp.PHASE_TWO in strPhase:
             return True
         else:
             return False

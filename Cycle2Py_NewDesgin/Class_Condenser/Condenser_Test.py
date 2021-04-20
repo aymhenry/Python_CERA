@@ -8,6 +8,7 @@ from Condenser import *
 objCP = CoolPrp()
 objCP.setup('R12')
 
+# UACOND
 #========================================================
 CFMC = 175.44    # to check the units - random value unknow
 DTSUBC = 0    # Refrigerant Exit Subcooling, Deg C
@@ -15,15 +16,15 @@ DTSUBC = 0    # Refrigerant Exit Subcooling, Deg C
 ATOTC = 0.849  # m2 Total Heat Transfer Surface Area
 MREF = 5.8  # kg/hr Refrigerant Mas Flow Rate
 MROLD = 5.7  # kg/hr Refrigerant Mas Flow Rate old value
-UA_FF_CND = 0  # sec-F/Btu(th) , Cond: A/R In Fresh Food Section (Or Cabinet Walls)
-UA_FZ_CND = 0  # sec-F/Btu(th) , Cond: A/R In Freezer Section Walls (If Separate Section)
-UA_FF_HXS = 0  # sec-F/Btu(th) , Both: A/R In Fresh Food Section (Or Cabinet Walls)
-UA_FZ_HXS = 0  # sec-F/Btu(th) , Both: A/R In Freezer Section Walls (If Separate Section)
+UA_FF_CND = 0  # watt/K , Cond: A/R In Fresh Food Section (Or Cabinet Walls)
+UA_FZ_CND = 0  # watt/K , Cond: A/R In Freezer Section Walls (If Separate Section)
+UA_FF_HXS = 0  # watt/K , Both: A/R In Fresh Food Section (Or Cabinet Walls)
+UA_FZ_HXS = 0  # watt/K , Both: A/R In Freezer Section Walls (If Separate Section)
 N_COND = 1  # Refrigeration Type 1,2,3,4,5,6 or 7
 
-UDSC  = 15.167* 3600    # Desuperheating Heat Transfer Conductance, kj/hr/m2/C
-USCC  = 15.434 * 3600   # Subcooling Heat Transfer Conductance, kj/hr/m2/C  
-UTPC  = 19.227 * 3600   # Two-Phase Heat Transfer Conductance, kj/hr/m2/C  
+UDSC  = 15.167* 3600    # Desuperheating Heat Transfer Conductance,# W/m2-K
+USCC  = 15.434 * 3600   # Subcooling Heat Transfer Conductance, # W/m2-K
+UTPC  = 19.227 * 3600   # Two-Phase Heat Transfer Conductance, # W/m2-K
 #=========================================================
 R12_TABLE_READING = 200.0 - 27.10795349661135
 
@@ -54,21 +55,21 @@ ICOND = 0
 objCondenser = Condenser()
 objCond = objCondenser.getObject(objCP=objCP, ICOND=ICOND)
 
-objCond.setParamters(ATOTC = ATOTC,
-                    UA_FF_CND = UA_FF_CND,
-                    UA_FZ_CND = UA_FZ_CND,
-                    UA_FF_HXS = UA_FF_HXS,
-                    UA_FZ_HXS = UA_FZ_HXS,
-                    CFMC = CFMC,
-                    DTSUBC = DTSUBC,
-                    N_COND = N_COND,
-                    TS1=TS1,
-                    TS3=TS3,
-                    TS5=TS5,
-                    USCC=USCC,
-                    UTPC=UTPC,
-                    UDSC=UDSC
-                    )
+objCond.setParamters(ATOTC=ATOTC,
+                     UA_FF_CND=UA_FF_CND,   # watt/K
+                     UA_FZ_CND=UA_FZ_CND,   # watt/K
+                     UA_FF_HXS=UA_FF_HXS,   # watt/K
+                     UA_FZ_HXS=UA_FZ_HXS,   # watt/K
+                     CFMC=CFMC,             # watt/K
+                     DTSUBC=DTSUBC,         # K
+                     N_COND=N_COND,
+                     TS1=TS1,
+                     TS3=TS3,
+                     TS5=TS5,
+                     USCC=USCC,         # W/m2-K
+                     UTPC=UTPC,         # W/m2-K
+                     UDSC=UDSC          # W/m2-K
+                          )
 
 dicRest = objCond.cond_balance(T14=T14,
                             H14=H14,
@@ -159,21 +160,21 @@ print ("Condenser DEW pressure Pa PBUB=",PBUB)
 
 objCondenser = Condenser()
 objCond = objCondenser.getObject(objCP=objCP, ICOND=ICOND)
-objCond.setParamters(ATOTC = ATOTC,
-                    UA_FF_CND = UA_FF_CND,
-                    UA_FZ_CND = UA_FZ_CND,
-                    UA_FF_HXS = UA_FF_HXS,
-                    UA_FZ_HXS = UA_FZ_HXS,
-                    CFMC = CFMC,
-                    DTSUBC = DTSUBC,
-                    N_COND = N_COND,
-                    TS1=TS1,
-                    TS3=TS3,
-                    TS5=TS5,
-                    USCC=USCC,
-                    UTPC=UTPC,
-                    UDSC=UDSC
-                    )
+objCond.setParamters(ATOTC=ATOTC,
+                     UA_FF_CND=UA_FF_CND,   # watt/K
+                     UA_FZ_CND=UA_FZ_CND,   # watt/K
+                     UA_FF_HXS=UA_FF_HXS,   # watt/K
+                     UA_FZ_HXS=UA_FZ_HXS,   # watt/K
+                     CFMC=CFMC,             # watt/K
+                     DTSUBC=DTSUBC,         # K
+                     N_COND=N_COND,
+                     TS1=TS1,
+                     TS3=TS3,
+                     TS5=TS5,
+                     USCC=USCC,         # W/m2-K
+                     UTPC=UTPC,         # W/m2-K
+                     UDSC=UDSC          # W/m2-K
+                          )
 
 dicRest = objCond.cond_balance(T14=T14,
                             H14=H14,
@@ -205,21 +206,22 @@ print ("Condenser DEW pressure Pa PBUB=",PBUB)
 
 objCondenser = Condenser()
 objCond = objCondenser.getObject(objCP=objCP, ICOND=ICOND)
-objCond.setParamters(ATOTC = ATOTC,
-                    UA_FF_CND = UA_FF_CND,
-                    UA_FZ_CND = UA_FZ_CND,
-                    UA_FF_HXS = UA_FF_HXS,
-                    UA_FZ_HXS = UA_FZ_HXS,
-                    CFMC = CFMC,
-                    DTSUBC = DTSUBC,
-                    N_COND = N_COND,
-                    TS1=TS1,
-                    TS3=TS3,
-                    TS5=TS5,
-                    USCC=USCC,
-                    UTPC=UTPC,
-                    UDSC=UDSC
-                    )
+objCond.setParamters(ATOTC=ATOTC,
+                     UA_FF_CND=UA_FF_CND,   # watt/K
+                     UA_FZ_CND=UA_FZ_CND,   # watt/K
+                     UA_FF_HXS=UA_FF_HXS,   # watt/K
+                     UA_FZ_HXS=UA_FZ_HXS,   # watt/K
+                     CFMC=CFMC,             # watt/K
+                     DTSUBC=DTSUBC,         # K
+                     N_COND=N_COND,
+                     TS1=TS1,
+                     TS3=TS3,
+                     TS5=TS5,
+                     USCC=USCC,         # W/m2-K
+                     UTPC=UTPC,         # W/m2-K
+                     UDSC=UDSC          # W/m2-K
+                          )
+
 
 dicRest = objCond.cond_balance(T14=T14,
                             H14=H14,
@@ -234,13 +236,13 @@ dicRest = objCond.cond_balance(T14=T14,
                             )
 
 print ("\n=== Output ==Not sure about unit====================")
-print ('Q desuperheating       rrr    QDSC = ',dicRest['QDSC'])
-print ('Q two phase            rrr    QTPC = ',dicRest['QTPC'])
-print ('Q subcooling           rrr    QSCC = ',dicRest['QSCC'])
-print ('Q total condenser       rrr  QTOTC = ',dicRest['QTOTC'])
+print ('Q desuperheating       watt    QDSC = ',dicRest['QDSC'])
+print ('Q two phase            watt    QTPC = ',dicRest['QTPC'])
+print ('Q subcooling           watt    QSCC = ',dicRest['QSCC'])
+print ('Q total condenser       watt  QTOTC = ',dicRest['QTOTC'])
 
-print ('Fraction desuperheating   rrr FSUP = ',dicRest['FSUP'])
-print ('Fraction subcooling       rrr FSUB = ',dicRest['FSUB'])
+print ('Fraction desuperheating   % FSUP = ',dicRest['FSUP'])
+print ('Fraction subcooling       % FSUB = ',dicRest['FSUB'])
 #========================================================
 
 print ("\n\n\n Testing cond method =======================")
@@ -256,9 +258,10 @@ H14 = 1000*(28942.71  /120.91 + R12_TABLE_READING) # Enthalpy condenser inlet J/
 ICOND = 1  # 0 Nat. cooling, 1 Cross, OR 2 Counter
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-QCONDS = 210.218  # check the units unknow, need to be in watt
-QCONDC = 75.156  # check the units unknow, need to be in watt
+QCONDS = 210.218  # watt
+QCONDC = 75.156  # watt
 QSCC = 0    # condenser subcooling heat transfer watt
+UACOND = 14.8 # watt/K
 
 print("==================input============")
 print(" old Initial Guess For Refrigerant Mas Flow Rate kg/hr MROLD = ", MROLD)
@@ -277,12 +280,20 @@ print(" condenser outlet Enthalpy      H4 =", H4)
 print("       watt QCONDS =", QCONDS)
 print("       watt QCONDC =", QCONDC)
 print("       watt QSCC =", QSCC)
+print("   watt/K UACOND =", UACOND)
 
-lstRest = objCond.cond(T4=T4, H4=H4, H14=H14,
-               TC=TC, JC=JC,
-               QCONDS=QCONDS, QCONDC=QCONDC, QSCC=QSCC,
-               MROLD=MROLD, MREF=MREF
-               )
+lstRest = objCond.cond(T4=T4,             # K
+                       H4=H4,             # j/kg
+                       H14=H14,           # j/kg
+                       TC=TC,             # K
+                       JC=JC,             # number unit less
+                       QCONDS=QCONDS,       # watt
+                       QCONDC=QCONDC,       # watt
+                       QSCC=QSCC,         # watt
+                       MROLD=MROLD,       # kg/hr
+                       MREF=MREF,         # kg/hr
+                       UACOND=UACOND      # watt/K
+                    )
 
 print("\n\n==================Output============")
 print("           K TS2 =", lstRest[0])
@@ -291,15 +302,26 @@ print("              JC =", lstRest[2])
 print("           ICONC =", lstRest[3])
 
 print ("\n=== Others outputs ======================")
-lstRest = objCond.getExtarOutputs()
+
+[Q_CND_FF,         # watt
+ Q_CND_FZ,         # watt
+ Q_HXS_FF,         # watt
+ Q_HXS_FZ,         # watt
+ UACOND,           # watt/K
+ UDSC,             # watt/m2 K
+ USCC,             # watt/m2 K
+ UTPC              # watt/m2 K
+ ] = objCond.getExtarOutputs()
+
 
 print ("if value is None, value is not calculated")
 print ("USCC, UTPC, UDSC are app inputs, and is recaluted here ")
-print (' Condenser Heat Fresh Food, sec-F/Btu(th) Q_CND_FF=', lstRest[0] )
-print (' Condenser Heat Freezer,    sec-F/Btu(th) Q_CND_FZ=', lstRest[1] )
-print (' Heat Exchanger Fresh Food  sec-F/Btu(th) Q_HXS_FF=', lstRest[2] )
-print (' Heat Exchanger Freezer     sec-F/Btu(th) Q_HXS_FZ=', lstRest[3] )
-print (' Condenser UA                    UACOND=', lstRest[4] )
-print (' Desuperheating Heat Transfer Conductance, kj/hr/m2/C UDSC=', lstRest[5])
-print (' Subcooling Heat Transfer Conductance, kj/hr/m2/C  USCC=', lstRest[6])
-print (' Two-Phase Heat Transfer Conductance,   kj/hr/m2/C UTPC=', lstRest[7])
+print (' Condenser Heat Fresh Food, watt Q_CND_FF=', Q_CND_FF )
+print (' Condenser Heat Freezer,    watt Q_CND_FZ=', Q_CND_FZ )
+print (' Heat Exchanger Fresh Food  watt Q_HXS_FF=', Q_HXS_FF )
+print (' Heat Exchanger Freezer     watt Q_HXS_FZ=', Q_HXS_FZ )
+print (' Condenser UA               watt/K UACOND=', UACOND )
+
+print (' Desuperheating Heat Transfer Conductance, watt/m2 K UDSC=', UDSC)
+print (' Subcooling Heat Transfer Conductance,    watt/m2 K  USCC=', USCC)
+print (' Two-Phase Heat Transfer Conductance,      watt/m2 K UTPC=',UTPC)

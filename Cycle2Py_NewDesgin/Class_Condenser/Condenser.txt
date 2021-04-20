@@ -49,11 +49,11 @@ Condenser bubble point Enthalpy            j/kg HBUB= 237420.86959494435
 Condenser bubble point CP              j/kg/K CPRLIQ= 1017.1201720287818
 
 === Output ==Not sure about unit====================
-Q desuperheating       watt    QDSC =  986.9898216322188
-Q two phase            watt    QTPC =  0.0
+Q desuperheating       watt    QDSC =  56.125189534915805
+Q two phase            watt    QTPC =  37.64423735961499
 Q subcooling           watt    QSCC =  0.0
-Q total condenser       watt  QTOTC =  986.9898216322188
-Fraction desuperheating   ratio% FSUP =  1.0
+Q total condenser       watt  QTOTC =  93.7694268945308
+Fraction desuperheating   ratio% FSUP =  0.10854982619249544
 Fraction subcooling       ratio% FSUB =  0.0
 
 
@@ -65,9 +65,9 @@ Condenser DEW pressure Pa PBUB= 828000
 
 === Output ==Not sure about unit====================
 Q desuperheating       watt    QDSC =  0.0
-Q two phase            watt    QTPC =  -63.90594959676789
+Q two phase            watt    QTPC =  -19.811545533250914
 Q subcooling           watt    QSCC =  0.0
-Q total condenser       watt  QTOTC =  -63.90594959676789
+Q total condenser       watt  QTOTC =  -19.811545533250914
 Fraction desuperheating   ration%  FSUP =  0.0
 Fraction subcooling       ration% FSUB =  0.0
 
@@ -79,12 +79,12 @@ Condenser Out pressure Pa   P4= 926000.0
 Condenser DEW pressure Pa PBUB= 828000
 
 === Output ==Not sure about unit====================
-Q desuperheating       rrr    QDSC =  9180.775199999996
-Q two phase            rrr    QTPC =  0.0
-Q subcooling           rrr    QSCC =  0.0
-Q total condenser       rrr  QTOTC =  9180.775199999996
-Fraction desuperheating   rrr FSUP =  1.0
-Fraction subcooling       rrr FSUB =  0.0
+Q desuperheating       watt    QDSC =  60.349294152162955
+Q two phase            watt    QTPC =  0.0
+Q subcooling           watt    QSCC =  0.0
+Q total condenser       watt  QTOTC =  60.349294152162955
+Fraction desuperheating   % FSUP =  1.0
+Fraction subcooling       % FSUB =  0.0
 
 
 
@@ -102,33 +102,26 @@ Fraction subcooling       rrr FSUB =  0.0
        watt QCONDS = 210.218
        watt QCONDC = 75.156
        watt QSCC = 0
+   watt/K UACOND = 14.8
 
 
 ==================Output============
            K TS2 = 309.73661878704974
-            K TC = [0.0, 311.66, 316.66, 0.0]
+            K TC = [0.0, 316.66, 310.8474526047841, 0.0]
               JC = 2
            ICONC = 0
 
 === Others outputs ======================
 if value is None, value is not calculated
 USCC, UTPC, UDSC are app inputs, and is recaluted here
- Condenser Heat Fresh Food, sec-F/Btu(th) Q_CND_FF= None
- Condenser Heat Freezer,    sec-F/Btu(th) Q_CND_FZ= None
- Heat Exchanger Fresh Food  sec-F/Btu(th) Q_HXS_FF= None
- Heat Exchanger Freezer     sec-F/Btu(th) Q_HXS_FZ= None
- Condenser UA                    UACOND= 46356.4188
- Desuperheating Heat Transfer Conductance, kj/hr/m2/C UDSC= 54601.2
- Subcooling Heat Transfer Conductance, kj/hr/m2/C  USCC= 55562.399999999994
- Two-Phase Heat Transfer Conductance,   kj/hr/m2/C UTPC= 69217.2
+ Condenser Heat Fresh Food, watt Q_CND_FF= None
+ Condenser Heat Freezer,    watt Q_CND_FZ= None
+ Heat Exchanger Fresh Food  watt Q_HXS_FF= None
+ Heat Exchanger Freezer     watt Q_HXS_FZ= None
+ Condenser UA               watt/K UACOND= 46356.4188
+ Desuperheating Heat Transfer Conductance, watt/m2 K UDSC= 54601.2
+ Subcooling Heat Transfer Conductance,    watt/m2 K  USCC= 55562.399999999994
+ Two-Phase Heat Transfer Conductance,      watt/m2 K UTPC= 69217.2
 Press any key to continue . . .
-
-
-
-
-
-
-
-
 
 
