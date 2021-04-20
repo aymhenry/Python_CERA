@@ -184,7 +184,7 @@ class Compressor:
 
         def read_comp_file(strFile_name, strFoldr=None):
             # ============Python commnet : data description and sample data
-            '''
+            """
                 SAMPLE CALORIMETER-BASED MAP
                 default data:
                 4.5 mass flow at standard rating point (lb/hr or kg/hr)
@@ -237,15 +237,17 @@ class Compressor:
                 110		76.4	93.3	110.0	126.0	141.0	154.2
                 120		77.3	96.1	114.7	132.9	150.2	166.0
                 130		77.3	98.1	118.7	139.0	158.6	177.0
-            '''
+            """
             # ==============================================================
 
             # set the default folder is folder is none
-            strFolder = strFoldr
-            if strFoldr is None:
-                strFolder = sys.path[0] + "\\" + "compmap"
 
-            obj_Compressor = CompMap(strFile_name, strFolder)
+            if strFoldr is None:
+                strFoldr2 = sys.path[0] + "\\" + "compmap"
+            else:
+                strFoldr2 = strFoldr
+
+            obj_Compressor = CompMap(strFile_name, strFoldr2)
 
             if obj_Compressor.isError():
                 print(obj_Compressor.err_description())
@@ -372,8 +374,8 @@ class Compressor:
 
         # handle off-speed operation (use Danfoss variable speed data)
         REL_CAP = - 0.046073 + \
-                  + 1.41364 * FRACT_SPEED \
-                  - 0.366744 * FRACT_SPEED * FRACT_SPEED
+            1.41364 * FRACT_SPEED - \
+            0.366744 * FRACT_SPEED * FRACT_SPEED
 
         CAP = CAP * REL_CAP
         POW = POW * REL_CAP

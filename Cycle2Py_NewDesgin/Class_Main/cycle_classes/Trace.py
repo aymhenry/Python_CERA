@@ -36,13 +36,15 @@ class Trace:
         self.dt = dt     # app data
         self.ds = obj_cycletype     # CycleSolver object
 
-    def file_line(self):
+    @staticmethod
+    def file_line():
         #  Returns the current file name & line number in our program
         str_file = inspect.getfile(inspect.currentframe().f_back.f_back)
         lng_line = inspect.currentframe().f_back.f_back.f_lineno
         return "\tFile: " + str_file + "\n\tLine: " + str(lng_line)
         
-    def is_canc_print(self, b_Flag):
+    @staticmethod
+    def is_canc_print(b_Flag):
         if not (b_Flag and Trace.DATA_ALL):
             return True
         else:

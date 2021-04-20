@@ -1,10 +1,7 @@
 # Python import
-import math
 import sys
 
 # User import
-# from cycle_classes.CoolPrp import *
-# from cycle_classes.Trace import *
 from cycle_classes.CoolPrpUtil import *
 from cycle_classes.exf4Cond_Evap import *
 
@@ -57,7 +54,8 @@ class CycleUtils(exf4Cond_Evap):
         return H
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
 
-    def adjlod(self, dt, ICYCL, IC, TS3, TS5, FROSTF, FROSTZ, IDFRST):
+    @staticmethod
+    def adjlod(dt, ICYCL, IC, TS3, TS5, FROSTF, FROSTZ, IDFRST):
         # ADJUST THE CABINET LOADS AND SET POINT TEMPERATURES *
 
         # IC conderser trail number
@@ -539,7 +537,8 @@ class CycleUtils(exf4Cond_Evap):
         return [H, P, T, TS6, QFREZ]
 
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
-    def efcross(self, CRAT, NTU):
+    @staticmethod
+    def efcross(CRAT, NTU):
         # CALCULATES THE HEAT TRANSFER EFFECTIVENESS FOR A CROSS     *
         # FLOW HEAT EXCHANGER WITH BOTH FLUIDS UNMIXED               *
 
@@ -561,19 +560,19 @@ class CycleUtils(exf4Cond_Evap):
         #          FIND POSITION IN ARRAY BASED ON THE CAPACITY RATIO
         #          OF THE TWO STREAMS
 
-        I = 0
+        I_fact = 0
 
         if 0.00 <= CRAT <= 0.25:
-            I = 1
+            I_fact = 1
 
         if 0.25 < CRAT <= 0.50:
-            I = 2
+            I_fact = 2
 
         if 0.50 < CRAT <= 0.75:
-            I = 3
+            I_fact = 3
 
         if 0.75 < CRAT <= 1.00:
-            I = 4
+            I_fact = 4
 
         if NTU <= 0.0:
             NTU = 0.0
@@ -584,14 +583,14 @@ class CycleUtils(exf4Cond_Evap):
 
         for J in range(1, 6 + 1):  # DO WHILE (J  <=  6)
             EX = 1.0 * J
-            if I == 1:
+            if I_fact == 1:
                 EFFA = 1.0 - math.exp(-NTU)
             else:
-                EFFA += A[I - 1][J] * BETA ** EX
+                EFFA += A[I_fact - 1][J] * BETA ** EX
 
-            EFFB += A[I][J] * BETA ** EX
+            EFFB += A[I_fact][J] * BETA ** EX
 
-        FRAC = (CRAT - (I - 1) * 0.25) / (I * 0.25 - (I - 1) * 0.25)
+        FRAC = (CRAT - (I_fact - 1) * 0.25) / (I_fact * 0.25 - (I_fact - 1) * 0.25)
         EFFECT = EFFA + FRAC * (EFFB - EFFA)
 
         if EFFECT > 1.0:
@@ -599,7 +598,8 @@ class CycleUtils(exf4Cond_Evap):
         return EFFECT
 
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
-    def inter2(self, objCP, PA, TAI, HAI, VAI, PB, HBO, TDEW, HDEW, VDEW, ETA):
+    @staticmethod
+    def inter2(objCP, PA, TAI, HAI, VAI, PB, HBO, TDEW, HDEW, VDEW, ETA):
         # iterates to solve for interchanger heat transfer knowing
         # the inlet state of one stream and outlet state of the
         # other for a counterflow heat exchanger.
@@ -669,7 +669,8 @@ class CycleUtils(exf4Cond_Evap):
         return [TBI, HBI, QACT]
 
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
-    def dutfnd(self, dt, ICAB,
+    @staticmethod
+    def dutfnd(dt, ICAB,
                IRFTYP, ICYCL, N,
                QFRSH, QFREZ,
                FROSTF, FROSTZ,
@@ -872,7 +873,8 @@ class CycleUtils(exf4Cond_Evap):
 
         return [QFF, QFZ, DUTYR]
 
-    def mixair(self, CAP, QFF, QFZ, TFF, TFZ, CFME):
+    @staticmethod
+    def mixair(CAP, QFF, QFZ, TFF, TFZ, CFME):
         #     *     CALCULATE INLET TEMPERATURE TO THE EVAPORATOR
         #          SET UP THE QUADRATIC EQUATION COEFFICIENTS
         #

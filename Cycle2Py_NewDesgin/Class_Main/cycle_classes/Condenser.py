@@ -19,7 +19,8 @@ from cycle_classes.Trace import *
 
 
 class Condenser:
-    def getObject(self, ICOND, objCP):
+    @staticmethod
+    def getObject(ICOND, objCP):
         if ICOND == 0:  # Natural Convection
             return CondCool_CNat(ICOND, objCP)
 
@@ -31,7 +32,6 @@ class Condenser:
 
         else:
             raise ErrorException('ICOND value error', 'Cond1000')
-
 
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

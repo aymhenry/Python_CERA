@@ -107,7 +107,7 @@ class Start:
         if obj_datamodel.isError():
             print("Error Opening file")
             print(obj_datamodel.err_description())  # print error description
-            self.obj_datamodel = ""     # clean object and close file
+            obj_datamodel = ""     # clean object and close file
             sys.exit('3000')  # terminat application
             # --------------
 

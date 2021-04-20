@@ -261,7 +261,8 @@ class CycleType_Abstract (ABC):
         
         return objFeedback   # obj_cycle.cycle()
 
-    def getRefName(self, lng_Code):
+    @staticmethod
+    def getRefName(lng_Code):
         lstRefList = [
             'R11',
             'R12',

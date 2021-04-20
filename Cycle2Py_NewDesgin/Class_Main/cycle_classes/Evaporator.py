@@ -16,7 +16,8 @@ from cycle_classes.Trace import *
 
 
 class Evaporator:
-    def getObject(self, IFRSH, objCP):
+    @staticmethod
+    def getObject(IFRSH, objCP):
         if IFRSH == 0:  # Natural Convection
             return EvapCool_FFNat(IFRSH, objCP)
 
@@ -199,8 +200,8 @@ class EvapCool_Abstract (exf4Cond_Evap):
         if DELT < -5.0:
             DELT = -5.0
 
-        #TEOUT = TE[JE] + DELT
-        #Omar correction - the TE is lower not higher!
+        # TEOUT = TE[JE] + DELT
+        # Omar correction - the TE is lower not higher!
         TEOUT = TE[JE] - DELT
         TS4 = TS3 - QFRSH / self.CFME   # K - [J/kg] [J/kg/K]
         
@@ -212,7 +213,8 @@ class EvapCool_Abstract (exf4Cond_Evap):
             TENEW = TEOUT
             
         else:
-            if (TEOUT < TE[1] < TE[2]) or (TEOUT > TE[2] > TE[1]) and TE[1]!=0: # need to make sure that TE[1] is not zero
+            # need to make sure that TE[1] is not zero
+            if (TEOUT < TE[1] < TE[2]) or (TEOUT > TE[2] > TE[1]) and TE[1] != 0:
                 TENEW = 0.5 * (TE[1] + TE[2])
                 
             else:

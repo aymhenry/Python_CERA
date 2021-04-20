@@ -10,9 +10,12 @@
 
 class QData:
     
-    def setup_vars(self, arg, lst_var_names, int_confg_row=0, int_var_names_count=-1, b_set_data_as_string=False):
+    def setup_vars(self, arg, lst_var_names, int_confg_row=None, int_var_names_count=-1, b_set_data_as_string=False):
         int_para_count = int_var_names_count
-        
+
+        if int_confg_row is None:
+            int_confg_row = 0
+
         # if int_var_names_count = -1 then use all list items
         if int_para_count == -1:
             int_para_count = len(lst_var_names) - 1
@@ -37,7 +40,7 @@ class QData:
             exec("self." + lst_var_names[int_var_numer - int_confg_row] + "=" + str(flt_val))
         
     def __setup_vars_list(self, lst_valuse, lst_var_names, int_confg_row, int_para_count, b_set_data_as_string=False):
-        '''
+        """
         Creates a list of vars, its names in lst_var_names, and values in lst_valuse
         Input
             lst_valuse         : list of values
@@ -46,7 +49,7 @@ class QData:
             int_para_count    : Count of vars
         Output
             Vars creaed iside this object
-        '''
+        """
         
         for int_var_numer in range(int_confg_row, int_para_count + 1):
             feedback = lst_valuse[int_var_numer]

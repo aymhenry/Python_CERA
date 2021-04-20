@@ -21,7 +21,8 @@ class View:
         # self.prn.write_or_terminate(" ")
 
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
-    def showError(self, strMsg, fltValue=0.0, isOnlyTest=False):
+    @staticmethod
+    def showError(strMsg, fltValue=0.0, isOnlyTest=False):
         print("\n\n==========================Error detected =================")
         if isOnlyTest:
             print("    Error: ", strMsg)
@@ -31,7 +32,8 @@ class View:
         print("==========================================================\n\n")
 
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=
-    def print_width(self, arr_data):
+    @staticmethod
+    def print_width(arr_data):
         col_width = 10
         print("".join(str(word)[:8].ljust(col_width) for word in arr_data))
 
@@ -187,22 +189,21 @@ class View:
         self.prn.write_or_terminate(""", STATE
                                       , T(C), T(C)
                                       , P, H, V, S
-                                      , XL, XV, XQ""")
+                                    """
+                                    )
 
         self.prn.write_or_terminate(""", , AIR,   REF
-                                      ,  kPa,  kj/kg ,  m3/kg ,  kj/kg-C
-                                      , (MASS FRAC),(MASS FRAC),(MASS FRAC)
-                                      """)
+                                      ,  kPa,  kj/kg,   m3/kg,   kj/kg-C
+                                    """
+                                    )
 
         self.print_width(['#', 'Point', 'STATE',
                           'T(C)', 'T(C)',
-                          'P', 'H', 'V', 'S',
-                          '#', 'XL', 'XV', 'XQ'
+                          'P', 'H', 'V', 'S'
                           ])
 
         self.print_width(['', '', '', 'AIR', 'REF',
-                          'kPa', 'kj/kg', 'm3/kg', 'kj/kg-C',
-                          '#', 'MASS-FRAC', 'MASS-FRAC', 'MASS-FRAC'
+                          'kPa', 'kj/kg', 'm3/kg', 'kj/kg-C'
                           ])
 
         K = 1
@@ -529,7 +530,7 @@ class View:
         TL1 = self.ds.TS3
         TL2 = self.ds.TS5
         
-        DENOM = TH * (QE * (1 / TL1 - 1 / TH) + QZ * (1 / TL2 - 1 / TH))
+        # DENOM = TH * (QE * (1 / TL1 - 1 / TH) + QZ * (1 / TL2 - 1 / TH))
         # COPI = (QE + QZ) / DENOM
 
         PR = self.ds.P[2]/self.ds.P[1]

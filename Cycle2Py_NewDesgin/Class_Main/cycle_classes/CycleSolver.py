@@ -160,21 +160,21 @@ class CycleSolver(CycleUtils):
         #       and interpolate between rho at 0 C and rho at 10 C
         # [m3/sec] * [kg/m3] * [j/kg/K] =j/sec/K = watt/K
         self.dt.CFMC = self.dt.CFMCI[self.lng_item] / 1000 * \
-                       self.getAirDencity(self.TS1) * \
-                       self.getAirCp(self.TS1)
+            self.getAirDencity(self.TS1) * \
+            self.getAirCp(self.TS1)
 
         # ------------------------------------
         # self.CFME = 1.8961 * (RHOCPE * self.dt.CFMEI[lng_item]) / 0.4720
         # [m3/sec] * [kg/m3] * [J/kg K]*1000 =j/sec K = watt/K
         self.dt.CFME = self.dt.CFMEI[self.lng_item] / 1000 * \
-                       self.getAirDencity(self.dt.TS3[self.lng_item]) * \
-                       self.getAirCp(self.TS3)
+            self.getAirDencity(self.dt.TS3[self.lng_item]) * \
+            self.getAirCp(self.TS3)
 
         # ------------------------------------
         # [m3/sec] * [kg/m3] * [J/kg K]*1000 =j/sec K = watt/K
         self.dt.CFMF = self.dt.CFMF / 1000 * \
-                       self.getAirDencity(self.dt.TS5) * \
-                       self.getAirCp(self.TS5)
+            self.getAirDencity(self.dt.TS5) * \
+            self.getAirCp(self.TS5)
         # =================================
 
         # Temp. At Comp., Inlet or -1 If Unspecified
@@ -263,7 +263,8 @@ class CycleSolver(CycleUtils):
                        strFileName=self.dt.FILE_NAME
                        )
 
-    def getAirCp(self, temp_K):
+    @staticmethod
+    def getAirCp(temp_K):
         # https://www.ohio.edu/mechanical/thermo/property_tables
         # /air/air_Cp_Cv.html#:~
         # :text=The%20nominal%20values%20used%20for,v%20%3D%200.718%20kJ%2Fkg
@@ -272,11 +273,11 @@ class CycleSolver(CycleUtils):
         # J/kg K
         return (0.0003 * (temp_K ** 2) - 0.129 * temp_K + 1016.55) * 1000
 
-    def getAirDencity(self, temp_K):
+    @staticmethod
+    def getAirDencity(temp_K):
         # m3/kg
         return 1.2873 + (temp_K - CycleSolver.K_C_DEG) / 10 * (1.2418 - 1.2873)
-        
-        
+
     #  -- Soving actions
     def solveCycle(self):
         print("\n\n== Starting processing ===")
@@ -431,7 +432,7 @@ class CycleSolver(CycleUtils):
             #    - self.dt.CONDHT[self.NCYC] / self.MREF / self.DUTYR
 
             self.H[16] = self.H[4] -\
-                         self.dt.CONDHT[self.NCYC] / (self.MREF / 3600) / self.DUTYR
+                self.dt.CONDHT[self.NCYC] / (self.MREF / 3600) / self.DUTYR
 
             self.P[16] = self.P[4]
 
@@ -449,7 +450,8 @@ class CycleSolver(CycleUtils):
 
             # Evaporator iteration
             self.evapIteration()
-
+            # print("Number of evapIteration iterations self.IE",self.IE)
+            
             self.evap_out7()   # 7 - OUTLET FROM FRESH FOOD EVAPORATOR
 
             #  ---------
@@ -702,7 +704,7 @@ class CycleSolver(CycleUtils):
         #            - self.dt.CONDHT[self.NCYC] / self.MREF / self.DUTYR
 
         self.H[16] = self.H[4] -\
-                     self.dt.CONDHT[self.NCYC] / (self.MREF / 3600) / self.DUTYR
+            self.dt.CONDHT[self.NCYC] / (self.MREF / 3600) / self.DUTYR
 
         self.P[16] = self.P[4]
         self.T[16] = self.objCP.Property('T', T=self.H[16],
@@ -894,7 +896,7 @@ class CycleSolver(CycleUtils):
                                                     P7=self.P[7]       # pa
                                                     )
 
-            else:   #  self.IFRSH == 2:
+            else:   # self.IFRSH == 2:
                 dicRest = self.objEvap.evap_balance(MREF=self.MREF,   # kg/hr
                                                     T5=self.T[5],     # K
                                                     H5=self.H[5],     # j/kg

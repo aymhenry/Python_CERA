@@ -196,19 +196,22 @@ class CoolPrp:
     #
     # Output		: True or false
     # -----------------------------------------------------------
-    def is_gas_phase(self, strPhase):
+    @staticmethod
+    def is_gas_phase(strPhase):
         if CoolPrp.PHASE_GAS in strPhase:
             return True
         else:
             return False
 
-    def is_liquid_phase(self, strPhase):
+    @staticmethod
+    def is_liquid_phase(strPhase):
         if CoolPrp.PHASE_LIQ in strPhase:
             return True
         else:
             return False
 
-    def is_two_phase(self, strPhase):
+    @staticmethod
+    def is_two_phase(strPhase):
         if CoolPrp.PHASE_TWO in strPhase:
             return True
         else:

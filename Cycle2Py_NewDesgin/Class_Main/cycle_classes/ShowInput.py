@@ -25,6 +25,7 @@ class ShowInput:
         int_type = self.dt.ICYCL
         if int_type == 1:
             self.show_sigle_cycle()
+            self.show_double_cycle()
         
         elif int_type == 2:
             self.show_double_cycle()   # to be checked later
@@ -198,7 +199,7 @@ class ShowInput:
         pass
     
     def show_sigle_cycle(self):
-        print("\n\n      Line Diagram for single cycle")
+        print("\n\n    Diagram of a Single Evaporator Cycle")
         print("                           ")
         print("              COND BUB    COND-DEW                           ")
         print(" COND OUT     11          3         COND IN                  ")
@@ -220,8 +221,43 @@ class ShowInput:
         print("         |    12                                |")
         print("        (X)   +----------+                      |")
         print("         +->--|Evaparator|-->-------------------+")
-        print("         5    +----------+    7                ")
-        print("       EVAP IN              EVAP OUT     \n\n\n")
-        
+        print("         5    +----------+    7                  ")
+        print("         EVAP IN              EVAP OUT     \n\n\n")
+
     def show_double_cycle(self):
-        pass
+        print("\n\n    Diagram of a Two Evaporator Cycle")
+        print("                           ")
+        print("              COND BUB    COND-DEW                           ")
+        print(" COND OUT     11          3         COND IN                  ")
+        print("         4    +-----------+         14                       ")
+        print("         +----| Condenser +----------+------<---+            ")
+        print("         |    +-----------+                     | 2  COMP DIS")
+        print("         |                                    +-+--+         ")
+        print("HX MULL  |+---------+------------>--+         |    |         ")
+        print("      16 ||         13              |         |Comp|         ")
+        print("       +-||-+     HX OUT            |         +-+--+         ")
+        print("       | || |                       |           | 1  COMP IN ")
+        print("       | || | hight temp            |           |            ")
+        print("       +-||-+ interchanger          +---->------+            ")
+        print("       6 ||                                      ")
+        print("SUBCOOL2 ||                                      ")
+        print("         |+------<------------------------------+")
+        print("         |    FRSH DEW                          |")
+        print("         |    12                                |")
+        print("         |    +---------------------+           |")
+        print("         |+---|Fresh Food Evaparator|-->--------+")
+        print("         || 5  +--------------------+  7         ")
+        print("         || FRSH IN                    FRSH OUT  ")
+        print("       +-||-+                                    ")
+        print("       | || |                                    ")
+        print("       | || | low temp                           ")
+        print("       +-||-+ interchanger                       ")
+        print("      10 ||                                      ")        
+        print("SUBCOOL1 ||                                      ")        
+        print("         |+------<------------------------------+")
+        print("         |                                      |")
+        print("         |    FREZ DEW                          |")
+        print("        (X)   +------------------+              |")
+        print("         +->--|Freezer Evaparator|-->-----------+")
+        print("         8    +------------------+  9            ")
+        print("         FREZ IN                   FREZ OUT\n\n\n")

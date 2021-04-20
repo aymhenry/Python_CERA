@@ -156,7 +156,8 @@ class CycleApp(Frame):
     #
     # Output		: True if found else False
     # -----------------------------------------------------------
-    def isFileExisits(self, strFileName, strPath=""):
+    @staticmethod
+    def isFileExisits(strFileName, strPath=""):
         if strPath == "":
             strPath = sys.path[0]
 
