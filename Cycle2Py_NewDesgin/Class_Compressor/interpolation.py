@@ -29,9 +29,9 @@ def interpolation(x_value, y_value, x_series, y_series, data):
          
     x_pos = find_nerest_index(x_value, x_series) - 1
     y_pos = find_nerest_index(y_value, y_series) - 1
-    
+ 
     # x position
-    if x_pos == -1:     # x_value less than min
+    if x_pos <= 0:     # x_value less than min
         x_pos = 0
         x_pos_next = 1
         
@@ -44,7 +44,7 @@ def interpolation(x_value, y_value, x_series, y_series, data):
         x_pos_next = x_pos + 1
 
     # y position
-    if y_pos == -1:     # y_value less than min
+    if y_pos <= 0:     # y_value less than min
         y_pos = 0
         y_pos_next = 1
         
@@ -56,6 +56,7 @@ def interpolation(x_value, y_value, x_series, y_series, data):
     else:   # y_value in between
         y_pos_next = y_pos + 1
 
+        
     value1 = interplate(x_val=x_value,
                         x1=x_series[x_pos],
                         x2=x_series[x_pos_next],
@@ -76,4 +77,5 @@ def interpolation(x_value, y_value, x_series, y_series, data):
                        y1=value1,
                        y2=value2
                        )
+
     return value

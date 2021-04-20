@@ -20,39 +20,24 @@ data = [
 x_value = -30
 y_value = 70
 
-print("\n............... Test 1 .........................................")
-print("\n............... Test 1-A1 . X less min  ........................")
-interpolation (x_value=-50, y_value=y_value,
-        x_series=x_series, y_series=y_series, data=data)
-
-print("\n............... Test 1-A2 ..X more max.......................................")
-interpolation (x_value=30, y_value=y_value,
-        x_series=x_series, y_series=y_series, data=data)
-               
-print("\n............... Test 1-A3 . Y less min  ........................")
-interpolation (x_value=x_value, y_value=60,
-        x_series=x_series, y_series=y_series, data=data)
-
-print("\n............... Test 1-A4 ..Y more max.......................................")
-interpolation (x_value=x_value, y_value=150,
-        x_series=x_series, y_series=y_series, data=data)
-
-print("\n............... Test 1-A5 ..X,Y more max.......................................")
-interpolation (x_value=x_value*10, y_value=150,
+print("\n............... Test A. Expected  512.8  @(-30,60).............")
+interpolation (x_value=-30, y_value=60,
         x_series=x_series, y_series=y_series, data=data)
         
-print ("\n............... Test 3 .........................................")
-interpolation (x_value=x_value, y_value=y_value,
+print("\n........... ... Test B. Expected 1,638.5  @(20,60) ...............")
+interpolation (x_value=20, y_value=60,
         x_series=x_series, y_series=y_series, data=data)
 
-print ("\n............... Test 4 .........................................")
-interpolation (x_value=-40, y_value=70,
-        x_series=x_series, y_series=y_series, data=data)  
-
-print ("\n............... Test 5 .........................................")
-interpolation (x_value=-20, y_value=90,
-        x_series=x_series, y_series=y_series, data=data)        
-
-print ("\n............... Test 6 .........................................")
-interpolation (x_value=-15, y_value=95,
+print("\n..............  Test C. Expected  381.0   @(-30, 140) ............")
+interpolation (x_value=-30, y_value=140,
         x_series=x_series, y_series=y_series, data=data)
+               
+print("\n.............   Test D. Expected   1,503.3    @(20, 140)..........")
+interpolation (x_value=20, y_value=140,
+        x_series=x_series, y_series=y_series, data=data)
+
+        
+print ("\n............... Test 1 ...Expected 915.5 @(-5,105).................")
+interpolation (x_value=-5, y_value=105,
+        x_series=x_series, y_series=y_series, data=data)
+

@@ -46,12 +46,12 @@ print ('    MREF kg/hr  = ', MREF)
 print ('    VSUCT kg/m3 = ', V1)
 
 print ("\n== Output===============")
-dicRest = objCompType.comp_balance(PSUCT=PSUCT,
-                                   PDISC=PDISC,
-                                   TSUCT=TSUCT,
-                                   MREF=MREF,
-                                   VSUCT=V1)
-
+dicRest = objCompType.comp_balance(PSUCT=PSUCT,     # pa
+                                   PDISC=PDISC,     # pa
+                                   TSUCT=TSUCT,     # K
+                                   MREF=MREF,       # kg/hr
+                                   VSUCT=V1)        # m3/kg
+                                         
 print ('Compressor exit Temp K        TSP = ',dicRest['TSP'])
 print ('Dischare Temp K             TDISC = ',dicRest['TDISC'])
 print ('Dischare Enthalpy    j/kg    HOUT = ',dicRest['HOUT'])
