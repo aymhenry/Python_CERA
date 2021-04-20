@@ -26,18 +26,14 @@ USUPE = 5.633  # W/m2-c Superheat Region Conductance, W/m2-C
 UTPE = 13.787  # W/m2-c Two-Phase Heat Transfer Conductance, W/m2-C
 ATOTE = 2.338  # m2 Total Heat Transfer Surface Area, m2
 
-CFME = 23.6   # L/s Air Flow Rate Across Coil (L/S)
-# RHOCPE   = 316.8/TS3
-# CFME     = 1.8961*(RHOCPE * CFME)/0.4720
+CFME = 14.5   # watt/K
 
 FZTEMP = -15 + 273.15 # K  Freezer Temperature (K)
 UA_FF = 0  # watt	UA_FF	Evap: A/R In Fresh Food Section (Or Cabinet Walls)
 
 TROOM = 32.22 + 273.15 #  K Room Temperature (K)
-Q_HXS_FF = 0 # Q_HXS_FF = 1.8 * Data.UA_FF_HXS*(TCND - TFF)*1.0548
-             # where 
-             # UA_FF_HXS=0 watt, Both: A/R 
-             # In Fresh Food Section (Or Cabinet Walls)
+Q_HXS_FF = 0 # watt
+
 
 IWALL_FF = 0 # FF (OR CABINET) EVAPORATOR BEHIND LINER (0: NO, 1: YES)
 NUM_ZONE= 5 #OA change from 1 to 5
@@ -45,7 +41,7 @@ IRFTYP = 1  # Refrigeration Type (1 to 7)
 
 # ===========================================
 T5 = 249.51 # 5 - INLET TO FRESH FOOD EVAPORATOR
-MREF = 5.8/3600  #[OA] kg/s Refrigerant Mas Flow Rate --OA changed input to be in kg/s
+MREF = 5.8 # kg/hr
 
 T8 = 249.51 # 8 - INLET TO FREEZER EVAPORATOR
 T9 = 249.51+5 # 9 - OUTLET FROM FREEZER EVAPORATOR
@@ -61,27 +57,29 @@ IFRSH = 0
 objEvaporator = Evaporator()
 objEvap = objEvaporator.getObject(objCP=objCP, IFRSH=IFRSH)
                       
-objEvap.setParamters(ATOTE = ATOTE,
-                    CFME = CFME,
-                    TS3=TS3,
-                    N_EVAP=N_EVAP,
-                    USUPE=USUPE,
-                    UTPE=UTPE,
-                    TROOM=TROOM,
-                    FZTEMP=FZTEMP,
-                    UA_FF=UA_FF,
-                    Q_HXS_FF=Q_HXS_FF,
-                    IWALL_FF=IWALL_FF,
-                    NUM_ZONE=NUM_ZONE,
-                    IRFTYP=IRFTYP
-                    )
 
-dicRest = objEvap.evap_balance (MREF=MREF,
-                       T5=T5, H5=H5, T7=T7,
-                       TDEW=TDEW,
-                       CPRVAP=CPRVAP
-                        )
+objEvap.setParamters(ATOTE=ATOTE,
+                          CFME=CFME,  # watt/K
+                          TS3=TS3,
+                          N_EVAP=N_EVAP,
+                          USUPE=USUPE,  # watt/m2-K
+                          UTPE=UTPE,  # watt/m2-K
+                          TROOM=TROOM,
+                          FZTEMP=FZTEMP,
+                          UA_FF=UA_FF,
+                          Q_HXS_FF=Q_HXS_FF,  # defalut =0 in Fortran
+                          IWALL_FF=IWALL_FF,
+                          NUM_ZONE=N_EVAP,
+                          IRFTYP=IRFTYP
+                          )
 
+dicRest = objEvap.evap_balance(MREF=MREF,      # kg/hr
+                               T5=T5,          # K
+                               H5=H5,          # j/kg
+                               T7=T7,          # K
+                               TDEW=TDEW,      # K
+                               CPRVAP=CPRVAP   # j/kg K
+                               )
 print ("\n\n\n Test 1 IFRSH = 0 ---------------------------------------------- ")
 print ("\n=== Parameters ======================")
 print ('Total Heat Transfer Surface Area               m2 ATOTE=', ATOTE)
@@ -120,6 +118,7 @@ print ("\n\n\n=== Output for IFRSH = 0   ====================")
 print ('                      W QFRSH = ',dicRest['QFRSH']) #[OA changed units]
 print ('                        W/C UAFF = ',dicRest['UAFF'])
 print ('Fraction subcooling,area Ration ASUPE / AEVAP FSUPE = ',dicRest['FSUPE'])
+UAFF = dicRest['UAFF']
 
 #========================================================
 print ("\n\n Test 2 IFRSH = 1 ---------------------------------------------- ")
@@ -144,34 +143,36 @@ print ('Pressure OUTLET FROM FRESH FOOD EVAPORATOR Pa P7=', P7)
 
 objEvaporator = Evaporator()
 objEvap = objEvaporator.getObject(objCP=objCP, IFRSH=IFRSH)
-objEvap.setParamters(ATOTE = ATOTE,
-                    CFME = CFME,
-                    TS3=TS3,
-                    N_EVAP=N_EVAP,
-                    USUPE=USUPE,
-                    UTPE=UTPE,
-                    TROOM=TROOM,
-                    FZTEMP=FZTEMP,
-                    UA_FF=UA_FF,
-                    Q_HXS_FF=Q_HXS_FF,
-                    IWALL_FF=IWALL_FF,
-                    NUM_ZONE=NUM_ZONE,
-                    IRFTYP=IRFTYP
-                    )
+objEvap.setParamters(ATOTE=ATOTE,
+                          CFME=CFME,  # watt/K
+                          TS3=TS3,
+                          N_EVAP=N_EVAP,
+                          USUPE=USUPE,  # watt/m2-K
+                          UTPE=UTPE,  # watt/m2-K
+                          TROOM=TROOM,
+                          FZTEMP=FZTEMP,
+                          UA_FF=UA_FF,
+                          Q_HXS_FF=Q_HXS_FF,  # defalut =0 in Fortran
+                          IWALL_FF=IWALL_FF,
+                          NUM_ZONE=N_EVAP,
+                          IRFTYP=IRFTYP
+                          )
 
-dicRest = objEvap.evap_balance (MREF=MREF,
-                       T5=T5, H5=H5, 
-                       TDEW=TDEW, 
-                       CPRVAP=CPRVAP,
-                       P5=P5, P7=P7
-                        )
+dicRest = objEvap.evap_balance(MREF=MREF,   # kg/hr
+                                    T5=T5,     # K
+                                    H5=H5,     # K
+                                    TDEW=TDEW,   # K
+                                    CPRVAP=CPRVAP,   # j/kg K
+                                    P5=P5,      # pa
+                                    P7=P7       # pa
+                                    )
 
 # ------------------------------------------
 print ("\n\n\n=== Output for IFRSH = 1   ====================")
 print ('                      W QFRSH = ',dicRest['QFRSH'])#[OA changed units]
 print ('                        W/C UAFF = ',dicRest['UAFF'])
 print ('Fraction subcooling,area Ration ASUPE / AEVAP FSUPE = ',dicRest['FSUPE'])
-
+UAFF = dicRest['UAFF']
 #========================================================
 print ("\n\n Test 3 IFRSH = 2---------------------------------------------- ")
 IFRSH = 2
@@ -197,34 +198,37 @@ print ('Pressure OUTLET FROM FRESH FOOD EVAPORATOR Pa P7=', P7)
 objEvaporator = Evaporator()
 objEvap = objEvaporator.getObject(objCP=objCP, IFRSH=IFRSH)
 
-objEvap.setParamters(ATOTE = ATOTE,
-                    CFME = CFME,
-                    TS3=TS3,
-                    N_EVAP=N_EVAP,
-                    USUPE=USUPE,
-                    UTPE=UTPE,
-                    TROOM=TROOM,
-                    FZTEMP=FZTEMP,
-                    UA_FF=UA_FF,
-                    Q_HXS_FF=Q_HXS_FF,
-                    IWALL_FF=IWALL_FF,
-                    NUM_ZONE=NUM_ZONE,
-                    IRFTYP=IRFTYP
-                    )
+objEvap.setParamters(ATOTE=ATOTE,
+                          CFME=CFME,  # watt/K
+                          TS3=TS3,
+                          N_EVAP=N_EVAP,
+                          USUPE=USUPE,  # watt/m2-K
+                          UTPE=UTPE,  # watt/m2-K
+                          TROOM=TROOM,
+                          FZTEMP=FZTEMP,
+                          UA_FF=UA_FF,
+                          Q_HXS_FF=Q_HXS_FF,  # defalut =0 in Fortran
+                          IWALL_FF=IWALL_FF,
+                          NUM_ZONE=N_EVAP,
+                          IRFTYP=IRFTYP
+                          )
 
-dicRest = objEvap.evap_balance (MREF=MREF,
-                       T5=T5, H5=H5, 
-                       TDEW=TDEW, 
-                       CPRVAP=CPRVAP,
-                       P5=P5, P7=P7
-                        )
+dicRest = objEvap.evap_balance(MREF=MREF,   # kg/hr
+                               T5=T5,     # K
+                               H5=H5,     # j/kg
+                               TDEW=TDEW,   # K
+                               CPRVAP=CPRVAP,   # j/kg K
+                               P5=P5,     # pa
+                               P7=P7      # pa
+                               )
 
 # -------------------------------------------------
 print ("\n=== Output for IFRSH = 2   ====================")
 print ('Q                     W QFRSH = ',dicRest['QFRSH'])#[OA changed units]
-print ('                        W/C UAFF = ',dicRest['UAFF'])
+print ('                     W/C UAFF = ',dicRest['UAFF'])
 print ('Fraction subcooling,area Ration ASUPE / AEVAP FSUPE = ',dicRest['FSUPE'])
 
+UAFF = dicRest['UAFF']
 #========================================================
 
 print ("\n\n\n Testing frsh method  ======================")
@@ -251,7 +255,7 @@ QFRSH = 450 #126354.802 #MREF * 10 * 1000    # W #[OA changed units]
 print ("\n\n\n Test 4 Input for frsh method  IFRSH = 0 =====================")
 
 print("        IFRSH =", IFRSH)
-print(" Entry Value to be checked W                     QFRSH = ", QFRSH)#[OA changed units]
+print(" Ref.          Watt          QFRSH = ", QFRSH)
 
 print(" Evaporator Temp                 TE =", TE)
 print(" Iteration count 1 or others     JE =", JE)
@@ -262,12 +266,16 @@ print(" Entry Value to be checked Enthalpy LIQUID LINE OUTLET FROM HIGH TEMP INT
 print(" Initial Guess For Refrigerant Mas Flow Rate   kg/s MREF = ", MREF) #[OA changed units]
 
 
-dicRest = objEvap.frsh(T5=T5, H5=H5, H7=H7, TS3=TS3,
-               TE=TE, JE=JE,
-               QFRSH=QFRSH,
-               MREF=MREF
-               )
-
+dicRest = objEvap.frsh(T5=T5,               # K
+                       H5=H5,               # j/kg
+                       H7=H7,               # j/kg
+                       TS3=TS3,               # K
+                       TE=TE,                 # K
+                       JE=JE,                 # none
+                       QFRSH=QFRSH,           # watt
+                       MREF=MREF,             # kg/kg
+                       UAFF=UAFF              # watt/m2 K
+                       )
 print ("\n output for frsh method  IFRSH = 0 =====================")
 print("           K TE =", dicRest['TE'])
 print("             JE =", dicRest['JE'])
@@ -279,13 +287,18 @@ print ("\n\n\n Test 5 input for frsh method  IFRSH = 1 =====================")
 IFRSH = 1  # 0 Nat. cooling, 1 Cross, OR 2 Counter
 
 print("        IFRSH =", IFRSH)
-print(" Entry Value to be checked W                     QFRSH = ", QFRSH)#[OA changed units]
+print(" Ref.          Watt          QFRSH = ", QFRSH)
 
-dicRest = objEvap.frsh(T5=T5, H5=H5, H7=H7, TS3=TS3,
-               TE=TE, JE=JE,
-               QFRSH=QFRSH,
-               MREF=MREF
-               )
+dicRest = objEvap.frsh(T5=T5,               # K
+                       H5=H5,               # j/kg
+                       H7=H7,               # j/kg
+                       TS3=TS3,               # K
+                       TE=TE,                 # K
+                       JE=JE,                 # none
+                       QFRSH=QFRSH,           # watt
+                       MREF=MREF,             # kg/kg
+                       UAFF=UAFF              # watt/m2 K
+                       )
 
 print ("\n output for frsh method  IFRSH = 1 =====================")
 print("           K TE =", dicRest['TE'])
@@ -298,13 +311,18 @@ print ("\n\n\n Test 6 b input for frsh method  IFRSH = 2 =====================")
 IFRSH = 2  # 0 Nat. cooling, 1 Cross, OR 2 Counter
 
 print("        IFRSH =", IFRSH)
-print(" Entry Value to be checked W                     QFRSH = ", QFRSH) #[OA changed units]
+print(" Ref.          Watt          QFRSH = ", QFRSH)
 
-dicRest = objEvap.frsh(T5=T5, H5=H5, H7=H7, TS3=TS3,
-               TE=TE, JE=JE,
-               QFRSH=QFRSH,
-               MREF=MREF
-               )
+dicRest = objEvap.frsh(T5=T5,               # K
+                       H5=H5,               # j/kg
+                       H7=H7,               # j/kg
+                       TS3=TS3,               # K
+                       TE=TE,                 # K
+                       JE=JE,                 # none
+                       QFRSH=QFRSH,           # watt
+                       MREF=MREF,             # kg/kg
+                       UAFF=UAFF              # watt/m2 K
+                       )
 
 print ("\n output for frsh method  IFRSH = 2 =====================")
 print("           K TE =", dicRest['TE'])

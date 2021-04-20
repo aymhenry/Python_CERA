@@ -1,12 +1,10 @@
 
-
-
  Test 1 IFRSH = 0 ----------------------------------------------
 
 === Parameters ======================
 Total Heat Transfer Surface Area               m2 ATOTE= 2.338
 Units to be checked  CFME
-L/s Air Flow Rate Across Coil (L/S)             CFME= 23.6
+L/s Air Flow Rate Across Coil (L/S)             CFME= 14.5
   (htf) temperature entering Evaporator
 htf temperature entering fresh food evaporator K TS3= 260.86
 Number of Zones on Evaporator                 N_EVAP= 5
@@ -33,8 +31,8 @@ Evaporator  CP  Cp of Ref. Vap              j/kg/K CPRVAP= 0.91
 
 === Output for IFRSH = 0   ====================
                       W QFRSH =  216.44503022777857
-                        W/C UAFF =  49.83185250415005
-Fraction subcooling,area Ration ASUPE / AEVAP FSUPE =  0.5092217773415156
+                        W/C UAFF =  36.349380663930006
+Fraction subcooling,area Ration ASUPE / AEVAP FSUPE =  0.3271855652815863
 
 
  Test 2 IFRSH = 1 ----------------------------------------------
@@ -51,9 +49,9 @@ Pressure OUTLET FROM FRESH FOOD EVAPORATOR Pa P7= 130500
 
 
 === Output for IFRSH = 1   ====================
-                      W QFRSH =  173.15719196762134
-                        W/C UAFF =  29.71949307284489
-Fraction subcooling,area Ration ASUPE / AEVAP FSUPE =  0.13189813619660248
+                      W QFRSH =  146.71876846761194
+                        W/C UAFF =  32.234006
+Fraction subcooling,area Ration ASUPE / AEVAP FSUPE =  0.0
 
 
  Test 3 IFRSH = 2----------------------------------------------
@@ -68,9 +66,9 @@ Pressure INLET TO FRESH FOOD EVAPORATOR    Pa P5= 130500
 Pressure OUTLET FROM FRESH FOOD EVAPORATOR Pa P7= 130500
 
 === Output for IFRSH = 2   ====================
-Q                     W QFRSH =  216.2558678594957
-                        W/C UAFF =  26.95624747615797
-Fraction subcooling,area Ration ASUPE / AEVAP FSUPE =  0.27684348132506337
+Q                     W QFRSH =  216.30505277346245
+                     W/C UAFF =  14.865846299315217
+Fraction subcooling,area Ration ASUPE / AEVAP FSUPE =  0.9110424006756163
 
 
 
@@ -80,41 +78,46 @@ Fraction subcooling,area Ration ASUPE / AEVAP FSUPE =  0.27684348132506337
 
  Test 4 Input for frsh method  IFRSH = 0 =====================
         IFRSH = 0
- Entry Value to be checked W                     QFRSH =  450
+ Ref.          Watt          QFRSH =  450
  Evaporator Temp                 TE = [0.0, 259.77, 0.0]
  Iteration count 1 or others     JE = 1
  Temperature INLET TO FRESH FOOD EVAPORATOR  K  T5 = 259.77
  Entry Value to be checked Enthalpy INLET TO FRESH FOOD EVAPORATOR   j/kg H5 = 209978.88795570855
  Entry Value to be checked Enthalpy LIQUID LINE OUTLET FROM HIGH TEMP INTERCHANGER j/kg H7 = 346856.64827330015
- Initial Guess For Refrigerant Mas Flow Rate   kg/s MREF =  0.0016111111111111111
+ Initial Guess For Refrigerant Mas Flow Rate   kg/s MREF =  5.8
 
  output for frsh method  IFRSH = 0 =====================
-           K TE = [0.0, 260.7728634649035, 259.77]
-             JE = 1
-          K TS4 = 242.70820338983052
+           K TE = [0.0, 0.0, 260.773]
+             JE = 2
+          K TS4 = 230.7415172413793
  1=Free Error, 0=Error Found         ICONE = 0
 
 
 
  Test 5 input for frsh method  IFRSH = 1 =====================
         IFRSH = 1
- Entry Value to be checked W                     QFRSH =  450
+ Ref.          Watt          QFRSH =  450
 
  output for frsh method  IFRSH = 1 =====================
-           K TE = [0.0, 261.2744317324517, 260.7728634649035]
-             JE = 1
-          K TS4 = 242.70820338983052
+           K TE = [0.0, 260.773, 5.0]
+             JE = 2
+          K TS4 = 230.7415172413793
  1=Free Error, 0=Error Found         ICONE = 0
 
 
 
  Test 6 b input for frsh method  IFRSH = 2 =====================
         IFRSH = 2
- Entry Value to be checked W                     QFRSH =  450
+ Ref.          Watt          QFRSH =  450
 
  output for frsh method  IFRSH = 2 =====================
-           K TE = [0.0, 261.52521586622584, 261.2744317324517]
-             JE = 1
-          K TS4 = 242.70820338983052
+           K TE = [0.0, 5.0, 261.2745]
+             JE = 2
+          K TS4 = 230.7415172413793
  1=Free Error, 0=Error Found         ICONE = 0
 Press any key to continue . . .
+
+
+
+
+
