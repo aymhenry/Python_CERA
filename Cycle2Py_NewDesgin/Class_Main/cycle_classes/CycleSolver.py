@@ -152,47 +152,29 @@ class CycleSolver(CycleUtils):
         # RHOCPC = 316.8 / self.dt.TS1[lng_item]
         # RHOCPE = 316.8 / self.dt.TS3[lng_item]
 
-        # modification by Ayman
-        # ------------------------------------
-        # https://www.ohio.edu/mechanical/thermo/property_tables
-        # /air/air_Cp_Cv.html#:~
-        # :text=The%20nominal%20values%20used%20for,v%20%3D%200.718%20kJ%2Fkg
-
-        # J/kg K
-        AirHeatCapacityC = 0.0003 * (self.TS1 ** 2) - 0.129 * self.TS1 + 1016.55
-
         # https://www.gribble.org/cycling/air_density.html
         # self.CFMC = 1.8961 * (RHOCPC * self.dt.CFMCI[lng_item]) / 0.4720
-
         # CFMCI L/sec = 1000 cm3/sec = 1000/100^3 m3/sec= 1/1000 m3/sec
 
         # equation change to account for correct pressure 101.325 kPa,
         #       and interpolate between rho at 0 C and rho at 10 C
-
-        air_densityC = 1.2873 + (self.TS1 - CycleSolver.K_C_DEG) / 10 * (1.2418 - 1.2873)
-
         # [m3/sec] * [kg/m3] * [j/kg/K] =j/sec/K = watt/K
-        self.dt.CFMC = self.dt.CFMCI[self.lng_item] / 1000 * air_densityC * AirHeatCapacityC
+        self.dt.CFMC = self.dt.CFMCI[self.lng_item] / 1000 * \
+                       self.getAirDencity(self.TS1) * \
+                       self.getAirCp(self.TS1)
 
         # ------------------------------------
         # self.CFME = 1.8961 * (RHOCPE * self.dt.CFMEI[lng_item]) / 0.4720
-
-        # J/kg K
-        AirHeatCapacityE = 0.0003 * (self.TS3 ** 2) - 0.129 * self.TS3 + 1016.55
-
-        air_densityE = 1.2873 + (self.dt.TS3[self.lng_item] - CycleSolver.K_C_DEG) / 10 * (1.2418 - 1.2873)
-
         # [m3/sec] * [kg/m3] * [J/kg K]*1000 =j/sec K = watt/K
-        self.dt.CFME = self.dt.CFMEI[self.lng_item] / 1000 * air_densityE * AirHeatCapacityE
+        self.dt.CFME = self.dt.CFMEI[self.lng_item] / 1000 * \
+                       self.getAirDencity(self.dt.TS3[self.lng_item]) * \
+                       self.getAirCp(self.TS3)
 
         # ------------------------------------
-        # J/kg K
-        AirHeatCapacityF = 0.0003 * self.TS5 ** 2 - 0.129 * self.TS5 + 1016.55
-
-        air_densityF = 1.2873 + (self.TS5 - CycleSolver.K_C_DEG) / 10 * (1.2418 - 1.2873)
-
         # [m3/sec] * [kg/m3] * [J/kg K]*1000 =j/sec K = watt/K
-        self.dt.CFMF = self.dt.CFMF / 1000 * air_densityF * AirHeatCapacityF
+        self.dt.CFMF = self.dt.CFMF / 1000 * \
+                       self.getAirDencity(self.dt.TS5) * \
+                       self.getAirCp(self.TS5)
         # =================================
 
         # Temp. At Comp., Inlet or -1 If Unspecified
@@ -281,6 +263,20 @@ class CycleSolver(CycleUtils):
                        strFileName=self.dt.FILE_NAME
                        )
 
+    def getAirCp(self, temp_K):
+        # https://www.ohio.edu/mechanical/thermo/property_tables
+        # /air/air_Cp_Cv.html#:~
+        # :text=The%20nominal%20values%20used%20for,v%20%3D%200.718%20kJ%2Fkg
+        
+        # kJ/kg K as mnstioned in the above site
+        # J/kg K
+        return (0.0003 * (temp_K ** 2) - 0.129 * temp_K + 1016.55) * 1000
+
+    def getAirDencity(self, temp_K):
+        # m3/kg
+        return 1.2873 + (temp_K - CycleSolver.K_C_DEG) / 10 * (1.2418 - 1.2873)
+        
+        
     #  -- Soving actions
     def solveCycle(self):
         print("\n\n== Starting processing ===")

@@ -405,7 +405,7 @@ class CycleUtils(exf4Cond_Evap):
                     if dt.IWALL_FZ == 1:
                         UAIR = 1.0 / (1.0 / UAIR + 0.1389 / 20.44)    # kW/m2 K
 
-                    UAIR *= 1000  # W/m2 K
+                    # UAIR *= 1000  # W/m2 K
 
                     # UAF[m2] * UAIR[watt/m2 K] * DELTAT[K]
                     QFREZ = dt.UAF * UAIR * DELTAT      # as Q_HXS_FZ watt

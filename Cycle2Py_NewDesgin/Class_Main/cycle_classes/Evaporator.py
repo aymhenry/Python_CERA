@@ -338,9 +338,7 @@ class EvapCool_FFNat(EvapCool_Abstract):  # IFRSH== 0
         UAIR = HRAD + HNAT  # W/m2 K feedback from condenser class
 
         if self.IWALL_FF == 1:
-            UAIR = 1.0 / (1.0 / UAIR + 0.1389 / 20.44)   # kW/m2 K
-            # UAIR by ayman units is power/Temp/sq-lenght
-            # Btu/hr/Feh/(length * Length)
+            UAIR = 1.0 / (1.0 / UAIR + 0.1389 / 20.44)   # W/m2 K
 
         self.trace.dr_omar("this is not SI units")
         # UA_FF is  W/K,  BTU = 1.0548 J
