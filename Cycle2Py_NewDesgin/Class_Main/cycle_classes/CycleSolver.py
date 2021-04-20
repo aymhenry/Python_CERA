@@ -1022,6 +1022,7 @@ class CycleSolver(CycleUtils):
 
     def evap_out7(self):   # 7 - OUTLET FROM FRESH FOOD EVAPORATOR
         # determine the enthalpy at [7]
+        self.trace.randam("Temp. at 7 in K", self.T[7])
         if self.ISPEC == 1:  # Evap superheat:
             # Approve concept self.trace.dr_omar("Wet region issue")
             # Ayman modification, in case DTSUPI = 0
