@@ -1,8 +1,8 @@
 # Python import
-from CoolProp.CoolProp import PhaseSI, PropsSI, get_global_param_string
+import sys
 
 # User import
-
+from CoolProp.CoolProp import PhaseSI, PropsSI, get_global_param_string
 
 class CoolPrp:
     # Class Startic vars
@@ -16,11 +16,15 @@ class CoolPrp:
     PHASE_LIQ = "liquid"
     PHASE_GAS = "gas"
 
-    def setup(self, strFluid):
+    def __init__(self):
         # member varbiable
+        
         self.m_error = CoolPrp.ERR_FUILD_NOT_FOUND
         self.m_error_desc = ""
         self.m_fluid = None
+        self.m_coolprp_err = ""
+        
+    def setup(self, strFluid):
 
         lstFluid = get_global_param_string("FluidsList").split(',')
 
@@ -48,23 +52,36 @@ class CoolPrp:
     # Output		: text of error number and error description
     # -----------------------------------------------------------
     def err_description(self):
+        
         if self.m_error == CoolPrp.ERR_FUILD_NOT_FOUND:
             return "Err " + str(CoolPrp.ERR_FUILD_NOT_FOUND) + \
-                " Fuild is not supported: " + str(self.m_error_desc)
+                " Fuild is not supported: " + \
+                str(self.m_error_desc) + \
+                "\n\n" + \
+                self.m_coolprp_err
 
         elif self.m_error == CoolPrp.ERR_PROB_ERROR:
             return "Err " + str(CoolPrp.ERR_PROB_ERROR) + \
-                " Call Prop error, error in parameters " + str(self.m_error_desc)
+                " Call Prop error, error in parameters " + \
+                str(self.m_error_desc) + \
+                "\n\n" + \
+                self.m_coolprp_err
 
         elif self.m_error == CoolPrp.ERR_PROB_NOT_FOUND:
             return "Err " + str(CoolPrp.ERR_PROB_NOT_FOUND) + \
-                " Property not supported: " + str(self.m_error_desc)
+                " Property not supported: " + \
+                str(self.m_error_desc) + \
+                "\n\n" + \
+                self.m_coolprp_err
 
         elif self.m_error == CoolPrp.ERR_NOT_FOUND:
             return "No error."
+        
         else:
             return "No error description, info. number CoolPrp:" + \
-                str(self.m_error)
+                str(self.m_error) + \
+                "\n\n" + \
+                self.m_coolprp_err
 
     # -----------------------------------------------------------
     # Job 			: get of of the properties 'P','T','V','V','H','S','CP','CV'
@@ -129,10 +146,12 @@ class CoolPrp:
 
             return result
 
-        except():   # BaseException:
+        except:   # BaseException:
             self.m_error = CoolPrp.ERR_PROB_ERROR
             self.m_error_desc = str_command
+            self.m_coolprp_err = str(ValueError())
             raise ValueError(self.err_description())
+            return None
 
     # -----------------------------------------------------------
     # Job 			: Get Used Fuild

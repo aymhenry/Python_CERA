@@ -20,11 +20,22 @@ class CoolPrpUtil:
     
     def getProp(self, P, T, prp="H", X=1):
         T_crit = self.objCP.getCrtiticalTemp()
-        if T > T_crit:
+        P_crit = self.objCP.getCrtiticalPress()
+        
+        if T >= T_crit or P >= P_crit:
             prop = self.objCP.Property(prp, T=T, P=P)
             
         else:
             P_sat = self.objCP.Property('P', T=T, X=0)  # Pa
+            if self.objCP.isError():
+                prop = self.objCP.Property(prp, T=T, P=P)
+                
+                if self.objCP.isError():
+                    print(self.objCP.err_description())
+                    sys.exit('4010')
+                    
+                return prop
+            
             # check if in wet area
             if abs(P_sat - P) > CoolPrpUtil.ERR_MARGIN:
                 # if so, get liquid or vap. value
@@ -33,6 +44,10 @@ class CoolPrpUtil:
             else:
                 prop = self.objCP.Property(prp, T=T, X=X)
         
+        if self.objCP.isError():
+            print(self.objCP.err_description())
+            sys.exit('4000')
+            
         return prop
 
     def get_coolQuality(self, Enthalpy, P, T):

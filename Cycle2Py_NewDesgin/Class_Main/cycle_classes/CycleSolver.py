@@ -1075,7 +1075,7 @@ class CycleSolver(CycleUtils):
             # CP7 = self.objCP.Property('CP', self.T=T[7], P=self.P[7]) j/kg K
             CP7 = self.coolutil.getProp(prp='CP', T=self.T[7],
                                         P=self.P[7])  # j/kg K
-
+            
             self.QINT = self.ETHX1 * (self.T[16] - self.T[7]) * CP7
             
             self.H[13] = self.H[7] + self.QINT
