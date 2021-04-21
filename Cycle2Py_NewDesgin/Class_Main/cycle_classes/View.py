@@ -186,18 +186,10 @@ class View:
         if self.ds.T[16] < TENV:
             self.dt.I_LIQUID_LINE = 1
 
-        self.prn.write_or_terminate(""", STATE
-                                      , T(C), T(C)
-                                      , P, H, V, S
-                                    """
-                                    )
+        self.prn.write_or_terminate('  , State, T(C), T(C), P, H, V, S')
+        self.prn.write_or_terminate(' , , AIR,  REF, kPa, kj/kg, m3/kg, kj/kg-C')
 
-        self.prn.write_or_terminate(""", , AIR,   REF
-                                      ,  kPa,  kj/kg,   m3/kg,   kj/kg-C
-                                    """
-                                    )
-
-        self.print_width(['#', 'Point', 'STATE',
+        self.print_width(['#', 'Point', 'State',
                           'T(C)', 'T(C)',
                           'P', 'H', 'V', 'S'
                           ])
@@ -391,122 +383,93 @@ class View:
         #    REST OF THE CONVERSIONS
         # done on printing time
 
-        #
+        # --------------------------------------------------------
         #    OUTPUT SUMMARY TABLE OF RESULTS
-        #
-        self.prn.write_or_terminate('CYCLE PERFORMANCE SUMMARY')
+        
+        self.prn.write_or_terminate(' ')
+        self.prn.write_or_terminate('Cycle Performance Summary')
         if self.dt.ITYPE == 1:
             self.prn.write_or_terminate(
-                'EVAPORATOR CAPACITY,  %9.2f, KJ/HR,  %9.2f, W' %
-                (self.ds.QE, self.ds.QE))
+                'Evaporator capacity,  %9.2f, watt'
+                % self.ds.QE)
         else:
             self.prn.write_or_terminate(
-                'FRESH FOOD EVAPORATOR CAPACITY,  %9.2f, KJ/HR,  %9.2f, W' %
-                (self.ds.QE, self.ds.QE))
+                'Fresh food evaporator capacity,  %9.2f, watt' 
+                 % self.ds.QE)
 
             self.prn.write_or_terminate(
-                'FREEZER EVAPORATOR CAPACITY,     %9.2f, KJ/HR,  %9.2f, W' %
-                (self.ds.QZ, self.ds.QZ))
+                'Freezer evaporator capacity, %9.2f, watt' 
+                % self.ds.QZ)
 
         self.prn.write_or_terminate(
-            'CONDENSER HEAT REJECTION RATE,  %9.2f, KJ/HR,  %9.2f, W' %
-            (self.ds.QC, self.ds.QC))
+            'Condenser heat rejection rate,  %9.2f, watt' 
+            % self.ds.QC)
 
         self.prn.write_or_terminate(
-            'COMPRESSOR POWER REQUIREMENT,     %9.2f, KJ/HR,  %9.2f, W' %
-            (self.ds.W, self.ds.W))
+            'Compressor power requirement, %9.2f, watt' 
+            % self.ds.W)
 
-        self.prn.write_or_terminate('''COEFFICIENT OF PERFORMANCE,
-            %9.2f''' % self.ds.COPR)
+        self.prn.write_or_terminate(
+            'Coefficient of performance, %9.2f'
+            % self.ds.COPR)
 
         if (self.dt.IRFTYP <= 3 and self.dt.ICYCL ==
                 1 and self.dt.ICAB != 0 and self.ds.IFRSH != 0):
             self.prn.write_or_terminate(
-                'FRACTION AIR TO FRESH FOOD,     %9.2f, (SINGLE EVAPORATOR CYCLE)' %
-                self.dt.FF_FRACT)
+                'Fraction air to fresh food, %9.2f, (single evaporator cycle)' 
+                % self.dt.FF_FRACT)
 
+        # ----------------------------------------------
         self.prn.write_or_terminate(" ")
-
-        if self.dt.IMAP == 1:
-            self.prn.write_or_terminate('''ESTIMATED COMPRESSION EFFICIENCY,
-                %9.2f, (COMPRESSOR EER MODEL)''' % self.ds.ETAS)
-
-            self.prn.write_or_terminate('''ESTIMATED MOTOR-PUMP EFFICIENCY,
-                                        %9.2f, (COMPRESSOR EER MODEL)'''
-                                        % (self.ds.EFFC / self.ds.ETAS))
-
-            self.prn.write_or_terminate('''ESTIMATED CLEARANCE VOLUME,
-                %9.2f, (COMPRESSOR EER MODEL)''' % self.dt.CE)
-
-            self.prn.write_or_terminate('''ESTIMATED SHELL LOSS,
-                %9.2f, (COMPRESSOR EER MODEL)''' % self.ds.QCAN)
-
-            self.prn.write_or_terminate(''''ESTIMATED DISC TUBE HEAT LOSS,
-                %9.2f, (COMPRESSOR EER MODEL)''' % self.ds.QHILO)
-
-        self.prn.write_or_terminate("HEAT EXCHANGER PERFORMANCE SUMMARY")
-        self.prn.write_or_terminate('''EXCHANGER, EFFECTIVENESS,
-            SUBCOOLED FRACTION, SUPERHEATED FRACTION''')
+        self.prn.write_or_terminate("Heat Exchanger Performance Summary")
+        self.prn.write_or_terminate(
+            'Exchanger, Effectiveness, Subcooled fraction, Superheated fraction')
 
         if self.dt.ITYPE == 1:
             if self.ds.IFRSH != 0:
                 self.prn.write_or_terminate(
-                    'EVAPORATOR,     %9.2f, N/A, ,%9.2f' %
-                    (self.ds.ETAE * 100, self.ds.FSUPE * 100))
+                    'Evaporator, %9.2f, N/A, ,%9.2f' 
+                    % (self.ds.ETAE * 100, self.ds.FSUPE * 100))
             else:
                 self.prn.write_or_terminate(
-                    'EVAPORATOR,     , N/A, N/A, %9.2f ' %
-                    (self.ds.FSUPE * 100))
+                    'Evaporator,     , N/A, N/A, %9.2f ' 
+                    % (self.ds.FSUPE * 100))
         else:
             if self.ds.IFRSH != 0:
                 self.prn.write_or_terminate(
-                    'FRESH FOOD EVAP.,     %9.2f, N/A, %9.2f ' %
-                    (self.dt.ETAE * 100, self.ds.FSUPE * 100))
+                    'Fresh food Evap.,     %9.2f, N/A, %9.2f '
+                    % (self.dt.ETAE * 100, self.ds.FSUPE * 100))
             else:
                 self.prn.write_or_terminate(
-                    'FRESH FOOD EVAP.,  , N/A, N/A, %9.2f ' %
-                    (self.ds.FSUPE * 100))
+                    'Fresh food Evap.,  , N/A, N/A, %9.2f '
+                    % (self.ds.FSUPE * 100))
 
             if self.dt.IFREZ != 0:
                 self.prn.write_or_terminate(
-                    'FREEZER EVAP.,   %9.2f, N/A,  ---- ' %
-                    (self.dt.ETAF * 100))
+                    'Freezer Evap.,   %9.2f, N/A, ---- '
+                    % (self.dt.ETAF * 100))
             else:
                 self.prn.write_or_terminate(' ')
 
         if self.ds.ICOND != 0:
             self.prn.write_or_terminate(
-                'CONDENSER,     %9.2f,%9.2f, %9.2f ' %
-                (self.ds.ETAC, self.ds.FSUPC, self.ds.FSUPC))
+                'Condenser, %9.2f,%9.2f, %9.2f' 
+                % (self.ds.ETAC, self.ds.FSUPC, self.ds.FSUPC))
         else:
             self.prn.write_or_terminate(
-                'CONDENSER,     , N/A, %9.2f, %9.2f ' %
-                (self.ds.FSUPC * 100, self.ds.FSUPC * 100))
+                'Condenser,     , N/A, %9.2f, %9.2f '
+                % (self.ds.FSUPC * 100, self.ds.FSUPC * 100))
 
-        self.prn.write_or_terminate("COMPRESSOR PERFORMANCE SUMMARY")
+        # ----------------------------------------------------------
+        self.prn.write_or_terminate(" ")
+        self.prn.write_or_terminate("Compressor Performance Summary")
         self.prn.write_or_terminate(
-            'REFRIGERANT MASS FLOW RATE.,   %9.2f, KG/HR' %
-            self.ds.FLOW)
-
-        if self.dt.IMAP != 0:
-            self.prn.write_or_terminate(
-                'VOLUMETRIC EFFICIENCY,   %9.2f' %
-                self.dt.ETAV)
+            'Refrigerant mass flow rate, %9.2f, kg/hr' 
+            % self.ds.FLOW)
 
         self.prn.write_or_terminate(
-            'PRESSURE RATIO,   %9.2f' %
-            (self.ds.P[2] / self.ds.P[1]))
-
-        if self.dt.IMAP != 0:
-            self.prn.write_or_terminate(
-                'SUCTION PORT TEMPERATURE (C),   %9.2f' %
-                (self.dt.TSUC - 273.11))
-            self.prn.write_or_terminate(
-                'DISCHARGE PORT TEMPERATURE (C),   %9.2f' %
-                (self.dt.TDISC - 273.11))
-            self.prn.write_or_terminate(
-                'DISCHARGE SUPERHEAT (C),   %9.2f' %
-                (self.dt.TSUPC - 273.11))
+            'Pressure ratio, %9.2f' 
+            % (self.ds.P[2] / self.ds.P[1]))
 
         self.prn.write_or_terminate(" ")
         #
@@ -536,109 +499,100 @@ class View:
         PR = self.ds.P[2]/self.ds.P[1]
         TSUPC = self.ds.T[2] - self.ds.T[3]
 
+        # ----------------------------------------------------------
         self.prn.write_or_terminate("OUTPUT RESULTS")
         #    OUTPUT SUMMARY TABLE OF RESULTS
 
-        self.prn.write_or_terminate('CYCLE PERFORMANCE SUMMARY')
+        self.prn.write_or_terminate(' ')
+        self.prn.write_or_terminate('Cycle Performance Summary')
         if self.dt.ITYPE == 1:
-            self.prn.write_or_terminate('''EVAPORATOR CAPACITY,
-            %9.3f, watt, %9.3f, W''' % (QE, QE))
+            self.prn.write_or_terminate(
+                'Evaporator capacity,%9.3f, watt' 
+                % (QE))
 
         else:
-            self.prn.write_or_terminate('''FRESH FOOD EVAPORATOR CAPACITY,
-                %9.3f, KJ/HR,  %9.3f, W''' % (QE, QE))
+            self.prn.write_or_terminate(
+                'Fresh Food evaporator capacity, %9.3f, watt' 
+                % (QE))
 
-            self.prn.write_or_terminate('''FREEZER EVAPORATOR CAPACITY,
-                %9.3f, KJ/HR,  %9.3f, W''' % (QZ, QZ))
+            self.prn.write_or_terminate(
+                'Freezer evaporator capacity, %9.3f, watt' 
+                % (QZ))
 
-        self.prn.write_or_terminate('''CONDENSER HEAT REJECTION RATE,
-                %9.3f, KJ/HR,  %9.3f, W''' % (QC, QC))
+        self.prn.write_or_terminate(
+            'Condenser heat rejection rate, %9.3f, watt' 
+            % (QC))
 
-        self.prn.write_or_terminate('''COMPRESSOR POWER REQUIREMENT,
-                %9.3f, KJ/HR,  %9.3f, W''' % (W, W))
+        self.prn.write_or_terminate(
+            'Compressor power requirement, %9.3f,watt' 
+            % (W))
 
-        self.prn.write_or_terminate('''COEFFICIENT OF PERFORMANCE,
-                %9.3f''' % self.ds.COPR)
+        self.prn.write_or_terminate(
+            'Coefficient of performance, %9.3f' 
+            % self.ds.COPR)
 
         if (self.dt.IRFTYP <= 3 and
                 self.dt.ICYCL == 1 and
                 self.dt.ICAB != 0 and
                 self.ds.IFRSH != 0):
-            self.prn.write_or_terminate('''FRACTION AIR TO FRESH FOOD,
-                %9.3f, (SINGLE EVAPORATOR CYCLE)''' % self.dt.FF_FRACT)
+                
+            self.prn.write_or_terminate(
+                'Fraction air to fresh food, %9.3f, (single evaporator cycle)'
+                % self.dt.FF_FRACT)
 
         self.prn.write_or_terminate(" ")
 
-        if self.dt.IMAP == 1:
-            self.prn.write_or_terminate('''ESTIMATED COMPRESSION EFFICIENCY,
-                %9.3f, (COMPRESSOR EER MODEL)''' % self.dt.ETAS)
-            self.prn.write_or_terminate('''ESTIMATED MOTOR-PUMP EFFICIENCY,
-                %9.3f, (COMPRESSOR EER MODEL)''' % (self.dt.EFFC / self.dt.ETAS))
-            self.prn.write_or_terminate('''ESTIMATED CLEARANCE VOLUME,
-                %9.3f, (COMPRESSOR EER MODEL)''' % self.dt.CE)
-            self.prn.write_or_terminate('''ESTIMATED SHELL LOSS,
-                %9.3f, (COMPRESSOR EER MODEL)''' % self.ds.QCAN)
-            self.prn.write_or_terminate('''ESTIMATED DISC TUBE HEAT LOSS,
-                %9.3f, (COMPRESSOR EER MODEL)''' % self.dt.QHILO)
+        self.prn.write_or_terminate("Heat Exchanger Performance Summary")
+        self.prn.write_or_terminate(
+            'Exchanger, Effectiveness, Subcooled fraction, Superheated fraction')
 
-        self.prn.write_or_terminate("HEAT EXCHANGER PERFORMANCE SUMMARY")
-        self.prn.write_or_terminate('''EXCHANGER, EFFECTIVENESS,
-            SUBCOOLED FRACTION, SUPERHEATED FRACTION''')
-
+        # ----------------------------------------------------------
         if self.dt.ITYPE == 1:
             if self.ds.IFRSH != 0:
-                self.prn.write_or_terminate('''EVAPORATOR,
-                    %9.3f, N/A, ,%9.3f''' % (self.dt.ETAE, self.ds.self.ds.FSUPE))
+                self.prn.write_or_terminate(
+                    'Evaporator, %9.3f, N/A, ,%9.3f'
+                    % (self.dt.ETAE, self.ds.self.ds.FSUPE))
 
             else:
-                self.prn.write_or_terminate('''EVAPORATOR,     , N/A, N/A,
-                    %9.3f''' % self.ds.FSUPE)
+                self.prn.write_or_terminate(
+                    'Evaporator, , N/A, N/A, %9.3f'
+                    % self.ds.FSUPE)
 
         else:
             if self.ds.IFRSH != 0:
-                self.prn.write_or_terminate('''FRESH FOOD EVAP.,
-                    %9.3f, N/A, %9.3f ''' % (self.dt.ETAE, self.ds.FSUPE))
+                self.prn.write_or_terminate(
+                    'Fresh food Evap., %9.3f, N/A, %9.3f'
+                    % (self.dt.ETAE, self.ds.FSUPE))
 
             else:
-                self.prn.write_or_terminate('''FRESH FOOD EVAP.,  , N/A, N/A,
-                    %9.3f''' % self.ds.FSUPE)
+                self.prn.write_or_terminate(
+                    'Fresh food Evap.,  , N/A, N/A, %9.3f' 
+                    % self.ds.FSUPE)
 
             if self.dt.IFREZ != 0:
-                self.prn.write_or_terminate('''FREEZER EVAP.,
-                    %9.3f, N/A,  ---- ''' % self.dt.ETAF)
+                self.prn.write_or_terminate(
+                    'Freezer Evap., %9.3f, N/A,  ---- '
+                    % self.dt.ETAF)
 
             else:
                 self.prn.write_or_terminate(' ')
 
         if self.ds.ICOND != 0:
-            self.prn.write_or_terminate('''CONDENSER,
-                %9.3f,%9.3f, %9.3f ''' % (self.ds.ETAC,
-                                          self.ds.FSUBC,
-                                          self.ds.FSUPC))
+            self.prn.write_or_terminate(
+                'Condenser, %9.3f, %9.3f, %9.3f '
+                % (self.ds.ETAC, self.ds.FSUBC, self.ds.FSUPC))
         else:
-            self.prn.write_or_terminate('''CONDENSER,     , N/A,
-                %9.3f,%9.3f ''' % (self.ds.FSUBC, self.ds.FSUPC))
+            self.prn.write_or_terminate(
+                'Condenser,  , N/A, %9.3f,%9.3f' 
+                % (self.ds.FSUBC, self.ds.FSUPC))
 
-        self.prn.write_or_terminate("COMPRESSOR PERFORMANCE SUMMARY")
-        self.prn.write_or_terminate('''REFRIGERANT MASS FLOW RATE.,
-            %9.3f, kg/hr''' % self.ds.FLOW)
+        # ----------------------------------------------------------
+        self.prn.write_or_terminate("Compressor Performance Summary")
+        
+        self.prn.write_or_terminate(
+            'Refrigerant mass flow rate, %9.3f, kg/hr' 
+            % self.ds.FLOW)
 
-        if self.dt.IMAP != 0:
-            self.prn.write_or_terminate('''VOLUMETRIC EFFICIENCY,
-                %9.3f''' % (self.dt.ETAV * 0.45359))
-
-        self.prn.write_or_terminate('PRESSURE RATIO,   %9.3f' % PR)
-
-        if self.dt.IMAP != 0:
-            self.prn.write_or_terminate('''SUCTION PORT TEMPERATURE (C),
-                %9.3f''' % self.ds.TSUC)
-
-            self.prn.write_or_terminate('''DISCHARGE PORT TEMPERATURE (C),
-                %9.3f''' % self.ds.TDISC)
-            self.prn.write_or_terminate('''DISCHARGE SUPERHEAT (C),
-                %9.3f''' % TSUPC)
-
-        self.prn.write_or_terminate(" ")
-
+        self.prn.write_or_terminate('Pressure ratio, %9.3f' % PR)
         return
 

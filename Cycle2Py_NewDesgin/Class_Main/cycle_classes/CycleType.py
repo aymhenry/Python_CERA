@@ -1,5 +1,4 @@
 # Python Import ====================
-from abc import ABC, abstractmethod
 
 # User Import ======================
 from cycle_classes.CycleSolver import *
@@ -14,98 +13,44 @@ from cycle_classes.ErrorException import ErrorException
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
 
-class CycleType_Abstract (ABC):
+class CycleType:
 
     def __init__(self, objdata):
-    
         self.dt = objdata
         
-        # Create basic object for coolProp
         # set be will be made later self.objCP.setup('R12')
         self.objCP = CoolPrp()
         
-        self.setup_vars_for_all_types()
-        self.setup_vars_extra()
+        # --------------------------------------------------
+        # Setup basic vars
+        # --------------------------------------------------
+        self.dt.ETAF = 0.0
+        self.dt.ETAV = 0.0
+        self.dt.MROLD = 0.0
 
-    # Abstract methods
-    # -----------------------------------------------------------
-    # Job 			: Change units, from the give SI units. (individual for every sub-class)
-    # Input 		:
-    #
-    # Output		:
-    # -----------------------------------------------------------
-    @abstractmethod
-    def adjust_units(self):
-        pass
+        self.dt.DUTYZ = 0.0
+        self.dt.CAPZ = 0.0
+        
+        self.dt.INCTRL = 0  # input is given only in Type 2
+        # self.dt.IFREZI = [1, 1, 1]
 
-    # -----------------------------------------------------------
-    # Job 			: inialize extra varibale in dt object with value (individual for every sub-class)
-    # Input 		:
-    #
-    # Output		:
-    # -----------------------------------------------------------
+        self.dt.TS5 = 300  # set non zero value, prevent calculation error
+        self.dt.AREAFZ = 300  # set non zero value, prevent calculation error
+        self.dt.UAF = 300  # set non zero value, prevent calculation error
+        self.dt.DPF = 3  # set non zero value, prevent calculation error
 
-    @abstractmethod
-    def setup_vars_extra(self):
-        pass
-
-    # -----------------------------------------------------------
-    # Job 			: Calculate cycle data, (individual for every sub-class)
-    # Input 		:
-    #
-    # Output		:
-    # -----------------------------------------------------------
-
-    @abstractmethod
-    def calculte(self):
-        pass
-
-    # -----------------------------------------------------------
-    # Job 			: Adjsut input data
-    # Input 		:
-    #
-    # Output		:
-    # -----------------------------------------------------------
-    @abstractmethod
-    def adjust_input(self):
-        pass
-    # -----------------------------------------------------------
-    # Job 			: Adjsut input data for all types
-    # Input 		:
-    #
-    # Output		:
-    # -----------------------------------------------------------
-
-    def adjust_input_for_all_types(self):
-        # QZ_NET = 0.0
-
-        # set Temperatue 17.11 C
-        self.dt.TS5 = 256.0
+        # --------------------------------------------------        
+        # adjust default vars, according to basic input values
+        # --------------------------------------------------
+        self.dt.TS5 = 256.0  # set Temperatue 17.11 C
 
         # initialize error code for liquid line anti-sweat heat
         self.dt.I_LIQUID_LINE = 0
 
-        # get compressor file name
-        # self.dt.FILMAP1 = self.getCompressorFileName(
-        #   # self.dt.FILMAP1_CODE) + ".cmp"
-
-        # Binary interaction parameter (BIP)
-        # for int_ref in range(1, 2 + 1):
-        #    # self.dt.F[2][1][int_ref] = self.dt.F[1][2][int_ref]
-        #    # self.dt.F[3][1][int_ref] = self.dt.F[1][3][int_ref]
-        #    # self.dt.F[3][2][int_ref] = self.dt.F[2][3][int_ref]
-
-        # Delat Temp Refrigerant Exit Superheat (C) Or Quality (0-1)
-        # add a new entry for Quality in Python only
-        # self.dt.QUALTY = self.dt.DTSPEI[:]
-
-        # if IDFRST(Manual Defrost) =1  (i.e Autoamtic ) DFSTCYC:Closed-Door
-        # Automatic Defrost (W)
         if self.dt.IDFRST == 1:
             self.dt.DFSTCYC = 0.0
 
         #  zero condenser heat loads to cabinet and evaporators
-        #
         self.dt.Q_CND_FF = 0.0
         self.dt.Q_CND_FZ = 0.0
         self.dt.Q_HXS_FF = 0.0
@@ -121,34 +66,15 @@ class CycleType_Abstract (ABC):
         # Python comment: save original ICYCL value
         self.dt.ICYCLS = self.dt.ICYCL
 
-        # Python comment: if 4- chest freezer, change it to 2- two-door
-        # bottom-mount befrigerator/freezer
-        if self.dt.ICYCL == 4:
-            self.dt.ICYCL = 2
-
-    # -----------------------------------------------------------
-    # Job 			: Adjsut unit for SI to Britch
-    # Input 		:
-    #
-    # Output		:
-    # -----------------------------------------------------------
-    def adjust_units_for_all_types(self):
-
+        # --------------------------------------------------
+        # Convert units
+        # --------------------------------------------------
         self.dt.FILE_NAME += '.cmp'
-        # TOL_FRSH 
-        # TOL_FRZ 
-        # TOL_COND
                 
         # Python - Temperatue input (C) and is converted to K
         self.dt.TS1 = [temp_c + 273.11 for temp_c in self.dt.TS1]
         self.dt.TS3 = [temp_c + 273.11 for temp_c in self.dt.TS3]
-        
-        # - delta -t not required
-        #       self.dt.DTSBCI= [temp_c + 273.11 for temp_c in self.dt.DTSBCI]
-        #       self.dt.SUPIHX= [temp_c + 273.11 for temp_c in self.dt.SUPIHX]
-        
-        # -----------------------------------
-        
+
         for item in range(0, len(self.dt.TSPECI)):
             if self.dt.TSPECI[item] > 0.0:
                 self.dt.TSPECI[item] += 273.11
@@ -165,10 +91,6 @@ class CycleType_Abstract (ABC):
         # others
         self.dt.FZQON = self.dt.FZQOFF
         self.dt.FZQ = self.dt.FZQOFF
-        # self.dt.FROSTFS = self.dt.FROSTF
-        # self.dt.FROSTZS = self.dt.FROSTZ
-
-        # error ===CONVERT UNITS need adjust may be move to other class
         
         self.dt.CONDF = self.dt.FFQ - self.dt.FFSEN - self.dt.FFLAT \
             - self.dt.FFHTQ - self.dt.FROSTF - self.dt.FFREFQ - self.dt.FFPENA
@@ -176,72 +98,11 @@ class CycleType_Abstract (ABC):
         self.dt.CONDZ = self.dt.FZQ - self.dt.FZSEN - self.dt.FZLAT - \
             self.dt.FZHTQ - self.dt.FROSTZ - self.dt.FZREFQ - self.dt.FZPENA
 
-    # -----------------------------------------------------------
-    # Job 			: add extra var for all types
-    # Input 		:
-    #
-    # Output		:
-    # -----------------------------------------------------------
-
-    def setup_vars_for_all_types(self):
-        self.dt.ETAF = 0.0
-        self.dt.ETAV = 0.0
-        self.dt.MROLD = 0.0
-
-        self.dt.DUTYZ = 0.0
-        self.dt.CAPZ = 0.0
-
-    # -----------------------------------------------------------
-    # Job 			: add extra var for all types except type 2
-    # Input 		:
-    #
-    # Output		:
-    # -----------------------------------------------------------
-    def setup_vars(self):
+    def calculte(self):        
+        self.dt.TS5 = -300.0   # 256
+        self.dt.DPF = 0.0
+        self.dt.CFMF = 0  # by pass required value.
         
-        self.dt.INCTRL = 0  # input is given only in Type 2
-        self.dt.IFREZI = [1, 1, 1]
-
-        self.dt.TS5 = 300  # set non zero value, prevent calculation error
-        # self.dt.CFMF = 300  # set non zero value, prevent calculation error
-        self.dt.AREAFZ = 300  # set non zero value, prevent calculation error
-        self.dt.UAF = 300  # set non zero value, prevent calculation error
-        self.dt.DPF = 3  # set non zero value, prevent calculation error
-
-    # -----------------------------------------------------------
-    # Job 			: prepare calling data to Cycle analysis
-    # Input 		: Item in array to use
-    #
-    # Output		:
-    # -----------------------------------------------------------
-    def prepare_Data4Cycle(self, lng_item):
-
-        # # convert to other units =========
-
-        # self.dt.UDSC = self.dt.UDSCI[lng_item] # * 3.600
-        # self.dt.UTPC = self.dt.UTPCI[lng_item] # * 3.600
-        # self.dt.USCC = self.dt.USCCI[lng_item] # * 3.600
-        # self.dt.UTPE = self.dt.UTPEI[lng_item] # * 3.600
-        # self.dt.USUPE = self.dt.USUPEI[lng_item] # * 3.600
-
-        # self.dt.SIZE = self.dt.SIZEN[lng_item] # / 0.252
-        # self.dt.MREF = self.dt.MREFI[lng_item] # * 2.20462 kg/hr --> LBM/hr
-        
-        # # from cm3 to cu-inch compressor displacement
-        # self.dt.DISPLC[lng_item] = self.dt.DISPLC[lng_item] # / 16.3871
-
-        # only for type 2
-        if self.dt.IFREZI[lng_item] != 0:
-            self.dt.UAF *= 3.600
-        # ============= end of data to be checked ==========
-
-    # -----------------------------------------------------------
-    # Job 			: prepare calling parameter for fror Cycle analysis
-    # Input 		: lng_item cycle number, N.B cycle type 3 only which has two cycles
-    #
-    # Output		:
-    # -----------------------------------------------------------
-    def call_cycle(self, lng_item):
         if self.getRefName(self.dt.IR[1][1]) == "":
             raise ErrorException('Error refrigerant code: ', 'cyt1000')
 
@@ -251,7 +112,7 @@ class CycleType_Abstract (ABC):
         
         objCycleSolver = CycleSolver(objCP=self.objCP,
                                      dt=self.dt,
-                                     lng_item=lng_item
+                                     lng_item=1
                                      # NCYC=1
                                      )
 
@@ -261,8 +122,7 @@ class CycleType_Abstract (ABC):
         
         return objFeedback   # obj_cycle.cycle()
 
-    @staticmethod
-    def getRefName(lng_Code):
+    def getRefName(self, lng_Code):
         lstRefList = [
             'R11',
             'R12',
@@ -305,142 +165,7 @@ class CycleType_Abstract (ABC):
         else:
             return lstRefList[lng_Code - 1]
             
-# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-# Job 			: Analisis Cycle Type 1 - Standard
-#
-# Editor		: aymhenry@gmail.com
-# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 
-class Type_1Standard (CycleType_Abstract):
-    pass
-
-    def calculte(self):
-        self.dt.ITYPE = 1
-        self.dt.IEVAP = 0
-        
-        self.dt.TS5 = -300.0   # 256
-        self.dt.DPF = 0.0
-        self.dt.CFMF = 0  # by pass required value.
-
-        return self.call_cycle(self.dt.ITYPE)
-
-    def setup_vars_extra(self):
-        self.setup_vars()
-
-    def adjust_units(self):
-        self.adjust_units_for_all_types()
-
-    def adjust_input(self):
-        self.adjust_input_for_all_types()
-        self.prepare_Data4Cycle(1)
-
-# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-# Job 			: Analisis Cycle Type 2 - Lorenz
-#
-# Editor		: aymhenry@gmail.com
-# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 
-class Type_2Lorenz (CycleType_Abstract):
-
-    def calculte(self):
-        pass
-
-    def setup_vars_extra(self):
-        pass
-
-    def adjust_units(self):
-        self.adjust_units_for_all_types()
-
-    def adjust_input(self):
-        self.adjust_input_for_all_types()
-        self.prepare_Data4Cycle(1)
-
-# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-# Job 			: Analisis Cycle Type 2 - Lorenz
-#               Control Method 4 -switching valve
-# Editor		: aymhenry@gmail.com
-# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-
-
-class Type_2Lorenz_4swtchVLV (Type_2Lorenz):
-    def adjust_input(self):
-        # super.adjust_input()
-        pass
-
-# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-# Job 			: Analisis Cycle Type 2 - Lorenz
-# 				Control Method 5 -solenoid valve
-# Editor		: aymhenry@gmail.com
-# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-
-
-class Type_2Lorenz_5solindVLV (Type_2Lorenz):
-    def adjust_input(self):
-        #   if INCTRL == 5 i.e solenoid valve or fan control
-        #   set IDFRST =1 Manual Defrost to Yes
-        self.dt.IDFRST = 1
-        # super.adjust_input()
-
-# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-# Job 			: Analisis Cycle Type 2 - Lorenz
-# 				Control Method any other ctrl method, but not 4 & 5
-# Editor		: aymhenry@gmail.com
-# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-
-
-class Type_2Lorenz_ctrlOthers (Type_2Lorenz):
-    def adjust_input(self):
-        # super.adjust_input()
-        pass
-
-# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-# Job 			: Analisis Cycle Type 3 - Dual Loop
-#
-# Editor		: aymhenry@gmail.com
-# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-
-
-class Type_3DualLoop (CycleType_Abstract):
-
-    def calculte(self):
-        pass
-
-    def setup_vars_extra(self):
-        self.setup_vars()
-
-    def adjust_units(self):
-        self.adjust_units_for_all_types()
-
-    def adjust_input(self):
-        self.adjust_input_for_all_types()
-
-        # get compressor file name
-        # self.dt.FILMAP2 = self.getCompressorFileName(
-        #    # self.dt.FILMAP2_CODE)
-
-        self.prepare_Data4Cycle(1)
-        # self.prepare_Data4Cycle (2)
-
-# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-# Job 			: Analisis Cycle Type 4 - Dual Evap
-#
-# Editor		: aymhenry@gmail.com
-# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-
-
-class Type_4DualEvap (CycleType_Abstract):
-
-    def calculte(self):
-        pass
-
-    def setup_vars_extra(self):
-        self.setup_vars()
-
-    def adjust_units(self):
-        self.adjust_units_for_all_types()
-
-    def adjust_input(self):
-        self.adjust_input_for_all_types()
-        self.prepare_Data4Cycle(1)

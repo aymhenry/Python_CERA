@@ -55,9 +55,11 @@ class CycleUtils(exf4Cond_Evap):
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
 
     @staticmethod
-    def adjlod(dt, ICYCL, IC, TS3, TS5, FROSTF, FROSTZ, IDFRST):
-        # ADJUST THE CABINET LOADS AND SET POINT TEMPERATURES *
-
+    def adjlod(dt, ds, ICYCL, IC, TS3, TS5, FROSTF, FROSTZ, IDFRST, ATOTE, AREAFZ):
+        # adjust the cabinet loads and set point temperatures
+        # dt input data object.
+        # ds CycleSolver object
+        
         # IC conderser trail number
         # CYCL: Cycle Type (1 to 5)
 
@@ -71,13 +73,12 @@ class CycleUtils(exf4Cond_Evap):
 
         # BRANCH ON THE VALUE IC.AVE VARIABLES AND INITIALIZE ON THE
         # FIRST CALL AND: WAIT UNTIL THE 4TH CALL TO MAKE ADJUSTMENTS
-        #
+        # ATOTE   m2  total area for Evap
+        # AREAFZ  m2  Area for freezer
+        
         IRET = 0  # in Python only
 
         if IC == 1:
-            # SELECT CASE (IC)
-            #   CASE [1]#Initialize
-
             dt.IBLNCE = 0
             # untused IRET = 0
 
@@ -106,12 +107,12 @@ class CycleUtils(exf4Cond_Evap):
             # CONDF_S = dt.CONDF
             # CONDZ_S = dt.CONDZ
 
-            dt.ATOTE_S = dt.ATOTE
-            dt.AREAFZ_S = dt.AREAFZ
+            ATOTE_S = ATOTE
+            AREAFZ_S = AREAFZ
 
             # UAF_S = dt.UAF  # only in Type = 2 cycle
-            dt.ATOTE_A = dt.ATOTE
-            dt.AREAFZ_A = dt.AREAFZ
+            ds.ATOTE_A = ATOTE
+            ds.AREAFZ_A = AREAFZ
 
             # UFF = (dt.FFQ - dt.FFLAT - dt.FFPENA - dt.FFHTQ -
             #       FROSTF + dt.QMUL) / (dt.TROOM - dt.FFTEMP)
@@ -133,8 +134,8 @@ class CycleUtils(exf4Cond_Evap):
             # TS3_S = TS3
             # TS5_S = TS5
 
-            dt.FFTEMP_A = dt.FFTEMP
-            dt.FZTEMP_A = dt.FZTEMP
+            ds.FFTEMP_A = dt.FFTEMP
+            ds.FZTEMP_A = dt.FZTEMP
 
             # DELTS5_OLD = 0
 
@@ -148,7 +149,7 @@ class CycleUtils(exf4Cond_Evap):
         else:
             # CASE DEFAULT
             if IRET == 1:
-                return [TS3, TS5]
+               return [TS3, TS5, ATOTE, AREAFZ]
 
             # Determine needed rebalancing of cabinet loads
             FFLOAD = dt.DUTYE * dt.CAPE + dt.DUTYZ * dt.Q_FZ_FF
@@ -165,7 +166,7 @@ class CycleUtils(exf4Cond_Evap):
             DUTERR = DUTDIF / DUTMAX
 
             if DUTERR <= 0.001:
-                return [TS3, TS5]
+                return [TS3, TS5, ATOTE, AREAFZ]
 
             if DUTDIF >= 0.025:
                 dt.IBLNCE = 1
@@ -173,48 +174,48 @@ class CycleUtils(exf4Cond_Evap):
             if dt.INCTRL == 0:
                 # SELECT CASE (dt.INCTRL)
                 # CASE (0)#No control
-                return [TS3, TS5]
+                return [TS3, TS5, ATOTE, AREAFZ]
 
             elif dt.INCTRL == 1:
                 # CASE [1]#Evap area ratio
                 # FFNEW = FFLOAD + DELLOD
                 # FZNEW = FZLOAD - DELLOD
 
-                # DAREAF = (FFNEW / FFLOAD - 1.0) * dt.ATOTE
-                # DAREAZ = (FZNEW / FZLOAD - 1.0) * dt.AREAFZ
+                # DAREAF = (FFNEW / FFLOAD - 1.0) * ATOTE
+                # DAREAZ = (FZNEW / FZLOAD - 1.0) * AREAFZ
 
                 DUTY_AVE = (dt.DUTYE + dt.DUTYZ) / 2.0
-                DAREAF = (dt.DUTYE / DUTY_AVE - 1.0) * dt.ATOTE
-                DAREAZ = (dt.DUTYZ / DUTY_AVE - 1.0) * dt.AREAFZ
+                DAREAF = (dt.DUTYE / DUTY_AVE - 1.0) * ATOTE
+                DAREAZ = (dt.DUTYZ / DUTY_AVE - 1.0) * AREAFZ
 
-                RATIOF = DAREAF / dt.ATOTE
+                RATIOF = DAREAF / ATOTE
 
                 if RATIOF < -0.5:
                     RATIOF = -0.5
 
-                DAREAF = RATIOF * dt.ATOTE * 0.5
-                RATIOZ = DAREAZ / dt.AREAFZ
+                DAREAF = RATIOF * ATOTE * 0.5
+                RATIOZ = DAREAZ / AREAFZ
 
                 if RATIOZ < -0.5:
                     RATIOZ = -0.5
 
-                DAREAZ = RATIOZ * dt.AREAFZ * 0.5
+                DAREAZ = RATIOZ * AREAFZ * 0.5
 
                 if abs(DAREAF) < abs(DAREAZ):
-                    dt.ATOTE = dt.ATOTE + DAREAF
-                    dt.AREAFZ = dt.AREAFZ - DAREAF
+                    ATOTE = ATOTE + DAREAF
+                    AREAFZ = AREAFZ - DAREAF
 
                 else:
-                    dt.AREAFZ = dt.AREAFZ + DAREAZ
-                    dt.ATOTE = dt.ATOTE - DAREAZ
+                    AREAFZ = AREAFZ + DAREAZ
+                    ATOTE = ATOTE - DAREAZ
 
-                dt.UAF = dt.UAF_S * dt.AREAFZ / dt.AREAFZ_S
-                dt.ATOTE_A = dt.ATOTE    # chk
-                dt.AREAFZ_A = dt.AREAFZ   # chk
+                dt.UAF = dt.UAF_S * AREAFZ / AREAFZ_S   # dt.AREAFZ_S
+                dt.ATOTE_A = ATOTE    # chk
+                dt.AREAFZ_A = AREAFZ   # chk
 
-                dt.UA_FZ = dt.UA_FZ_S * dt.AREAFZ / dt.AREAFZ_S
-                dt.UA_ML = dt.UA_ML_S * dt.AREAFZ / dt.AREAFZ_S
-                dt.UA_FF = dt.UA_FF_S * dt.ATOTE / dt.ATOTE_S
+                dt.UA_FZ = dt.UA_FZ_S * AREAFZ / AREAFZ_S   # dt.AREAFZ_S
+                dt.UA_ML = dt.UA_ML_S * AREAFZ / AREAFZ_S   # dt.AREAFZ_S
+                dt.UA_FF = dt.UA_FF_S * ATOTE / ATOTE_S   # dt.ATOTE_S
 
             elif dt.INCTRL == 2:
                 # CASE (2)#FF Cabinet temp
@@ -259,14 +260,11 @@ class CycleUtils(exf4Cond_Evap):
             elif dt.INCTRL in [4, 5]:
                 pass
 
-        return [TS3, TS5]
+        return [TS3, TS5, ATOTE, AREAFZ]
 
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
     def lowevp(self, dt, ds, objCP, MREF, ICYCL, ICNTRL,
                H, P, T,
-               # XQ, XL, XV, not used
-               # ,VL, VV
-               # HL, not clear its use,
                TS3, TS5,
                DPF, ETHX2
                ):
@@ -670,32 +668,31 @@ class CycleUtils(exf4Cond_Evap):
 
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
     @staticmethod
-    def dutfnd(dt, ICAB,
-               IRFTYP, ICYCL, N,
-               QFRSH, QFREZ,
-               FROSTF, FROSTZ,
-               TS3, TS5, T, IDFRST
-               ):
+    def dutfnd(dt, 
+        FANE,       # watt
+        ICAB,       # Use Cab data 0 or 1
+        IRFTYP,     # Refrigeration Type
+        ICYCL,      # Cycle Type
+        QFRSH,      # watt
+        QFREZ,      # watt
+        FROSTF,     # Fresh Food Door Frost Load - watt
+        FROSTZ,     # Freezer Frost Load - watt
+        TS3, TS5, T,        # K
+        IDFRST              # Manual Defrost 0 or 1
+        ):
 
+        N = 1   # one gas
         # CALCULATE DUTY CYCLE AND THE AVERAGE CABINET LOADS
 
         if ICAB == 0:
             return [0, 0, 0]
-        #
-        # CALCULATE IN-WALL HEAT LOADS
-        #
-        # TENV = (dt.TROOM + 459.6) / 1.8
+            
+        # calculate in-wall heat loads
         TENV = dt.TROOM
         TCND = 0.2 * T[14] + 0.4 * T[3] + 0.4 * T[11]
 
         if TS5 > -300.0:  # Freezer evaporator
             TRFZ = (T[8] + T[9]) / 2.0
-
-            # dt.Q_FZ_IN_WALL = 1.8 * dt.UA_FZ * (TENV - TS5)
-            # dt.Q_ML_IN_WALL = 1.8 * dt.UA_ML * (dt.TS3 - TS5)
-            # dt.CAPZ_IN_WALL = 1.8 * dt.UA_FZ * (TENV - TRFZ)
-            # dt.CAPM_IN_WALL = 1.8 * dt.UA_ML * (dt.TS3 - TRFZ)
-            # dt.Q_FZ_FF = 1.8 * dt.UA_ML * (TS5 - TRFZ)
 
             dt.Q_FZ_IN_WALL = dt.UA_FZ * (TENV - TS5)
             dt.Q_ML_IN_WALL = dt.UA_ML * (dt.TS3 - TS5)
@@ -711,23 +708,15 @@ class CycleUtils(exf4Cond_Evap):
             dt.CAPM_IN_WALL = 0
 
             dt.Q_FZ_FF = 0
-        # End if
 
         TRFF = (T[5] + T[7]) / 2.0
 
-        # dt.Q_FF_IN_WALL = 1.8 * dt.UA_FF * (TENV - dt.TS3)
-        # dt.CAPE_IN_WALL = 1.8 * dt.UA_FF * (TENV - TRFF)
-        # dt.CONDF_IN_WALL = 1.8 * dt.UA_FF_CND * (TCND - TENV)
-        # dt.CONDZ_IN_WALL = 1.8 *  dt.UA_FZ_CND * (TCND - TENV)
-
-        dt.Q_FF_IN_WALL = dt.UA_FF * (TENV - dt.TS3)
+        dt.Q_FF_IN_WALL = dt.UA_FF * (TENV - TS3)
         dt.CAPE_IN_WALL = dt.UA_FF * (TENV - TRFF)
         dt.CONDF_IN_WALL = dt.UA_FF_CND * (TCND - TENV)
         dt.CONDZ_IN_WALL = dt.UA_FZ_CND * (TCND - TENV)
 
-        #
-        # BRANCH ACCORDING TO THE TYPE OF REFRIGERATOR
-        #
+        # branch according to the type of refrigerator
         QFF = dt.FFQ
         QFZ = dt.FZQOFF
 
@@ -749,7 +738,7 @@ class CycleUtils(exf4Cond_Evap):
                 # are zero by defalut
 
                 dt.CAPE = QFRSH \
-                    - dt.FANE \
+                    - FANE \
                     - dt.DFSTCYC \
                     - dt.FFCYC  \
                     - dt.FZCYC \
@@ -801,7 +790,7 @@ class CycleUtils(exf4Cond_Evap):
                 #    # - dt.Q_HXS_FF / 1.0548
 
                 dt.CAPE = QFRSH \
-                    - dt.FANE \
+                    - FANE \
                     - dt.FFCYC \
                     + dt.Q_FF_IN_WALL \
                     - dt.CAPE_IN_WALL \
@@ -839,11 +828,11 @@ class CycleUtils(exf4Cond_Evap):
 
                 else:
                     # dt.CAPE = QFRSH / 1.0548 - 3.413 * \
-                    #    # (dt.FANE + dt.FFCYC)
+                    #    # (FANE + dt.FFCYC)
                     #    # + dt.Q_FF_IN_WALL - dt.CAPE_IN_WALL
 
                     dt.CAPE = QFRSH \
-                        - (dt.FANE + dt.FFCYC) \
+                        - (FANE + dt.FFCYC) \
                         + dt.Q_FF_IN_WALL - dt.CAPE_IN_WALL
 
                     QFF = QFF - dt.FROSTF
@@ -857,13 +846,13 @@ class CycleUtils(exf4Cond_Evap):
                 if dt.IDFRST == 0:
                     QFZ = QFZ + dt.FROSTF
 
-                # dt.CAPE = QFRSH / 1.0548 - 3.413 * (dt.FANE
+                # dt.CAPE = QFRSH / 1.0548 - 3.413 * (FANE
                     # + dt.DFSTCYC + dt.FZCYC)	\
                     # + dt.Q_FF_IN_WALL - dt.CAPE_IN_WALL	\
                     # - dt.CONDF_IN_WALL - dt.Q_HXS_FF / 1.0548
 
                 dt.CAPE = QFRSH \
-                    - (dt.FANE + dt.DFSTCYC + dt.FZCYC) \
+                    - (FANE + dt.DFSTCYC + dt.FZCYC) \
                     + dt.Q_FF_IN_WALL - dt.CAPE_IN_WALL \
                     - dt.CONDF_IN_WALL - dt.Q_HXS_FF
 

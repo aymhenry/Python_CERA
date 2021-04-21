@@ -56,21 +56,8 @@ class Start:
         self.data_prepare()  # assign value to dt
         
         # it will return objSolution object (has cycle solution)
-        objSolution = self.calculte()  # calculate heat rate
+        objSolution = self.obj_control.calculte()  # calculate heat rate
         
-        '''
-        try:
-            obj_param = self.calculte ()        # calculate heat rate
-
-        except ValueError as err_description: # OSError
-            print ("Fatal program error ... system terminated")
-            print (str(err_description) + "\n\n")
-            print ("=======================================")
-            print ("Expected reasone, none propoer input data")
-            print ("=======================================\n\n")
-            print ("               sys.exit('3100')  # terminat application")
-            print ("=======================================\n\n")
-        '''
         obj_view = View(
             self.dt,
             objSolution,    # will be named ds for short
@@ -80,17 +67,6 @@ class Start:
             
         obj_view.show_overall()
         obj_view.show_rep()        
-
-    # -----------------------------------------------------------
-    # Job             : Calaculte heat balance, the main app target.
-    # Input         :
-    #
-    # Output        :
-    # -----------------------------------------------------------
-    def calculte(self):
-        # run object in CycleType.py according to cycle type given
-        # it will return objSolution object (has cycle solution)
-        return self.obj_control.calculte()
 
     # -----------------------------------------------------------
     # Job             : Preprae the main data object & control object
@@ -132,44 +108,15 @@ class Start:
         self.obj_control = ""
 
         # 1: Standard
-        if self.dt.ICYCL == 1:
-            self.obj_control = Type_1Standard(self.dt)
+        # self.dt.ICYCL == 1:
+        self.obj_control = CycleType(self.dt)
 
-        # 2: Lorenz
-        elif self.dt.ICYCL == 2:
-            print("Type 2 is not supported.")  # print error description
-            sys.exit('9001')                            # terminate
-
-            # INCTRL: 0 = none
-            #         1 = adjust evaporator areas,
-            #         2 = adjust fresh food section tempeature
-            #         3 = adjust freezer    section tempeature
-            #         4 = switching valve(only one section is cooled at a time)
-            #         5 = solenoid valve 
-            #               or fan control provides evaporator capacity 
-            #               to only one cabinet during part of the cycle
-            
-            # if self.dt.INCTRL == 4:
-            #    self.obj_control = Type_2Lorenz_4swtchVLV(self.dt)
-
-            # elif self.dt.INCTRL == 5:
-            #    self.obj_control = Type_2Lorenz_5solindVLV(self.dt)
-
-            # else:
-            #    self.obj_control = Type_2Lorenz_ctrlOthers(self.dt)
-
-        # 3: Dual Loop
-        elif self.dt.ICYCL == 3:
-            self.obj_control = Type_3DualLoop(self.dt)
-
-        # 4: Dual Evap
-        elif self.dt.ICYCL == 4:
-            self.obj_control = Type_4DualEvap(self.dt)
-
-        # adjust default vars, according to basic input values
-        self.obj_control.adjust_input()
-
-        # Convert to units
-        self.obj_control.adjust_units()
-
-# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+        # INCTRL: 0 = none
+        #         1 = adjust evaporator areas,
+        #         2 = adjust fresh food section tempeature
+        #         3 = adjust freezer    section tempeature
+        #         4 = switching valve(only one section is cooled at a time)
+        #         5 = solenoid valve 
+        #               or fan control provides evaporator capacity 
+        #               to only one cabinet during part of the cycle
+  

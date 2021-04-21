@@ -24,61 +24,25 @@ from cycle_classes.Trace import *
 class CycleSolver(CycleUtils):
     K_C_DEG = 273.11
 
-    #  setup basic objects
-    def setupEvap(self, IFRSH, ISPEC):
-        self.IFRSH = IFRSH
-        self.ISPEC = ISPEC
+    def __init__(self, objCP, dt, lng_item, NCYC=1):
+        # --------------------------------------------------
+        # main init method
+        # --------------------------------------------------
+        self.objCP = objCP
+        self.dt = dt
+        self.lng_item = lng_item
 
-        objEvaporator = Evaporator()
-        self.objEvap = objEvaporator.getObject(objCP=self.objCP, IFRSH=IFRSH)
+        # Trace Data
+        self.trace = Trace(self.dt, self)
+        self.coolutil = CoolPrpUtil(objCP)
 
-        # ------- Setup paramters
-        self.objEvap.setParamters(ATOTE=self.dt.ATOTEI[self.lng_item],
-                                  CFME=self.dt.CFME,  # watt/K
-                                  TS3=self.TS3,
-                                  N_EVAP=self.dt.N_EVAP,
-                                  USUPE=self.USUPE,  # watt/m2-K
-                                  UTPE=self.UTPE,  # watt/m2-K
-                                  TROOM=self.dt.TROOM,
-                                  FZTEMP=self.dt.FZTEMP,
-                                  UA_FF=self.dt.UA_FF,
-                                  Q_HXS_FF=self.dt.Q_HXS_FF,  # defalut =0 in Fortran
-                                  IWALL_FF=self.dt.IWALL_FF,
-                                  NUM_ZONE=self.dt.N_EVAP,
-                                  IRFTYP=self.dt.IRFTYP
-                                  )
+        # lng_item group number of data.
+        # NCYC number of calls to cycle (1=Single or 2= Dual cycle)
+        self.NCYC = NCYC
 
-    def setupCond(self, ICOND):
-        self.ICOND = ICOND
-        objCondenser = Condenser()
-        self.objCond = objCondenser.getObject(objCP=self.objCP, ICOND=ICOND)
-
-        self.objCond.setParamters(ATOTC=self.dt.ATOTCI[self.lng_item],
-                                  UA_FF_CND=self.dt.UA_FF_CND,
-                                  UA_FZ_CND=self.dt.UA_FZ_CND,
-                                  UA_FF_HXS=self.dt.UA_FF_HXS,
-                                  UA_FZ_HXS=self.dt.UA_FZ_HXS,
-                                  CFMC=self.dt.CFMC,  # watt/K
-                                  DTSUBC=self.DTSUBC,
-                                  N_COND=self.dt.N_COND,
-                                  TS1=self.TS1,
-                                  TS3=self.TS3,
-                                  TS5=self.TS5,
-                                  USCC=self.USCC,  # W/m2-K
-                                  UTPC=self.UTPC,  # W/m2-K
-                                  UDSC=self.UDSC  # W/m2-K
-                                  )
-
-    def setupComp(self, ICOMP, TAMB, FRACT_SPEED, strFileName):
-        self.ICOMP = ICOMP
-        self.objComp = Compressor(objCP=self.objCP,
-                                  TAMB=TAMB,  # K
-                                  ICOMP=ICOMP,  # none
-                                  FRACT_SPEED=FRACT_SPEED,  # none
-                                  strFileName=strFileName  # none
-                                  )
-
-    def paraCycle(self):
+        # --------------------------------------------------
+        # Cycle setup
+        # --------------------------------------------------
         # TS1 - HEAT TRANSFER FLUID (HTF) TEMPERATURE ENTERING CONDENSER
         # TS3 - HTF TEMPERATURE ENTERING FRESH FOOD EVAPORATOR
         # TS5 - HTF TEMPERATURE ENTERING FREEZER EVAPORATOR
@@ -111,7 +75,7 @@ class CycleSolver(CycleUtils):
         self.FANCL = self.dt.FNPWRC[self.lng_item]
 
         # Evaporator Fan Power (watt)
-        self.FANES = self.dt.FNPWRE[self.lng_item]
+        self.FANE = self.FANES = self.dt.FNPWRE[self.lng_item]
 
         # Desuperheating Heat Transfer Conductance W/m2-c
         self.UDSC = self.dt.UDSCI[self.lng_item]
@@ -137,7 +101,7 @@ class CycleSolver(CycleUtils):
 
         # Nominal Speed rpm
         self.SPEED = self.dt.SPEEDI[self.lng_item]
-
+        
         # self.CFME Air Flow Rate Across Coil
         # self.CFMC Air Flow Rate Across Coil (L/S)
 
@@ -230,38 +194,64 @@ class CycleSolver(CycleUtils):
         self.TE = [0, 0, 0]
         self.TC = [0, 0, 0]
 
-        # self.objCP = objCP
-
-    def __init__(self, objCP, dt, lng_item, NCYC=1):
         # --------------------------------------------------
-        # main init method
+        # Condenser setup
         # --------------------------------------------------
-        self.objCP = objCP
-        self.dt = dt
-        self.lng_item = lng_item
+        self.ICOND = self.dt.ICONDI[self.lng_item]
+        objCondenser = Condenser()
+        self.objCond = objCondenser.getObject(objCP=self.objCP,
+            ICOND=self.ICOND)
 
-        # Trace Data
-        self.trace = Trace(self.dt, self)
-        self.coolutil = CoolPrpUtil(objCP)
+        self.objCond.setParamters(ATOTC=self.dt.ATOTCI[self.lng_item],
+                                  UA_FF_CND=self.dt.UA_FF_CND,
+                                  UA_FZ_CND=self.dt.UA_FZ_CND,
+                                  UA_FF_HXS=self.dt.UA_FF_HXS,
+                                  UA_FZ_HXS=self.dt.UA_FZ_HXS,
+                                  CFMC=self.dt.CFMC,  # watt/K
+                                  DTSUBC=self.DTSUBC,
+                                  N_COND=self.dt.N_COND,
+                                  TS1=self.TS1,
+                                  TS3=self.TS3,
+                                  TS5=self.TS5,
+                                  USCC=self.USCC,  # W/m2-K
+                                  UTPC=self.UTPC,  # W/m2-K
+                                  UDSC=self.UDSC  # W/m2-K
+                                  )        
+        # --------------------------------------------------
+        # Evaporator setup
+        # --------------------------------------------------
+        self.IFRSH = self.dt.IFRSHI[self.lng_item]
+        self.ISPEC = self.dt.ISPECI[self.lng_item]
 
-        # lng_item group number of data.
-        # NCYC number of calls to cycle (1=Single or 2= Dual cycle)
-        self.NCYC = NCYC
+        objEvaporator = Evaporator()
+        self.objEvap = objEvaporator.getObject(objCP=self.objCP,
+            IFRSH=self.IFRSH)
 
-        self.paraCycle()
-
-        # Create Basic objects
-        self.setupCond(self.dt.ICONDI[self.lng_item])  # ICOND
-
-        self.setupEvap(self.dt.IFRSHI[self.lng_item],  # IFRSH
-                       self.dt.ISPECI[self.lng_item]  # ISPEC
-                       )
-
-        self.setupComp(ICOMP=self.dt.ICOMP,
-                       TAMB=self.TS1,
-                       FRACT_SPEED=1,  # not used in IMAP=0
-                       strFileName=self.dt.FILE_NAME
-                       )
+        # ------- Setup paramters
+        self.objEvap.setParamters(ATOTE=self.dt.ATOTEI[self.lng_item],
+                                  CFME=self.dt.CFME,  # watt/K
+                                  TS3=self.TS3,
+                                  N_EVAP=self.dt.N_EVAP,
+                                  USUPE=self.USUPE,  # watt/m2-K
+                                  UTPE=self.UTPE,  # watt/m2-K
+                                  TROOM=self.dt.TROOM,
+                                  FZTEMP=self.dt.FZTEMP,
+                                  UA_FF=self.dt.UA_FF,
+                                  Q_HXS_FF=self.dt.Q_HXS_FF,  # defalut =0 in Fortran
+                                  IWALL_FF=self.dt.IWALL_FF,
+                                  NUM_ZONE=self.dt.N_EVAP,
+                                  IRFTYP=self.dt.IRFTYP
+                                  )
+        # --------------------------------------------------
+        # Compressor Setup
+        # --------------------------------------------------
+        self.ICOMP = self.dt.ICOMP
+        self.objComp = Compressor(objCP=self.objCP,
+                                  TAMB=self.TS1,  # K
+                                  ICOMP=self.ICOMP,  # none
+                                  FRACT_SPEED=1,  # # not used in IMAP=0
+                                  strFileName=self.dt.FILE_NAME  # none
+                                  )
 
     def getAirCp(self, temp_K):
         # https://www.ohio.edu/mechanical/thermo/property_tables
@@ -275,7 +265,6 @@ class CycleSolver(CycleUtils):
     def getAirDencity(self, temp_K):
         # m3/kg
         return 1.2873 + (temp_K - CycleSolver.K_C_DEG) / 10 * (1.2418 - 1.2873)
-        
         
     #  -- Soving actions
     def solveCycle(self):
@@ -382,7 +371,11 @@ class CycleSolver(CycleUtils):
             self.trace.dr_omar("adjlod is not tested nor used")  # Dr. Omar
             #  ICAB Flag to represent presence of cabinet loads in input, 0 =No
             if self.dt.ICAB == 1:
-                [self.TS3, self.TS5] = self.adjlod(self.dt,    # self.MREF / 3600,
+                self.ATOTE_S = self.ATOTE   # save of output report
+                self.dt.AREAFZ_S = self.dt.AREAFZ   # save of output report
+                
+                [self.TS3, self.TS5, self.ATOTE,
+                    self.dt.AREAFZ] = self.adjlod(self.dt, self,
                                                    # self.dt.ATOTEI[self.lng_item],
                                                    self.dt.ICYCL,
                                                    self.IC,
@@ -390,7 +383,9 @@ class CycleSolver(CycleUtils):
                                                    self.TS5,
                                                    self.dt.FROSTF,
                                                    self.dt.FROSTF,
-                                                   self.dt.IDFRST
+                                                   self.dt.IDFRST,
+                                                   self.ATOTE,       # m2
+                                                   self.dt.AREAFZ       # m2
                                                    )
 
             self.T[4] = self.TC[self.JC]  # 4 - CONDENSER OUTLET
@@ -823,9 +818,10 @@ class CycleSolver(CycleUtils):
             if self.IC != 1:  # skip first trail to calc. some values later
                 [QFF, QFZ, DUTYR] = \
                     self.dutfnd(self.dt, self.dt.ICAB,
+                                self.FANE,       # watt
                                 self.dt.IRFTYP,
                                 self.dt.ICYCL,
-                                self.NCYC,
+                                # self.NCYC,
                                 self.QFRSH,  # from Evaporator class
                                 self.QFREZ,
                                 self.dt.FROSTF,
@@ -833,7 +829,7 @@ class CycleSolver(CycleUtils):
                                 self.TS3,
                                 self.TS5,
                                 self.T,
-                                self.dt.IDFRST
+                                self.dt.IDFRST      # Manual Defrost 0 or 1
                                 )
 
             # CALCULATE FRESH FOOD EVAPORATOR HEAT TRANSFER.
