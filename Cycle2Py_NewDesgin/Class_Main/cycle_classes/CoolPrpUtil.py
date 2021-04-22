@@ -25,7 +25,10 @@ class CoolPrpUtil:
     def err_description(self):
         return self.objCP.err_description()
     
-    def getProp(self, P, T, prp="H", X=1):
+    def getProp(self, P, T, prp="H", X=None):
+        if X is None:
+            X = 1
+
         T_crit = self.objCP.getCrtiticalTemp()
         P_crit = self.objCP.getCrtiticalPress()
 
@@ -44,8 +47,9 @@ class CoolPrpUtil:
                 prop = self.objCP.Property(prp, T=T, P=P)
                 
                 if self.objCP.isError():
-                    print(self.objCP.err_description())
-                    sys.exit('4010')
+                    # print(self.objCP.err_description())
+                    # sys.exit('4010')
+                    return self.objCP.getErrFlag()
                     
                 return prop
             

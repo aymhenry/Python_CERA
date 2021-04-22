@@ -106,7 +106,7 @@ class CycleType:
 
         print("Using Ref. ", self.getRefName(self.dt.REF))
         if self.dt.DEBUG:
-            print("\t>>>>WORKING IN DEBUG mode")
+            print("\t>>>> WORKING IN DEBUG mode")
             
         self.objCP = CoolPrp(self.dt.DEBUG)
         self.objCP.setup(self.getRefName(self.dt.REF))  # 'R12'
@@ -165,4 +165,3 @@ class CycleType:
 
         else:
             return lstRefList[lng_Code - 1]
-            

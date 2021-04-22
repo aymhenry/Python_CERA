@@ -127,21 +127,21 @@ class CycleSolver(CycleUtils):
         #       and interpolate between rho at 0 C and rho at 10 C
         # [m3/sec] * [kg/m3] * [j/kg/K] =j/sec/K = watt/K
         self.dt.CFMC = self.dt.CFMCI[self.lng_item] / 1000 * \
-                       self.getAirDencity(self.TS1) * \
-                       self.getAirCp(self.TS1)
+            self.getAirDencity(self.TS1) * \
+            self.getAirCp(self.TS1)
 
         # ------------------------------------
         # self.CFME = 1.8961 * (RHOCPE * self.dt.CFMEI[lng_item]) / 0.4720
         # [m3/sec] * [kg/m3] * [J/kg K]*1000 =j/sec K = watt/K
         self.dt.CFME = self.dt.CFMEI[self.lng_item] / 1000 * \
-                       self.getAirDencity(self.dt.TS3[self.lng_item]) * \
-                       self.getAirCp(self.TS3)
+            self.getAirDencity(self.dt.TS3[self.lng_item]) * \
+            self.getAirCp(self.TS3)
 
         # ------------------------------------
         # [m3/sec] * [kg/m3] * [J/kg K]*1000 =j/sec K = watt/K
         self.dt.CFMF = self.dt.CFMF / 1000 * \
-                       self.getAirDencity(self.dt.TS5) * \
-                       self.getAirCp(self.TS5)
+            self.getAirDencity(self.dt.TS5) * \
+            self.getAirCp(self.TS5)
         # =================================
 
         # Temp. At Comp., Inlet or -1 If Unspecified
@@ -203,7 +203,7 @@ class CycleSolver(CycleUtils):
         self.ICOND = self.dt.ICONDI[self.lng_item]
         objCondenser = Condenser()
         self.objCond = objCondenser.getObject(objCP=self.objCP,
-            ICOND=self.ICOND)
+                                              ICOND=self.ICOND)
 
         self.objCond.setParamters(ATOTC=self.dt.ATOTCI[self.lng_item],
                                   UA_FF_CND=self.dt.UA_FF_CND,
@@ -228,7 +228,7 @@ class CycleSolver(CycleUtils):
 
         objEvaporator = Evaporator()
         self.objEvap = objEvaporator.getObject(objCP=self.objCP,
-            IFRSH=self.IFRSH)
+                                               IFRSH=self.IFRSH)
 
         # ------- Setup paramters
         self.objEvap.setParamters(ATOTE=self.dt.ATOTEI[self.lng_item],
@@ -263,7 +263,7 @@ class CycleSolver(CycleUtils):
         
         # kJ/kg K as mnstioned in the above site
         # J/kg K
-        return (0.0003 * (temp_K ** 2) - 0.129 * temp_K + 1016.55)
+        return 0.0003 * (temp_K ** 2) - 0.129 * temp_K + 1016.55
 
     def getAirDencity(self, temp_K):
         # m3/kg
@@ -272,7 +272,7 @@ class CycleSolver(CycleUtils):
     #  -- Soving actions
     def solveCycle(self):
         print("\n\n== Starting processing ===")
-        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
+        print("~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
         # INITIAL GUESSES FOR TC AND TE
         # ASSUME TEMP RISE OF COND IS 0.5 F PER LBM
 
@@ -311,14 +311,27 @@ class CycleSolver(CycleUtils):
         self.FSUBC = 0  # unit (%) in python only
         # -----------------------
 
-        self.__solveCycle()
+        if self.dt.DEBUG:
+            self.__solveCycle()
+        
+        else:
+            try:
+                self.__solveCycle()
+                # if error job will terminate
+                if self.objCP.isError(): 
+                    self.dt.IS_SOLTION = False
+                return
+                
+            except():
+                self.dt.IS_SOLTION = False
 
     # basic Solver
+
     def __solveCycle(self):
         # GUESS A DEW POINT TEMPERATURE AT THE EVAPORATOR EXIT
         # -----------------------------
         if self.ISPEC == 1:  # Evap superheat:
-            self.T[15] = self.TS3 - (self.DTSUPE + 2.0) 
+            self.T[15] = self.TS3 - (self.DTSUPE + 2.0)
 
             self.P[15] = self.objCP.Property('P', X=1, T=self.T[15])  # pa
             self.V[15] = self.objCP.Property('V', X=1, T=self.T[15])  # m3/kg
@@ -380,17 +393,17 @@ class CycleSolver(CycleUtils):
                 
                 [self.TS3, self.TS5, self.ATOTE,
                     self.dt.AREAFZ] = self.adjlod(self.dt, self,
-                                                   # self.dt.ATOTEI[self.lng_item],
-                                                   # self.dt.ICYCL,
-                                                   self.IC,
-                                                   self.TS3,
-                                                   self.TS5,
-                                                   self.dt.FROSTF,
-                                                   self.dt.FROSTF,
-                                                   self.dt.IDFRST,
-                                                   self.ATOTE,       # m2
-                                                   self.dt.AREAFZ       # m2
-                                                   )
+                                                  # self.dt.ATOTEI[self.lng_item],
+                                                  # self.dt.ICYCL,
+                                                  self.IC,
+                                                  self.TS3,
+                                                  self.TS5,
+                                                  self.dt.FROSTF,
+                                                  self.dt.FROSTF,
+                                                  self.dt.IDFRST,
+                                                  self.ATOTE,       # m2
+                                                  self.dt.AREAFZ       # m2
+                                                  )
 
             self.T[4] = self.TC[self.JC]  # 4 - CONDENSER OUTLET
 
@@ -430,7 +443,7 @@ class CycleSolver(CycleUtils):
             #    - self.dt.CONDHT[self.NCYC] / self.MREF / self.DUTYR
 
             self.H[16] = self.H[4] -\
-                         self.dt.CONDHT[self.NCYC] / (self.MREF / 3600) / self.DUTYR
+                self.dt.CONDHT[self.NCYC] / (self.MREF / 3600) / self.DUTYR
 
             self.P[16] = self.P[4]
 
@@ -573,11 +586,6 @@ class CycleSolver(CycleUtils):
 
         self.trace.cycle_out()
 
-        # if error job will terminate
-        if self.objCP.isError(): 
-            self.dt.IS_SOLTION = False
-        return
-
     # condenser calculations
     def condenser_calc(self):
         # CALCULATE CONDENSER HEAT EXCHANGE
@@ -705,7 +713,7 @@ class CycleSolver(CycleUtils):
         #            - self.dt.CONDHT[self.NCYC] / self.MREF / self.DUTYR
 
         self.H[16] = self.H[4] -\
-                     self.dt.CONDHT[self.NCYC] / (self.MREF / 3600) / self.DUTYR
+            self.dt.CONDHT[self.NCYC] / (self.MREF / 3600) / self.DUTYR
 
         self.P[16] = self.P[4]
         self.T[16] = self.objCP.Property('T', H=self.H[16],
@@ -845,7 +853,7 @@ class CycleSolver(CycleUtils):
             self.trace.dr_omar("General review for this point")
             if self.dt.IRFTYP <= 3:
 
-                if (self.dt.ICAB != 0 and self.IFRSH != 0):
+                if self.dt.ICAB != 0 and self.IFRSH != 0:
                     if self.dt.IC == 1:
                         TIN = 0.15 * self.TFF + 0.85 * self.TFZ
                         self.FF_FRACT = 0.0  # in Python only
@@ -895,7 +903,7 @@ class CycleSolver(CycleUtils):
                                                     P7=self.P[7]       # pa
                                                     )
 
-            else:   #  self.IFRSH == 2:
+            else:   # self.IFRSH == 2:
                 dicRest = self.objEvap.evap_balance(MREF=self.MREF,   # kg/hr
                                                     T5=self.T[5],     # K
                                                     H5=self.H[5],     # j/kg
@@ -1229,63 +1237,6 @@ class CycleSolver(CycleUtils):
                 # m3/kg
                 self.V[J] = self.objCP.Property('V', T=self.T[J], X=quality)
 
-        # SL5 = self.entrop(
-        # self.T[5],
-        # self.VL[5],
-        # self.getArr2dCol(
-        # self.XL,
-        # 5))  # XL[1][5]
-
-        # SV5 = self.entrop(
-        # self.T[5],
-        # self.VV[5],
-        # self.getArr2dCol(
-        # self.XV,
-        # 5))  # XV[1][5]
-
-        # self.S[5] = min(1.0, 1.0 - self.XQ[5]) * SL5 \
-        # + max(0.0, self.XQ[5]) * SV5
-
-        # SL8 = self.entrop(
-        # self.T[8],
-        # self.VL[8],
-        # self.getArr2dCol(
-        # self.XL,
-        # 8))  # XL[1][8]
-
-        # SV8 = self.entrop(
-        # self.T[8],
-        # self.VV[8],
-        # self.getArr2dCol(
-        # self.XV,
-        # 8))  # XV[1][8]
-
-        # self.S[8] = min(1.0, 1.0 - self.XQ[8]) * SL8 \
-        # + max(0.0, self.XQ[8]) * SV8
-
-        # SL9 = self.entrop(
-        # self.T[9],
-        # self.VL[9],
-        # self.getArr2dCol(
-        # self.XL,
-        # 9))  # XL[1][9]
-
-        # SV9 = self.entrop(
-        # self.T[9],
-        # self.VV[9],
-        # self.getArr2dCol(
-        # self.XV,
-        # 9))  # XV[1][9]
-
-        # self.S[9] = min(1.0, 1.0 - self.XQ[9]) * SL9 \
-        # + max(0.0,Cycle.obj_parameter.XQ[9]) * SV9
-
-        # correct cop dur to cycling losses
-        #
-        #if self.dt.I_CYCLE == 0:
-        #    self.CORR_COP = 1.0
-        # else:
-         
         self.TENV = self.dt.TROOM
         self.TMID_COND = (self.T[3] + self.T[11]) / 2.0
         self.TMID_EVAP = (self.T[8] + self.T[9]) / 2.0

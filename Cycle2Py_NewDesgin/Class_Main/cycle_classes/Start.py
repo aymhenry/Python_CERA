@@ -96,7 +96,6 @@ class Start:
         if obj_datamodel.isError():
             print("Error Opening file")
             print(obj_datamodel.err_description())  # print error description
-            obj_datamodel = ""     # clean object and close file
             sys.exit('3000')  # terminat application
             # --------------
 
@@ -133,4 +132,43 @@ class Start:
         #         5 = solenoid valve 
         #               or fan control provides evaporator capacity 
         #               to only one cabinet during part of the cycle
-  
+
+    def print_scr_rep(self, is_solution):
+        def print_fixed_width(str_data, rept=-1):
+            lng_width = 50
+            if rept != -1:
+                str_data *= rept
+
+            str_extenstion = ''
+            if len(str_data) < lng_width:
+                str_extenstion = ' ' * (lng_width - len(str_data))
+
+            print('|' + str_data + str_extenstion + '|')
+
+        print('\n')
+        print_fixed_width('=', 50)
+
+        if is_solution:
+            print_fixed_width('     Cycle. App Done Succufully')
+            print_fixed_width('     was create on current directory ')
+
+            print_fixed_width(' ')
+            print_fixed_width(' ')
+
+            print_fixed_width('     Input File: ' + self.str_FILE_CYC_INPUT)
+            print_fixed_width('     Output File: ' + self.str_FILE_CYCLE_OUTPUT)
+            print_fixed_width(' ')
+
+        else:
+            print_fixed_width('     Cycle. App is faied')
+            print_fixed_width('     No slotion is found')
+            print_fixed_width('     Check your inputs')
+
+            print_fixed_width(' ')
+            print_fixed_width(' ')
+
+            print_fixed_width('     Input File: ' + self.str_FILE_CYC_INPUT)
+            print_fixed_width(' ')
+
+        print_fixed_width('     Configration: ' + str(self.dt.IRFTYP))
+        print_fixed_width('=', 50)

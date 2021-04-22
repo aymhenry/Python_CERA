@@ -1,5 +1,5 @@
 # Python import
-import sys
+# import sys
 
 # User import
 from cycle_classes.CoolPrpUtil import *
@@ -77,7 +77,10 @@ class CycleUtils(exf4Cond_Evap):
         
         ICYCL = 1
         IRET = 0  # in Python only
-
+        
+        ATOTE_S = ATOTE
+        AREAFZ_S = AREAFZ
+            
         if IC == 1:
             dt.IBLNCE = 0
             # untused IRET = 0
@@ -149,7 +152,7 @@ class CycleUtils(exf4Cond_Evap):
         else:
             # CASE DEFAULT
             if IRET == 1:
-               return [TS3, TS5, ATOTE, AREAFZ]
+                return [TS3, TS5, ATOTE, AREAFZ]
 
             # Determine needed rebalancing of cabinet loads
             FFLOAD = dt.DUTYE * dt.CAPE + dt.DUTYZ * dt.Q_FZ_FF
@@ -313,11 +316,9 @@ class CycleUtils(exf4Cond_Evap):
             H[10] = H[6]
             T[10] = T[6]
 
-
         ETHX = 0
 
         # begin iteration for temperature at point 10
-
         ITER = 1
         # the next statment by Ayman VL[10] = VL[6]
         VL10 = objCP.Property('V', P=P[6], H=H[6])  # m3/kg
@@ -673,17 +674,17 @@ class CycleUtils(exf4Cond_Evap):
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
     @staticmethod
     def dutfnd(dt, 
-        FANE,       # watt
-        ICAB,       # Use Cab data 0 or 1
-        IRFTYP,     # Refrigeration Type
-        # ICYCL,      # Cycle Type
-        QFRSH,      # watt
-        QFREZ,      # watt
-        FROSTF,     # Fresh Food Door Frost Load - watt
-        FROSTZ,     # Freezer Frost Load - watt
-        TS3, TS5, T,        # K
-        IDFRST              # Manual Defrost 0 or 1
-        ):
+               FANE,       # watt
+               ICAB,       # Use Cab data 0 or 1
+               IRFTYP,     # Refrigeration Type
+               # ICYCL,      # Cycle Type
+               QFRSH,      # watt
+               QFREZ,      # watt
+               FROSTF,     # Fresh Food Door Frost Load - watt
+               FROSTZ,     # Freezer Frost Load - watt
+               TS3, TS5, T,        # K
+               IDFRST              # Manual Defrost 0 or 1
+               ):
         
         ICYCL = 1
         N = 1   # one gas

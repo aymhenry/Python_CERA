@@ -1,8 +1,9 @@
 # Python import
-import sys
+# import sys
 
 # User import
 from CoolProp.CoolProp import PhaseSI, PropsSI, get_global_param_string
+
 
 class CoolPrp:
     # Class Startic vars
@@ -240,7 +241,7 @@ class CoolPrp:
             
             return result
 
-        except:   # BaseException:
+        except():   # BaseException:
             self.m_error = CoolPrp.ERR_PROB_ERROR
             self.m_error_desc = str_command
             self.m_coolprp_err = str(ValueError())
@@ -256,7 +257,7 @@ class CoolPrp:
     def raisError(self):
         if self.m_debug and self.isError():
             raise ValueError(self.err_description())
-        
+
         else:
             # sys.exit(self.err_description())
             return CoolPrp.ERR_FLAG  # -ve value, no -ve value in module

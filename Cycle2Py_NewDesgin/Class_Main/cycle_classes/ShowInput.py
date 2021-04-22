@@ -26,7 +26,7 @@ class ShowInput:
         # self.show_double_cycle()
             
     def show(self):
-         self.show_type1()
+        self.show_type1()
             
     def show_type1(self):
         self.showdata('TITLE', '#', 'MULTIPLE PATHWAYS BASELINE PROTOTYPE')

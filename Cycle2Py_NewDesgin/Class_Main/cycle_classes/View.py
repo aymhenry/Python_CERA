@@ -303,7 +303,7 @@ class View:
             'Coefficient of performance, %9.2f'
             % self.ds.COPR)
 
-        if (self.dt.IRFTYP <= 3 and self.dt.ICAB != 0 and self.ds.IFRSH != 0):
+        if self.dt.IRFTYP <= 3 and self.dt.ICAB != 0 and self.ds.IFRSH != 0:
             self.prn.write_or_terminate(
                 'Fraction air to fresh food, %9.2f, (single evaporator cycle)' 
                 % self.dt.FF_FRACT)
@@ -379,16 +379,16 @@ class View:
         self.prn.write_or_terminate('Cycle Performance Summary')
 
         self.prn.write_or_terminate(
-            'Evaporator capacity,%9.3f, watt' 
-            % (QE))
+            'Evaporator capacity,%9.3f, watt'
+            % QE)
 
         self.prn.write_or_terminate(
-            'Condenser heat rejection rate, %9.3f, watt' 
-            % (QC))
+            'Condenser heat rejection rate, %9.3f, watt'
+            % QC)
 
         self.prn.write_or_terminate(
-            'Compressor power requirement, %9.3f,watt' 
-            % (W))
+            'Compressor power requirement, %9.3f,watt'
+            % W)
 
         self.prn.write_or_terminate(
             'Coefficient of performance, %9.3f' 
