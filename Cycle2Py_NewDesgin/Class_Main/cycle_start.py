@@ -15,7 +15,6 @@ def print_fixed_width(str_data):
     
 
 obj_start = Start()
-lst_Cycle_Type = ["Standard", "Lorenz", "Dual Loop", "Dual Evap"]
 
 obj_start.main()
 
@@ -32,6 +31,4 @@ print_fixed_width("     Output File: " + Start.FILE_CYC_OUTPUT)
 print_fixed_width(" ")
 
 print_fixed_width("     Configration: " + str(obj_start.dt.IRFTYP))
-print_fixed_width("     Cycle       : " + str(obj_start.dt.ICYCL) + " - "
-                  + lst_Cycle_Type[obj_start.dt.ICYCL - 1])
 print_fixed_width("=" * lng_width)

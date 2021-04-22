@@ -64,7 +64,7 @@ class CycleType:
         self.dt.IFAN = 0
 
         # Python comment: save original ICYCL value
-        self.dt.ICYCLS = self.dt.ICYCL
+        self.dt.ICYCLS = 1  # self.dt.ICYCL
 
         # --------------------------------------------------
         # Convert units
@@ -103,12 +103,12 @@ class CycleType:
         self.dt.DPF = 0.0
         self.dt.CFMF = 0  # by pass required value.
         
-        if self.getRefName(self.dt.IR[1][1]) == "":
+        if self.getRefName(self.dt.REF) == "":
             raise ErrorException('Error refrigerant code: ', 'cyt1000')
 
-        print("Using Ref. ", self.getRefName(self.dt.IR[1][1]))
+        print("Using Ref. ", self.getRefName(self.dt.REF))
         
-        self.objCP.setup(self.getRefName(self.dt.IR[1][1]))  # 'R12'
+        self.objCP.setup(self.getRefName(self.dt.REF))  # 'R12'
         
         objCycleSolver = CycleSolver(objCP=self.objCP,
                                      dt=self.dt,
@@ -165,7 +165,3 @@ class CycleType:
         else:
             return lstRefList[lng_Code - 1]
             
-
-
-
-

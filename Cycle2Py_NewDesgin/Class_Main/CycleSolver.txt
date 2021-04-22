@@ -1,33 +1,15 @@
 TITLE  =  MODEL D (TOP MOUNT)    #       MULTIPLE PATHWAYS BASELINE PROTOTYPE
 TITLE2  =  Cycle Data    #       Title of report
 FILERA  =  MODEL_D.ERA   #       FILE NAME
-ICYCL  =  1      #       Cycle Type
 IRFTYP  =  1     #       Refrigeration Type
 IDFRST  =  0     #       Manual Defrost
-HRSOFF  =  1000          hr      Hours Shutdown For Cycle Defrost
-TOL_FRSH  =  0.01        DEG C   Torelance in iteration for fresh food
-TOL_FRZ  =  0.1          DEG C   Torelance in iteration for frezzer
-TOL_COND  =  0.075       DEG C   Torelance in iteration for condenser
-TOL_MASS  =  0.01        %       Torelance in iteration for mass
-TOL_HX  =  0.001         #       Torelance in iteration for heat exchanger
 N_EVAP  =  1     #       Number of Zones on Evaporator
 N_COND  =  1     #       Number of Zones on Condenser
 ICOMP  =  1      #       Compressor Type
-IMAP  =  0       #       Compressor Analysis
-I_CYCLE  =  1    #       Cycling Loss Analysis
 T_CYCLE  =  2    #       Cycles Per Hour
 I_VALVE  =  0    #       Shut-Off Valve
 FILE_NAME  =  ABB_EMX70HSC       #       file name for map file
-IR[1][1]  =  2   #       Code (IR(1)) For 1st Refrigerant
-IR[2][1]  =  1   #       Code (IR(2)) For 2nd Refrigerant
-IR[3][1]  =  1   #       Code (IR(3)) For 3rd Refrigerant
-NC[1]  =  1      #       Number Of Components (Maximum Of Three)
-F[1][2][1]  =  0         #       Mixture Interaction Parameter- Component 1-2
-F[1][3][1]  =  0         #       Mixture Interaction Parameter- Component 1-3
-F[2][3][1]  =  0         #       Mixture Interaction Parameter- Component 2-3
-X[1][1]  =  1    #       Mass Fraction Of 1st Refrigerant
-X[2][1]  =  0    #       Mass Fraction Of 2nd Refrigerant
-X[3][1]  =  0    #       Mass Fraction Of 3rd Refrigeran
+REF  =  2        #       Code of Refrigerant
 ICONDI[1]  =  0          #       Heat Exchanger Configuration
 TS1[1]  =  35    DEG C   Temp Of Air Entering Condenser
 CFMCI[1]  =  42.476      L/s     Air Flow Rate Across Coil
@@ -71,7 +53,7 @@ DFSTCYC  =  7.5          watt    Closed-Door Automatic Defrost
 FFCYC  =  0      watt    Fresh Food Section
 FZCYC  =  0      watt    Freezer Section
 OUTCYC  =  1.5   watt    Outside Cabinet
-ICAB  =  0       #       Flag to represent presence of cabinet loads in input, 0 =No
+ICAB  =  1       #       Flag to represent presence of cabinet loads in input, 0 =No
 FFASH  =  0.92   watt    Fresh Food Antisweat Heater
 FFAUX  =  0      watt    Fresh Food Auxiliary Power
 FZASH  =  1.83   watt    Freezer Antisweat Heater
@@ -97,7 +79,7 @@ FZREFQ  =  1.2   watt    Freezer Refrigerant Line
 QMUL  =  2.6     watt    Mullion Heat Load
 
 
-      Line Diagram for single cycle
+    Diagram of a Single Evaporator Cycle
 
               COND BUB    COND-DEW
  COND OUT     11          3         COND IN
@@ -120,7 +102,7 @@ SUBCOOL  ||
         (X)   +----------+                      |
          +->--|Evaparator|-->-------------------+
          5    +----------+    7
-       EVAP IN              EVAP OUT
+         EVAP IN              EVAP OUT
 
 
 
@@ -149,23 +131,119 @@ Using Ref.  R12
 == Starting processing ===
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-#         Point     STATE     T(C)      T(C)      P         H         V         S
-                              AIR       REF       kPa       kj/kg     m3/kg     kj/kg-C
-1         1         COMP IN   N/A       22.46992  173.1614  368.7954  0.113384  1.653213
-2         2         COMP DIS  N/A       45.40767  956.0290  373.0399  0.019046  1.559569
-3         14        COND IN   35.65012  45.40326  956.0782  373.0359  0.019044  1.559553
-4         3         COND DEW  N/A       39.90334  955.5570  368.9146  0.018441  1.546534
-5         11        COND BUB  N/A       39.72235  951.3582  238.8929  0.000796  1.131152
-6         4         COND OUT  35.0      35.72025  951.3090  234.7910  0.000786  1.117956
-7         16        LIQ LINE  N/A       32.23822  951.3090  231.2662  0.000777  1.106478
-8         6         SUBCOOL   N/A       10.05860  951.3090  209.5962  0.000732  1.032826
-9         5         EVAP IN   -13.1340  -15.2485  180.3614  209.5962  0.014338  1.039109
-10        12        EVAP DEW  N/A       -16.3340  173.1614  345.3442  0.096385  1.568201
-11        7         EVAP OUT  -11.3340  -13.3340  173.1614  347.1254  0.097736  1.575097
-12        13        HX OUT    N/A       22.46992  173.1614  368.7954  0.113384  1.653213
 
-                Leaving cycle with IC:12
-                Leaving cycle with IE:8
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+Condenser Iteration Number self.IC =  1
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+        >>> 1 =  Temp. at 7 in K
+        >>> 2 =  259.776
+
+  Cond iter.= 1  Evaporator Iter. Number --> IE= 1
+    ===========================================
+    ICONE if 1, iteration done >  0
+        >>> 1 =  Temp. at 7 in K
+        >>> 2 =  259.776
+
+  Cond iter.= 1  Evaporator Iter. Number --> IE= 2
+    ===========================================
+    ICONE if 1, iteration done >  0
+        >>> 1 =  Temp. at 7 in K
+        >>> 2 =  254.776
+
+  Cond iter.= 1  Evaporator Iter. Number --> IE= 3
+    ===========================================
+    ICONE if 1, iteration done >  1
+        >>> 1 =  Temp. at 7 in K
+        >>> 2 =  254.80219223350343
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+Condenser Iteration Number self.IC =  2
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+        >>> 1 =  Temp. at 7 in K
+        >>> 2 =  254.80219223350343
+
+  Cond iter.= 2  Evaporator Iter. Number --> IE= 1
+    ===========================================
+    ICONE if 1, iteration done >  0
+        >>> 1 =  Temp. at 7 in K
+        >>> 2 =  254.80219223350343
+
+  Cond iter.= 2  Evaporator Iter. Number --> IE= 2
+    ===========================================
+    ICONE if 1, iteration done >  1
+        >>> 1 =  Temp. at 7 in K
+        >>> 2 =  254.89844887898738
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+Condenser Iteration Number self.IC =  3
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+        >>> 1 =  Temp. at 7 in K
+        >>> 2 =  254.89844887898738
+
+  Cond iter.= 3  Evaporator Iter. Number --> IE= 1
+    ===========================================
+    ICONE if 1, iteration done >  0
+        >>> 1 =  Temp. at 7 in K
+        >>> 2 =  254.89844887898738
+
+  Cond iter.= 3  Evaporator Iter. Number --> IE= 2
+    ===========================================
+    ICONE if 1, iteration done >  1
+        >>> 1 =  Temp. at 7 in K
+        >>> 2 =  254.99560389551868
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+Condenser Iteration Number self.IC =  4
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+        >>> 1 =  Temp. at 7 in K
+        >>> 2 =  254.99560389551868
+
+  Cond iter.= 4  Evaporator Iter. Number --> IE= 1
+    ===========================================
+    ICONE if 1, iteration done >  0
+        >>> 1 =  Temp. at 7 in K
+        >>> 2 =  254.99560389551868
+
+  Cond iter.= 4  Evaporator Iter. Number --> IE= 2
+    ===========================================
+    ICONE if 1, iteration done >  1
+        >>> 1 =  Temp. at 7 in K
+        >>> 2 =  255.09193389843392
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+Condenser Iteration Number self.IC =  5
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+        >>> 1 =  Temp. at 7 in K
+        >>> 2 =  255.09193389843392
+
+  Cond iter.= 5  Evaporator Iter. Number --> IE= 1
+    ===========================================
+    ICONE if 1, iteration done >  0
+        >>> 1 =  Temp. at 7 in K
+        >>> 2 =  255.09193389843392
+
+  Cond iter.= 5  Evaporator Iter. Number --> IE= 2
+    ===========================================
+    ICONE if 1, iteration done >  1
+        >>> 1 =  Temp. at 7 in K
+        >>> 2 =  255.18754183753367
+#         Point     State     T(C)      T(C)      P         H         V         S
+                              AIR       REF       kPa       kj/kg     m3/kg     kj/kg-C
+1         1         COMP IN   N/A       28.22172  145.6797  372.7028  0.138431  1.677830
+2         2         COMP DIS  N/A       78.99586  1214.488  394.5128  0.016933  1.609813
+3         14        COND IN   44.68621  79.00784  1213.549  394.5326  0.016950  1.609914
+4         3         COND DEW  N/A       49.91431  1214.016  372.2061  0.000824  1.164091
+5         11        COND BUB  N/A       49.76246  1208.829  249.4160  0.000823  1.163603
+6         4         COND OUT  35.0      45.79606  1209.768  245.2057  0.000811  1.150480
+7         16        LIQ LINE  N/A       41.34191  1209.768  240.5579  0.000799  1.135803
+8         6         SUBCOOL   N/A       13.40531  1209.768  212.8430  0.000737  1.043558
+9         5         EVAP IN   -18.7140  -19.5905  152.8797  212.8430  0.021221  1.053681
+10        12        EVAP DEW  N/A       -20.6384  146.7599  343.3359  0.112532  1.571101
+11        7         EVAP OUT  -11.3340  -17.9224  145.6797  344.9457  0.114845  1.577927
+12        13        HX OUT    N/A       28.22172  145.6797  372.7028  0.138431  1.677830
+
+                Leaving cycle with IC:6
+                Leaving cycle with IE:3
 
 
 |==================================================|
@@ -177,6 +255,5 @@ Using Ref.  R12
 |     Output File: Cycle_out.csv                   |
 |                                                  |
 |     Configration: 1                              |
-|     Cycle       : 1 - Standard                   |
 |==================================================|
 Press any key to continue . . .

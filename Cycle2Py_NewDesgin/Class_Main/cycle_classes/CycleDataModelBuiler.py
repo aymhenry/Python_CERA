@@ -14,7 +14,7 @@ from common_classes.DataModelBuiler import DataModelBuiler
 class CycleDataModelBuiler (DataModelBuiler):
     # Type 2 is not supported
     # required data for each configration
-    DataModelBuiler.lst_required_data = [98, 0, 105, 105]
+    DataModelBuiler.lst_required_data = [98 - 18, 0, 105, 105]
     # maximum data file lines to read, this need to be updated if there is any
     # data line more than this
     DataModelBuiler.MAX_DATA_FILE_TO_READ = 150
@@ -31,33 +31,33 @@ class CycleDataModelBuiler (DataModelBuiler):
     # -----------------------------------------------------------
     def assign_vars(self):
         lst_config1 = [  # 'TITLE','TITLE2','FILERA','FILE_NAME'
-            'ICYCL',
+            # 'ICYCL',
             'IRFTYP',
             'IDFRST',
-            'HRSOFF',  
-            'TOL_FRSH',
-            'TOL_FRZ',
-            'TOL_COND',
-            'TOL_MASS', 
-            'TOL_HX',
+            # 'HRSOFF',  
+            # 'TOL_FRSH',
+            # 'TOL_FRZ',
+            # 'TOL_COND',
+            # 'TOL_MASS', 
+            # 'TOL_HX',
             'N_EVAP', 
             'N_COND', 
             'ICOMP',
-            'IMAP', 
-            'I_CYCLE',
+            # 'IMAP', 
+            # 'I_CYCLE',
             'T_CYCLE', 
             'I_VALVE',
             'FILE_NAME_code',
-            'IR[1][1]', 
-            'IR[2][1]',
-            'IR[3][1]', 
-            'NC[1]', 
-            'F[1][2][1]',
-            'F[1][3][1]', 
-            'F[2][3][1]', 
-            'X[1][1]', 
-            'X[2][1]', 
-            'X[3][1]', 
+            'REF', 
+            # 'IR[2][1]',
+            # 'IR[3][1]', 
+            # 'NC[1]', 
+            # 'F[1][2][1]',
+            # 'F[1][3][1]', 
+            # 'F[2][3][1]', 
+            # 'X[1][1]', 
+            # 'X[2][1]', 
+            # 'X[3][1]', 
             'ICONDI[1]', 
             'TS1[1]', 
             'CFMCI[1]', 
@@ -137,9 +137,6 @@ class CycleDataModelBuiler (DataModelBuiler):
             'FZREFQ',
             'QMUL']
 
-        lst_config2 = ['TITLE', 'TITLE2', 'FILERA', 'ICYCL']
-        lst_config3 = ['TITLE', 'TITLE2', 'FILERA', 'ICYCL']
-
         # lst_config4 same as 2
 
         lst_var_names = []
@@ -149,17 +146,8 @@ class CycleDataModelBuiler (DataModelBuiler):
 
         # according to the given configration in data file, saved in int_configration
         # set the realtive list of variable name in list
-        if self.int_configration == 1:
-            lst_var_names = lst_config1
 
-        elif self.int_configration == 2:
-            lst_var_names = lst_config2
-
-        elif self.int_configration == 3:
-            lst_var_names = lst_config3
-
-        elif self.int_configration == 4:
-            lst_var_names = lst_config2  # same as config 2
+        lst_var_names = lst_config1
 
         # send data list of variable, and relative list of values to data object.
         # data object put values of data list on variable
@@ -189,7 +177,6 @@ class CycleDataModelBuiler (DataModelBuiler):
     # Output		:
     # -----------------------------------------------------------
     def setup_array(self):
-
         # X(5,2)
         # array(Rows, Cols) = [[0] * Cols for i in range(Rows)]
         self.obj_qdata.X = [[0.0] * (2 + 1) for i in range(5 + 1)]
@@ -255,24 +242,13 @@ class CycleDataModelBuiler (DataModelBuiler):
     #            	during part of the cycle
 
     # ICYCL		1 =	Standard
-    #            2 =	Lorenz
-    #            3 =	Dual Loop
-    #            4 =	Dual Evap
 
     # ICOMP		1 = Reciprocating
     #            2 = Rotary
 
-    # N			1 =	Single Component
-    #            2 =	Two Components
-    #            3 =	Three Components
-
     # ICONDI or	0 =	Natural Convection
-    # ISPECI		1 =	Cross-Flow
+    # ISPECI	 1 =	Cross-Flow
     #            2 =	Counter-Flow
-
-    # IMAP 		0 =	Map
-    # 			1 =	EER
-    # 			2 =	Efficiency Model
 
     # ISPECI	1 =	Evap Exit Superheat
     # 			2 =	Interchanger Exit Superheat
@@ -334,25 +310,6 @@ class CycleDataModelBuiler (DataModelBuiler):
         #  I_CYCLE		Cycling Loss Analysis
         #  T_CYCLE		Cycles Per Hour
         #  I_VALVE		Shut-Off Valve
-
-    # Compressor map file data
-        #  FILMAP1_CODE	file name for map file for compressor 1
-        #  FILMAP2_CODE file name for map file for compressor 2 if any
-
-    #  Refrigerant data
-        #  IR[1][1]		Code (IR(1)) For 1st Refrigerant
-        #  IR[2][1]		Code (IR(2)) For 2nd Refrigerant
-        #  IR[3][1]		Code (IR(3)) For 3rd Refrigerant
-
-        #  NC[1]		Number Of Components (Maximum Of Three)
-
-        #  F[1][2][1]	Mixture Interaction Parameter- Component 1-2
-        #  F[1][3][1]	Mixture Interaction Parameter- Component 1-3
-        #  F[2][3][1]	Mixture Interaction Parameter- Component 2-3
-
-        #  X[1][1]		Mass Fraction Of 1st Refrigerant
-        #  X[2][1]		Mass Fraction Of 2nd Refrigerant
-        #  X[3][1]		Mass Fraction Of 3rd Refrigeran
 
     # Condenser data
         #  ICONDI[1]	Heat Exchanger Configuration

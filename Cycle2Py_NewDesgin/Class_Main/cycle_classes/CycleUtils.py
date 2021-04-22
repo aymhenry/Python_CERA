@@ -55,13 +55,12 @@ class CycleUtils(exf4Cond_Evap):
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
 
     @staticmethod
-    def adjlod(dt, ds, ICYCL, IC, TS3, TS5, FROSTF, FROSTZ, IDFRST, ATOTE, AREAFZ):
+    def adjlod(dt, ds, IC, TS3, TS5, FROSTF, FROSTZ, IDFRST, ATOTE, AREAFZ):
         # adjust the cabinet loads and set point temperatures
         # dt input data object.
         # ds CycleSolver object
         
         # IC conderser trail number
-        # CYCL: Cycle Type (1 to 5)
 
         # TS3 - K - HTF temperature entering fresh food evaporator
         # TS5 - K - HTF temperature entering freezer evaporator
@@ -76,6 +75,7 @@ class CycleUtils(exf4Cond_Evap):
         # ATOTE   m2  total area for Evap
         # AREAFZ  m2  Area for freezer
         
+        ICYCL = 1
         IRET = 0  # in Python only
 
         if IC == 1:
@@ -263,7 +263,9 @@ class CycleUtils(exf4Cond_Evap):
         return [TS3, TS5, ATOTE, AREAFZ]
 
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
-    def lowevp(self, dt, ds, objCP, MREF, ICYCL, ICNTRL,
+    def lowevp(self, dt, ds, objCP, MREF,
+               # ICYCL,
+               ICNTRL,
                H, P, T,
                TS3, TS5,
                DPF, ETHX2
@@ -273,7 +275,9 @@ class CycleUtils(exf4Cond_Evap):
 
         coolutil = CoolPrpUtil(objCP)
         NCALL = 0
-
+        
+        ICYCL = 1
+        
         # SET UP PRESSURES AND QUALITIES
         P[10] = P[6]
         P[9] = P[5]
@@ -309,8 +313,8 @@ class CycleUtils(exf4Cond_Evap):
             H[10] = H[6]
             T[10] = T[6]
 
-        if dt.ITYPE == 1:
-            ETHX = 0
+
+        ETHX = 0
 
         # begin iteration for temperature at point 10
 
@@ -672,7 +676,7 @@ class CycleUtils(exf4Cond_Evap):
         FANE,       # watt
         ICAB,       # Use Cab data 0 or 1
         IRFTYP,     # Refrigeration Type
-        ICYCL,      # Cycle Type
+        # ICYCL,      # Cycle Type
         QFRSH,      # watt
         QFREZ,      # watt
         FROSTF,     # Fresh Food Door Frost Load - watt
@@ -680,7 +684,8 @@ class CycleUtils(exf4Cond_Evap):
         TS3, TS5, T,        # K
         IDFRST              # Manual Defrost 0 or 1
         ):
-
+        
+        ICYCL = 1
         N = 1   # one gas
         # CALCULATE DUTY CYCLE AND THE AVERAGE CABINET LOADS
 
@@ -723,142 +728,51 @@ class CycleUtils(exf4Cond_Evap):
         DUTYR = 0
 
         if IRFTYP in [1, 3]:
-            if ICYCL == 1:
-                if dt.IDFRST == 0:
-                    QFF = QFF + dt.FROSTF
-                    QFZ = QFZ + dt.FROSTF
+            if dt.IDFRST == 0:
+                QFF = QFF + dt.FROSTF
+                QFZ = QFZ + dt.FROSTF
 
-                # 1 Wh = 3.413 Btu    BTU = 1.0548 kj/hr
-                # dt.CAPE = QFRSH / 1.0548 \
-                    # - 3.413 * dt.FANE - 3.413 * dt.DFSTCYC	\
-                    # - 3.413 * dt.FFCYC - 3.413 * dt.FZCYC	\
-                    # - dt.CONDF_IN_WALL - dt.CONDZ_IN_WALL
+            # 1 Wh = 3.413 Btu    BTU = 1.0548 kj/hr
+            # dt.CAPE = QFRSH / 1.0548 \
+                # - 3.413 * dt.FANE - 3.413 * dt.DFSTCYC	\
+                # - 3.413 * dt.FFCYC - 3.413 * dt.FZCYC	\
+                # - dt.CONDF_IN_WALL - dt.CONDZ_IN_WALL
 
-                # both dt.CONDF_IN_WALL - dt.CONDZ_IN_WALL
-                # are zero by defalut
+            # both dt.CONDF_IN_WALL - dt.CONDZ_IN_WALL
+            # are zero by defalut
 
-                dt.CAPE = QFRSH \
-                    - FANE \
-                    - dt.DFSTCYC \
-                    - dt.FFCYC  \
-                    - dt.FZCYC \
-                    - dt.CONDF_IN_WALL \
-                    - dt.CONDZ_IN_WALL
+            dt.CAPE = QFRSH \
+                - FANE \
+                - dt.DFSTCYC \
+                - dt.FFCYC  \
+                - dt.FZCYC \
+                - dt.CONDF_IN_WALL \
+                - dt.CONDZ_IN_WALL
 
-                dt.DUTYC = (QFF + QFZ) / dt.CAPE
+            dt.DUTYC = (QFF + QFZ) / dt.CAPE
 
-                if dt.DUTYC > 1.0:
-                    dt.DUTYC = 1.0
+            if dt.DUTYC > 1.0:
+                dt.DUTYC = 1.0
 
-                # DUTYR = dt.DUTYC
+            # DUTYR = dt.DUTYC
 
-            if ICYCL == 2:
-                QFF = QFF - dt.FROSTF
-                if dt.IDFRST == 0:
-                    QFZ = QFZ + dt.FROSTF
+            # --------------------
+            if dt.IDFRST == 0:
+                QFZ = QFZ + dt.FROSTF
 
-                # Dr. Omar Unit
-                # dt.CAPZ = QFREZ / 1.0548 - 3.413 * dt.FANZ \
-                    # - 3.413 * dt.DFSTCYC	\
-                    # + dt.Q_FZ_IN_WALL + dt.Q_ML_IN_WALL	\
-                    # - dt.CAPZ_IN_WALL - dt.CAPM_IN_WALL	\
-                    # - dt.CONDZ_IN_WALL - 3.413 * dt.FZCYC	\
-                    # - dt.Q_HXS_FZ / 1.0548
+            # dt.CAPE = QFRSH / 1.0548 - 3.413 * (FANE
+                # + dt.DFSTCYC + dt.FZCYC)	\
+                # + dt.Q_FF_IN_WALL - dt.CAPE_IN_WALL	\
+                # - dt.CONDF_IN_WALL - dt.Q_HXS_FF / 1.0548
 
-                dt.CAPZ = QFREZ \
-                    - dt.FANZ \
-                    - dt.DFSTCYC \
-                    + dt.Q_FZ_IN_WALL \
-                    + dt.Q_ML_IN_WALL \
-                    - dt.CAPZ_IN_WALL \
-                    - dt.CAPM_IN_WALL \
-                    - dt.CONDZ_IN_WALL \
-                    - dt.FZCYC	\
-                    - dt.Q_HXS_FZ
+            dt.CAPE = QFRSH \
+                - (FANE + dt.DFSTCYC + dt.FZCYC) \
+                + dt.Q_FF_IN_WALL - dt.CAPE_IN_WALL \
+                - dt.CONDF_IN_WALL - dt.Q_HXS_FF
 
-                if dt.CAPZ <= 0.0:
-                    # self.showError("Incorrect Solution, Check Mass Flow")
-                    # self.showError("Solution being Terminated")
-                    sys.exit("Incorrect Solution, Check Mass Flow 100")  # STOP ' '
-
-                dt.DUTYZ = QFZ / dt.CAPZ
-
-                # dt.CAPE = QFRSH / 1.0548 - 3.413 * dt.FANE \
-                #    # - 3.413 * dt.FFCYC	\
-                #    # + dt.Q_FF_IN_WALL - dt.CAPE_IN_WALL	\
-                #    # - dt.CONDF_IN_WALL + dt.Q_FZ_FF	\
-                #    # - dt.Q_HXS_FF / 1.0548
-
-                dt.CAPE = QFRSH \
-                    - FANE \
-                    - dt.FFCYC \
-                    + dt.Q_FF_IN_WALL \
-                    - dt.CAPE_IN_WALL \
-                    - dt.CONDF_IN_WALL \
-                    + dt.Q_FZ_FF \
-                    - dt.Q_HXS_FF
-
-                dt.DUTYE = QFF / dt.CAPE
-
-                dt.DUTYC = min(
-                    dt.DUTYE, dt.DUTYZ)
-
-                if dt.DUTYC > 1.0:
-                    dt.DUTYC = 1.0
-
-                DUTYR = max(dt.DUTYE, dt.DUTYZ)
-
-                # if DUTYR > 1.0:
-                #    DUTYR = 1.0
-
-            if ICYCL == 3:
-                if N == 1:
-                    if dt.IDFRST == 0:
-                        QFZ = QFZ + dt.FROSTF
-
-                    # dt.CAPZ = QFRSH / 1.0548 - 3.413 * dt.FANE - \
-                        # 3.413 * (dt.DFSTCYC + dt.FZCYC)
-
-                    dt.CAPZ = QFRSH - dt.FANE - (dt.DFSTCYC + dt.FZCYC)
-
-                    dt.DUTYZ = QFZ / dt.CAPZ
-
-                    dt.DUTYC = min(dt.DUTYZ, 1.0)
-                    dt.DUTYZ = dt.DUTYC
-
-                else:
-                    # dt.CAPE = QFRSH / 1.0548 - 3.413 * \
-                    #    # (FANE + dt.FFCYC)
-                    #    # + dt.Q_FF_IN_WALL - dt.CAPE_IN_WALL
-
-                    dt.CAPE = QFRSH \
-                        - (FANE + dt.FFCYC) \
-                        + dt.Q_FF_IN_WALL - dt.CAPE_IN_WALL
-
-                    QFF = QFF - dt.FROSTF
-                    dt.DUTYE = QFF / dt.CAPE
-                    dt.DUTYC = min(dt.DUTYE, 1.0)
-                    dt.DUTYE = dt.DUTYC
-
-                DUTYR = dt.DUTYC
-
-            else:
-                if dt.IDFRST == 0:
-                    QFZ = QFZ + dt.FROSTF
-
-                # dt.CAPE = QFRSH / 1.0548 - 3.413 * (FANE
-                    # + dt.DFSTCYC + dt.FZCYC)	\
-                    # + dt.Q_FF_IN_WALL - dt.CAPE_IN_WALL	\
-                    # - dt.CONDF_IN_WALL - dt.Q_HXS_FF / 1.0548
-
-                dt.CAPE = QFRSH \
-                    - (FANE + dt.DFSTCYC + dt.FZCYC) \
-                    + dt.Q_FF_IN_WALL - dt.CAPE_IN_WALL \
-                    - dt.CONDF_IN_WALL - dt.Q_HXS_FF
-
-                dt.DUTYE = QFZ / dt.CAPE
-                dt.DUTYC = min(dt.DUTYE, 1.0)
-                DUTYR = dt.DUTYC
+            dt.DUTYE = QFZ / dt.CAPE
+            dt.DUTYC = min(dt.DUTYE, 1.0)
+            DUTYR = dt.DUTYC
 
         return [QFF, QFZ, DUTYR]
 

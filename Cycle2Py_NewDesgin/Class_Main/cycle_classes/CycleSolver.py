@@ -32,6 +32,9 @@ class CycleSolver(CycleUtils):
         self.dt = dt
         self.lng_item = lng_item
 
+        dt.ITYPE = 1
+        dt.ICYCL = 1
+        
         # Trace Data
         self.trace = Trace(self.dt, self)
         self.coolutil = CoolPrpUtil(objCP)
@@ -377,7 +380,7 @@ class CycleSolver(CycleUtils):
                 [self.TS3, self.TS5, self.ATOTE,
                     self.dt.AREAFZ] = self.adjlod(self.dt, self,
                                                    # self.dt.ATOTEI[self.lng_item],
-                                                   self.dt.ICYCL,
+                                                   # self.dt.ICYCL,
                                                    self.IC,
                                                    self.TS3,
                                                    self.TS5,
@@ -820,7 +823,7 @@ class CycleSolver(CycleUtils):
                     self.dutfnd(self.dt, self.dt.ICAB,
                                 self.FANE,       # watt
                                 self.dt.IRFTYP,
-                                self.dt.ICYCL,
+                                # self.dt.ICYCL,
                                 # self.NCYC,
                                 self.QFRSH,  # from Evaporator class
                                 self.QFREZ,
@@ -838,10 +841,7 @@ class CycleSolver(CycleUtils):
             self.trace.dr_omar("General review for this point")
             if self.dt.IRFTYP <= 3:
 
-                if (self.dt.ICYCL == 1 and
-                        self.dt.ICAB != 0 and
-                        self.IFRSH != 0):
-
+                if (self.dt.ICAB != 0 and self.IFRSH != 0):
                     if self.dt.IC == 1:
                         TIN = 0.15 * self.TFF + 0.85 * self.TFZ
                         self.FF_FRACT = 0.0  # in Python only
@@ -1104,13 +1104,16 @@ class CycleSolver(CycleUtils):
         self.trace.dr_omar("chk lowevp") 
         [self.H, self.P, self.T, self.TS6, self.QFREZ] = \
             self.lowevp(self.dt, self,
-                        self.objCP, self.MREF, self.dt.ICYCL,
+                        self.objCP,
+                        self.MREF,          # kg/hr
+                        # , self.dt.ICYCL,
                         0,  # ICNTRL no value set in Fortran
                         self.H, self.P, self.T,
                         # , VL
                         # ,HL not clear its use
                         self.TS3, self.dt.TS5, self.dt.DPF,
-                        self.ETHX2)
+                        self.ETHX2
+                        )
                         
         # self.H[5] = self.H[4] +self.H[7] - self.H[13] # by Ayman
         
@@ -1275,11 +1278,12 @@ class CycleSolver(CycleUtils):
 
         # correct cop dur to cycling losses
         #
-        if self.dt.I_CYCLE == 0:
-            self.CORR_COP = 1.0
-        else:
-            self.TENV = self.dt.TROOM
-            self.TMID_COND = (self.T[3] + self.T[11]) / 2.0
-            self.TMID_EVAP = (self.T[8] + self.T[9]) / 2.0
+        #if self.dt.I_CYCLE == 0:
+        #    self.CORR_COP = 1.0
+        # else:
+         
+        self.TENV = self.dt.TROOM
+        self.TMID_COND = (self.T[3] + self.T[11]) / 2.0
+        self.TMID_EVAP = (self.T[8] + self.T[9]) / 2.0
 
-            self.CORR_COP = cyclos(self.dt.I_VALVE, self.dt.T_CYCLE)
+        self.CORR_COP = cyclos(self.dt.I_VALVE, self.dt.T_CYCLE)

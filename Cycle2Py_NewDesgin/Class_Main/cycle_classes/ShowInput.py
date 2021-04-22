@@ -22,69 +22,47 @@ class ShowInput:
               )
 
     def graph(self):
-        int_type = self.dt.ICYCL
-        if int_type == 1:
-            self.show_sigle_cycle()
-            self.show_double_cycle()
-        
-        elif int_type == 2:
-            self.show_double_cycle()   # to be checked later
-            
-        elif int_type == 3:
-            self.show_double_cycle()
-            
-        elif int_type == 4:
-            self.show_double_cycle()
+        self.show_sigle_cycle()
+        # self.show_double_cycle()
             
     def show(self):
-        int_type = self.dt.ICYCL
-        if int_type == 1:
-            self.show_type1()
-        
-        elif int_type == 2:
-            self.show_type2()
-            
-        elif int_type == 3:
-            self.show_type3()
-            
-        elif int_type == 4:
-            self.show_type4()
+         self.show_type1()
             
     def show_type1(self):
         self.showdata('TITLE', '#', 'MULTIPLE PATHWAYS BASELINE PROTOTYPE')
         self.showdata('TITLE2', '#', 'Title of report')
         self.showdata('FILERA', '#', 'FILE NAME')
-        self.showdata('ICYCL', '#', 'Cycle Type')
+        # self.showdata('ICYCL', '#', 'Cycle Type')
         self.showdata('IRFTYP', '#', 'Refrigeration Type')
         self.showdata('IDFRST', '#', 'Manual Defrost')
-        self.showdata('HRSOFF', 'hr', 'Hours Shutdown For Cycle Defrost')
-        self.showdata('TOL_FRSH', 'DEG C',
-                      'Torelance in iteration for fresh food')
-        self.showdata('TOL_FRZ', 'DEG C',
-                      'Torelance in iteration for frezzer')
-        self.showdata('TOL_COND', 'DEG C',
-                      'Torelance in iteration for condenser')
-        self.showdata('TOL_MASS', '%', 'Torelance in iteration for mass')
-        self.showdata('TOL_HX', '#',
-                      'Torelance in iteration for heat exchanger')
+        # self.showdata('HRSOFF', 'hr', 'Hours Shutdown For Cycle Defrost')
+        # self.showdata('TOL_FRSH', 'DEG C',
+        #              'Torelance in iteration for fresh food')
+        # self.showdata('TOL_FRZ', 'DEG C',
+        #              'Torelance in iteration for frezzer')
+        # self.showdata('TOL_COND', 'DEG C',
+        #              'Torelance in iteration for condenser')
+        # self.showdata('TOL_MASS', '%', 'Torelance in iteration for mass')
+        # self.showdata('TOL_HX', '#',
+        #               'Torelance in iteration for heat exchanger')
         self.showdata('N_EVAP', '#', 'Number of Zones on Evaporator')
         self.showdata('N_COND', '#', 'Number of Zones on Condenser')
         self.showdata('ICOMP', '#', 'Compressor Type')
-        self.showdata('IMAP', '#', 'Compressor Analysis')
-        self.showdata('I_CYCLE', '#', 'Cycling Loss Analysis')
+        # self.showdata('IMAP', '#', 'Compressor Analysis')
+        # self.showdata('I_CYCLE', '#', 'Cycling Loss Analysis')
         self.showdata('T_CYCLE', '#', 'Cycles Per Hour')
         self.showdata('I_VALVE', '#', 'Shut-Off Valve')
         self.showdata('FILE_NAME', '#', 'file name for map file')
-        self.showdata('IR[1][1]', '#', 'Code (IR(1)) For 1st Refrigerant ')
-        self.showdata('IR[2][1]', '#', 'Code (IR(2)) For 2nd Refrigerant')
-        self.showdata('IR[3][1]', '#', 'Code (IR(3)) For 3rd Refrigerant')
-        self.showdata('NC[1]', '#', 'Number Of Components (Maximum Of Three)')
-        self.showdata('F[1][2][1]', '#', 'Mixture Interaction Parameter- Component 1-2')
-        self.showdata('F[1][3][1]', '#', 'Mixture Interaction Parameter- Component 1-3')
-        self.showdata('F[2][3][1]', '#', 'Mixture Interaction Parameter- Component 2-3')
-        self.showdata('X[1][1]', '#', 'Mass Fraction Of 1st Refrigerant')
-        self.showdata('X[2][1]', '#', 'Mass Fraction Of 2nd Refrigerant')
-        self.showdata('X[3][1]', '#', 'Mass Fraction Of 3rd Refrigeran')
+        self.showdata('REF', '#', 'Code of Refrigerant ')
+        # self.showdata('IR[2][1]', '#', 'Code (IR(2)) For 2nd Refrigerant')
+        # self.showdata('IR[3][1]', '#', 'Code (IR(3)) For 3rd Refrigerant')
+        # self.showdata('NC[1]', '#', 'Number Of Components (Maximum Of Three)')
+        # self.showdata('F[1][2][1]', '#', 'Mixture Interaction Parameter- Component 1-2')
+        # self.showdata('F[1][3][1]', '#', 'Mixture Interaction Parameter- Component 1-3')
+        # self.showdata('F[2][3][1]', '#', 'Mixture Interaction Parameter- Component 2-3')
+        # self.showdata('X[1][1]', '#', 'Mass Fraction Of 1st Refrigerant')
+        # self.showdata('X[2][1]', '#', 'Mass Fraction Of 2nd Refrigerant')
+        # self.showdata('X[3][1]', '#', 'Mass Fraction Of 3rd Refrigeran')
         self.showdata('ICONDI[1]', '#', 'Heat Exchanger Configuration')
         self.showdata('TS1[1]', 'DEG C', 'Temp Of Air Entering Condenser')
         self.showdata('CFMCI[1]', 'L/s', 'Air Flow Rate Across Coil')
