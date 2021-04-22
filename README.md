@@ -19,7 +19,7 @@ a new design will be introduced, to overcome the bugs in the Fortran source file
 
 Start to build application from down to top. see folder :-
 
-https://github.com/aymhenry/Python_CERA/tree/master/Cycle2Py_NewDesgin/
+https://github.com/aymhenry/Python_CERA/tree/master/Cycle2Py
 
 
 

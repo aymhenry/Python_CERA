@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AnalysisUIOptions">
+    <option name="SPLITTER_PROPORTION" value="0.38741183" />
+    <option name="CUSTOM_SCOPE_NAME" value="Module 'Class_Main'" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="7a4fde3e-b7ab-4ff3-8b18-2eb61b731645" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/Cycle_out.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Cycle_out.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cycle_classes/CoolPrp.py" beforeDir="false" afterPath="$PROJECT_DIR$/cycle_classes/CoolPrp.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cycle_classes/CoolPrpUtil.py" beforeDir="false" afterPath="$PROJECT_DIR$/cycle_classes/CoolPrpUtil.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cycle_classes/CycleSolver.py" beforeDir="false" afterPath="$PROJECT_DIR$/cycle_classes/CycleSolver.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cycle_classes/CycleType.py" beforeDir="false" afterPath="$PROJECT_DIR$/cycle_classes/CycleType.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cycle_classes/CycleUtils.py" beforeDir="false" afterPath="$PROJECT_DIR$/cycle_classes/CycleUtils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cycle_classes/ErrorException.py" beforeDir="false" afterPath="$PROJECT_DIR$/cycle_classes/ErrorException.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cycle_classes/ShowInput.py" beforeDir="false" afterPath="$PROJECT_DIR$/cycle_classes/ShowInput.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cycle_classes/Start.py" beforeDir="false" afterPath="$PROJECT_DIR$/cycle_classes/Start.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cycle_classes/View.py" beforeDir="false" afterPath="$PROJECT_DIR$/cycle_classes/View.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cycle_start.py" beforeDir="false" afterPath="$PROJECT_DIR$/cycle_start.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cycle_start_win.py" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
+  </component>
+  <component name="ProjectId" id="1qzejgxAqQUX5emLvqB6ivvwjJq" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/cycle_start.py" />
+    <property name="run.code.analysis.last.selected.profile" value="aDefault" />
+  </component>
+  <component name="RunManager" selected="Python.cycle_start_debug">
+    <configuration name="cycle_start" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="Class_Main" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="D:\ProgFiles\Python38-32\python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/cycle_start.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="cycle_start_debug" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="Class_Main" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="D:\ProgFiles\Python38-32\python.exe" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/cycle_start_debug.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Python.cycle_start" />
+      <item itemvalue="Python.cycle_start_debug" />
+    </list>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="7a4fde3e-b7ab-4ff3-8b18-2eb61b731645" name="Default Changelist" comment="" />
+      <created>1618086982601</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1618086982601</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="586" y="198" key="#Inspections" timestamp="1618699768398">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="586" y="198" key="#Inspections/0.0.1920.1040/545.-600.800.560@0.0.1920.1040" timestamp="1618699768398" />
+    <state x="414" y="174" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1619113642673">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="414" y="174" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040/545.-600.800.560@0.0.1920.1040" timestamp="1619113642673" />
+    <state x="717" y="389" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1" timestamp="1619114677336">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="717" y="389" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/0.0.1920.1040/545.-600.800.560@0.0.1920.1040" timestamp="1619114677336" />
+    <state x="740" y="274" key="FileChooserDialogImpl" timestamp="1618087009393">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="740" y="274" key="FileChooserDialogImpl/0.0.1920.1040/545.-600.800.560@0.0.1920.1040" timestamp="1618087009393" />
+    <state width="1899" height="274" key="GridCell.Tab.0.bottom" timestamp="1619114815705">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="274" key="GridCell.Tab.0.bottom/0.0.1920.1040/545.-600.800.560@0.0.1920.1040" timestamp="1619114815705" />
+    <state width="1899" height="274" key="GridCell.Tab.0.center" timestamp="1619114815705">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="274" key="GridCell.Tab.0.center/0.0.1920.1040/545.-600.800.560@0.0.1920.1040" timestamp="1619114815705" />
+    <state width="1899" height="274" key="GridCell.Tab.0.left" timestamp="1619114815705">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="274" key="GridCell.Tab.0.left/0.0.1920.1040/545.-600.800.560@0.0.1920.1040" timestamp="1619114815705" />
+    <state width="1899" height="274" key="GridCell.Tab.0.right" timestamp="1619114815705">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="274" key="GridCell.Tab.0.right/0.0.1920.1040/545.-600.800.560@0.0.1920.1040" timestamp="1619114815705" />
+    <state width="1899" height="338" key="GridCell.Tab.1.bottom" timestamp="1619114815704">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="338" key="GridCell.Tab.1.bottom/0.0.1920.1040/545.-600.800.560@0.0.1920.1040" timestamp="1619114815704" />
+    <state width="1899" height="338" key="GridCell.Tab.1.center" timestamp="1619114815703">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="338" key="GridCell.Tab.1.center/0.0.1920.1040/545.-600.800.560@0.0.1920.1040" timestamp="1619114815703" />
+    <state width="1899" height="338" key="GridCell.Tab.1.left" timestamp="1619114815703">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="338" key="GridCell.Tab.1.left/0.0.1920.1040/545.-600.800.560@0.0.1920.1040" timestamp="1619114815703" />
+    <state width="1899" height="338" key="GridCell.Tab.1.right" timestamp="1619114815703">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="338" key="GridCell.Tab.1.right/0.0.1920.1040/545.-600.800.560@0.0.1920.1040" timestamp="1619114815703" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/cycle_classes/CycleSolver.py</url>
+          <line>380</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>
