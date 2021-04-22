@@ -16,10 +16,8 @@ from cycle_classes.ErrorException import ErrorException
 class CycleType:
 
     def __init__(self, objdata):
+        self.objCP = None
         self.dt = objdata
-        
-        # set be will be made later self.objCP.setup('R12')
-        self.objCP = CoolPrp()
         
         # --------------------------------------------------
         # Setup basic vars
@@ -98,7 +96,7 @@ class CycleType:
         self.dt.CONDZ = self.dt.FZQ - self.dt.FZSEN - self.dt.FZLAT - \
             self.dt.FZHTQ - self.dt.FROSTZ - self.dt.FZREFQ - self.dt.FZPENA
 
-    def calculte(self):        
+    def calculte(self):
         self.dt.TS5 = -300.0   # 256
         self.dt.DPF = 0.0
         self.dt.CFMF = 0  # by pass required value.
@@ -107,20 +105,23 @@ class CycleType:
             raise ErrorException('Error refrigerant code: ', 'cyt1000')
 
         print("Using Ref. ", self.getRefName(self.dt.REF))
-        
+        if self.dt.DEBUG:
+            print("\t>>>>WORKING IN DEBUG mode")
+            
+        self.objCP = CoolPrp(self.dt.DEBUG)
         self.objCP.setup(self.getRefName(self.dt.REF))  # 'R12'
         
         objCycleSolver = CycleSolver(objCP=self.objCP,
                                      dt=self.dt,
                                      lng_item=1
-                                     # NCYC=1
                                      )
 
         # === solve
         objCycleSolver.solveCycle()
-        objFeedback = objCycleSolver.getSolution()
+        if self.dt.IS_SOLTION:
+            return objCycleSolver.getSolution()
         
-        return objFeedback   # obj_cycle.cycle()
+        return None   # obj_cycle.cycle()
 
     def getRefName(self, lng_Code):
         lstRefList = [

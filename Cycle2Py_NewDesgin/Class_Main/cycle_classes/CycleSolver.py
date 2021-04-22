@@ -318,8 +318,9 @@ class CycleSolver(CycleUtils):
         # GUESS A DEW POINT TEMPERATURE AT THE EVAPORATOR EXIT
         # -----------------------------
         if self.ISPEC == 1:  # Evap superheat:
-            self.T[15] = self.TS3 - (self.DTSUPE + 2.0)
-            self.P[15] = self.objCP.Property('P', X=1, T=self.T[15])  # Pa
+            self.T[15] = self.TS3 - (self.DTSUPE + 2.0) 
+
+            self.P[15] = self.objCP.Property('P', X=1, T=self.T[15])  # pa
             self.V[15] = self.objCP.Property('V', X=1, T=self.T[15])  # m3/kg
 
             # self.TE[1] = self.T[15] + self.DTSUPE
@@ -338,7 +339,7 @@ class CycleSolver(CycleUtils):
                 self.T[13] = self.TC[1] - 5.0
                 self.T[15] = self.T[13] - self.DTSUPI  # Interchanger DT
 
-            self.P[15] = self.objCP.Property('P', X=1, T=self.T[15])  # Pa
+            self.P[15] = self.objCP.Property('P', X=1, T=self.T[15])  # pa
 
             self.TE[1] = self.T[15]
             self.T[7] = self.TE[1]
@@ -349,7 +350,7 @@ class CycleSolver(CycleUtils):
             self.V[15] = self.objCP.Property('V', X=self.XEXITE
                                              , T=self.T[15])  # m3/kg
             self.P[15] = self.objCP.Property('P', X=self.XEXITE
-                                             , T=self.T[15])  # Pa
+                                             , T=self.T[15])  # pa
 
             self.trace.dr_omar("Ayman to chk source code")
             # Dr omar
@@ -364,7 +365,7 @@ class CycleSolver(CycleUtils):
             self.T[7] = self.TE[1]
             self.P[7] = self.P[15]
         # -----------------------------
-
+        
         # Condenser itaration loop
         while self.IC <= self.ITMAXC and self.LCCON:
             self.trace.cond_ic()  # self.IC
@@ -395,7 +396,7 @@ class CycleSolver(CycleUtils):
 
             # find condenser pressure for current guess of TC
             TBUB4 = self.TC[self.JC] + self.DTSUBC
-            self.P[4] = self.objCP.Property('P', X=0, T=TBUB4)  # Pa
+            self.P[4] = self.objCP.Property('P', X=0, T=TBUB4)  # pa
 
             # determine the specific volume of the liquid
             if self.DTSUBC > 0:
@@ -572,6 +573,9 @@ class CycleSolver(CycleUtils):
 
         self.trace.cycle_out()
 
+        # if error job will terminate
+        if self.objCP.isError(): 
+            self.dt.IS_SOLTION = False
         return
 
     # condenser calculations
@@ -704,7 +708,7 @@ class CycleSolver(CycleUtils):
                      self.dt.CONDHT[self.NCYC] / (self.MREF / 3600) / self.DUTYR
 
         self.P[16] = self.P[4]
-        self.T[16] = self.objCP.Property('T', T=self.H[16],
+        self.T[16] = self.objCP.Property('T', H=self.H[16],
                                          P=self.P[16])  # K
 
         # calculate the average effectiveness of the heat exchanger

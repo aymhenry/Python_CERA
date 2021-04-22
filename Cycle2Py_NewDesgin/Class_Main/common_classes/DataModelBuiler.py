@@ -565,8 +565,8 @@ class DataModelBuiler (FileAccess):
 
         # if number of data given is not as the required by configration
         # number, return False with error code
-        if len(self.lst_data) != self.int_parameter_count + \
-                1:  # error if not the same number + header row
+        if len(self.lst_data) != self.int_parameter_count + 1:
+            # error if not the same number + header row
             self.m_error_desc = " given (" + str(len(self.lst_data)) + \
                 ") required (" + str(self.int_parameter_count + 1) + ")"
             self.m_error = DataModelBuiler.ERR_FOUND_DATA_COUNT

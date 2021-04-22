@@ -18,9 +18,22 @@ class CoolPrpUtil:
     def __init__(self, objCP):
         self.objCP = objCP
     
+    def isError(self):
+        # return true if error, else return false
+        return self.objCP.isError()
+        
+    def err_description(self):
+        return self.objCP.err_description()
+    
     def getProp(self, P, T, prp="H", X=1):
         T_crit = self.objCP.getCrtiticalTemp()
         P_crit = self.objCP.getCrtiticalPress()
+
+        if self.isError():
+            # print(self.err_description())
+            return self.objCP.getErrFlag()
+            
+        # Temp & Press in the accepatable limit
         
         if T >= T_crit or P >= P_crit:
             prop = self.objCP.Property(prp, T=T, P=P)
@@ -44,16 +57,20 @@ class CoolPrpUtil:
             else:
                 prop = self.objCP.Property(prp, T=T, X=X)
         
-        if self.objCP.isError():
-            print(self.objCP.err_description())
-            sys.exit('4000')
+        # if self.isError():
+        #    # print(self.err_description())
+        #    # sys.exit('4000')
             
         return prop
 
     def get_coolQuality(self, Enthalpy, P, T):
         # as, liquid, twophase,  supercritical_gas
         P_sat = self.objCP.Property('P', T=T, X=0)  # Pa
-
+        
+        if self.isError():
+            # print(self.err_description())
+            return self.objCP.getErrFlag()
+            
         if abs(P_sat - P) > CoolPrpUtil.ERR_MARGIN:
             sta_phas = False
 

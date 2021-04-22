@@ -14,21 +14,36 @@ def print_fixed_width(str_data):
     print("|" + str_data + str_extenstion + "|")
     
 
-obj_start = Start()
+obj_start = Start()         
 
-obj_start.main()
+# is_solution = obj_start.main(True)      # DEBUG ON
+is_solution = obj_start.main(False)      # DEBUG OFF
+
 
 print("\n")
 print_fixed_width("=" * lng_width)
-print_fixed_width("     Cycle. App Done Succufully")
-print_fixed_width("     was create on current directory ")
 
-print_fixed_width(" ")
-print_fixed_width(" ")
+if is_solution:
+    print_fixed_width("     Cycle. App Done Succufully")
+    print_fixed_width("     was create on current directory ")
 
-print_fixed_width("     Input File: " + Start.FILE_CYC_INPUT)
-print_fixed_width("     Output File: " + Start.FILE_CYC_OUTPUT)
-print_fixed_width(" ")
+    print_fixed_width(" ")
+    print_fixed_width(" ")
+
+    print_fixed_width("     Input File: " + Start.FILE_CYC_INPUT)
+    print_fixed_width("     Output File: " + Start.FILE_CYC_OUTPUT)
+    print_fixed_width(" ")
+
+else:
+    print_fixed_width("     Cycle. App is faied")
+    print_fixed_width("     No slotion is found")
+    print_fixed_width("     Check your inputs")
+
+    print_fixed_width(" ")
+    print_fixed_width(" ")
+
+    print_fixed_width("     Input File: " + Start.FILE_CYC_INPUT)
+    print_fixed_width(" ")
 
 print_fixed_width("     Configration: " + str(obj_start.dt.IRFTYP))
 print_fixed_width("=" * lng_width)

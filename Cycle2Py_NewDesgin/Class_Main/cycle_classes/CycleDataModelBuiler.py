@@ -14,12 +14,12 @@ from common_classes.DataModelBuiler import DataModelBuiler
 class CycleDataModelBuiler (DataModelBuiler):
     # Type 2 is not supported
     # required data for each configration
-    DataModelBuiler.lst_required_data = [98 - 18, 0, 105, 105]
+    DataModelBuiler.lst_required_data = [98 - 18]
     # maximum data file lines to read, this need to be updated if there is any
     # data line more than this
     DataModelBuiler.MAX_DATA_FILE_TO_READ = 150
 
-    DataModelBuiler.CONFIGRATION_COUNT = 4   # max. number of configrations
+    DataModelBuiler.CONFIGRATION_COUNT = 1   # max. number of configrations
     # +1 			# set row number that has the configration
     DataModelBuiler.CONFIGRATION_ROW = 5   # 4 sting lines found
 
@@ -177,19 +177,7 @@ class CycleDataModelBuiler (DataModelBuiler):
     # Output		:
     # -----------------------------------------------------------
     def setup_array(self):
-        # X(5,2)
         # array(Rows, Cols) = [[0] * Cols for i in range(Rows)]
-        self.obj_qdata.X = [[0.0] * (2 + 1) for i in range(5 + 1)]
-
-        # IR(5,2)
-        # array(Rows, Cols) = [[0] * Cols for i in range(Rows)]
-        self.obj_qdata.IR = [[0.0] * (2 + 1) for i in range(5 + 1)]
-
-        self.obj_qdata.F = [[[0.0] * (2 + 1)
-                             for i in range(5 + 1)] for j in range(5 + 1)]
-
-        self.obj_qdata.NC = [0.0] * (2 + 1)
-        # self.obj_qdata.pythNC = [0.0] * (2+1)
 
         self.obj_qdata.ICONDI = [0.0] * (2 + 1)
         self.obj_qdata.TS1 = [0.0] * (2 + 1)
@@ -217,17 +205,6 @@ class CycleDataModelBuiler (DataModelBuiler):
         self.obj_qdata.MREFI = [0.0] * (2 + 1)
         self.obj_qdata.SPEEDI = [0.0] * (2 + 1)
         self.obj_qdata.TSPECI = [0.0] * (2 + 1)
-        # self.obj_qdata.DISPLC = [0.0] * (2 + 1)
-        # self.obj_qdata.SIZEN = [0.0] * (2 + 1)
-        # self.obj_qdata.SPDNOM = [0.0] * (2 + 1)
-        # self.obj_qdata.EERN = [0.0] * (2 + 1)
-        # self.obj_qdata.ICOOLN = [0.0] * (2 + 1)
-        # self.obj_qdata.CEI = [0.0] * (2 + 1)
-        # self.obj_qdata.SEFFI = [0.0] * (2 + 1)
-        # self.obj_qdata.MEFF = [0.0] * (2 + 1)
-        # self.obj_qdata.ELOSS = [0.0] * (2 + 1)
-        # self.obj_qdata.QCAN = [0.0] * (2 + 1)
-        # self.obj_qdata.QHILO = [0.0] * (2 + 1)
         self.obj_qdata.SUPIHX = [0.0] * (2 + 1)
         self.obj_qdata.ETHX = [0.0] * (2 + 1)
 

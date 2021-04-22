@@ -21,16 +21,16 @@ class Trace:
     
     COMP_INS = False   # for comp_ins
     COMP_OUT = False   # for comp_out
-    COND_IC = True    # for cond_ic
-    EVAP_IE = True    # for evap_ie
+    COND_IC = False    # for cond_ic
+    EVAP_IE = False    # for evap_ie
     FRSH_INS = False   # for frsh_ins
     FRSH_OUT = False   # for frsh_out
     CYCLE_OUT = False  # for cycle_out
     APP_INS = True     # for app ins
     CYC_PID = True     # for cycle pid
-    PNT_LST = True     # for list of points name
+    PNT_LST = False     # for list of points name
     
-    RANDAM = True      # for randam
+    RANDAM = False      # for randam
     
     def __init__(self, dt=None, obj_cycletype=None):
         self.dt = dt     # app data

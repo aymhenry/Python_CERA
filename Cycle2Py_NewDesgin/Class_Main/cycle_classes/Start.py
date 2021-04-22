@@ -20,8 +20,8 @@ class Start:
     FILE_CYC_INPUT = "Cycle_dat.csv"  # input file for cabinit module
     FILE_CYC_OUTPUT = "Cycle_out.csv"  # output file for cabinit module
 
-    def __init__(self):
-        self.dt = None  # object to save data
+    def __init__(self):        
+        self.dt = None  # object to save data        
         self.obj_control = None  # object to control data
 
         self.str_FILE_CYC_INPUT = Start.FILE_CYC_INPUT
@@ -52,12 +52,23 @@ class Start:
     #
     # Output        :
     # -----------------------------------------------------------
-    def main(self):
-        self.data_prepare()  # assign value to dt
+    def main(self, DEBUG=None):
+        # Add debug flag
+        if DEBUG is None:
+            DEBUG = True
+            
+        self.data_prepare(DEBUG)  # assign value to dt
+        
+        # add defalut feedback, OK, there is solution
+        self.dt.IS_SOLTION = True
         
         # it will return objSolution object (has cycle solution)
         objSolution = self.obj_control.calculte()  # calculate heat rate
         
+        # if no slotion do not print anything
+        if not self.dt.IS_SOLTION:
+            return False
+            
         obj_view = View(
             self.dt,
             objSolution,    # will be named ds for short
@@ -67,6 +78,8 @@ class Start:
             
         obj_view.show_overall()
         obj_view.show_rep()        
+        
+        return True
 
     # -----------------------------------------------------------
     # Job             : Preprae the main data object & control object
@@ -74,7 +87,7 @@ class Start:
     #
     # Output        :
     # -----------------------------------------------------------
-    def data_prepare(self):
+    def data_prepare(self, DEBUG):
         # Set main data file name
         obj_datamodel = CycleDataModelBuiler(self.str_FILE_CYC_INPUT,
                                              self.str_path_cyc_in)
@@ -94,10 +107,11 @@ class Start:
         if obj_datamodel.isError():
             print(obj_datamodel.err_description())  # print error description
             sys.exit('3001')                            # terminate
-
+        
         # Create related data object as the given configration
         self.dt = obj_datamodel.get_data_object()
-
+        self.dt.DEBUG = DEBUG
+        
         # show row data input
         trace = Trace(dt=self.dt)
         trace.app_ins()     # show list of app inputs
