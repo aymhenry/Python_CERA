@@ -6,7 +6,7 @@
 
 Cycle Solver is a solver in Python for refrigerator cycle. it contains a group of class as shown in graph:
 
-![charts/Cycle_OOP_Rev01.png](charts\Cycle_OOP_Rev01.png)
+![./charts/Cycle_OOP_Rev01.png](./charts/Cycle_OOP_Rev01.png)
 
 **Solver has the following class  :-**
 
