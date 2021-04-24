@@ -1,0 +1,442 @@
+$DEBUG
+      SUBROUTINE COMPCALL (H, P, X, T, CV, CP, HOUT, MEFF, QHILO,
+     .                     QCAN, VSUC, V, VV2, TSUC, TDISC, TAMB,
+     .                     GAMA, RN, ETAS)
+C     ******************************************************************
+C     *    TRUE COMPRESSOR MAP ROUTINE.  APPLIES TO REFRIGERANT        *
+C     *    SUBROUTINE COMPCALL CALCULATES ISENTROPIC COMPRESSOR        *
+C     *    PERFORMANCE AND CALLS SUBROUTINE COMPMAP                    *
+C     ******************************************************************
+C
+      LOGICAL         LCRIT
+      REAL            MEFF, MREF
+      DIMENSION       H(16), P(16), X(5), XQ(16), XL(5,16), XV(5,16),
+     .                T(16), V(16), XL2S(5,16), XV2S(5,16)
+ 
+      COMMON /PARMS/  ICOND, IFRSH, IFREZ, DISP, SPEED, CE, CREF, MREF,
+     .                ETAV, SEFF
+C
+C          DETERMINE ISENTROPIC COMPRESSOR PERFORMANCE
+C
+      TSUCT = T(1)
+      PSUCT = P(1)
+      VSUCT = V(1)
+      CALL HCVCPS(3, TSUCT, VSUCT, X, HVSUCT, CV, CP, VS)
+      GAMA = CP/CV
+      SSUCT = ENTROP(TSUCT, VSUCT, X)
+      CALL BUBLP(P(2), XL(1,2), X, TDEW, XXX, VDEW, .FALSE., LCRIT)
+      CALL SPIN(SSUCT, P(2), X, T2S, XQ2S, XL2S(1,2), XV2S(1,2), VL2,
+     .          VV2, SL, SV)
+      CALL ESPAR(0, T2S, X, A2S, B2S)
+      VGUESS = V(1)*T2S/T(1)*P(1)/P(2)
+      CALL VIT(T2S, P(2), A2S, B2S, VGUESS, .FALSE., LCRIT)
+      VV2 = VGUESS
+      IF(XQ2S .LT. 1.0) THEN
+        CALL HCVCPS(1, T2S, VL2, XL2S(1,2), HL2, CV, CP, VS)
+        CALL HCVCPS(1, T2S, VV2, XV2S(1,2), HV2, CV, CP, VS)
+        H2S = XQ2S*HV2 + (1.0-XQ2S)*HL2
+      ELSE
+        CALL HCVCPS(1, T2S, VV2, XV2S(1,2), HV2, CV, CP, VS)
+        H2S = HV2
+      END IF
+C
+C          CALCULATE ISENTROPIC POWER REQUIREMENT
+C
+      WDOTS = MREF*(H2S-H(1))
+C
+C          DETERMINE ACTUAL COMPRESSOR PERFORMANCE
+C
+      CALL COMPMAP(P(1), P(2), T(1), V(1), TAMB, X, GAMA, TSUC, WDOT,
+     .             MREF, QSHELL, SPEED)
+C
+C          CALCULATE REFRIGERANT EXIT ENTHALPY AND TEMPERATURE
+C
+      fact = QSHELL / WDOT
+ 
+      H(2) = H(1) + (WDOT-QSHELL)/MREF
+      HOUT = H(2)
+      QCAN = QSHELL/WDOT
+      CALL HPIN(H(2), P(2), X, T(2), XQ(2), XL(1,2), XV(1,2), VL2, VV2,
+     .          HL2, HV2)
+      TDISC = T(2)
+C
+C          CALCULATE ISENTROPIC EFFICIENCY
+C
+      ETAS = WDOTS/WDOT
+C
+C           USE CALL STATEMENT ARGUMENTS TO AVOID COMPILIER WARNING
+C
+      MEFF = MEFF
+      VSUC = V(1)
+      QHILO = 0.0
+      RN = 0.97*GAMA
+      RETURN
+      END
+ 
+ 
+      SUBROUTINE COMPMAP (PSUCT, PDISC, TSUCT, VSUCT, TAMB, X, GAMA,
+     .                    TSP, WDOT, MDOT, QSHELL, SPEED)
+C     ******************************************************************
+C     *    CALCULATES COMPRESSOR PERFORMANCE BASED ON TABULAR MAP      *
+C     *    DATA AND CORRECTS FOR SUCTION TEMPERATURE OTHER THAN 90F    *
+C     ******************************************************************
+C
+C
+      LOGICAL         FOUND_DATA
+      REAL            MDOT, MDOT90
+      DIMENSION       TEDATA(20), TCDATA(20), CAPAC(20,20), POWER(20,20)
+      DIMENSION       X(5), XX(5)
+      LOGICAL         LCRIT, LCONV
+      COMMON /MAPDAT/ IMAP, ICOMP, ICOOL, EER, SIZE, DISPL, EFFC,
+     .                SPEEDN, IREAD
+      DATA            INCOMP /15/, QLOSS /1.00/
+C
+C
+C
+      IF(IREAD.EQ.0) THEN
+        OPEN(INCOMP, FILE='COMPMAP.DAT', STATUS='OLD')
+ 
+        FOUND_DATA = .FALSE.
+        READ(INCOMP, *, IOSTAT=IOCHECK)
+ 
+        DO WHILE(.NOT. FOUND_DATA)
+          READ(INCOMP, *, IOSTAT=IOCHECK) DUMMY
+          IF(IOCHECK .NE. 0) CYCLE
+          FOUND_DATA = .TRUE.
+        END DO
+ 
+        READ(INCOMP, *) NEVAP
+        READ(INCOMP, *) NCOND
+        READ(INCOMP, *) ICOMP
+        READ(INCOMP, *) IUNITS
+C
+C
+C
+        FOUND_DATA = .FALSE.
+        DO WHILE(.NOT. FOUND_DATA)
+          READ(INCOMP, *, IOSTAT=IOCHECK) (TEDATA(II), II=1,NEVAP)
+          IF(IOCHECK .NE. 0) CYCLE
+          FOUND_DATA = .TRUE.
+        END DO
+C
+C          READ COMPRESSOR CAPACITY DATA
+C
+        DO I = 1,NCOND
+          READ(INCOMP,*) TCDATA(I), (CAPAC(I,J), J=1,NEVAP)
+        END DO
+C
+C          READ COMPRESSOR POWER DATA
+C
+        FOUND_DATA = .FALSE.
+        DO WHILE(.NOT. FOUND_DATA)
+          READ(INCOMP, *, IOSTAT=IOCHECK) DUMMY
+          IF(IOCHECK .NE. 0) CYCLE
+          FOUND_DATA = .TRUE.
+        END DO
+ 
+        DO I = 1,NCOND
+          READ(INCOMP, *) DUMMY, (POWER(I,J), J=1,NEVAP)
+        END DO
+ 
+        IREAD=1
+        CLOSE(INCOMP)
+      END IF
+C
+C          DETERMINE THE SATURATION TEMPERATURES CORRESPONDING TO PSUCT, PDISC
+C
+      CALL BUBLP(PSUCT, XX, X, TEVAPK, VL, VDEW, .FALSE., LCRIT)
+      CALL BUBLP(PDISC, X, XX, TCONDK, VBUB, VV, .TRUE., LCRIT)
+C
+C          DETERMINE THE ENTHALPIES AT EACH PRESSURE FOR THE FOLLOWING:
+C            VAPOR - 90F
+C            LIQUID - 90F
+C
+ 
+      TEMPV = (90.0+459.67)/1.8
+      TEMPL = (90.0+459.67)/1.8
+C
+C          FIRST CALCULATE THE SPECIFIC VOLUMES
+C
+      VGUESS = VDEW*TEMPV/TEVAPK
+      CALL ESPAR(0, TEMPV, X, A, B)
+      CALL VIT(TEMPV, PSUCT, A, B, VGUESS, .FALSE., LCONV)
+      VVAP = VGUESS    !! vapor specific volume
+ 
+      VGUESS = VBUB
+      CALL ESPAR(0, TEMPL, X, A, B)
+      CALL VIT(TEMPL, PDISC, A, B, VGUESS, .TRUE., LCONV)
+      VLIQ = VGUESS    !! liquid specific volume
+C
+C          VAPOR ENTERING THE COMPRESSOR
+C
+      CALL HCVCPS(1, TEMPV, VVAP, X, HIN, CV, CP, VS)
+C
+C          LIQUID LEAVING CONDENSER
+C
+      CALL HCVCPS(1, TEMPL, VLIQ, X, HOUT, CV, CP, VS)
+C
+C           DETERMINE ISENTROPIC COMPRESSION ENTHALPY (HS)
+C
+      SSUC = ENTROP(TEMPV, VVAP, X)
+      CALL SPIN (SSUC, PDISC, X, TS, XQS, XLS, XVS, VLS, VVS, SL, SV)
+      VGUESS = VVAP
+      CALL ESPAR(0, TS, X, AE, BE)
+      CALL VIT(TS, PDISC, AE, BE, VGUESS, .FALSE., LCONV)
+      CALL HCVCPS(1, TS, VGUESS, X, HS, CVF, CPF, VSND)
+C
+C           CONVERT THE SATURATION TEMPERATURES TO CORRESSPOND TO MAP DATA UNITS
+C
+      IF(IUNITS .EQ. 1) THEN
+        TEVAP = TEVAPK*1.8 - 459.67
+        TCOND = TCONDK*1.8 - 459.67
+      ELSE
+        TEVAP = TEVAPK - 273.16
+        TCOND = TCONDK - 273.16
+      END IF
+C
+C          CHECK IF TCOND AND/OR TEVAP IS OFF MAP DATA
+C
+      ICOND = 1
+      IF(TCOND .LT. TCDATA(1)) ICOND = 0
+      IF(TCOND .GE. TCDATA(NCOND)) ICOND = NCOND
+      IEVAP = 1
+      IF(TEVAP .LT. TEDATA(1)) IEVAP = 0
+      IF(TEVAP .GE. TEDATA(NEVAP)) IEVAP = NEVAP
+ 
+C
+C          THIS CODING WILL INTERPOLATE IF DATA IS WITHIN THE MAP OR
+C          EXTROPOLATE IF TCOND AND/OR TEVAP ARE/IS LESS THAN MAP DATA
+C
+C          DETERMINE LOCATION WITHIN MAP
+C
+      IF(ICOND .LE. 1 .AND. IEVAP .LE. 1) THEN
+        IF(ICOND .EQ. 1) THEN
+          I = 1
+          DO WHILE(TCOND .GE. TCDATA(I))
+            I = I + 1
+          END DO
+          ICOND = I - 1
+ 
+        ELSE
+          ICOND = 1
+        END IF
+ 
+        I = 1
+        IF(IEVAP .EQ. 1) THEN
+          DO WHILE(TEVAP .GE. TEDATA(I))
+            I = I + 1
+          END DO
+          IEVAP = I - 1
+ 
+        ELSE
+         IEVAP = 1
+        END IF
+C
+C          COMPRESSOR CAPACITY INTERPOLATION
+C
+        DELTC = TCDATA(ICOND+1) - TCDATA(ICOND)
+        DELTE = TEDATA(IEVAP+1) - TEDATA(IEVAP)
+        FRAC = (TCOND-TCDATA(ICOND))/DELTC
+        CAP1 = CAPAC(ICOND,IEVAP) + (CAPAC(ICOND+1,IEVAP)-
+     .         CAPAC(ICOND,IEVAP))*FRAC
+        CAP2 = CAPAC(ICOND,IEVAP+1) + (CAPAC(ICOND+1,IEVAP+1)-
+     .         CAPAC(ICOND,IEVAP+1))*FRAC
+        FRAC = (TEVAP-TEDATA(IEVAP))/DELTE
+        CAP = CAP1 + (CAP2-CAP1)*FRAC
+C
+C          COMPRESSOR POWER INTERPOLATION
+C
+        FRAC = (TCOND-TCDATA(ICOND))/DELTC
+        POW1 = POWER(ICOND,IEVAP) + (POWER(ICOND+1,IEVAP)-
+     .         POWER(ICOND,IEVAP))*FRAC
+        POW2 = POWER(ICOND,IEVAP+1) + (POWER(ICOND+1,IEVAP+1)-
+     .         POWER(ICOND,IEVAP+1))*FRAC
+        FRAC = (TEVAP-TEDATA(IEVAP))/DELTE
+        POW = POW1 + (POW2-POW1)*FRAC
+      END IF
+C
+C          TCOND GREATER THAN OR EQUAL THE MAXIMUM CONDENSING TEMP DATA POINT
+C
+      IF(ICOND .EQ. NCOND) THEN
+        IF(IEVAP .LE. 1) THEN
+          I = 1
+          IF(IEVAP .EQ. 1) THEN
+            DO WHILE(TEVAP .GE. TEDATA(I))
+              I = I + 1
+            END DO
+            IEVAP = I-1
+          ELSE
+            IEVAP = 1
+          END IF
+C
+C          COMPRESSOR CAPACITY CALCULATION
+C
+          DELTC = TCDATA(ICOND) - TCDATA(ICOND-1)
+          DELTE = TEDATA(IEVAP+1) - TEDATA(IEVAP)
+          FRAC = (TCOND-TCDATA(ICOND))/DELTC
+          FRAC2 = FRAC
+          CAP1 = CAPAC(ICOND,IEVAP) + (CAPAC(ICOND,IEVAP)-
+     .           CAPAC(ICOND-1,IEVAP))*FRAC
+          CAP2 = CAPAC(ICOND,IEVAP+1) + (CAPAC(ICOND,IEVAP+1)-
+     .           CAPAC(ICOND-1,IEVAP+1))*FRAC
+          FRAC = (TEVAP-TEDATA(IEVAP))/DELTE
+          CAP = CAP1 + (CAP2-CAP1)*FRAC
+C
+C          COMPRESSOR POWER CALCULATION
+C
+          FRAC = (TCOND-TCDATA(ICOND))/DELTC
+          POW1 = POWER(ICOND,IEVAP) + (POWER(ICOND,IEVAP)-
+     .           POWER(ICOND-1,IEVAP))*FRAC
+          POW2 = POWER(ICOND,IEVAP+1) + (POWER(ICOND,IEVAP+1)-
+     .           POWER(ICOND-1,IEVAP+1))*FRAC
+          FRAC = (TEVAP-TEDATA(IEVAP))/DELTE
+          POW = POW1 + (POW2-POW1)*FRAC
+ 
+        ELSE
+C
+C          COMPRESSOR CAPACITY CALCULATION
+C
+          DELTC = TCDATA(ICOND)-TCDATA(ICOND-1)
+          DELTE = TEDATA(IEVAP)-TEDATA(IEVAP-1)
+          FRAC = (TCOND-TCDATA(ICOND))/DELTC
+          CAP1 = CAPAC(ICOND,IEVAP-1) + (CAPAC(ICOND,IEVAP-1) -
+     .           CAPAC(ICOND-1,IEVAP-1))*FRAC
+          CAP2 = CAPAC(ICOND,IEVAP) + (CAPAC(ICOND,IEVAP) -
+     .           CAPAC(ICOND-1,IEVAP))*FRAC
+          FRAC = (TEVAP-TEDATA(IEVAP))/DELTE
+          CAP = CAP2 + (CAP2-CAP1)*FRAC
+C
+C          COMPRESSOR POWER CALCULATION
+C
+          FRAC = (TCOND-TCDATA(ICOND))/DELTC
+          POW1 = POWER(ICOND,IEVAP-1) + (POWER(ICOND,IEVAP-1)-
+     .           POWER(ICOND-1,IEVAP-1))*FRAC
+          POW2 = POWER(ICOND,IEVAP) + (POWER(ICOND,IEVAP)-
+     .           POWER(ICOND-1,IEVAP))*FRAC
+          FRAC = (TEVAP-TEDATA(IEVAP))/DELTE
+          POW = POW2 + (POW2-POW1)*FRAC
+        END IF
+      END IF
+C
+C          CONDENSING TEMPERATURE NOT GREATER THAN MAXIMUM OF MAP DATA
+C          EVAPORATING TEMPERATURE GREATER THAN MAXIMUM OF MAP DATA
+C
+      IF(IEVAP .EQ. NEVAP .AND. ICOND .LT. NCOND) THEN
+        IF(ICOND .EQ. 1) THEN
+          I = 1
+          DO WHILE(TCOND.GE.TCDATA(I))
+            I = I + 1
+          END DO
+          ICOND = I - 1
+        ELSE
+          ICOND = 1
+        END IF
+C
+C          COMPRESSOR CAPACITY CALCULATION
+C
+          DELTC = TCDATA(ICOND+1) - TCDATA(ICOND)
+          DELTE = TEDATA(IEVAP) - TEDATA(IEVAP-1)
+          FRAC = (TCOND-TCDATA(ICOND))/DELTC
+          CAP1 = CAPAC(ICOND,IEVAP-1) + (CAPAC(ICOND+1,IEVAP-1)-
+     .           CAPAC(ICOND,IEVAP-1))*FRAC
+          CAP2 = CAPAC(ICOND,IEVAP) + (CAPAC(ICOND+1,IEVAP)-
+     .           CAPAC(ICOND,IEVAP))*FRAC
+          FRAC = (TEVAP-TEDATA(IEVAP))/DELTE
+          CAP = CAP2 + (CAP2-CAP1)*FRAC
+C
+C          COMPRESSOR POWER CALCULATION
+C
+          FRAC = (TCOND-TCDATA(ICOND))/DELTC
+          POW1 = POWER(ICOND,IEVAP-1) + (POWER(ICOND+1,IEVAP-1)-
+     .           POWER(ICOND,IEVAP-1))*FRAC
+          POW2 = POWER(ICOND,IEVAP) + (POWER(ICOND+1,IEVAP)-
+     .           POWER(ICOND,IEVAP))*FRAC
+          FRAC = (TEVAP-TEDATA(IEVAP))/DELTE
+          POW = POW2 + (POW2-POW1)*FRAC
+      END IF
+ 
+      !! handle off-speed operation (use Danfoss variable speed data)
+      REL_CAP = -0.046073 + 1.41364 * SPEED
+     .             - 0.366744 * SPEED * SPEED
+      CAP = CAP * REL_CAP
+      POW = POW * REL_CAP
+ 
+      !! correct for power term based on UI document UILU-ENG_96-4022
+      REL_POW = 0.9535 + 0.04565 * SPEED
+      POW = POW * REL_POW
+ 
+C
+C          CONVERT THE CAPACITY TO KJ/HR
+C
+      IF(IUNITS .EQ. 1) THEN
+        CAP = CAP*1.0548
+      ELSE
+        CAP = CAP*4.184
+      END IF
+      IF(IUNITS .NE. 1 .AND. IUNITS .NE. 2) THEN
+        WRITE(6, '(''CHECK COMPRESSOR MAP UNITS!!!!'')')
+      END IF
+C
+      WDOT = POW
+C
+C          CONVERT TO KJ/HR
+C
+      WDOT = WDOT/1000.0*3600.0
+      WDOT90 = WDOT
+C
+C          CALCULATE THE MASS FLOW RATE IN MOLES/HR
+C
+      MDOT = CAP/(HIN-HOUT)
+      MDOT90 = MDOT
+C
+C          CORRECT MASS FLOW RATE FOR SUCTION TEMPERATURE OTHER THAN 90 F
+C
+      T90 = (90 + 459.67) / 1.8
+      MDOT = MDOT90 * VVAP / VSUCT
+C
+C          ESTIMATE EFFECT ON COMPRESSOR POWER AS RATIO OF
+C          SUCTION PLENUM TEMPERATURES
+C
+      EFFS = MDOT90 * (HS - HIN) / WDOT90
+ 
+      CALL HCVCPS(1, TSUCT, VSUCT, X, HSUCT, CV, CP, VS)
+ 
+      SSUC = ENTROP(TSUCT, VSUCT, X)
+      CALL SPIN (SSUC, PDISC, X, TS, XQS, XLS, XVS, VLS, VVS, SL, SV)
+      VGUESS = VSUCT
+      CALL ESPAR(0, TS, X, AE, BE)
+      CALL VIT(TS, PDISC, AE, BE, VGUESS, .FALSE., LCONV)
+      CALL HCVCPS(1, TS, VGUESS, X, HS, CVF, CPF, VSND)
+ 
+      WDOT = MDOT * (HS - HSUCT) / EFFS
+C
+C          ESTIMATE SHELL HEAT LOSS INCLUDING EFFECT OF DIFFERENT AMBIENT
+C
+      IF (ICOMP .EQ. 1) THEN                     ! Reciprocating compressor
+         DELTIN = 67.0
+         TSUCTF = TSUCT * 1.8 - 459.67
+         DTSUCT = 67.0 - 0.43333 * (TSUCTF - 90.0)
+         TSP = TSUCT + DTSUCT / 1.8
+ 
+      ELSE                                       ! Rotary compressor
+         DELTIN = 30.0
+         TSP = TSUCT + DELTIN / 1.8
+      END IF
+ 
+ 
+      EXP = (GAMA - 1.0) / GAMA
+      PRAT = PDISC / PSUCT
+      TSP90 = (90.0 + DELTIN + 459.67) / 1.8
+      AAA = PRAT**EXP
+      TMAX90= TSP90 * AAA
+      TMAX = TSP * AAA
+      T90K = (90.0 + 459.67) / 1.8
+      RATIO = (TMAX - TAMB) / (TMAX90 - T90K)
+ 
+      QLOSS = 0.90
+      QLOSS = 0.80
+      QSHELL = WDOT * QLOSS * RATIO
+ 
+      RETURN
+      END
+

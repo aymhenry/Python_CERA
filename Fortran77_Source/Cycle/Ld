@@ -1,0 +1,3 @@
+/CO eracyc cycle evap2 showfig cycsub block2 cnat cond enthal adjlod ccount +
+map cyclos COMPCALL eraasm,eracyc,,llibfor7.lib;
+

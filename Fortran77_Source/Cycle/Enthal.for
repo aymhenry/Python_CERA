@@ -1,0 +1,146 @@
+$DEBUG
+      SUBROUTINE ENTHAL(HBUB,HDEW,XSPEC,X,P,H)
+C     ******************************************************************
+C     *    ITERATES TO DETERMINE THE ENTHALPY.                         *
+C     *    THE PRESSURE AND QUALITY ARE INPUTS                         *
+C     ******************************************************************
+C
+      DIMENSION X(5),XL(5),XV(5)
+C
+C          MAKE INITIAL GUESS ASSUMING A LINEAR VARIATION IN ENTHALPY
+C          WITH THE EXIT QUALITY
+C
+      HGUESS = HBUB + (HDEW-HBUB)*XSPEC
+      DELH = 0.0
+ 
+      ITERH = 0
+      XTOL = 1000.0
+ 
+      DO WHILE(ITERH .LE. 100 .AND. XTOL .GE. 0.001)
+         HGUESS = HGUESS + DELH
+         IF(HGUESS .LT. HBUB) HGUESS = HBUB*1.01
+         IF(HGUESS .GT. HDEW) HGUESS = HDEW*0.99
+         CALL HPIN(HGUESS,P,X,T,XCALC,XL,XV,VL,V,HL,HV)
+         IF(XCALC .LE. 0.0) XCALC = 0.001
+         IF(XCALC .GE. 1.0) XCALC = 0.999
+C
+C          ADJUST ENTHALPY GUESS
+C
+         ALPHAH = 1.0 - XCALC/XSPEC
+         XTOL = ABS(ALPHAH)
+         DELH = (HDEW-HBUB)*ALPHAH
+         ITERH = ITERH + 1
+      END DO
+ 
+      H=HGUESS
+C
+      RETURN
+      END
+C
+      SUBROUTINE INTER1(X,P4,T4,H4,V4,P7,T7,H7,V7,ETHX1,QACT)
+C     ******************************************************************
+C     *    INTERCHANGER FOR SUBCOOLING CONDENSER LIQUID                *
+C     *    USED WHEN THE INLET STATES OF BOTH STREAMS SPECIFIED        *
+C     ******************************************************************
+C
+C     STATEPOINTS:  4 = CONDENSER OUTLET,
+C                   6 = LIQUID OUTLET FROM INTERCHANGER
+C                   7 = OUTLET FROM FRESH FOOD EVAPORATOR
+C                  13 = LOW PRESSURE SIDE OUTLET FROM INTERCHANGER
+C
+      LOGICAL LCONV
+      DIMENSION X(5)
+C
+C          DETERMINE STATE 6 FOR CASE OF REFRIGERANT EXIT TEMP=T(7)
+C
+      P6STAR = P4
+      T6STAR = T7
+      VGUESS = V4
+      CALL ESPAR(0,T6STAR,X,A6STAR,B6STAR)
+      CALL VIT(T6STAR,P6STAR,A6STAR,B6STAR,VGUESS,.TRUE.,LCONV)
+      V6STAR = VGUESS
+      CALL HCVCPS(1,T6STAR,V6STAR,X,H6STAR,CV,CP,VS)
+C
+C
+C          DETERMINE STATE 13 IF REFRIGERANT EXIT TEMP=T(4)
+C          FOR THE CASE OF EVAPORATOR EXIT SUPERHEAT SPECIFIED
+C
+      P13STR = P7
+      T13STR = T4
+      VGUESS = V7*T13STR/T7
+      CALL ESPAR(0,T13STR,X,A13STR,B13STR)
+      CALL VIT(T13STR,P13STR,A13STR,B13STR,VGUESS,.FALSE.,LCONV)
+      V13STR = VGUESS
+      CALL HCVCPS(1,T13STR,V13STR,X,H13STR,CV,CP,VS)
+C
+C          FIND THE MAXIMUM AND ACTUAL HEAT TRANSFER
+C
+      DELH1 = H4 - H6STAR
+      DELH2 = H13STR - H7
+      QBEST = MIN(DELH1,DELH2)
+      QACT = ETHX1*QBEST
+ 
+      RETURN
+      END
+C
+      SUBROUTINE INTER2(X,PA,TAI,HAI,VAI,PB,HBO,TDEW,HDEW,VDEW,ETA,TBI,
+     .                  HBI,QACT)
+C     ******************************************************************
+C     *    ITERATES TO SOLVE FOR INTERCHANGER HEAT TRANSFER KNOWING    *
+C     *    THE INLET STATE OF ONE STREAM AND OUTLET STATE OF THE       *
+C     *    OTHER FOR A COUNTERFLOW HEAT EXCHANGER.                     *
+C     *    EQUAL MASS FLOW RATES OF THE SAME FLUID                     *
+C     ******************************************************************
+C
+      LOGICAL LCONV
+      DIMENSION X(5),XL(5),XV(5)
+C
+C          KNOWN: INLET STATE OF STREAM A
+C                 OUTLET STATE OF STREAM B
+C
+C          GUESS THE INLET STATE FOR STREAM B
+C
+      HBI = HDEW - 5.0
+      ITER = 0
+      HTOL = 1000.0
+      DO WHILE (ITER .LE. 100 .AND. HTOL .GT. 0.001)
+         CALL HPIN(HBI,PB,X,TBI,XQBI,XL,XV,VL,VV,HL,HV)    !State at BI
+C
+C          DETERMINE EXIT STATE OF STREAM A IF AT TBI
+C
+         VGUESS = VAI
+         CALL ESPAR(0,TBI,X,AA,BB)
+         CALL VIT(TBI,PA,AA,BB,VGUESS,.TRUE.,LCONV)
+         VAOSTR = VGUESS
+         CALL HCVCPS(1,TBI,VAOSTR,X,HAOSTR,CV,CP,VSND)
+         DHAMAX = HAI - HAOSTR
+C
+C          DETERMINE EXIT STATE OF STREAM B IF AT TAI
+C
+         VGUESS = VDEW*TAI/TDEW
+         CALL ESPAR(0,TAI,X,AA,BB)
+         CALL VIT(TAI,PB,AA,BB,VGUESS,.TRUE.,LCONV)
+         VBOSTR = VGUESS
+         CALL HCVCPS(1,TAI,VBOSTR,X,HBOSTR,CV,CP,VSND)
+         DHBMAX = HBI - HBOSTR
+C
+C          DETERMINE THE HEAT TRANSFER FOR THE GUESSED INLET STATE HBI
+C
+         QMAX=MIN(DHAMAX,DHBMAX)
+         QACT=ETA*QMAX
+C
+C          ADJUST THE STREAM B ENTHALPY GUESS
+C
+         DELTA = QACT/(HBO-HBI)
+         HTOL = ABS(1.0-DELTA)
+         HBI2 = HBO - (HBO-HBI)*DELTA
+         IF(HBI2 .GT. 1.1*HBI) HBI2 = 1.1*HBI
+         IF(HBI2 .LT. 0.9*HBI) HBI2 = 0.9*HBI
+         HBI = HBI2
+ 
+         ITER = ITER + 1
+      END DO
+ 
+      RETURN
+      END
+

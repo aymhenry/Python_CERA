@@ -1,0 +1,4 @@
+/CO cab CLEAR DOORPN QINIT QL13 QL8 QL2 QL467 QL5 +
+QREAD QRDSET QWRITI QWRITO RADTRN inastk +
+start eraasm,cab,,llibfor7.lib;
+
