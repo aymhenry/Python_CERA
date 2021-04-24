@@ -15,9 +15,10 @@ from cycle_classes.ErrorException import ErrorException
 
 class CycleType:
 
-    def __init__(self, objdata):
+    def __init__(self, objdata, cab):
         self.objCP = None
         self.dt = objdata
+        self.cab = cab
         
         # --------------------------------------------------
         # Setup basic vars
@@ -58,7 +59,7 @@ class CycleType:
         self.dt.FF_AIR = 0
 
         self.dt.DUTYC = 0.5
-        self.dt.IRFTPL = self.dt.IRFTYP
+        self.dt.IRFTPL = self.cab.IRFTYP
         self.dt.IFAN = 0
 
         # Python comment: save original ICYCL value
@@ -78,23 +79,23 @@ class CycleType:
                 self.dt.TSPECI[item] += 273.11
 
         self.dt.TS5 += 273.11
-        self.dt.TROOM += 273.11
-        self.dt.FFTEMP += 273.11
-        self.dt.FZTEMP += 273.11
+        self.cab.TROOM += 273.11
+        self.cab.FFTEMP += 273.11
+        self.cab.FZTEMP += 273.11
                 
         # kpa to pa
         self.dt.DPC = [kpa * 1000 for kpa in self.dt.DPC]
         self.dt.DPE = [kpa * 1000 for kpa in self.dt.DPE]
         
         # others
-        self.dt.FZQON = self.dt.FZQOFF
-        self.dt.FZQ = self.dt.FZQOFF
+        self.dt.FZQON = self.cab.FZQOFF
+        self.dt.FZQ = self.cab.FZQOFF
         
-        self.dt.CONDF = self.dt.FFQ - self.dt.FFSEN - self.dt.FFLAT \
-            - self.dt.FFHTQ - self.dt.FROSTF - self.dt.FFREFQ - self.dt.FFPENA
+        self.dt.CONDF = self.cab.FFQ - self.cab.FFSEN - self.cab.FFLAT \
+            - self.cab.FFHTQ - self.cab.FROSTF - self.cab.FFREFQ - self.cab.FFPENA
 
-        self.dt.CONDZ = self.dt.FZQ - self.dt.FZSEN - self.dt.FZLAT - \
-            self.dt.FZHTQ - self.dt.FROSTZ - self.dt.FZREFQ - self.dt.FZPENA
+        self.dt.CONDZ = self.dt.FZQ - self.cab.FZSEN - self.cab.FZLAT - \
+            self.cab.FZHTQ - self.cab.FROSTZ - self.cab.FZREFQ - self.cab.FZPENA
 
     def calculte(self):
         self.dt.TS5 = -300.0   # 256
@@ -113,6 +114,7 @@ class CycleType:
         
         objCycleSolver = CycleSolver(objCP=self.objCP,
                                      dt=self.dt,
+                                     cab=self.cab,
                                      lng_item=1
                                      )
 

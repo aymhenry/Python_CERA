@@ -24,19 +24,20 @@ from cycle_classes.Trace import *
 class CycleSolver(CycleUtils):
     K_C_DEG = 273.11
 
-    def __init__(self, objCP, dt, lng_item, NCYC=1):
+    def __init__(self, objCP, dt, cab, lng_item, NCYC=1):
         # --------------------------------------------------
         # main init method
         # --------------------------------------------------
         self.objCP = objCP
         self.dt = dt
+        self.cab = cab
         self.lng_item = lng_item
 
         dt.ITYPE = 1
         dt.ICYCL = 1
         
         # Trace Data
-        self.trace = Trace(self.dt, self)
+        self.trace = Trace(self.dt, self, self.cab)
         self.coolutil = CoolPrpUtil(objCP)
 
         # lng_item group number of data.
@@ -203,6 +204,7 @@ class CycleSolver(CycleUtils):
         self.ICOND = self.dt.ICONDI[self.lng_item]
         objCondenser = Condenser()
         self.objCond = objCondenser.getObject(objCP=self.objCP,
+                                              objTrace=self.trace,
                                               ICOND=self.ICOND)
 
         self.objCond.setParamters(ATOTC=self.dt.ATOTCI[self.lng_item],
@@ -228,6 +230,7 @@ class CycleSolver(CycleUtils):
 
         objEvaporator = Evaporator()
         self.objEvap = objEvaporator.getObject(objCP=self.objCP,
+                                               objTrace=self.trace,
                                                IFRSH=self.IFRSH)
 
         # ------- Setup paramters
@@ -237,19 +240,20 @@ class CycleSolver(CycleUtils):
                                   N_EVAP=self.dt.N_EVAP,
                                   USUPE=self.USUPE,  # watt/m2-K
                                   UTPE=self.UTPE,  # watt/m2-K
-                                  TROOM=self.dt.TROOM,
-                                  FZTEMP=self.dt.FZTEMP,
+                                  TROOM=self.cab.TROOM,
+                                  FZTEMP=self.cab.FZTEMP,
                                   UA_FF=self.dt.UA_FF,
                                   Q_HXS_FF=self.dt.Q_HXS_FF,  # defalut =0 in Fortran
                                   IWALL_FF=self.dt.IWALL_FF,
                                   NUM_ZONE=self.dt.N_EVAP,
-                                  IRFTYP=self.dt.IRFTYP
+                                  IRFTYP=self.cab.IRFTYP
                                   )
         # --------------------------------------------------
         # Compressor Setup
         # --------------------------------------------------
         self.ICOMP = self.dt.ICOMP
         self.objComp = Compressor(objCP=self.objCP,
+                                  objTrace=self.trace,
                                   TAMB=self.TS1,  # K
                                   ICOMP=self.ICOMP,  # none
                                   FRACT_SPEED=1,  # # not used in IMAP=0
@@ -294,8 +298,8 @@ class CycleSolver(CycleUtils):
 
         # SET UP TEMPERATURES AND CABINET LOADS FOR INLET TEMPERATURE
         # CALCULATION FOR EVAPORATOR OF A STANDARD DESIGN (TYPE 1)
-        self.TFF = self.dt.FFTEMP  # Fresh Food Temperature
-        self.TFZ = self.dt.FZTEMP  # Freezer Temperature
+        self.TFF = self.cab.FFTEMP  # Fresh Food Temperature
+        self.TFZ = self.cab.FZTEMP  # Freezer Temperature
 
         self.ICONC = 0  # Condenser Flag, =1 if iteration result is good
         self.IC = 1  # Condenser iteration counter
@@ -392,14 +396,14 @@ class CycleSolver(CycleUtils):
                 self.dt.AREAFZ_S = self.dt.AREAFZ   # save of output report
                 
                 [self.TS3, self.TS5, self.ATOTE,
-                    self.dt.AREAFZ] = self.adjlod(self.dt, self,
+                    self.dt.AREAFZ] = self.adjlod(self.dt, self.cab, self,
                                                   # self.dt.ATOTEI[self.lng_item],
                                                   # self.dt.ICYCL,
                                                   self.IC,
                                                   self.TS3,
                                                   self.TS5,
-                                                  self.dt.FROSTF,
-                                                  self.dt.FROSTF,
+                                                  self.cab.FROSTF,
+                                                  self.cab.FROSTF,
                                                   self.dt.IDFRST,
                                                   self.ATOTE,       # m2
                                                   self.dt.AREAFZ       # m2
@@ -832,15 +836,15 @@ class CycleSolver(CycleUtils):
 
             if self.IC != 1:  # skip first trail to calc. some values later
                 [QFF, QFZ, DUTYR] = \
-                    self.dutfnd(self.dt, self.dt.ICAB,
+                    self.dutfnd(self.dt, self.cab, self.dt.ICAB,
                                 self.FANE,       # watt
-                                self.dt.IRFTYP,
+                                self.cab.IRFTYP,
                                 # self.dt.ICYCL,
                                 # self.NCYC,
                                 self.QFRSH,  # from Evaporator class
                                 self.QFREZ,
-                                self.dt.FROSTF,
-                                self.dt.FROSTZ,
+                                self.cab.FROSTF,
+                                self.cab.FROSTZ,
                                 self.TS3,
                                 self.TS5,
                                 self.T,
@@ -851,7 +855,7 @@ class CycleSolver(CycleUtils):
             # TEST FOR STANDARD DESIGN.
 
             self.trace.dr_omar("General review for this point")
-            if self.dt.IRFTYP <= 3:
+            if self.cab.IRFTYP <= 3:
 
                 if self.dt.ICAB != 0 and self.IFRSH != 0:
                     if self.dt.IC == 1:
@@ -1237,7 +1241,7 @@ class CycleSolver(CycleUtils):
                 # m3/kg
                 self.V[J] = self.objCP.Property('V', T=self.T[J], X=quality)
 
-        self.TENV = self.dt.TROOM
+        self.TENV = self.cab.TROOM
         self.TMID_COND = (self.T[3] + self.T[11]) / 2.0
         self.TMID_EVAP = (self.T[8] + self.T[9]) / 2.0
 

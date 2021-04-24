@@ -11,12 +11,13 @@
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 class ShowInput:
         
-    def __init__(self, dt):
+    def __init__(self, dt, cab):
         self.dt = dt
+        self.cab = cab
 
-    def showdata(self, str_var_name, str_var_unit, str_var_desc):
-        print(str_var_name,
-              " = ", eval('self.dt.' + str_var_name),
+    def showdata(self, str_var_name, str_data_sor, str_var_unit, str_var_desc):
+        print(str_data_sor + "." + str_var_name, 
+              " = ", eval( 'self.' + str_data_sor + '.' + str_var_name),
               "\t", str_var_unit,
               "\t", str_var_desc
               )
@@ -29,143 +30,119 @@ class ShowInput:
         self.show_type1()
             
     def show_type1(self):
-        self.showdata('TITLE', '#', 'MULTIPLE PATHWAYS BASELINE PROTOTYPE')
-        self.showdata('TITLE2', '#', 'Title of report')
-        self.showdata('FILERA', '#', 'FILE NAME')
-        # self.showdata('ICYCL', '#', 'Cycle Type')
-        self.showdata('IRFTYP', '#', 'Refrigeration Type')
-        self.showdata('IDFRST', '#', 'Manual Defrost')
-        # self.showdata('HRSOFF', 'hr', 'Hours Shutdown For Cycle Defrost')
-        # self.showdata('TOL_FRSH', 'DEG C',
-        #              'Torelance in iteration for fresh food')
-        # self.showdata('TOL_FRZ', 'DEG C',
-        #              'Torelance in iteration for frezzer')
-        # self.showdata('TOL_COND', 'DEG C',
-        #              'Torelance in iteration for condenser')
-        # self.showdata('TOL_MASS', '%', 'Torelance in iteration for mass')
-        # self.showdata('TOL_HX', '#',
-        #               'Torelance in iteration for heat exchanger')
-        self.showdata('N_EVAP', '#', 'Number of Zones on Evaporator')
-        self.showdata('N_COND', '#', 'Number of Zones on Condenser')
-        self.showdata('ICOMP', '#', 'Compressor Type')
-        # self.showdata('IMAP', '#', 'Compressor Analysis')
-        # self.showdata('I_CYCLE', '#', 'Cycling Loss Analysis')
-        self.showdata('T_CYCLE', '#', 'Cycles Per Hour')
-        self.showdata('I_VALVE', '#', 'Shut-Off Valve')
-        self.showdata('FILE_NAME', '#', 'file name for map file')
-        self.showdata('REF', '#', 'Code of Refrigerant ')
-        # self.showdata('IR[2][1]', '#', 'Code (IR(2)) For 2nd Refrigerant')
-        # self.showdata('IR[3][1]', '#', 'Code (IR(3)) For 3rd Refrigerant')
-        # self.showdata('NC[1]', '#', 'Number Of Components (Maximum Of Three)')
-        # self.showdata('F[1][2][1]', '#', 'Mixture Interaction Parameter- Component 1-2')
-        # self.showdata('F[1][3][1]', '#', 'Mixture Interaction Parameter- Component 1-3')
-        # self.showdata('F[2][3][1]', '#', 'Mixture Interaction Parameter- Component 2-3')
-        # self.showdata('X[1][1]', '#', 'Mass Fraction Of 1st Refrigerant')
-        # self.showdata('X[2][1]', '#', 'Mass Fraction Of 2nd Refrigerant')
-        # self.showdata('X[3][1]', '#', 'Mass Fraction Of 3rd Refrigeran')
-        self.showdata('ICONDI[1]', '#', 'Heat Exchanger Configuration')
-        self.showdata('TS1[1]', 'DEG C', 'Temp Of Air Entering Condenser')
-        self.showdata('CFMCI[1]', 'L/s', 'Air Flow Rate Across Coil')
-        self.showdata('FNPWRC[1]', 'watt', 'Fan Power')
-        self.showdata('DPC[1]', 'kpa', 'Pressure Drop Through Condenser')
-        self.showdata('UDSCI[1]', 'W/m2-c',
+        self.showdata('TITLE', 'dt', '#', 'MULTIPLE PATHWAYS BASELINE PROTOTYPE')
+        self.showdata('TITLE2', 'dt', '#', 'Title of report')
+        self.showdata('FILERA', 'dt', '#', 'FILE NAME')
+  
+        self.showdata('IDFRST', 'dt', '#', 'Manual Defrost')
+
+        self.showdata('N_EVAP', 'dt', '#', 'Number of Zones on Evaporator')
+        self.showdata('N_COND', 'dt', '#', 'Number of Zones on Condenser')
+        self.showdata('ICOMP', 'dt', '#', 'Compressor Type')
+
+        self.showdata('T_CYCLE', 'dt', '#', 'Cycles Per Hour')
+        self.showdata('I_VALVE', 'dt', '#', 'Shut-Off Valve')
+        self.showdata('FILE_NAME', 'dt', '#', 'file name for map file')
+        self.showdata('REF', 'dt', '#', 'Code of Refrigerant ')
+
+        self.showdata('ICONDI[1]', 'dt', '#', 'Heat Exchanger Configuration')
+        self.showdata('TS1[1]', 'dt', 'DEG C', 'Temp Of Air Entering Condenser')
+        self.showdata('CFMCI[1]', 'dt', 'L/s', 'Air Flow Rate Across Coil')
+        self.showdata('FNPWRC[1]', 'dt', 'watt', 'Fan Power')
+        self.showdata('DPC[1]', 'dt', 'kpa', 'Pressure Drop Through Condenser')
+        self.showdata('UDSCI[1]', 'dt', 'W/m2-c',
                       'Desuperheating Heat Transfer Conductance')
-        self.showdata('UTPCI[1]', 'W/m2-c', 'Two-Phase Heat Transfer Conductance')
-        self.showdata('USCCI[1]', 'W/m2-c',
+        self.showdata('UTPCI[1]', 'dt', 'W/m2-c', 'Two-Phase Heat Transfer Conductance')
+        self.showdata('USCCI[1]', 'dt', 'W/m2-c',
                       'Subcooling Heat Transfer Conductance')
-        self.showdata('ATOTCI[1]', 'm2',
+        self.showdata('ATOTCI[1]', 'dt', 'm2',
                       'Condenser Total Heat Transfer Surface Area')
-        self.showdata('DTSBCI[1]', 'DEG C', 'Refrigerant Exit Subcooling')
-        self.showdata('CONDHT[1]', 'watt', 'Liquid-Line Anti-Sweat Heat')
-        self.showdata('CONDVP[1]', 'watt', 'Vapor-Line Anti-Sweat Heat')
-        self.showdata('ISPECI[1]', '#', 'Evaporator Specification')
-        self.showdata('IFRSHI[1]', '#', 'Heat Exchanger Configuration')
-        self.showdata('TS3[1]', 'DEG C',
+        self.showdata('DTSBCI[1]', 'dt', 'DEG C', 'Refrigerant Exit Subcooling')
+        self.showdata('CONDHT[1]', 'dt', 'watt', 'Liquid-Line Anti-Sweat Heat')
+        self.showdata('CONDVP[1]', 'dt', 'watt', 'Vapor-Line Anti-Sweat Heat')
+        self.showdata('ISPECI[1]', 'dt', '#', 'Evaporator Specification')
+        self.showdata('IFRSHI[1]', 'dt', '#', 'Heat Exchanger Configuration')
+        self.showdata('TS3[1]', 'dt', 'DEG C',
                       'Temp Of Air Entering Fresh Food Section Evaporator')
-        self.showdata('CFMEI[1]', 'L/s', 'Air Flow Rate Across Coil')
-        self.showdata('FNPWRE[1]', 'watt', 'Fan Power')
-        self.showdata('DPE[1]', 'kPa',
+        self.showdata('CFMEI[1]', 'dt', 'L/s', 'Air Flow Rate Across Coil')
+        self.showdata('FNPWRE[1]', 'dt', 'watt', 'Fan Power')
+        self.showdata('DPE[1]', 'dt', 'kPa',
                       'Pressure Drop Through Fresh Food Evaporator')
-        self.showdata('UTPEI[1]', 'W/m2-c', 'Two-Phase Heat Transfer Conductance')
-        self.showdata('USUPEI[1]', 'W/m2-c', 'Superheat Region Conductance')
-        self.showdata('ATOTEI[1]', 'm2', 'Total Heat Transfer Surface Area')
-        self.showdata('DTSPEI[1]', '#', 'Refrigerant Exit Superheat (C)')
-        self.showdata('QUALITY[1]', '#', 'Quality (0-1)')
-        self.showdata('MREFI[1]', 'kg/hr',
+        self.showdata('UTPEI[1]', 'dt', 'W/m2-c', 'Two-Phase Heat Transfer Conductance')
+        self.showdata('USUPEI[1]', 'dt', 'W/m2-c', 'Superheat Region Conductance')
+        self.showdata('ATOTEI[1]', 'dt', 'm2', 'Total Heat Transfer Surface Area')
+        self.showdata('DTSPEI[1]', 'dt', '#', 'Refrigerant Exit Superheat (C)')
+        self.showdata('QUALITY[1]', 'dt', '#', 'Quality (0-1)')
+        self.showdata('MREFI[1]', 'dt', 'kg/hr',
                       'Initial Guess For Refrigerant Mas Flow Rate')
-        self.showdata('SPEEDI[1]', 'rpm', 'Nominal Speed')
-        self.showdata('TSPECI[1]', 'DEG C',
+        self.showdata('SPEEDI[1]', 'dt', 'rpm', 'Nominal Speed')
+        self.showdata('TSPECI[1]', 'dt', 'DEG C',
                       'Temp. At Comp., Inlet or -1 If Unspecified')
-            
-        # self.showdata('DISPLC[1]', 'cm3', 'Compressor Displacement')
-        # self.showdata('SIZEN[1]', 'kcal/hr', 'Rated Capacity')
-        # self.showdata('SPDNOM[1]', '#', 'Fractional Speed')
-        # self.showdata('EERN[1]', '#', 'Rated EER')
-        # self.showdata('ICOOLN[1]', '#', 'Fan cooling method')
-        # self.showdata('CEI[1]', 'cm3', 'Estimated clearance volume')
-        # self.showdata('SEFFI[1]', '%', 'isentropic efficiency')
-        # self.showdata('MEFF[1]', '%', 'Mechanical Efficiency')
-        # self.showdata('ELOSS[1]', '#', 'Electrical LOSSES')
-        # self.showdata('QCAN[1]', 'watt'
-        #    ,'Compressor shell loss normalized to power input')
-        # self.showdata('QHILO[1]', 'watt'
-        #    ,'Normalized heat loss from dischange line inside the compressor'
-        #        + 'shell to suction gas')
                 
-        self.showdata('SUPIHX[1]', 'DEG C', 'Interchanger exit superheat')
-        self.showdata('ETHX[1]', '#', 'Effectiveness Of High Temp Interchanger')
-        self.showdata('UA_FF', 'W/K',
+        self.showdata('SUPIHX[1]', 'dt', 'DEG C', 'Interchanger exit superheat')
+        self.showdata('ETHX[1]', 'dt', '#', 'Effectiveness Of High Temp Interchanger')
+        self.showdata('UA_FF', 'dt', 'W/K',
                       'Evap: A/R In Fresh Food Section (Or Cabinet Walls)')
-        self.showdata('UA_FZ', 'W/K',
+        self.showdata('UA_FZ', 'dt', 'W/K',
                       'Evap: A/R In Freezer Section Walls (If Separate Section)')
-        self.showdata('UA_ML', 'W/K',
+        self.showdata('UA_ML', 'dt', 'W/K',
                       'Evap: A/R In Mullion Section (If Present)')
-        self.showdata('UA_FF_CND', 'W/K',
+        self.showdata('UA_FF_CND', 'dt', 'W/K',
                       'Cond: A/R In Fresh Food Section (Or Cabinet Walls)')
-        self.showdata('UA_FZ_CND', 'W/K',
+        self.showdata('UA_FZ_CND', 'dt', 'W/K',
                       'Cond: A/R In Freezer Section Walls (If Separate Section)')
-        self.showdata('UA_FF_HXS', 'W/K',
+        self.showdata('UA_FF_HXS', 'dt', 'W/K',
                       'Both: A/R In Fresh Food Section (Or Cabinet Walls)')
-        self.showdata('UA_FZ_HXS', 'W/K',
+        self.showdata('UA_FZ_HXS', 'dt', 'W/K',
                       'Both: A/R In Freezer Section Walls (If Separate Section)')
-        self.showdata('FRACT_FF', 'watt',
+        self.showdata('FRACT_FF', 'dt', 'watt',
                       'Fraction Of Fresh Food Section (Or Cabinet Walls)')
-        self.showdata('FRACT_FZ', 'watt',
+        self.showdata('FRACT_FZ', 'dt', 'watt',
                       'Fraction Of Freezer Section Walls (Including Mullion)')
-        self.showdata('IWALL_FF', '#',
+        self.showdata('IWALL_FF', 'dt', '#',
                       'FF (Or Cabinet) Evaporator Behind Liner')
-        self.showdata('IWALL_FZ', '#', 'FZ Evaporator Behind Liner')
-        self.showdata('DFSTCYC', 'watt', 'Closed-Door Automatic Defrost')
-        self.showdata('FFCYC', 'watt', 'Fresh Food Section')
-        self.showdata('FZCYC', 'watt', 'Freezer Section')
-        self.showdata('OUTCYC', 'watt', 'Outside Cabinet')
+        self.showdata('IWALL_FZ', 'dt', '#', 'FZ Evaporator Behind Liner')
+        self.showdata('DFSTCYC', 'dt', 'watt', 'Closed-Door Automatic Defrost')
+        self.showdata('FFCYC', 'dt', 'watt', 'Fresh Food Section')
+        self.showdata('FZCYC', 'dt', 'watt', 'Freezer Section')
+        self.showdata('OUTCYC', 'dt', 'watt', 'Outside Cabinet')
         
-        self.showdata('ICAB', '#',
+        self.showdata('ICAB', 'dt', '#',
                       'Flag to represent presence of cabinet loads in input, 0 =No')
-            
-        self.showdata('FFASH', 'watt', 'Fresh Food Antisweat Heater')
-        self.showdata('FFAUX', 'watt', 'Fresh Food Auxiliary Power')
-        self.showdata('FZASH', 'watt', 'Freezer Antisweat Heater')
-        self.showdata('FZAUX', 'watt', 'Freezer Auxiliary Power')
-        self.showdata('OTHERW', 'watt', 'Other heat')
-        self.showdata('TROOM', 'DEG C', 'Room Temperature')
-        self.showdata('FFTEMP', 'DEG C', 'Fresh Food Temperature')
-        self.showdata('FZTEMP', 'DEG C', 'Freezer Temperature')
-        self.showdata('FFQ', 'watt', 'Fresh Food Net Load')
-        self.showdata('FZQOFF', 'watt', 'Freezer Load')
-        self.showdata('FFSEN', 'watt', 'Fresh Food Door Sensible Load')
-        self.showdata('FFLAT', 'watt', 'Fresh Food Door Condensation')
-        self.showdata('FROSTF', 'watt', 'Fresh Food Door Frost Load')
-        self.showdata('FZSEN', 'watt', 'Freezer Door Sensible Load')
-        self.showdata('FZLAT', 'watt', 'Freezer Door Condensation Load')
-        self.showdata('FROSTZ', 'watt', 'Freezer Door Frost Load')
-        self.showdata('FFPENA', 'watt', 'Fresh Food Penetrations')
-        self.showdata('FZPENA', 'watt', 'Freezer Penetrations')
-        self.showdata('FFHTQ', 'watt', 'Fresh Food Heaters And Controls')
-        self.showdata('FZHTQ', 'watt', 'Freezer Heaters And Controls')
-        self.showdata('FFREFQ', 'watt', 'Fresh Food Refrigerant Line')
-        self.showdata('FZREFQ', 'watt', 'Freezer Refrigerant Line')
-        self.showdata('QMUL', 'watt', 'Mullion Heat Load')
+
+        self.showdata('IRFTYP', 'cab', '#', 'Refrigeration Type')
+        self.showdata('FFASH', 'cab', 'watt', 'Fresh Food Antisweat Heater')
+        self.showdata('FFAUX', 'cab', 'watt', 'Fresh Food Auxiliary Power')
+        
+        self.showdata('FZASH', 'cab', 'watt', 'Freezer Antisweat Heater')
+        self.showdata('FZAUX', 'cab', 'watt', 'Freezer Auxiliary Power')
+        self.showdata('OTHERW', 'cab', 'watt', 'Other heat')
+        
+        self.showdata('TROOM', 'cab', 'DEG C', 'Room Temperature')
+        self.showdata('FFTEMP', 'cab', 'DEG C', 'Fresh Food Temperature')
+        self.showdata('FZTEMP', 'cab', 'DEG C', 'Freezer Temperature')
+        
+        self.showdata('FFQ', 'cab', 'watt', 'Fresh Food Net Load')
+        self.showdata('FZQOFF', 'cab', 'watt', 'Freezer Load')
+        
+        self.showdata('FFSEN', 'cab', 'watt', 'Fresh Food Door Sensible Load')
+        self.showdata('FFLAT', 'cab', 'watt', 'Fresh Food Door Condensation')
+        self.showdata('FROSTF', 'cab', 'watt', 'Fresh Food Door Frost Load')
+        
+        self.showdata('FZSEN', 'cab', 'watt', 'Freezer Door Sensible Load')
+        self.showdata('FZLAT', 'cab', 'watt', 'Freezer Door Condensation Load')
+        self.showdata('FROSTZ', 'cab', 'watt', 'Freezer Door Frost Load')
+        
+        self.showdata('FFPENA', 'cab', 'watt', 'Fresh Food Penetrations')
+        self.showdata('FZPENA', 'cab', 'watt', 'Freezer Penetrations')
+        
+        self.showdata('FFHTQ', 'cab', 'watt', 'Fresh Food Heaters And Controls')
+        self.showdata('FZHTQ', 'cab', 'watt', 'Freezer Heaters And Controls')
+        
+        self.showdata('FFREFQ', 'cab', 'watt', 'Fresh Food Refrigerant Line')
+        self.showdata('FZREFQ', 'cab', 'watt', 'Freezer Refrigerant Line')
+        
+        self.showdata('QMUL', 'cab', 'watt', 'Mullion Heat Load')
 
     def show_type2(self):
         pass

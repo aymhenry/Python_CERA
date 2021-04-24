@@ -20,15 +20,15 @@ from cycle_classes.Trace import *
 
 class Condenser:
     @staticmethod
-    def getObject(ICOND, objCP):
+    def getObject(ICOND, objCP, objTrace):
         if ICOND == 0:  # Natural Convection
-            return CondCool_CNat(ICOND, objCP)
+            return CondCool_CNat(ICOND, objCP, objTrace)
 
         elif ICOND == 1:  # Cross-Flow
-            return CondCool_CCross(ICOND, objCP)
+            return CondCool_CCross(ICOND, objCP, objTrace)
 
         elif ICOND == 2:  # Counter-Flow
-            return CondCool_CCount(ICOND, objCP)
+            return CondCool_CCount(ICOND, objCP, objTrace)
 
         else:
             raise ErrorException('ICOND value error', 'Cond1000')
@@ -42,10 +42,10 @@ class Condenser:
 class CondCool_Abstract(exf4Cond_Evap):
     DATA_PARA = 0  # if set to 1 parameters was set
 
-    def __init__(self, ICOND, objCP):
+    def __init__(self, ICOND, objCP, objTrace):
         self.ICOND = ICOND
         self.objCP = objCP
-        self.trace = Trace()
+        self.trace = objTrace
 
     def setParamters(self, ATOTC, CFMC, TS1, TS3, TS5, DTSUBC, N_COND,
                      USCC, UTPC, UDSC,

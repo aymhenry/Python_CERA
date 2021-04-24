@@ -15,7 +15,7 @@ from common_classes.QData import QData
 class DataModelBuiler (FileAccess):
     # maximum data file lines to read, this need to be updated if there is any
     # data line more than this
-    MAX_DATA_FILE_TO_READ = 100
+    MAX_DATA_FILE_TO_READ = 150
     CONFIGRATION_COUNT = 7 			# max. number of configrations
     CONFIGRATION_ROW = 6 			# set row number that has the configration
     # required data for each configration
@@ -30,15 +30,12 @@ class DataModelBuiler (FileAccess):
     ERR_FOUND_DATA_TYPE2 = 106   	# more than one decimal point, or (-) sign
 
     def __init__(self, strFileName, strPath=""):
-        super().__init__(strFileName)
-
+        super().__init__(strFileName, 'read', strPath)
         self.lst_data = []
         self.obj_qdata = QData()
         self.int_parameter_count = None 	# number of parameter for the selected configration
 
         self.int_configration = None 		# configration selected
-
-        super().__init__(strFileName, "read", strPath)
 
     # -----------------------------------------------------------
     # Job 			: get created data class
@@ -56,13 +53,13 @@ class DataModelBuiler (FileAccess):
     # Output		: object from this sigle tone class
     # -----------------------------------------------------------
 
-    def build_var_list(self):
+    def build_var_list(self, int_config_no=None):
         # if error return
         if not self.readlines():
             return False
 
         # check that all input data, set error flag if any
-        self.chk_data_model()
+        self.chk_data_model(int_config_no)
 
         # read error flag, after last check, return false if any
         if self.isError():
@@ -531,7 +528,7 @@ class DataModelBuiler (FileAccess):
     # Set the int_configration  : configration number
     #    return True  if no error, else Flase
     # -----------------------------------------------------------
-    def chk_data_model(self):
+    def chk_data_model(self, int_config_no=None):
         # Configration from 1 to CONFIGRATION_ROW
         # every configration has number of parameters rquirted.
         # configration no. 1 count of parameters is lst_required_data[0]
@@ -541,10 +538,14 @@ class DataModelBuiler (FileAccess):
         # no number in this list more than MAX_DATA_FILE_TO_READ, or this
         # constant needs update
 
-        # read feed_back, related number of data to read
-        feed_back = self.getData_from_list(
-            DataModelBuiler.CONFIGRATION_ROW, "int")
-
+        # use custom data model, or read config. from file
+        if int_config_no == None:
+            # read feed_back, related number of data to read
+            feed_back = self.getData_from_list(
+                DataModelBuiler.CONFIGRATION_ROW, "int")
+        else:
+            feed_back = int_config_no 
+            
         # if error is returned from the above method, return with Flase, with
         # error code set by getData_from_list
         if self.isError():
@@ -625,8 +626,7 @@ class DataModelBuiler (FileAccess):
                 num_list = str_all_line.split(",")  # convert line to list
 
                 # if blank line, or no items in list then exit
-                if str_all_line == "" or len(
-                        num_list) < 1:  # if blank line or data then stop
+                if str_all_line == "" or len(num_list) < 1:  # if blank line or data then stop
                     break
 
                 # update class list by the current read list

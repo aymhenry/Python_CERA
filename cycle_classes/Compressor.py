@@ -27,7 +27,7 @@ class Compressor:
     CAPAC = None
     POWER = None
 
-    def __init__(self, objCP, TAMB, ICOMP, FRACT_SPEED, strFileName):
+    def __init__(self, objCP, objTrace, TAMB, ICOMP, FRACT_SPEED, strFileName):
         self.objCP = objCP
 
         self.TAMB = TAMB
@@ -36,7 +36,7 @@ class Compressor:
         self.FRACT_SPEED = FRACT_SPEED
         self.strFileName = strFileName
         self.coolutil = CoolPrpUtil(objCP)
-        self.trace = Trace()
+        self.trace = objTrace
 
     def comp_balance(self, PSUCT, PDISC, TSUCT, VSUCT, MREF):
 

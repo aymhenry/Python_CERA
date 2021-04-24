@@ -32,8 +32,9 @@ class Trace:
     
     RANDAM = False      # for randam
     
-    def __init__(self, dt=None, obj_cycletype=None):
+    def __init__(self, dt=None, obj_cycletype=None, cab=None):
         self.dt = dt     # app data
+        self.cab = cab     # app data
         self.ds = obj_cycletype     # CycleSolver object
 
     @staticmethod
@@ -85,14 +86,14 @@ class Trace:
         if self.is_canc_print(Trace.CYC_PID):
             return
             
-        obj_show = ShowInput(self.dt)
+        obj_show = ShowInput(None, None)
         obj_show.graph()
         
     def app_ins(self):
         if self.is_canc_print(Trace.APP_INS):
             return
             
-        obj_show = ShowInput(self.dt)
+        obj_show = ShowInput(self.dt, self.cab)
         obj_show.show()
     
     def randam(self, *args, **kargs):

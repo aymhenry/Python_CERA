@@ -8,11 +8,12 @@ from common_classes.FileAccess import FileAccess
 
 
 class View:
-    def __init__(self, dt, objCycleSlover, str_file_cycle, str_path_cycle):
+    def __init__(self, dt, cab, objCycleSlover, str_file_cycle, str_path_cycle):
         self.str_file_cycle = str_file_cycle
         self.str_path_cycle = str_path_cycle
 
         self.dt = dt        # input data object
+        self.cab = cab       
         # will add some other data to the given ds object in this class
         self.ds = objCycleSlover     # soultion in objCycleSlover
 
@@ -162,7 +163,7 @@ class View:
         #
 
         # TENV = (self.dt.TROOM + 459.6) / 1.8
-        TENV = self.dt.TROOM
+        TENV = self.cab.TROOM
 
         if self.ds.T[16] < TENV:
             self.dt.I_LIQUID_LINE = 1
@@ -303,7 +304,7 @@ class View:
             'Coefficient of performance, %9.2f'
             % self.ds.COPR)
 
-        if self.dt.IRFTYP <= 3 and self.dt.ICAB != 0 and self.ds.IFRSH != 0:
+        if self.cab.IRFTYP <= 3 and self.dt.ICAB != 0 and self.ds.IFRSH != 0:
             self.prn.write_or_terminate(
                 'Fraction air to fresh food, %9.2f, (single evaporator cycle)' 
                 % self.dt.FF_FRACT)
@@ -394,7 +395,7 @@ class View:
             'Coefficient of performance, %9.3f' 
             % self.ds.COPR)
 
-        if (self.dt.IRFTYP <= 3 and
+        if (self.cab.IRFTYP <= 3 and
                 self.dt.ICAB != 0 and
                 self.ds.IFRSH != 0):
                 

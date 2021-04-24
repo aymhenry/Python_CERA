@@ -17,15 +17,15 @@ from cycle_classes.Trace import *
 
 class Evaporator:
     @staticmethod
-    def getObject(IFRSH, objCP):
+    def getObject(IFRSH, objCP, objTrace):
         if IFRSH == 0:  # Natural Convection
-            return EvapCool_FFNat(IFRSH, objCP)
+            return EvapCool_FFNat(IFRSH, objCP, objTrace)
 
         elif IFRSH == 1:  # Cross-Flow
-            return EvapCool_FFCross(IFRSH, objCP)
+            return EvapCool_FFCross(IFRSH, objCP, objTrace)
 
         elif IFRSH == 2:  # Counter-Flow
-            return EvapCool_FFCount(IFRSH, objCP)
+            return EvapCool_FFCount(IFRSH, objCP, objTrace)
 
         else:
             # objEvapCool = None
@@ -38,10 +38,10 @@ class Evaporator:
 # Editor		: aymhenry@gmail.com
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 class EvapCool_Abstract (exf4Cond_Evap):
-    def __init__(self, IFRSH, objCP):
+    def __init__(self, IFRSH, objCP, objTrace):
         self.IFRSH = IFRSH
         self.objCP = objCP
-        self.trace = Trace()
+        self.trace = objTrace
 
     def setParamters(self, ATOTE, CFME, TS3, N_EVAP,
                      USUPE, UTPE, TROOM, FZTEMP,

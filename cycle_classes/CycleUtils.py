@@ -55,7 +55,7 @@ class CycleUtils(exf4Cond_Evap):
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
 
     @staticmethod
-    def adjlod(dt, ds, IC, TS3, TS5, FROSTF, FROSTZ, IDFRST, ATOTE, AREAFZ):
+    def adjlod(dt, cab, ds, IC, TS3, TS5, FROSTF, FROSTZ, IDFRST, ATOTE, AREAFZ):
         # adjust the cabinet loads and set point temperatures
         # dt input data object.
         # ds CycleSolver object
@@ -91,18 +91,18 @@ class CycleUtils(exf4Cond_Evap):
             # FFTEMP_S = dt.FFTEMP
             # FZTEMP_S = dt.FZTEMP
 
-            # FFQ_S = dt.FFQ
+            # FFQ_S = cab.FFQ
             # FZQON_S = dt.FZQON
-            # FZQOFF_S = dt.FZQOFF
+            # FZQOFF_S = cab.FZQOFF
 
-            # FFLAT_S = dt.FFLAT
-            # FZLAT_S = dt.FZLAT
+            # FFLAT_S = cab.FFLAT
+            # FZLAT_S = cab.FZLAT
 
-            # FFSEN_S = dt.FFSEN
-            # FZSEN_S = dt.FZSEN
+            # FFSEN_S = cab.FFSEN
+            # FZSEN_S = cab.FZSEN
 
             # FFHTQ_S = dt.FFHTQ
-            # FZHTQ_S = dt.FZHTQ
+            # FZHTQ_S = cab.FZHTQ
 
             # FROSTF_S = FROSTF
             # FROSTZ_S = FROSTZ
@@ -117,28 +117,28 @@ class CycleUtils(exf4Cond_Evap):
             ds.ATOTE_A = ATOTE
             ds.AREAFZ_A = AREAFZ
 
-            # UFF = (dt.FFQ - dt.FFLAT - dt.FFPENA - dt.FFHTQ -
-            #       FROSTF + dt.QMUL) / (dt.TROOM - dt.FFTEMP)
+            # UFF = (cab.FFQ - cab.FFLAT - cab.FFPENA - dt.FFHTQ -
+            #       FROSTF + cab.QMUL) / (dt.TROOM - dt.FFTEMP)
 
             # FZQ = dt.FZQON
             # FZQ_S = FZQ
 
-            # UFZ = (FZQ - dt.FZLAT - dt.FZPENA - dt.FZHTQ -
-            #       FROSTZ - dt.QMUL) / (dt.TROOM - dt.FZTEMP)
+            # UFZ = (FZQ - cab.FZLAT - cab.FZPENA - cab.FZHTQ -
+            #       FROSTZ - cab.QMUL) / (dt.TROOM - dt.FZTEMP)
 
             # UFF_SEN = FFSEN_S / (dt.TROOM - FFTEMP_S)
             # UFZ_SEN = FZSEN_S / (dt.TROOM - FZTEMP_S)
 
-            # UCND_F = (dt.CONDF + dt.QMUL) / \
+            # UCND_F = (dt.CONDF + cab.QMUL) / \
             #    (dt.TROOM - FFTEMP_S)
-            # UCND_Z = (dt.CONDZ - dt.QMUL) / \
+            # UCND_Z = (dt.CONDZ - cab.QMUL) / \
             #    (dt.TROOM - FZTEMP_S)
 
             # TS3_S = TS3
             # TS5_S = TS5
 
-            ds.FFTEMP_A = dt.FFTEMP
-            ds.FZTEMP_A = dt.FZTEMP
+            ds.FFTEMP_A = cab.FFTEMP
+            ds.FZTEMP_A = cab.FZTEMP
 
             # DELTS5_OLD = 0
 
@@ -223,8 +223,8 @@ class CycleUtils(exf4Cond_Evap):
             elif dt.INCTRL == 2:
                 # CASE (2)#FF Cabinet temp
                 DUTYN = 0.5 * (dt.DUTYE + dt.DUTYZ)
-                dt.FFQ = DUTYN * dt.CAPE + DUTYN * dt.Q_FZ_FF + dt.FROSTF_S
-                DELTS3 = (dt.FFQ - dt.FFQ_S) / dt.UFF
+                cab.FFQ = DUTYN * dt.CAPE + DUTYN * dt.Q_FZ_FF + dt.FROSTF_S
+                DELTS3 = (cab.FFQ - dt.FFQ_S) / dt.UFF
 
                 # check temp units--- dr. Omar
                 # TS3 = TS3_S - DELTS3 / 1.8
@@ -233,8 +233,8 @@ class CycleUtils(exf4Cond_Evap):
                 TS3 = dt.TS3_S - DELTS3
                 dt.FFTEMP_A = TS3
 
-                dt.FFSEN = dt.UFF_SEN * (dt.TROOM - dt.FFTEMP_A)
-                dt.CONDF = dt.UCND_F * (dt.TROOM - dt.FFTEMP_A) - dt.QMUL
+                cab.FFSEN = dt.UFF_SEN * (cab.TROOM - dt.FFTEMP_A)
+                dt.CONDF = dt.UCND_F * (cab.TROOM - dt.FFTEMP_A) - cab.QMUL
 
             elif dt.INCTRL == 3:
                 # CASE (3)#Freezer temp
@@ -249,7 +249,7 @@ class CycleUtils(exf4Cond_Evap):
 
                 FZQ = dt.FZQ_S + dt.UFZ * DELTS5
                 dt.FZQON = FZQ
-                dt.FZQOFF = FZQ
+                cab.FZQOFF = FZQ
 
                 # TS5 = dt.TS5_S - DELTS5 / 1.8
                 TS5 = dt.TS5_S - DELTS5     # K
@@ -257,8 +257,8 @@ class CycleUtils(exf4Cond_Evap):
                 # dt.FZTEMP_A = 1.8 * TS5 - 459.6
                 dt.FZTEMP_A = TS5   # K
 
-                dt.FZSEN = dt.UFZ_SEN * (dt.TROOM - dt.FZTEMP_A)
-                dt.CONDZ = dt.UCND_Z * (dt.TROOM - dt.FZTEMP_A) + dt.QMUL
+                cab.FZSEN = dt.UFZ_SEN * (cab.TROOM - dt.FZTEMP_A)
+                dt.CONDZ = dt.UCND_Z * (cab.TROOM - dt.FZTEMP_A) + cab.QMUL
 
             elif dt.INCTRL in [4, 5]:
                 pass
@@ -416,7 +416,7 @@ class CycleUtils(exf4Cond_Evap):
 
                     # Dr Omar Temp Unit
                     # TENV = (TROOM + 459.6) / 1.8
-                    TENV = dt.TROOM
+                    TENV = cab.TROOM
 
                     # Q_HXS_FZ in watt as given from Condenser class
 
@@ -673,7 +673,7 @@ class CycleUtils(exf4Cond_Evap):
 
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
     @staticmethod
-    def dutfnd(dt, 
+    def dutfnd(dt, cab, 
                FANE,       # watt
                ICAB,       # Use Cab data 0 or 1
                IRFTYP,     # Refrigeration Type
@@ -694,7 +694,7 @@ class CycleUtils(exf4Cond_Evap):
             return [0, 0, 0]
             
         # calculate in-wall heat loads
-        TENV = dt.TROOM
+        TENV = cab.TROOM
         TCND = 0.2 * T[14] + 0.4 * T[3] + 0.4 * T[11]
 
         if TS5 > -300.0:  # Freezer evaporator
@@ -723,15 +723,15 @@ class CycleUtils(exf4Cond_Evap):
         dt.CONDZ_IN_WALL = dt.UA_FZ_CND * (TCND - TENV)
 
         # branch according to the type of refrigerator
-        QFF = dt.FFQ
-        QFZ = dt.FZQOFF
+        QFF = cab.FFQ
+        QFZ = cab.FZQOFF
 
         DUTYR = 0
 
         if IRFTYP in [1, 3]:
             if dt.IDFRST == 0:
-                QFF = QFF + dt.FROSTF
-                QFZ = QFZ + dt.FROSTF
+                QFF = QFF + FROSTF
+                QFZ = QFZ + FROSTF
 
             # 1 Wh = 3.413 Btu    BTU = 1.0548 kj/hr
             # dt.CAPE = QFRSH / 1.0548 \
@@ -759,7 +759,7 @@ class CycleUtils(exf4Cond_Evap):
 
             # --------------------
             if dt.IDFRST == 0:
-                QFZ = QFZ + dt.FROSTF
+                QFZ = QFZ + FROSTF
 
             # dt.CAPE = QFRSH / 1.0548 - 3.413 * (FANE
                 # + dt.DFSTCYC + dt.FZCYC)	\

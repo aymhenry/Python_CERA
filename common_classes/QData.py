@@ -37,20 +37,22 @@ class QData:
                 flt_val = "'" + str(flt_val) + "'"
                 
             # save values to data object    
-            exec("self." + lst_var_names[int_var_numer - int_confg_row] + "=" + str(flt_val))
+            strVar = lst_var_names[int_var_numer - int_confg_row]
+            if strVar == "_":
+                continue
+                
+            exec("self." + strVar + "=" + str(flt_val))
         
     def __setup_vars_list(self, lst_valuse, lst_var_names, int_confg_row, int_para_count, b_set_data_as_string=False):
-        """
-        Creates a list of vars, its names in lst_var_names, and values in lst_valuse
-        Input
-            lst_valuse         : list of values
-            lst_var_names    : List of Vars names
-            int_confg_row    : Start read values from  lst_valuse from this item 
-            int_para_count    : Count of vars
-        Output
-            Vars creaed iside this object
-        """
-        
+        # Creates a list of vars, its names in lst_var_names, and values in lst_valuse
+        # Input
+        #    lst_valuse       : list of values
+        #    lst_var_names    : List of Vars names
+        #    int_confg_row    : Start read values from  lst_valuse from this item 
+        #    int_para_count   : Count of vars
+        # Output
+        #    Vars creaed iside this object
+                
         for int_var_numer in range(int_confg_row, int_para_count + 1):
             feedback = lst_valuse[int_var_numer]
             
@@ -63,7 +65,11 @@ class QData:
 
             #  save values to data object
             # print("self." + lst_var_names[int_var_numer - int_confg_row] + "=" + str(feedback))
-            exec("self." + lst_var_names[int_var_numer - int_confg_row] + "=" + str(feedback))
+            strVar = lst_var_names[int_var_numer - int_confg_row]
+            if strVar == "_":
+                continue
+                
+            exec("self." + strVar + "=" + str(feedback))
 
         # =================================================
         # Variable list for CYCLE module

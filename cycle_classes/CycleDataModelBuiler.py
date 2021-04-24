@@ -12,17 +12,19 @@ from common_classes.DataModelBuiler import DataModelBuiler
 
 
 class CycleDataModelBuiler (DataModelBuiler):
-    # Type 2 is not supported
     # required data for each configration
-    DataModelBuiler.lst_required_data = [98 - 18]
-    # maximum data file lines to read, this need to be updated if there is any
-    # data line more than this
-    DataModelBuiler.MAX_DATA_FILE_TO_READ = 150
+    # start reading from line 5, counting from zero i.e 6 lines more
+    DataModelBuiler.CONFIGRATION_ROW = 5   # 6 sting lines found
+    DataModelBuiler.lst_required_data = \
+        [52 + DataModelBuiler.CONFIGRATION_ROW,
+         25 + DataModelBuiler.CONFIGRATION_ROW]
+   
+    # +1 set row number that has the configration
 
-    DataModelBuiler.CONFIGRATION_COUNT = 1   # max. number of configrations
-    # +1 			# set row number that has the configration
-    DataModelBuiler.CONFIGRATION_ROW = 5   # 4 sting lines found
 
+    # values from 1 to configration count
+    DataModelBuiler.CONFIGRATION_COUNT = 2   # max. number of configrations 
+      
     # -----------------------------------------------------------
     # Job 			: Assign values from table to selected class vars
     # Input 		:
@@ -32,113 +34,91 @@ class CycleDataModelBuiler (DataModelBuiler):
     def assign_vars(self):
         lst_config1 = [  # 'TITLE','TITLE2','FILERA','FILE_NAME'
             # 'ICYCL',
-            'IRFTYP',
-            'IDFRST',
-            # 'HRSOFF',  
-            # 'TOL_FRSH',
-            # 'TOL_FRZ',
-            # 'TOL_COND',
-            # 'TOL_MASS', 
-            # 'TOL_HX',
+            # 'IRFTYP',          remove 23+1 items
+            'IDFRST',       # item 1
             'N_EVAP', 
             'N_COND', 
             'ICOMP',
-            # 'IMAP', 
-            # 'I_CYCLE',
-            'T_CYCLE', 
+            'T_CYCLE',      # item 5
             'I_VALVE',
             'FILE_NAME_code',
-            'REF', 
-            # 'IR[2][1]',
-            # 'IR[3][1]', 
-            # 'NC[1]', 
-            # 'F[1][2][1]',
-            # 'F[1][3][1]', 
-            # 'F[2][3][1]', 
-            # 'X[1][1]', 
-            # 'X[2][1]', 
-            # 'X[3][1]', 
+            'REF',  
             'ICONDI[1]', 
-            'TS1[1]', 
+            'TS1[1]',       # item 10
             'CFMCI[1]', 
             'FNPWRC[1]', 
             'DPC[1]', 
             'UDSCI[1]', 
-            'UTPCI[1]',
+            'UTPCI[1]',     # item 15
             'USCCI[1]',
             'ATOTCI[1]',
             'DTSBCI[1]',
             'CONDHT[1]', 
-            'CONDVP[1]',
+            'CONDVP[1]',    # item 20
             'ISPECI[1]', 
             'IFRSHI[1]', 
             'TS3[1]',
             'CFMEI[1]', 
-            'FNPWRE[1]', 
+            'FNPWRE[1]',     # item 25
             'DPE[1]', 
             'UTPEI[1]', 
             'USUPEI[1]',
             'ATOTEI[1]', 
-            'DTSPEI[1]', 
+            'DTSPEI[1]',        # item 30
             'QUALITY[1]', 
             'MREFI[1]', 
             'SPEEDI[1]', 
             'TSPECI[1]', 
-            #  'DISPLC[1]',
-            #  'SIZEN[1]',
-            #  'SPDNOM[1]',
-            #  'EERN[1]',
-            #  'ICOOLN[1]',
-            #  'CEI[1]',
-            #  'SEFFI[1]',
-            #  'MEFF[1]',
-            #  'ELOSS[1]',
-            #  'QCAN[1]',
-            #  'QHILO[1]',
-            'SUPIHX[1]', 
+            'SUPIHX[1]',          # item 35
             'ETHX[1]',
             'UA_FF', 
             'UA_FZ', 
             'UA_ML', 
-            'UA_FF_CND', 
+            'UA_FF_CND',        # item 40
             'UA_FZ_CND', 
             'UA_FF_HXS',
             'UA_FZ_HXS', 
             'FRACT_FF', 
-            'FRACT_FZ', 
+            'FRACT_FZ',         # item 45
             'IWALL_FF', 
             'IWALL_FZ',
             'DFSTCYC',
             'FFCYC', 
-            'FZCYC',
+            'FZCYC',        # item 50
             'OUTCYC',
-            'ICAB', 
+            'ICAB',          #  item 52
+            '_'          # extra for line feed at end of line
+            ]
+
+        lst_config2 = [     # 25 items
+            'IRFTYP',   # cab type 1-5
             'FFASH', 
             'FFAUX', 
-            'FZASH',
-            'FZAUX', 
+            'FZASH', 
+            'FZAUX',   # item 5
             'OTHERW', 
             'TROOM', 
             'FFTEMP', 
-            'FZTEMP',
+            'FZTEMP', 
+            '_',        # blank line # item 10
             'FFQ', 
             'FZQOFF', 
             'FFSEN', 
             'FFLAT', 
-            'FROSTF',
+            'FROSTF',       # item 15
             'FZSEN', 
-            'FZLAT',
+            'FZLAT', 
             'FROSTZ', 
             'FFPENA', 
-            'FZPENA',
+            'FZPENA',       # item 20
             'FFHTQ', 
             'FZHTQ', 
-            'FFREFQ',
-            'FZREFQ',
-            'QMUL']
-
-        # lst_config4 same as 2
-
+            'FFREFQ', 
+            'FZREFQ', 
+            'QMUL',
+            '_'          # extra for line feed at end of line
+            ]        # item 25
+        
         lst_var_names = []
 
         # creates blank array to put the basic inputs
@@ -146,8 +126,11 @@ class CycleDataModelBuiler (DataModelBuiler):
 
         # according to the given configration in data file, saved in int_configration
         # set the realtive list of variable name in list
+        if self.int_configration == 1:
+            lst_var_names = lst_config1
 
-        lst_var_names = lst_config1
+        elif self.int_configration == 2:
+            lst_var_names = lst_config2
 
         # send data list of variable, and relative list of values to data object.
         # data object put values of data list on variable
@@ -163,6 +146,8 @@ class CycleDataModelBuiler (DataModelBuiler):
 
         # create vars title1 up to CONFIGRATION_ROW, with the given values in
         # list
+        
+        print(self.lst_data)
         self.obj_qdata.setup_vars(
             self.lst_data,
             lst_title,
