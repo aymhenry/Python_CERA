@@ -3,9 +3,10 @@
 
 # User Import ======================
 
-from .View import *
-from .CycleType import *
-from .CycleDataModelBuiler import CycleDataModelBuiler
+from cycle_classes.View import *
+from cycle_classes.CycleType import *
+from cycle_classes.CycData import *
+
 from cycle_classes.Trace import *
 
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
@@ -102,14 +103,14 @@ class Start:
         # main cycle data reading
         # ---------------------------------------
         # Set main data file name, datagroup 1
-        obj_datamodel = CycleDataModelBuiler(self.str_FILE_CYC_INPUT,
-                                             self.str_path_cyc_in)
+        obj_datamodel = CycData(self.str_FILE_CYC_INPUT,
+                                self.str_path_cyc_in)
         
         # check if error, if so exit application
         if obj_datamodel.isError():
             print("Error Opening file")
             print(obj_datamodel.err_description())  # print error description
-            sys.exit('3000')  # terminat application
+            sys.exit('Cyc-3000')  # terminat application
             # --------------
         # obj_datamodel.setSor(1)
         # read data list from file, and put values in variables
@@ -118,20 +119,20 @@ class Start:
         # Is data is good, or exit application
         if obj_datamodel.isError():
             print(obj_datamodel.err_description())  # print error description
-            sys.exit('3001')                            # terminate
+            sys.exit('Cyc-3001')                            # terminate
 
         # ---------------------------------------
         # Data from Cab app to cycle data reading
         # ---------------------------------------
         # Set main data file name, datagroup 1
-        obj_cab = CycleDataModelBuiler(self.str_FILE_CAB2CYC_IN,
+        obj_cab = CycData(self.str_FILE_CAB2CYC_IN,
                                        self.str_path_cyc_in)
         # obj_cab.setSor(2)
         # check if error, if so exit application
         if obj_cab.isError():
             print("Error Opening file")
             print(obj_cab.err_description())  # print error description
-            sys.exit('3000')  # terminat application
+            sys.exit('Cyc-3010')  # terminat application
             # --------------
 
         # read data list from file, and put values in variables

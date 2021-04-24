@@ -11,20 +11,24 @@ from common_classes.DataModelBuiler import DataModelBuiler
 # -----------------------------------------------------------
 
 
-class CycleDataModelBuiler (DataModelBuiler):
-    # required data for each configration
-    # start reading from line 5, counting from zero i.e 6 lines more
-    DataModelBuiler.CONFIGRATION_ROW = 5   # 6 sting lines found
-    DataModelBuiler.lst_required_data = \
-        [52 + DataModelBuiler.CONFIGRATION_ROW,
-         25 + DataModelBuiler.CONFIGRATION_ROW]
-   
-    # +1 set row number that has the configration
+class CycData (DataModelBuiler):
+    # -----------------------------------------------------------
+    # Job 			: Assign default values for class
+    # Input 		:
+    #
+    # Output		:
+    # -----------------------------------------------------------
 
-
-    # values from 1 to configration count
-    DataModelBuiler.CONFIGRATION_COUNT = 2   # max. number of configrations 
-      
+    def __init__(self, strFileName, strPath=""):
+        super().__init__(strFileName, strPath)
+        
+        DataModelBuiler.CONFIGRATION_COUNT = 2 			# max. number of configrations
+        DataModelBuiler.CONFIGRATION_ROW = 5 			# set row number that has the configration
+        
+        # required data for each configration
+        DataModelBuiler.lst_required_data = [52 + DataModelBuiler.CONFIGRATION_ROW,
+                                             25 + DataModelBuiler.CONFIGRATION_ROW]
+    
     # -----------------------------------------------------------
     # Job 			: Assign values from table to selected class vars
     # Input 		:
@@ -147,7 +151,6 @@ class CycleDataModelBuiler (DataModelBuiler):
         # create vars title1 up to CONFIGRATION_ROW, with the given values in
         # list
         
-        print(self.lst_data)
         self.obj_qdata.setup_vars(
             self.lst_data,
             lst_title,

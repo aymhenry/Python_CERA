@@ -5,9 +5,9 @@ import datetime
 
 # User Import ======================
 from cab_classes.QCtrl import *
+from cab_classes.CabData import CabData
+# from common_classes.QData import QData
 
-from common_classes.DataModelBuiler import DataModelBuiler
-from common_classes.QData import QData
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 # Job            : Start Cab app
 #
@@ -75,7 +75,7 @@ class Start:
                             
             except():   # ValueError as err_description:   # OSError
                 is_solution = False
-                # sys.exit('3100')    # terminat application
+                # sys.exit('CAB-3100')    # terminat application
 
         if is_solution:
             self.view()            # output results
@@ -122,7 +122,7 @@ class Start:
 
     def data_prepare(self):
         # Set main data file name
-        obj_datamodel = DataModelBuiler(self.str_file_cab_input,
+        obj_datamodel = CabData(self.str_file_cab_input,
                                         self.str_path_cab)
                                         
         # obj_datamodel.set_init_data(self.str_file_cab_input, self.str_path_cab)     # Input data file name
@@ -131,7 +131,7 @@ class Start:
         if obj_datamodel.isError():
             print("Error Opening file")
             print(obj_datamodel.err_description())    # print error description
-            sys.exit('3000')    # terminat application
+            sys.exit('CAB-3000')    # terminat application
             # -------------
 
         # read data list from file, and put values in variables
@@ -140,7 +140,7 @@ class Start:
         # Is data is good, or exit application
         if obj_datamodel.isError():
             print(obj_datamodel.err_description())    # print error description
-            sys.exit('3001')                            # terminate
+            sys.exit('CAB-3001')                            # terminate
 
         # Create related data object as the given configration
         self.obj_data = obj_datamodel.get_data_object()

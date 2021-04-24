@@ -86,13 +86,14 @@ class CabApp(Frame):
                           
         is_solution = obj_start.main(True)
         
-        mb.showinfo('Cab. App Done Succufully', ''
-            + "File create on current directory\n\n"
-            + "Input File: " + self.str_file_cab_in + "\n"
-            + "File create on current directory: " + self.str_file_cab_out + "\n\n"
-            + "Configration: " + str(obj_start.obj_data.IRFTYP) + "\n"
-            + "Mode        : " + str(obj_start.obj_data.NMOD)
-            )
+        if is_solution:
+            mb.showinfo('Cab. App Done Succufully', ''
+                + "File create on current directory\n\n"
+                + "Input File: " + self.str_file_cab_in + "\n"
+                + "File create on current directory: " + self.str_file_cab_out + "\n\n"
+                + "Configration: " + str(obj_start.obj_data.IRFTYP) + "\n"
+                + "Mode        : " + str(obj_start.obj_data.NMOD)
+                )
 
         obj_start.print_scr_rep(is_solution)
 
