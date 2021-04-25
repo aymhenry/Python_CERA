@@ -2,9 +2,9 @@
 #import math,sys
 
 # User Import
-from Block2 import BData
 
-class Data (BData):
+
+class Data ():
 	
 	#=======================================================
 	# Set Static Vars
