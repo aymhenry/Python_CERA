@@ -10,7 +10,7 @@
 
 ### **Project target**
 
-1. Convert an application, from old Fortran77 to Python.**
+1. Convert an application, from old Fortran77 to Python.
 2. Translate the source-code language of CERA from Fortran to Python. This should include testing and verification of the translation to ensure that source code operates effectively under the new version.
    Deliverable: A source code of CERA converted to python 
 3. Improve and change the source-code architecture to Object-Oriented Programing
@@ -33,16 +33,50 @@ Cycle Solver is a solver in Python for refrigerator cycle. it contains a group o
 
 - Some variables is not used
 
-- some calculated values is not used nor printed in reports.
+- Some calculated values is not used nor printed in reports.
 
    
 
 ### Basic design of Python
 
+​	The application is divided into two  main parts, namely Cab and Cycle application. Each has its own OOP structure, and inputs and outputs. Some class is used in both application (saved in App/common_classes)
 
+##### 	Cab application (save in App/cab_classes)
+
+​	Analyses of the cabinet loads. The steady-state heat inputs to the cabinet section are determined for various configuration refrigerator/freezers, alternative insulation system designs, and specified environment and usage conditions.
+
+![cab_oop.png](./charts/cab_oop.png)
+
+##### 	Cycle Application (save in App/cycle_classes)
+
+​	Determination of the steady-state, instantaneous, refrigeration cycle capacity and power draws. The hourly average cabinet loads and instantaneous refrigeration capacities determine the compressor duty cycle and the corresponding fan powers.
+
+![cycle_oop.png](./charts/cycle_oop.png)
 
 ### Input / Output entry values to Python
 
+​	Both application inputs is a CSV file, to make the thing more easy an Excel Sheet(s) was made to each application to enter the inputs, later user will save file as CSV for application to run. Output also is a CSV files that is created by application and could be browsed by simple text editor or by Excel.
+
+​	Folder (data) was created as the preferred  location for data inputs/output for both application, but user can select his/her preferred  folder name and file name. User has to follow the given structure for the inputs file as the sample in data folder, or application will raise an error.
+
+| Function     | File Name / Location    | Folder | Comment                                            |
+| ------------ | ----------------------- | ------ | -------------------------------------------------- |
+| Cab Input    | cab_dat.csv             | data   | cab_input_R13.xlsx, in folder (Input_interterface) |
+| Cab Output   | cab_out.csv             | data   |                                                    |
+|              | **cab4cyc_out.csv**     | data   | created as an input for Cycle                      |
+| Cycle Input  | cycle_dat.csv           | data   | cyc_input_R11.xlsx, in folder (Input_interterface) |
+|              | and **cab4cyc_out.csv** |        | came from Cab output.                              |
+| Cycle Output | cycle_out.csv           | data   |                                                    |
+
+#### Excel files for Input interface
+
+​	*For Cab*
+
+![Cab input file interface](https://github.com/aymhenry/Python_CERA-under-development/blob/master/input_interface/cab_input_R13.xlsx)
+
+​	*For Cycle*
+
+![Cycle input file interface](https://github.com/aymhenry/Python_CERA-under-development/blob/master/input_interface/cyc_input_R11.xlsx)
 
 
 ### Running Application
@@ -52,9 +86,6 @@ Cycle Solver is a solver in Python for refrigerator cycle. it contains a group o
 python app_start.py
 
 
-
-![cycle_oop.png](./charts/cycle_oop.png)
-![cab_oop.png](./charts/cab_oop.png)
 
 **Solver has the following class  :-**
 
