@@ -6,7 +6,22 @@
 
 ### **Introduction**
 
-​	This project man target is to translate an old Fortran77 application, to a new Python language. OOP technology need to be used in the final project output. Source code for Fortran77  is included in this application documents, folder **([Source code for Fortran77](https://github.com/aymhenry/Python_CERA-under-development/tree/master/Fortran77_Source))**. 
+​	This project man target is to translate an old Fortran77 application, to a new Python language. OOP technology need to be used in the final project output. Source code for Fortran77  is included in this application documents.
+
+### [Fortran Source]()
+
+​	Fortran source code
+
+| Folder                                                       | Files Count | Lines Count |
+| ------------------------------------------------------------ | ----------- | ----------- |
+| [Cab](https://github.com/aymhenry/Python_CERA-under-development/tree/master/Fortran77_Source/Cab) | 19          | 4,636       |
+| [Cycle](https://github.com/aymhenry/Python_CERA-under-development/tree/master/Fortran77_Source/Cycle) | 17          | 9,112       |
+| [Menu](https://github.com/aymhenry/Python_CERA-under-development/tree/master/Fortran77_Source/Menu) | 39          | 20,656      |
+| [cyc600a](https://github.com/aymhenry/Python_CERA-under-development/tree/master/Fortran77_Source/cyc600a) | 1           | 173         |
+| [User Manual](https://github.com/aymhenry/Python_CERA-under-development/blob/master/Fortran77_Source/UserManual.pdf) | 1           | 1           |
+| **Total**                                                    | 77          | 34,578      |
+
+
 
 ### **Project target**
 
@@ -37,7 +52,7 @@ Cycle Solver is a solver in Python for refrigerator cycle. it contains a group o
 
    
 
-### Basic design of Python
+## Application Basic design in Python (3.8)
 
 ​	The application is divided into two  main parts, namely Cab and Cycle application. Each has its own OOP structure, and inputs and outputs. Some class is used in both application (see [/common_classes](/common_classes))
 
@@ -59,7 +74,7 @@ Cycle Solver is a solver in Python for refrigerator cycle. it contains a group o
 |  ![cycle_oop.png](./charts/cycle_oop.png)|
 
 
-### Input / Output entry values to Python
+### Input / Output entry values to application
 
 ​	Both application inputs is a CSV file, to make the thing more easy an Excel Sheet(s) was made to each application to enter the inputs, later user will save file as CSV for application to run. Output also is a CSV files that is created by application and could be browsed by simple text editor or by Excel.
 
@@ -108,140 +123,62 @@ FILE_CYC_OUTPUT = "cycle_out.csv"  # output file for cycle module
 
 ​	*Run both by one script use* [app_start](https://github.com/aymhenry/Python_CERA-under-development/blob/master/App/app_start.py)
 
-​		
 
-**Solver has the following class  :-**
 
-1. Condenser class
-2. Evaporator class.
-3. Compressor class.
-4. CycleType class.
-5. Trace class.
-6. ErrorExpection class
-7. CoolPrp class
-8. CoolPrpUtil class
-9. Other helper classes:
-   1. FileAccess class
-   2. Qdata class
-   3. CycleModelBuilder class
+### Cab Application Classes
 
-## **Basic class functions**
+List of all application files with approximate 14,573 lines count .
 
-------
+| File Name                                                    | Class Description                                            | Lines Count (approximate) |
+| ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------- |
+| [CabData.py](https://github.com/aymhenry/Python_CERA-under-development/blob/master/App/cab_classes/CabData.py) | Reads data from input file, and save it in [QData](https://github.com/aymhenry/Python_CERA-under-development/blob/master/App/common_classes/QData.py) object (in common classes) | 417                       |
+| [CabUtils.py](https://github.com/aymhenry/Python_CERA-under-development/blob/master/App/cab_classes/CabUtils.py) | Utility to Cab calculation                                   | 131                       |
+| [DoorOpen.py](https://github.com/aymhenry/Python_CERA-under-development/blob/master/App/cab_classes/CabData.py) | Utility to Cab calculation for Qlxxx classes                 | 427                       |
+| [QCtrl.py](https://github.com/aymhenry/Python_CERA-under-development/blob/master/App/cab_classes/QCtrl.py) | Class to select the required class to use according to inputs flag | 736                       |
+| [Ql13.py](https://github.com/aymhenry/Python_CERA-under-development/blob/master/App/cab_classes/Ql13.py) | Cab calculation for types mode 1 & 3                         | 526                       |
+| [Ql2.py](https://github.com/aymhenry/Python_CERA-under-development/blob/master/App/cab_classes/Ql2.py) | Cab calculation for types mode 2                             | 745                       |
+| [Ql467.py](https://github.com/aymhenry/Python_CERA-under-development/blob/master/App/cab_classes/Ql467.py) | Cab calculation for types mode 1, 4, 6, 7                    | 493                       |
+| [Ql5.py](https://github.com/aymhenry/Python_CERA-under-development/blob/master/App/cab_classes/Ql5.py) | Cab calculation for types mode 5                             | 275                       |
+| [Ql8.py](https://github.com/aymhenry/Python_CERA-under-development/blob/master/App/cab_classes/Ql8.py) | Cab calculation for types mode 8                             | 501                       |
+| [Start.py](https://github.com/aymhenry/Python_CERA-under-development/blob/master/App/cab_classes/Start.py) | Start class for Cab application                              | 237                       |
+| [View.py](https://github.com/aymhenry/Python_CERA-under-development/blob/master/App/cab_classes/View.py) | Cab reporter                                                 | 1,218                     |
+| [Volume.py](https://github.com/aymhenry/Python_CERA-under-development/blob/master/App/cab_classes/Volume.py) | Cab calculation for Volume                                   | 292                       |
+| **Total**                                                    |                                                              | 5,998                     |
 
-### *Class: Condenser*
 
-#### 		Description 
-​		- later
 
-#### 	Class methods 
-​		- Later
+### Cycle Application Classes
 
-------
+| File Name | Class Description | Lines Count (approximate) |
+| --------- | ----------------- | --------- |
+|[CabData.py](https://github.com/aymhenry/Python_CERA-under-development/blob/master/App/cab_classes/CabData.py)    | Read input data for cycle, came from Cab application | 383 |
+|[CompMap.py](https://github.com/aymhenry/Python_CERA-under-development/blob/master/App/cab_classes/CompMap.py)     | Compressor Map utility | 420 |
+|[Compressor.py](https://github.com/aymhenry/Python_CERA-under-development/blob/master/App/cab_classes/Compressor.py)  | Compressor calculations | 468 |
+|[Condenser.py](https://github.com/aymhenry/Python_CERA-under-development/blob/master/App/cab_classes/Condenser.py)  | Condenser calculations | 1,077 |
+|[CoolPrp.py](https://github.com/aymhenry/Python_CERA-under-development/blob/master/App/cab_classes/CoolPrp.py)  | Call CoolProp utility | 238 |
+|[CoolPrpUtil.py](https://github.com/aymhenry/Python_CERA-under-development/blob/master/App/cab_classes/CoolPrpUtil.py)  | Utility function for CoolPrp class | 83 |
+|[CycData.py](https://github.com/aymhenry/Python_CERA-under-development/blob/master/App/cab_classes/CycData.py)  | Read input data for cycle | 383 |
+|[CycleSolver.py](https://github.com/aymhenry/Python_CERA-under-development/blob/master/App/cab_classes/CycleSolver.py)  | Main cycle solver | 1,290 |
+|[CycleType.py](https://github.com/aymhenry/Python_CERA-under-development/blob/master/App/cab_classes/CycleType.py)  | Cycle solver utility | 447 |
+|[CycleUtils.py](https://github.com/aymhenry/Python_CERA-under-development/blob/master/App/cab_classes/CycleUtils.py)  | Cycle solver utility | 893 |
+|[ErrorException.py](https://github.com/aymhenry/Python_CERA-under-development/blob/master/App/cab_classes/ErrorException.py)  | Error handler | 20 |
+|[Evaporator.py](https://github.com/aymhenry/Python_CERA-under-development/blob/master/App/cab_classes/Evaporator.py)  | Evaporator calculations | 834 |
+|[exf4Cond_Evap.py](https://github.com/aymhenry/Python_CERA-under-development/blob/master/App/cab_classes/exf4Cond_Evap.py)  | Utility for heat exchanger | 106 |
+|[ShowInput.py](https://github.com/aymhenry/Python_CERA-under-development/blob/master/App/cab_classes/ShowInput.py)  | Print information, input, PID and others | 264 |
+|[Start.py](https://github.com/aymhenry/Python_CERA-under-development/blob/master/App/cab_classes/Start.py)  | Start class for Cycle application | 176 |
+|[Trace.py](https://github.com/aymhenry/Python_CERA-under-development/blob/master/App/cab_classes/Trace.py)  | Used to select to print or not a group(s) of point, that print data in a selected places | 196 |
+|[View.py](https://github.com/aymhenry/Python_CERA-under-development/blob/master/App/cab_classes/View.py)  | Cycle reporter | 645 |
+|**Total** |  | 7,540 |
 
-### *Class: Evaporator*
 
-#### 		Description 
-​		- later
 
-#### 	Class methods 
-​		- Later
+### Common Classes
 
-------
-
-### *Class: Compressor*
-
-#### 		Description 
-​		- later
-
-#### 	Class methods 
-​		- Later
-
-------
-
-### *Class: CycleType*
-
-#### 		Description 
-​		- later
-
-#### 	Class methods 
-​		- Later
-
-------
-
-### *Class: Trace*
-
-#### 		Description 
-​		- later
-
-#### 	Class methods 
-​		- Later
-
-------
-
-### *Class: ErrorExpection*
-
-#### 		Description 
-​		- later
-
-#### 	Class methods 
-​		- Later
-
-------
-
-### *Class: CoolPrp*
-
-#### 		Description 
-​		- later
-
-#### 	Class methods 
-​		- Later
-
-------
-
-### *Class: CoolPrpUtil*
-
-#### 		Description 
-​		- later
-
-#### 	Class methods 
-​		- Later
-
-------
-
-### *Other helper classes:*
-
-#### 		Description 
-​		- later
-
-#### 	Class methods 
-​		- Later
-
-------
-
-## List of Cycle Solver Files
-
-| File Name             | Approximate lines count |
-| :-------------------- | :--------------------: |
-| CompMap.py            | 420                  |
-| Compressor.py         | 468                  |
-| Condenser.py          | 1077                  |
-| CoolPrp.py            | 238                  |
-| CoolPrpUtil.py        | 83                  |
-| CycleDataModelBuiler.py | 707                |
-| CycleSolver.py        | 1290                  |
-| CycleType.py          | 447                  |
-| CycleUtils.py         | 893                  |
-| ErrorException.py     | 20                  |
-| Evaporator.py         | 834                  |
-| exf4Cond_Evap.py      | 106                  |
-| ShowInput.py          | 264                  |
-| Start.py              | 176                  |
-| Trace.py              | 196                  |
-| View.py               | 645                  |
-| QData.py              | 268                  |
-| FileAccess.py         | 242                  |
-
-------
-
+| File Name                                                    | Class Description                                            | Lines Count (approximate) |
+| ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------- |
+| [DataModelBuiler.py](https://github.com/aymhenry/Python_CERA-under-development/blob/master/App/common_classes/DataModelBuiler.py) | Parent class from other class to read csv files and save data to python QDATA class | 325                       |
+| [FileAccess.py](https://github.com/aymhenry/Python_CERA-under-development/blob/master/App/common_classes/FileAccess.py) | Read & writes to csv files.                                  | 242                       |
+| [Unit.py](https://github.com/aymhenry/Python_CERA-under-development/blob/master/App/common_classes/Unit.py) | Control to convert between Britch and SI units.              | 194                       |
+| [QData.py](https://github.com/aymhenry/Python_CERA-under-development/blob/master/App/common_classes/QData.py) | Class to save data from csv file(s).                         | 274                       |
+| **Total**                                                    |                                                              | 1,035                     |
 
