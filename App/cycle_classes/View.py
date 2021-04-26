@@ -18,7 +18,7 @@ class View:
         self.ds = objCycleSlover     # soultion in objCycleSlover
 
         #    OPEN OUTPUT FILE
-        self.prn = FileAccess(self.str_file_cycle, "write")  # IO_Cycle Tag
+        self.prn = FileAccess(self.str_file_cycle, "write", self.str_path_cycle)
         # self.prn.write_or_terminate(" ")
 
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=

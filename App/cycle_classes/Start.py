@@ -141,7 +141,7 @@ class Start:
         # Is data is good, or exit application
         if obj_cab.isError():
             print(obj_cab.err_description())  # print error description
-            sys.exit('3005 cab to cycle file error')         # terminate
+            sys.exit('CYC-3005 cab to cycle file error')         # terminate
 
         # ----- dt data handling ----------------------------------------
         # Create related data object as the given configration

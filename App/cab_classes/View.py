@@ -677,27 +677,28 @@ class View(ABC):
         self.rep_heading()
         
         self.objCycout.write_or_terminate("1,,,CABINET LOADS DATA")
-        self.objCycout.write_or_terminate((" %2.0f, #, IRFTYP, Configration (1 to 5)" 
-                                           % self.obj_data.IRFTYP))
+        self.objCycout.write_or_terminate(
+            " %2.0f, #, IRFTYP, Configration (1 to 5)" % self.obj_data.IRFTYP)
                 
-        self.objCycout.write_or_terminate("%10.2f, watt, FFASHW,Fresh food antisweat heater"
-                                          % self.obj_data.FFASHW)
-        self.objCycout.write_or_terminate("%10.2f,watt, FFAUXW, Fresh food auxiliary power"
-                                          % self.obj_data.FFAUXW)
+        self.objCycout.write_or_terminate(
+            "%10.2f, watt, FFASHW,Fresh food antisweat heater" % self.obj_data.FFASHW)
+        self.objCycout.write_or_terminate(
+            "%10.2f,watt, FFAUXW, Fresh food auxiliary power" % self.obj_data.FFAUXW)
 
-        self.objCycout.write_or_terminate("%10.2f, watt, FZASHW, Freezer antisweat heater"
-                                           % self.obj_data.FZASHW)
-        self.objCycout.write_or_terminate("%10.2f, watt, FZAUXW, Freezer auxiliary power" 
-                                           % self.obj_data.FZAUXW)
-        self.objCycout.write_or_terminate("%10.2f, watt, OTHERW, Outside cabinet power" 
-                                           % self.obj_data.OTHERW)
+        self.objCycout.write_or_terminate(
+            "%10.2f, watt, FZASHW, Freezer antisweat heater" % self.obj_data.FZASHW)
+        self.objCycout.write_or_terminate(
+            "%10.2f, watt, FZAUXW, Freezer auxiliary power" % self.obj_data.FZAUXW)
+
+        self.objCycout.write_or_terminate(
+            "%10.2f, watt, OTHERW, Outside cabinet power" % self.obj_data.OTHERW)
             
-        self.objCycout.write_or_terminate("%10.2f, DEG C, TROOM, Room temperature " 
-                                           % (Unit.f_c(self.obj_data.TROOM)))
-        self.objCycout.write_or_terminate("%10.2f, DEG C, TFF, Fresh food temperature " 
-                                           % (Unit.f_c(self.obj_data.TFF)))
-        self.objCycout.write_or_terminate("%10.2f, DEG C, TFRZ, Freezer temperature" 
-                                           % (Unit.f_c(self.obj_data.TFRZ)))
+        self.objCycout.write_or_terminate(
+            "%10.2f, DEG C, TROOM, Room temperature " % (Unit.f_c(self.obj_data.TROOM)))
+        self.objCycout.write_or_terminate(
+            "%10.2f, DEG C, TFF, Fresh food temperature " % (Unit.f_c(self.obj_data.TFF)))
+        self.objCycout.write_or_terminate(
+            "%10.2f, DEG C, TFRZ, Freezer temperature" % (Unit.f_c(self.obj_data.TFRZ)))
     
     # ----------------------------------------------------------
     # Job            : show input data(cycle report), this section is displayed for mode 4
@@ -720,8 +721,8 @@ class View(ABC):
         self.rep_heading()
         
         self.objCycout.write_or_terminate("1,,,CABINET LOADS DATA")
-        self.objCycout.write_or_terminate((" %2.0f, #, IRFTYP, Configration (1 to 5)" 
-                % self.obj_data.IRFTYP))
+        self.objCycout.write_or_terminate(
+            " %2.0f, #, IRFTYP, Configration (1 to 5)" % self.obj_data.IRFTYP)
                 
         self.objCycout.write_or_terminate(
             "%10.2f, FFASHW, watt, Fresh food antisweat heater (same as Freezer antisweat power)" 
@@ -729,19 +730,21 @@ class View(ABC):
         self.objCycout.write_or_terminate(
             "%10.2f, FFASH, watt, Fresh food auxiliary power (same as Freezer Aux. power)" 
             % self.obj_data.FZAUXW)
-        self.objCycout.write_or_terminate("%10.2f, FZASH, watt, Freezer antisweat heater" 
-            % self.obj_data.FZASHW)
-        self.objCycout.write_or_terminate("%10.2f, FZAUX, watt, Freezer auxiliary power" 
-            % self.obj_data.FZAUXW)
-        self.objCycout.write_or_terminate("%10.2f, OTHERW, watt, Outside cabinet power" 
-            % self.obj_data.OTHERW)
 
-        self.objCycout.write_or_terminate("%10.2f, TROOM, DEG C, Room temperature " 
-            % (Unit.f_c(self.obj_data.TROOM)))
-        self.objCycout.write_or_terminate("%10.2f, FFTEMP, DEG C, Fresh food temperature " 
-            % (Unit.f_c(self.obj_data.TFF)))
-        self.objCycout.write_or_terminate("%10.2f, FZTEMP, DEG C, Freezer temperature" 
-            % (Unit.f_c(self.obj_data.TFRZ)))    
+        self.objCycout.write_or_terminate(
+            "%10.2f, FZASH, watt, Freezer antisweat heater" % self.obj_data.FZASHW)
+        self.objCycout.write_or_terminate(
+            "%10.2f, FZAUX, watt, Freezer auxiliary power" % self.obj_data.FZAUXW)
+
+        self.objCycout.write_or_terminate(
+            "%10.2f, OTHERW, watt, Outside cabinet power" % self.obj_data.OTHERW)
+
+        self.objCycout.write_or_terminate(
+            "%10.2f, TROOM, DEG C, Room temperature " % (Unit.f_c(self.obj_data.TROOM)))
+        self.objCycout.write_or_terminate(
+            "%10.2f, FFTEMP, DEG C, Fresh food temperature " % (Unit.f_c(self.obj_data.TFF)))
+        self.objCycout.write_or_terminate(
+            "%10.2f, FZTEMP, DEG C, Freezer temperature" % (Unit.f_c(self.obj_data.TFRZ)))
     
     # ----------------------------------------------------------
     # Job         : show output data(cycle report), this section is displayed for modes 2,3,8

@@ -196,7 +196,6 @@ class CycData (DataModelBuiler):
         self.obj_qdata.SUPIHX = [0.0] * (2 + 1)
         self.obj_qdata.ETHX = [0.0] * (2 + 1)
 
-
     # Control Variables definitions
     # =====================
     # INCTRL: 	0 = none,

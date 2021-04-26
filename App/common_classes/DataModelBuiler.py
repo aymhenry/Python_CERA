@@ -73,13 +73,13 @@ class DataModelBuiler (FileAccess):
         # in sub class call self.assign_vars()
         return True
 
-    
     # -----------------------------------------------------------
     # Job 			: descript the error occured if any
     # Input 		:
     #
     # Output		: text of error number and error description
     # -----------------------------------------------------------
+
     def err_description(self):
         # check if error descript is found or send blank text
         def show_extar_err_desc():
