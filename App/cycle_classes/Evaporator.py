@@ -185,9 +185,9 @@ class EvapCool_FFNat(EvapCool_Abstract):  # IFRSH== 0
                             MREF=MREF
                             )
 
-        dicRes = {'QFRSH': lstRes[0],  # Q
+        dicRes = {'QFRSH': lstRes[0],   # watt
                   'FSUPE': lstRes[1],   # Fraction subcooling
-                  'UAFF': lstRes[2]
+                  'UAFF': lstRes[2]     # watt/K
                   }
         return dicRes
 
@@ -481,13 +481,6 @@ class EvapCool_FFCross (EvapCool_Abstract):  # IFRSH== 1
             # determine cmin and cmax in the two-phase region
             CAIR = (ALEFT / self.ATOTE) * self.CFME      # watt/K
 
-            # if(CAIR  <=  CR):
-            # CMINDS = CAIR
-            # CMAXDS = CR
-            # else:
-            # CMINDS = CR
-            # CMAXDS = CAIR
-
             CMINDS = min(CR, CAIR)
             CMAXDS = max(CR, CAIR)
 
@@ -605,8 +598,6 @@ class EvapCool_FFCount (EvapCool_Abstract):  # IFRSH== 2
                 HDEW = H5 + DELH    # pa
 
                 if HAVE_NOT_USED_FULL_AREA:
-                    # [TDEW, XQ, XL, XV, VL, VV, HL,
-                    #  HV] = self.hpin(HDEW, PDEW, X)
                     TDEW = self.objCP.Property('T', H=HDEW, P=PDEW)  # K
 
                     CPRTP = (HDEW - H5) / abs(TDEW - T5 + 0.0001)  # j/kg K
@@ -620,7 +611,7 @@ class EvapCool_FFCount (EvapCool_Abstract):  # IFRSH== 2
 
                     QDUM = MREF_kg_s * (HDEW - H5)   # watt
                     TAIR_END = TAIR + QDUM / CAIR    # K
-                    # # watt/K * K
+                    # watt/K * K
                     QMAX = CMINTP * (TAIR_END - T5)     # watt
 
                     EFF_TPC = QDUM / QMAX   # unitless

@@ -9,7 +9,7 @@ class exf4Cond_Evap:
     @staticmethod
     def getHNAT(detal_T_K, A_NAT):
         detal_T_F = detal_T_K * 1.8     # defrance to F
-        
+        # old equation is
         # HNAT = 0.19 * DELTA ** 0.33 * 20.44   # W/m2 K
         # A_NAT = 0.239 + 3.34E-04 * (273.0 - TBAR)
         
@@ -18,6 +18,7 @@ class exf4Cond_Evap:
 
     @staticmethod
     def getHRAD(TAVE_K, TS_K, EPS):
+        # old value & equation
         # SIGMA = 2.0432E-7
         SIGMA = 5.670374419E-8   # W/m2 K4   # by Dr Omar
         # EPS = 0.8
@@ -30,8 +31,8 @@ class exf4Cond_Evap:
     @staticmethod
     def exf(LOC, AREA, U, CMIN, CMAX):
         # calculate counter flow efficiency parameters                
-        # LOC is LOC == 1:   Counter-flow
-        #                    Cross-flow
+        # if is LOC == 1:   Counter-flow
+        #                   Cross-flow
         # AREA m2
         # U  W/m2 K
         # CMIN, CMAX watt/K

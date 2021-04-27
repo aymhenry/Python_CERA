@@ -158,11 +158,7 @@ class View:
 
             input("Press Enter to continue...")
 
-        #
-        #    OUTPUT RESULTS.  BEGIN BY CONVERTING TO ENGLISH UNITS.
-        #
-
-        # TENV = (self.dt.TROOM + 459.6) / 1.8
+        #    OUTPUT RESULTS.
         TENV = self.cab.TROOM
 
         if self.ds.T[16] < TENV:
@@ -187,12 +183,6 @@ class View:
             M += 1
             J = self.ds.LPNT[M]
 
-            # self.ds.TS[J] = self.ds.TS[J] - 273.11
-            # self.ds.T[J] = self.ds.T[J] - 273.11
-            # self.ds.V[J] = self.ds.V[J] #/ 10.0
-            # if (self.ds.XQ[J] > 1.0): self.ds.XQ[J] = 1.0
-            # if (self.ds.XQ[J] < 0.0): self.ds.XQ[J] = 0.0
-
             if 9 <= M <= 11:
                 continue
             K += 1
@@ -208,14 +198,7 @@ class View:
                        self.ds.H[J] / 1000,
                        self.ds.V[J],
                        self.ds.S[J] / 1000
-                       # self.ds.XL[1][J],
-                       # self.ds.XV[1][J],
-                       # self.ds.XQ[J]
                        ))
-
-                # print ("%d,%d, %s , %9.2f, %9.2f, %9.2f, %9.2f, %9.2f, %9.2f, %s, %s, %s"    \
-                #    % (K,J, self.ds.MSTATE[K], self.ds.TS[J],self.ds.T[J],self.ds.P[J],self.ds.H[J],self.ds.V[J],
-                #    self.ds.S[J],self.ds.XL[1][J],self.ds.XV[1][J],self.ds.XQ[J]))
 
                 self.print_width([K, J,
                                   self.ds.MSTATE[K],
@@ -225,9 +208,6 @@ class View:
                                   self.ds.H[J] / 1000,
                                   self.ds.V[J],
                                   self.ds.S[J] / 1000
-                                  # self.ds.XL[1][J],
-                                  # self.ds.XV[1][J],
-                                  # self.ds.XQ[J]
                                   ])
             else:
 
@@ -243,10 +223,6 @@ class View:
                         )
                                             )
 
-                # print ("%d,%d, %s , N/A, %9.2f, %9.2f, %9.2f, %9.2f, %9.2f, %s, %s, %s"    \
-                # % (K,J, self.ds.MSTATE[K], self.ds.T[J],self.ds.P[J],self.ds.H[J],self.ds.V[J],
-                # self.ds.S[J],self.ds.XL[1][J],self.ds.XV[1][J],self.ds.XQ[J]))
-
                 self.print_width([K,
                                   J,
                                   self.ds.MSTATE[K],
@@ -256,21 +232,10 @@ class View:
                                   self.ds.H[J] / 1000,
                                   self.ds.V[J],
                                   self.ds.S[J] / 1000
-                                  # self.ds.XL[1][J],
-                                  # self.ds.XV[1][J],
-                                  # self.ds.XQ[J]]
                                   ])
 
         # ================================
         #    NORMALIZE BY THE MASS FLOW
-
-        # FLOW = self.ds.FLOW * self.ds.MREF / self.ds.MREFSV
-
-        # self.dt.DISP = self.dt.DISP     #/ 1.6387E-05
-        # self.ds.W = 0.4302 * self.ds.W * self.ds.FLOW * 1.0548
-        # self.dt.QZ = 0.4302 * self.dt.QZ * self.ds.FLOW * 1.0548
-        # self.dt.QE = 0.4302 * self.dt.QE * self.ds.FLOW * 1.0548
-        # self.ds.QC = 0.4302 * self.ds.QC * self.ds.FLOW * 1.0548
 
         self.ds.W = self.ds.W * self.ds.MREF / 3600     # j/kg . kg/hr/3600 =watt
         self.ds.QZ = self.ds.QZ * self.ds.MREF / 3600   # watt
@@ -280,8 +245,6 @@ class View:
         self.ds.COPR = (self.ds.QE + self.ds.QZ)/self.ds.W
         #
         #    REST OF THE CONVERSIONS
-        # done on printing time
-
         # --------------------------------------------------------
         #    OUTPUT SUMMARY TABLE OF RESULTS
         
@@ -353,21 +316,14 @@ class View:
         print("\t\tLeaving cycle with IE:" + str(self.ds.IE))
 
     def show_overall(self):
-        # HOUT = HOUT/WMAVG
-        # VSUC = VSUC/WMAVG
-
         W = self.ds.W
         QE = self.ds.QE
         QC = self.ds.QC
         QZ = self.ds.QZ
-        # COPR = (QE + QZ)/W
 
         TH = self.ds.TS1
         TL1 = self.ds.TS3
         TL2 = self.ds.TS5
-        
-        # DENOM = TH * (QE * (1 / TL1 - 1 / TH) + QZ * (1 / TL2 - 1 / TH))
-        # COPI = (QE + QZ) / DENOM
 
         PR = self.ds.P[2]/self.ds.P[1]
         TSUPC = self.ds.T[2] - self.ds.T[3]

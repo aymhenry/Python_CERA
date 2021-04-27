@@ -29,7 +29,7 @@ class CycleUtils(exf4Cond_Evap):
                 HGUESS = HBUB * 1.01
             if HGUESS > HDEW:
                 HGUESS = HDEW * 0.99
-
+            
             # [T, XCALC, XL, XV, VL, V, HL, HV] = self.hpin(HGUESS, P, X)
             # not used T = objCP.Property('T', P=P, H=HGUESS)  # K
             # Python only
@@ -51,7 +51,7 @@ class CycleUtils(exf4Cond_Evap):
 
         H = HGUESS
 
-        return H
+        return H    # j/kg
     # =.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.==.=.=.=.=.=.=.=.=.=.=.=.=.=.=.
 
     @staticmethod
@@ -59,7 +59,7 @@ class CycleUtils(exf4Cond_Evap):
         # adjust the cabinet loads and set point temperatures
         # dt input data object.
         # ds CycleSolver object
-        
+        # cab input data from Cab application results
         # IC conderser trail number
 
         # TS3 - K - HTF temperature entering fresh food evaporator
@@ -87,7 +87,8 @@ class CycleUtils(exf4Cond_Evap):
 
             # if ICYCL != 2:
             #    IRET = 1
-
+            
+            # keep those equation, as it was set in Fortarn
             # FFTEMP_S = dt.FFTEMP
             # FZTEMP_S = dt.FZTEMP
 
@@ -117,6 +118,7 @@ class CycleUtils(exf4Cond_Evap):
             ds.ATOTE_A = ATOTE
             ds.AREAFZ_A = AREAFZ
 
+             # keep those equation, as it was set in Fortarn
             # UFF = (cab.FFQ - cab.FFLAT - cab.FFPENA - dt.FFHTQ -
             #       FROSTF + cab.QMUL) / (dt.TROOM - dt.FFTEMP)
 
@@ -150,7 +152,6 @@ class CycleUtils(exf4Cond_Evap):
             pass
 
         else:
-            # CASE DEFAULT
             if IRET == 1:
                 return [TS3, TS5, ATOTE, AREAFZ]
 
@@ -175,12 +176,9 @@ class CycleUtils(exf4Cond_Evap):
                 dt.IBLNCE = 1
 
             if dt.INCTRL == 0:
-                # SELECT CASE (dt.INCTRL)
-                # CASE (0)#No control
                 return [TS3, TS5, ATOTE, AREAFZ]
 
-            elif dt.INCTRL == 1:
-                # CASE [1]#Evap area ratio
+            elif dt.INCTRL == 1:    # Evap area ratio
                 # FFNEW = FFLOAD + DELLOD
                 # FZNEW = FZLOAD - DELLOD
 
@@ -213,15 +211,14 @@ class CycleUtils(exf4Cond_Evap):
                     ATOTE = ATOTE - DAREAZ
 
                 dt.UAF = dt.UAF_S * AREAFZ / AREAFZ_S   # dt.AREAFZ_S
-                dt.ATOTE_A = ATOTE    # chk
-                dt.AREAFZ_A = AREAFZ   # chk
+                dt.ATOTE_A = ATOTE    # m2
+                dt.AREAFZ_A = AREAFZ   # m2
 
                 dt.UA_FZ = dt.UA_FZ_S * AREAFZ / AREAFZ_S   # dt.AREAFZ_S
                 dt.UA_ML = dt.UA_ML_S * AREAFZ / AREAFZ_S   # dt.AREAFZ_S
                 dt.UA_FF = dt.UA_FF_S * ATOTE / ATOTE_S   # dt.ATOTE_S
 
-            elif dt.INCTRL == 2:
-                # CASE (2)#FF Cabinet temp
+            elif dt.INCTRL == 2:    # FF Cabinet temp
                 DUTYN = 0.5 * (dt.DUTYE + dt.DUTYZ)
                 cab.FFQ = DUTYN * dt.CAPE + DUTYN * dt.Q_FZ_FF + dt.FROSTF_S
                 DELTS3 = (cab.FFQ - dt.FFQ_S) / dt.UFF
@@ -236,8 +233,7 @@ class CycleUtils(exf4Cond_Evap):
                 cab.FFSEN = dt.UFF_SEN * (cab.TROOM - dt.FFTEMP_A)
                 dt.CONDF = dt.UCND_F * (cab.TROOM - dt.FFTEMP_A) - cab.QMUL
 
-            elif dt.INCTRL == 3:
-                # CASE (3)#Freezer temp
+            elif dt.INCTRL == 3:    # Freezer temp
                 DUTYN = 0.25 * dt.DUTYE + 0.75 * dt.DUTYZ
                 FZQ = DUTYN * dt.CAPZ
 
@@ -329,7 +325,7 @@ class CycleUtils(exf4Cond_Evap):
 
             H[10] = objCP.Property('H', T=T[10], V=VL10)  # j/kg
 
-            # I think it is T[10]
+            # use T[10]
             T[10] = objCP.Property('T', P=P[10], H=H[10])  # K
 
             H[8] = H[10]
@@ -406,8 +402,6 @@ class CycleUtils(exf4Cond_Evap):
                     if dt.IWALL_FZ == 1:
                         UAIR = 1.0 / (1.0 / UAIR + 0.1389 / 20.44)    # kW/m2 K
 
-                    # UAIR *= 1000  # W/m2 K
-
                     # UAF[m2] * UAIR[watt/m2 K] * DELTAT[K]
                     QFREZ = dt.UAF * UAIR * DELTAT      # as Q_HXS_FZ watt
 
@@ -461,8 +455,7 @@ class CycleUtils(exf4Cond_Evap):
             if IFREZ2 == 0:
                 break  # GO TO 20
 
-            #          GET NEW GUESS FOR TEMPERATURE AT POINT 10
-
+            # GET NEW GUESS FOR TEMPERATURE AT POINT 10
             TOLD = T[10]
             if ICYCL != 2 or ICNTRL != 2:
                 TNEW = T[6] - ETHX * (T[6] - T[9])     # K
@@ -552,17 +545,6 @@ class CycleUtils(exf4Cond_Evap):
               [0.0, 2.359642, -3.3765, 3.04862, -1.63421, 0.468741, -0.05492],
               ]
 
-        #  DATA (A(I,1),I=1,4)/2.394292,2.410798,2.399687,2.359642/
-        #  DATA (A(I,2),I=1,4)/-1.19402,-2.23391,-2.96882,-3.37650/
-        #  DATA (A(I,3),I=1,4)/-1.45067,0.825900,2.367080,3.04862/
-
-        #  DATA (A(I,4),I=1,4)/1.938453,0.051006,-1.23009,-1.63421/
-        #  DATA (A(I,5),I=1,4)/-0.81305,-0.11891,0.373338,0.468741/
-        #  DATA (A(I,6),I=1,4)/0.118651,0.023360,-0.04886,-0.05492/
-        #
-        #          FIND POSITION IN ARRAY BASED ON THE CAPACITY RATIO
-        #          OF THE TWO STREAMS
-
         I_fact = 0
 
         if 0.00 <= CRAT <= 0.25:
@@ -584,7 +566,7 @@ class CycleUtils(exf4Cond_Evap):
         EFFA = 0.0
         EFFB = 0.0
 
-        for J in range(1, 6 + 1):  # DO WHILE (J  <=  6)
+        for J in range(1, 6 + 1):
             EX = 1.0 * J
             if I_fact == 1:
                 EFFA = 1.0 - math.exp(-NTU)
@@ -608,8 +590,6 @@ class CycleUtils(exf4Cond_Evap):
         # other for a counterflow heat exchanger.
         # equal mass flow rates of the same fluid
 
-        # LCONV = False
-
         # KNOWN: INLET STATE OF STREAM A
         #        OUTLET STATE OF STREAM B
 
@@ -623,7 +603,6 @@ class CycleUtils(exf4Cond_Evap):
         TBI = QACT = 0
 
         while ITER <= 100 and HTOL > 0.001:
-            # [TBI, XQBI, XL, XV, VL, VV, HL, HV] = self.hpin(HBI, PB, X)
             TBI = objCP.Property('T', H=HBI, P=PB)  # K
 
             # DETERMINE EXIT STATE OF STREAM A if AT TBI
@@ -644,7 +623,6 @@ class CycleUtils(exf4Cond_Evap):
             # the given point came to wet area.
             # check if in wet area, return sat. liquid or sat. vap.
 
-            # HBOSTR = self.objCP.Property('H', X=0, T=TAI)  # j/kg
             HBOSTR = coolutil.getProp(P=PA,
                                       T=TAI, X=0)  # j/kg
 
@@ -779,17 +757,21 @@ class CycleUtils(exf4Cond_Evap):
 
     @staticmethod
     def mixair(CAP, QFF, QFZ, TFF, TFZ, CFME):
-        #     *     CALCULATE INLET TEMPERATURE TO THE EVAPORATOR
-        #          SET UP THE QUADRATIC EQUATION COEFFICIENTS
-        #
-
-        A = 1.08 * CFME * (TFF - TFZ) / CAP
-        B = - (A + 1.0)
-        C = QFF / (QFF + QFZ)
+        #  CALCULATE INLET TEMPERATURE TO THE EVAPORATOR
+        #   SET UP THE QUADRATIC EQUATION COEFFICIENTS
+        
+        # CAP watt
+        # CFME watt/K
+        # TFF, TFZ   K
+        # QFF, QFZ
+        
+        A = 1.08 * CFME * (TFF - TFZ) / CAP     # unitless
+        B = - (A + 1.0)                         # unitless
+        C = QFF / (QFF + QFZ)                   # unitless
 
         # Solve the quadratic equation
         X = - B / (2.0 * A) - math.sqrt(B**2 - 4.0 * A * C) / (2.0 * A)
-        TIN = X * TFF + (1.0 - X) * TFZ
+        TIN = X * TFF + (1.0 - X) * TFZ     # K
 
         # Ayman not used anywhere Data.obj_cdata.FF_AIR = X
 
