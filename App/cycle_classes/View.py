@@ -264,7 +264,7 @@ class View:
         # ================================
         #    NORMALIZE BY THE MASS FLOW
 
-        FLOW = self.ds.FLOW * self.ds.MREF / self.ds.MREFSV
+        # FLOW = self.ds.FLOW * self.ds.MREF / self.ds.MREFSV
 
         # self.dt.DISP = self.dt.DISP     #/ 1.6387E-05
         # self.ds.W = 0.4302 * self.ds.W * self.ds.FLOW * 1.0548
@@ -272,10 +272,10 @@ class View:
         # self.dt.QE = 0.4302 * self.dt.QE * self.ds.FLOW * 1.0548
         # self.ds.QC = 0.4302 * self.ds.QC * self.ds.FLOW * 1.0548
 
-        self.ds.W = self.ds.W * FLOW
-        self.ds.QZ = self.ds.QZ * FLOW
-        self.ds.QE = self.ds.QE * FLOW
-        self.ds.QC = self.ds.QC * FLOW
+        self.ds.W = self.ds.W * self.ds.MREF / 3600     # j/kg . kg/hr/3600 =watt
+        self.ds.QZ = self.ds.QZ * self.ds.MREF / 3600   # watt
+        self.ds.QE = self.ds.QE * self.ds.MREF / 3600   # watt
+        self.ds.QC = self.ds.QC * self.ds.MREF / 3600   # watt
         
         self.ds.COPR = (self.ds.QE + self.ds.QZ)/self.ds.W
         #
